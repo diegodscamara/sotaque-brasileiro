@@ -1,6 +1,5 @@
 "use client";
 
-import { Calendar, Clock } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import Avatar from "@/components/Avatar";
@@ -98,7 +97,7 @@ const Summary = () => {
           </div>
         </dl>
         <div className="py-5 mt-3 border-t border-gray-900/5">
-          <Link href="#" className="font-semibold text-gray-900 text-sm/6">
+          <Link href="/profile" className="font-semibold text-gray-900 text-sm/6">
             View profile <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>

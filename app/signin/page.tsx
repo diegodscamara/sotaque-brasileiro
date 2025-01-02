@@ -3,11 +3,9 @@
 import React, { useState } from "react";
 
 import ButtonSupport from "@/components/ButtonSupport";
-import Image from "next/image";
 import Link from "next/link";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
-import logo from "@/app/icon.png";
 import { toast } from "react-hot-toast";
 
 const supabase = createClient();
@@ -44,27 +42,27 @@ export default function Login() {
 
   return (
     <main
-      className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8"
+      className="flex flex-col justify-center flex-1 min-h-full py-12 sm:px-6 lg:px-8"
       data-theme={config.colors.theme}
     >
       <div>
-        <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-base-content">
+        <h2 className="mt-6 text-2xl font-bold tracking-tight text-center text-base-content">
           Sign in to {config.appName}
         </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-base-100 px-6 py-12 shadow sm:rounded-lg sm:px-12">
+        <div className="px-6 py-12 shadow bg-base-100 sm:rounded-lg sm:px-12">
           <form
             className="space-y-6"
             onSubmit={(e) => handleSignup(e, { type: "magic_link" })}
           >
-            <label className="input input-bordered flex items-center gap-2">
+            <label className="flex items-center gap-2 input input-bordered">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
                 fill="currentColor"
-                className="h-4 w-4 opacity-70"
+                className="w-4 h-4 opacity-70"
               >
                 <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
                 <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
@@ -84,7 +82,7 @@ export default function Login() {
             <div>
               <button
                 type="submit"
-                className="btn btn-accent w-full"
+                className="w-full btn btn-accent"
                 disabled={isLoading}
               >
                 {isLoading && (
@@ -104,7 +102,7 @@ export default function Login() {
                 <div className="w-full border-t border-base-300" />
               </div>
               <div className="relative flex justify-center text-sm font-medium">
-                <span className="bg-base-100 px-6 text-base-content">
+                <span className="px-6 bg-base-100 text-base-content">
                   or
                 </span>
               </div>
@@ -113,9 +111,9 @@ export default function Login() {
             <div className="mt-6">
               <button
                 onClick={(e) => handleSignup(e, { type: "oauth" })}
-                className="btn btn-outline w-full"
+                className="w-full btn btn-outline"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="w-5 h-5">
                   <path
                     d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
                     fill="#EA4335"
@@ -154,7 +152,7 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 justify-center mt-8">
+        <div className="flex flex-wrap justify-center gap-4 mt-8">
           <Link href="/" className="btn btn-sm">
             <svg
               xmlns="http://www.w3.org/2000/svg"
