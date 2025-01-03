@@ -115,7 +115,7 @@ export default function Package() {
   }
 
   return (
-    <div className="flex flex-col justify-between gap-4 bg-white p-6 border rounded-lg h-full">
+    <div className="flex flex-col justify-between gap-4 bg-white shadow-sm p-6 border rounded-lg h-full divide">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="font-semibold text-lg">
