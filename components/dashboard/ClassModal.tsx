@@ -255,17 +255,6 @@ export const ClassModal = ({
 
         if (classError) throw classError;
 
-        // Deduct credits - one credit per class
-        const { error: creditError } = await supabase
-          .from("profiles")
-          .update({ 
-            credits: availableCredits - creditsCost,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", user.id);
-
-        if (creditError) throw creditError;
-
         toast.success(`${classDates.length} class${classDates.length > 1 ? 'es' : ''} scheduled successfully`);
       }
 
@@ -320,27 +309,7 @@ export const ClassModal = ({
         if (error) throw error;
       }
 
-      // Refund credits
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("credits")
-          .eq("id", user.id)
-          .single();
-
-        await supabase
-          .from("profiles")
-          .update({ 
-            credits: (profile?.credits || 0) + selectedClass.credits_cost,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", user.id);
-      }
-
+      // The trigger function will handle credit refunds automatically
       toast.success(cancelType === 'single' 
         ? "Class cancelled successfully" 
         : "All future recurring classes cancelled successfully"
@@ -679,14 +648,14 @@ export const ClassModal = ({
       {/* Cancel Dialog */}
       {showCancelDialog && (
         <div className="z-[60] fixed inset-0 flex justify-center items-center bg-black/50">
-          <div className="bg-base-100 p-6 rounded-lg w-full max-w-sm">
+          <div className="bg-base-100 p-6 rounded-lg w-full max-w-md">
             <h3 className="mb-4 font-medium text-lg">Cancel Recurring Class</h3>
             <p className="mb-6 text-base-content/70">
               Would you like to cancel this class only, or all future classes in the series?
             </p>
             <div className="flex justify-end gap-2">
               <button
-                className="btn btn-ghost"
+                className="btn btn-outline"
                 onClick={() => setShowCancelDialog(false)}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
