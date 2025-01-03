@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import LessonCard from "@/components/dashboard/LessonCard";
-import { MonthCalendar } from "@/components/dashboard/MonthCalendar";
+import { MonthCalendar } from "@/components/dashboard/calendar/MonthlyView";
 import Package from "@/components/dashboard/Package";
 import Stats from "@/components/dashboard/Stats";
 import Summary from "@/components/dashboard/Summary";
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
   return (
-    <main className="container flex flex-col gap-6 p-8 mx-auto">
+    <main className="flex flex-col gap-6 mx-auto p-8 container">
       {/* Breadcrumb */}
       <Breadcrumb />
 
@@ -21,7 +21,7 @@ export default async function Dashboard() {
         </div>
 
         {/* Left: Summary and Package */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="gap-6 grid grid-cols-1 xl:grid-cols-2">
           <div className="xl:col-span-1">
             <Summary />
           </div>
@@ -31,7 +31,7 @@ export default async function Dashboard() {
         </div>
 
         {/* Right: Packages and LessonCard */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="gap-6 grid grid-cols-1 xl:grid-cols-2">
           <div className="xl:col-span-1">
             <LessonCard />
           </div>

@@ -5,7 +5,7 @@ import { addMonths, differenceInHours, format, isAfter, isSameDay, subMonths } f
 import { useEffect, useState } from "react";
 
 import type { Class } from "@/types/class";
-import { ClassModal } from "./ClassModal";
+import { ClassModal } from "../ClassModal";
 import React from "react";
 import { createClient } from "@/libs/supabase/client";
 import { toast } from "react-hot-toast";
@@ -229,11 +229,11 @@ export const MonthCalendar = () => {
             ${isAfter(new Date(cls.start_time), new Date()) ? 'cursor-move' : ''}
           `}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+          <span className="flex-shrink-0 bg-primary rounded-full w-1.5 h-1.5" />
           <span className="font-medium">
             {format(new Date(cls.start_time), "HH:mm")}
           </span>
-          <span className="truncate flex-1">
+          <span className="flex-1 truncate">
             {cls.title}
           </span>
         </div>
@@ -241,7 +241,7 @@ export const MonthCalendar = () => {
         {/* Tooltip */}
         {showTooltip && cls.status !== 'cancelled' && (
           <div 
-            className="absolute z-50 left-0 top-full mt-1 w-64 p-2 bg-base-100 rounded-lg shadow-lg border border-base-300"
+            className="top-full left-0 z-50 absolute bg-base-100 shadow-lg mt-1 p-2 border border-base-300 rounded-lg w-64"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
@@ -261,7 +261,7 @@ export const MonthCalendar = () => {
                         e.stopPropagation();
                         handleRescheduleClass(cls);
                       }}
-                      className="btn btn-xs btn-outline w-full justify-start"
+                      className="justify-start w-full btn btn-outline btn-xs"
                     >
                       Reschedule (Free)
                     </button>
@@ -270,7 +270,7 @@ export const MonthCalendar = () => {
                         e.stopPropagation();
                         handleCancelClass(cls);
                       }}
-                      className="btn btn-xs btn-outline btn-error w-full justify-start"
+                      className="justify-start w-full btn btn-error btn-outline btn-xs"
                     >
                       Cancel (Refund Credit)
                     </button>
@@ -282,7 +282,7 @@ export const MonthCalendar = () => {
                         e.stopPropagation();
                         handleRescheduleClass(cls);
                       }}
-                      className="btn btn-xs btn-outline w-full justify-start"
+                      className="justify-start w-full btn btn-outline btn-xs"
                     >
                       Reschedule (Uses 1 Credit)
                     </button>
@@ -291,7 +291,7 @@ export const MonthCalendar = () => {
                         e.stopPropagation();
                         handleCancelClass(cls);
                       }}
-                      className="btn btn-xs btn-outline btn-error w-full justify-start"
+                      className="justify-start w-full btn btn-error btn-outline btn-xs"
                     >
                       Cancel (No Refund)
                     </button>
@@ -344,29 +344,29 @@ export const MonthCalendar = () => {
   };
 
   return (
-    <div className="bg-base-100 rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-base-100 shadow-sm rounded-lg overflow-hidden">
       {/* Calendar Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b border-base-200">
-        <h2 className="text-xl font-semibold mb-4 sm:mb-0">
+      <div className="flex sm:flex-row flex-col justify-between items-center p-4 border-b border-base-200">
+        <h2 className="mb-4 sm:mb-0 font-semibold text-xl">
           {format(currentDate, "MMMM yyyy")}
         </h2>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center rounded-lg bg-base-200">
+          <div className="flex items-center bg-base-200 rounded-lg">
             <button
               onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-              className="p-2 hover:bg-base-300 rounded-l-lg"
+              className="hover:bg-base-300 p-2 rounded-l-lg"
             >
               <CaretLeft className="w-4 h-4" />
             </button>
             <button 
               onClick={() => setCurrentDate(new Date())} 
-              className="px-3 py-1 hover:bg-base-300 text-sm font-medium"
+              className="hover:bg-base-300 px-3 py-1 font-medium text-sm"
             >
               Today
             </button>
             <button
               onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-              className="p-2 hover:bg-base-300 rounded-r-lg"
+              className="hover:bg-base-300 p-2 rounded-r-lg"
             >
               <CaretRight className="w-4 h-4" />
             </button>
@@ -385,7 +385,7 @@ export const MonthCalendar = () => {
         <div className="grid grid-cols-7 text-sm">
           {/* Day headers */}
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-            <div key={day} className="p-2 text-center font-medium text-base-content/70">
+            <div key={day} className="p-2 font-medium text-base-content/70 text-center">
               {day}
             </div>
           ))}
@@ -419,7 +419,7 @@ export const MonthCalendar = () => {
                 onDragOver={(e) => handleDragOver(e, date)}
                 onDrop={(e) => handleDrop(e, date)}
               >
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex justify-between items-center mb-1">
                   <span 
                     className={`
                       text-sm font-medium
@@ -449,7 +449,7 @@ export const MonthCalendar = () => {
       {/* Reschedule Confirmation Modal */}
       {showRescheduleConfirm && draggedClass && targetDate && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          className="z-50 fixed inset-0 flex justify-center items-center bg-black/50"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowRescheduleConfirm(false);
@@ -458,8 +458,8 @@ export const MonthCalendar = () => {
             }
           }}
         >
-          <div className="w-full max-w-md bg-base-100 rounded-lg p-6 max-h-[80vh] overflow-y-auto m-4">
-            <h3 className="text-lg font-semibold mb-4">Confirm Reschedule</h3>
+          <div className="bg-base-100 m-4 p-6 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <h3 className="mb-4 font-semibold text-lg">Confirm Reschedule</h3>
             <p className="mb-4">
               Are you sure you want to reschedule your class from{' '}
               <span className="font-medium">
@@ -497,7 +497,7 @@ export const MonthCalendar = () => {
       {/* Cancel Confirmation Modal */}
       {showCancelConfirm && selectedClassToCancel && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          className="z-50 fixed inset-0 flex justify-center items-center bg-black/50"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowCancelConfirm(false);
@@ -505,8 +505,8 @@ export const MonthCalendar = () => {
             }
           }}
         >
-          <div className="w-full max-w-md bg-base-100 rounded-lg p-6 max-h-[80vh] overflow-y-auto m-4">
-            <h3 className="text-lg font-semibold mb-4">Confirm Cancellation</h3>
+          <div className="bg-base-100 m-4 p-6 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <h3 className="mb-4 font-semibold text-lg">Confirm Cancellation</h3>
             <p className="mb-4">
               Are you sure you want to cancel your class on{' '}
               <span className="font-medium">
@@ -515,11 +515,11 @@ export const MonthCalendar = () => {
               ?
             </p>
             {differenceInHours(new Date(selectedClassToCancel.start_time), new Date()) > 24 ? (
-              <p className="text-sm text-base-content/70 mb-4">
+              <p className="mb-4 text-base-content/70 text-sm">
                 You will receive a refund of 1 credit since you're cancelling more than 24 hours in advance.
               </p>
             ) : (
-              <p className="text-sm text-error mb-4">
+              <p className="mb-4 text-error text-sm">
                 No credit will be refunded since you're cancelling less than 24 hours before the class.
               </p>
             )}
