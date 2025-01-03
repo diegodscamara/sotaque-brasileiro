@@ -17,7 +17,6 @@ interface UserProfileData {
 }
 
 const Stats = () => {
-
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfileData | null>(null);

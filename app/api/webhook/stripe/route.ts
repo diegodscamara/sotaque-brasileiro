@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { addMonths, addYears } from "date-fns";
 
 import Stripe from "stripe";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -63,24 +64,33 @@ export async function POST(req: NextRequest) {
           .select("credits")
           .eq("id", userId)
           .single();
+
         if (customerId && priceId && units > 0) {
+          // Calculate expiration date based on plan interval
+          let expirationDate = new Date();
+          switch (plan.interval) {
+            case "monthly":
+              expirationDate = addMonths(expirationDate, 1);
+              break;
+            case "yearly":
+              expirationDate = addYears(expirationDate, 1);
+              break;
+            case "one-time":
+              expirationDate = addMonths(expirationDate, 1);
+              break;
+          }
+
           await supabase
             .from("profiles")
             .update({
               customer_id: customerId,
               price_id: priceId,
               has_access: true,
-              credits: (profile?.credits || 0) + units, // Add credits to the profile
+              credits: (profile?.credits || 0) + units,
+              package_expiration: expirationDate.toISOString(),
             })
             .eq("id", userId);
         }
-
-        // Extra: send email with user link, product page, etc...
-        // try {
-        //   await sendEmail(...);
-        // } catch (e) {
-        //   console.error("Email issue:" + e?.message);
-        // }
 
         break;
       }
@@ -109,7 +119,10 @@ export async function POST(req: NextRequest) {
 
         await supabase
           .from("profiles")
-          .update({ has_access: false })
+          .update({ 
+            has_access: false,
+            package_expiration: null
+          })
           .eq("customer_id", subscription.customer);
         break;
       }
@@ -121,6 +134,9 @@ export async function POST(req: NextRequest) {
           .object as Stripe.Invoice;
         const priceId = stripeObject.lines.data[0].price.id;
         const customerId = stripeObject.customer;
+        const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
+
+        if (!plan) break;
 
         // Find profile where customer_id equals the customerId (in table called 'profiles')
         const { data: profile } = await supabase
@@ -132,10 +148,27 @@ export async function POST(req: NextRequest) {
         // Make sure the invoice is for the same plan (priceId) the user subscribed to
         if (profile.price_id !== priceId) break;
 
-        // Grant the profile access to your product. It's a boolean in the database, but could be a number of credits, etc...
+        // Calculate new expiration date based on plan interval
+        let expirationDate = new Date();
+        switch (plan.interval) {
+          case "monthly":
+            expirationDate = addMonths(expirationDate, 1);
+            break;
+          case "yearly":
+            expirationDate = addYears(expirationDate, 1);
+            break;
+          case "one-time":
+            expirationDate = addMonths(expirationDate, 1);
+            break;
+        }
+
+        // Grant the profile access to your product and update expiration
         await supabase
           .from("profiles")
-          .update({ has_access: true })
+          .update({ 
+            has_access: true,
+            package_expiration: expirationDate.toISOString()
+          })
           .eq("customer_id", customerId);
 
         break;

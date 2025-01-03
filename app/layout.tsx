@@ -1,10 +1,12 @@
-import { ReactNode } from "react";
-import { Inter } from "next/font/google";
-import { Viewport } from "next";
-import { getSEOTags } from "@/libs/seo";
-import ClientLayout from "@/components/LayoutClient";
-import config from "@/config";
 import "./globals.css";
+
+import ClientLayout from "@/components/LayoutClient";
+import { Inter } from "next/font/google";
+import { ReactNode } from "react";
+import SupabaseProvider from "./providers/SupabaseProvider";
+import { Viewport } from "next";
+import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -28,7 +30,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 		>
 			<body>
 				{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-				<ClientLayout>{children}</ClientLayout>
+				<SupabaseProvider>
+					<ClientLayout>{children}</ClientLayout>
+				</SupabaseProvider>
 			</body>
 		</html>
 	);

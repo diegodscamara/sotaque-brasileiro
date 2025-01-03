@@ -1,136 +1,143 @@
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
+"use client";
 
-interface Person {
-  name: string;
-  email: string;
-  role: string;
-  imageUrl: string;
-  href: string;
-  lastSeen: string | null;
-  lastSeenDateTime?: string;
-}
+import { CalendarBlank, Clock, NotePencil } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
 
-const people: Person[] = [
-  {
-    name: "Leslie Alexander",
-    email: "leslie.alexander@example.com",
-    role: "Co-Founder / CEO",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    href: "#",
-    lastSeen: "3h ago",
-    lastSeenDateTime: "2023-01-23T13:23Z",
-  },
-  {
-    name: "Michael Foster",
-    email: "michael.foster@example.com",
-    role: "Co-Founder / CTO",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    href: "#",
-    lastSeen: "3h ago",
-    lastSeenDateTime: "2023-01-23T13:23Z",
-  },
-  {
-    name: "Dries Vincent",
-    email: "dries.vincent@example.com",
-    role: "Business Relations",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    href: "#",
-    lastSeen: null,
-  },
-  {
-    name: "Lindsay Walton",
-    email: "lindsay.walton@example.com",
-    role: "Front-end Developer",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    href: "#",
-    lastSeen: "3h ago",
-    lastSeenDateTime: "2023-01-23T13:23Z",
-  },
-  {
-    name: "Courtney Henry",
-    email: "courtney.henry@example.com",
-    role: "Designer",
-    imageUrl:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    href: "#",
-    lastSeen: "3h ago",
-    lastSeenDateTime: "2023-01-23T13:23Z",
-  },
-  {
-    name: "Tom Cook",
-    email: "tom.cook@example.com",
-    role: "Director of Product",
-    imageUrl:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    href: "#",
-    lastSeen: null,
-  },
-];
+import { Class } from "@/types/class";
+import { RealtimeChannel } from "@supabase/supabase-js";
+import { createClient } from "@/libs/supabase/client";
+import { format } from "date-fns";
 
-export default function LessonCard() {
+const LessonCard = () => {
+  const supabase = createClient();
+  const [lessons, setLessons] = useState<Class[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+
+  const fetchLessons = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: lessons, error } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("student_id", user.id)
+        .eq("status", "scheduled")
+        .order("start_time", { ascending: true });
+
+      if (error) throw error;
+      setLessons(lessons || []);
+    } catch (error) {
+      console.error("Error fetching lessons:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLessons();
+
+    const setupSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Subscribe to changes
+      const channel = supabase
+        .channel('lessons_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*', // Listen to all changes
+            schema: 'public',
+            table: 'classes',
+            filter: `student_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('Change received!', payload);
+            fetchLessons(); // Refresh the lessons when a change occurs
+          }
+        )
+        .subscribe();
+
+      setChannel(channel);
+    };
+
+    setupSubscription();
+
+    // Cleanup subscription on unmount
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="p-4 w-full">
+        <div className="space-y-4 animate-pulse">
+          <div className="bg-base-300 rounded w-1/4 h-4"></div>
+          <div className="bg-base-300 rounded h-32"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (lessons.length === 0) {
+    return (
+      <div className="py-12 text-center">
+        <CalendarBlank className="mx-auto w-12 h-12 text-base-content/70" />
+        <h3 className="mt-2 font-semibold text-sm">No lessons scheduled</h3>
+        <p className="mt-1 text-base-content/70 text-sm">
+          Get started by scheduling your first lesson.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <ul
-      role="list"
-      className="overflow-hidden bg-white divide-y divide-gray-100 rounded-md shadow-sm ring-1 ring-gray-900/5"
-    >
-      {people.map((person) => (
-        <li
-          key={person.email}
-          className="relative flex justify-between px-4 py-5 gap-x-6 hover:bg-gray-50 sm:px-6"
-        >
-          <div className="flex min-w-0 gap-x-4">
-            <img
-              alt=""
-              src={person.imageUrl}
-              className="flex-none rounded-full size-12 bg-gray-50"
-            />
-            <div className="flex-auto min-w-0">
-              <p className="font-semibold text-gray-900 text-sm/6">
-                <a href={person.href}>
-                  <span className="absolute inset-x-0 bottom-0 -top-px" />
-                  {person.name}
-                </a>
-              </p>
-              <p className="flex mt-1 text-gray-500 text-xs/5">
-                <a
-                  href={`mailto:${person.email}`}
-                  className="relative truncate hover:underline"
-                >
-                  {person.email}
-                </a>
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center shrink-0 gap-x-4">
-            <div className="hidden sm:flex sm:flex-col sm:items-end">
-              <p className="text-gray-900 text-sm/6">{person.role}</p>
-              {person.lastSeen ? (
-                <p className="mt-1 text-gray-500 text-xs/5">
-                  Last seen{" "}
-                  <time dateTime={person.lastSeenDateTime}>
-                    {person.lastSeen}
+    <div className="divide-y divide-base-200">
+      {lessons.map((lesson) => (
+        <div key={lesson.id} className="hover:bg-base-200/50 p-4">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <h3 className="font-semibold text-base">{lesson.title}</h3>
+              <div className="space-y-1 mt-1">
+                <div className="flex items-center text-base-content/70 text-sm">
+                  <Clock className="flex-shrink-0 mr-1.5 w-4 h-4" />
+                  <time dateTime={lesson.start_time}>
+                    {format(new Date(lesson.start_time), "EEEE, MMMM d, yyyy")}
                   </time>
-                </p>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5">
-                  <div className="flex-none p-1 rounded-full bg-emerald-500/20">
-                    <div className="size-1.5 rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="text-gray-500 text-xs/5">Online</p>
+                  <span className="mx-1">•</span>
+                  <span>
+                    {format(new Date(lesson.start_time), "h:mm a")} - {format(new Date(lesson.end_time), "h:mm a")}
+                  </span>
                 </div>
-              )}
+                {lesson.notes && (
+                  <div className="flex items-start text-base-content/70 text-sm">
+                    <NotePencil className="flex-shrink-0 mt-0.5 mr-1.5 w-4 h-4" />
+                    <span>{lesson.notes}</span>
+                  </div>
+                )}
+              </div>
             </div>
-            <ChevronRightIcon
-              aria-hidden="true"
-              className="flex-none text-gray-400 size-5"
-            />
+            <div className="ml-4">
+              <span
+                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+                  lesson.recurring_group_id
+                    ? "bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10"
+                    : "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                }`}
+              >
+                {lesson.recurring_group_id ? "Recurring" : "One-time"}
+              </span>
+            </div>
           </div>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   );
-}
+};
+
+export default LessonCard;

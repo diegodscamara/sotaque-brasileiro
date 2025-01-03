@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import LessonCard from "@/components/dashboard/LessonCard";
-import MonthCalendar from "@/components/dashboard/MonthCalendar";
+import { MonthCalendar } from "@/components/dashboard/MonthCalendar";
 import Package from "@/components/dashboard/Package";
 import Stats from "@/components/dashboard/Stats";
 import Summary from "@/components/dashboard/Summary";

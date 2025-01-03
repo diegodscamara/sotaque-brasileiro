@@ -20,3 +20,44 @@ progress::-webkit-progress-value {
     @apply !capitalize;
   }
 }
+
+.tabs-vertical {
+  @apply flex flex-col;
+}
+
+.tabs-vertical .tab {
+  @apply border-l-2 border-transparent px-4 py-3 text-sm;
+}
+
+.tabs-vertical .tab-active {
+  @apply border-l-2 border-primary text-primary bg-base-200;
+}
+
+/* Drag and Drop Styles */
+.drop-target {
+  position: relative;
+}
+
+.drop-target::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px dashed hsl(var(--p));
+  border-radius: 0.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.drop-target:hover::after {
+  opacity: 1;
+}
+
+[draggable="true"] {
+  cursor: move;
+  user-select: none;
+}
+
+[draggable="true"]:active {
+  opacity: 0.5;
+}
