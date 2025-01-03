@@ -104,7 +104,7 @@ export default function Stats() {
     return (
       <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-[104px] skeleton"></div>
+          <div key={i} className="rounded-md h-[104px] skeleton"></div>
         ))}
       </div>
     );
@@ -112,7 +112,7 @@ export default function Stats() {
 
   return (
     <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
-      <div className="bg-white p-6 border rounded-lg">
+      <div className="bg-white shadow-sm p-6 border rounded-md">
         <div className="flex items-center gap-4">
           <div className="bg-primary/10 p-3 rounded-lg">
             <CreditCard className="w-6 h-6 text-primary" weight="duotone" />
@@ -124,7 +124,7 @@ export default function Stats() {
         </div>
       </div>
 
-      <div className="bg-white p-6 border rounded-lg">
+      <div className="bg-white shadow-sm p-6 border rounded-md">
         <div className="flex items-center gap-4">
           <div className="bg-primary/10 p-3 rounded-lg">
             <Clock className="w-6 h-6 text-primary" weight="duotone" />
@@ -136,7 +136,7 @@ export default function Stats() {
         </div>
       </div>
 
-      <div className="bg-white p-6 border rounded-lg">
+      <div className="bg-white shadow-sm p-6 border rounded-md">
         <div className="flex items-center gap-4">
           <div className="bg-primary/10 p-3 rounded-lg">
             <Trophy className="w-6 h-6 text-primary" weight="duotone" />
