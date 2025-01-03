@@ -5,9 +5,9 @@ import { addDays, format, getDay } from "date-fns";
 import { useEffect, useState } from "react";
 
 import { Class } from "@/types/class";
-import { DatePicker } from "./DatePicker";
-import { RecurringOptions } from "./RecurringOptions";
-import { TimeSlotPicker } from "./TimeSlotPicker";
+import { DatePicker } from "./calendar/DatePicker";
+import { RecurringOptions } from "./calendar/RecurringOptions";
+import { TimeSlotPicker } from "./calendar/TimeSlotPicker";
 import { createClient } from "@/libs/supabase/client";
 import { toast } from "react-hot-toast";
 
@@ -149,7 +149,6 @@ export const ClassModal = ({
         maxDays--;
       }
 
-      console.log('Generated recurring dates:', dates); // Debug log
       return dates;
     }
     
@@ -218,6 +217,7 @@ export const ClassModal = ({
           return;
         }
 
+        // Each class costs 1 credit
         const creditsCost = classDates.length;
 
         if (availableCredits < creditsCost) {
@@ -241,26 +241,21 @@ export const ClassModal = ({
             notes: formData.notes,
             status: "scheduled",
             type: "private",
-            credits_cost: 1,
+            credits_cost: 1, // Each class costs 1 credit
             recurring_group_id: recurringGroupId,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           };
         });
 
-        console.log('Creating classes:', classesToCreate); // Debug log
-
         const { data, error: classError } = await supabase
           .from("classes")
           .insert(classesToCreate)
           .select();
 
-        if (classError) {
-          console.error('Supabase error:', classError); // Debug log
-          throw classError;
-        }
+        if (classError) throw classError;
 
-        // Deduct credits
+        // Deduct credits - one credit per class
         const { error: creditError } = await supabase
           .from("profiles")
           .update({ 
@@ -269,10 +264,7 @@ export const ClassModal = ({
           })
           .eq("id", user.id);
 
-        if (creditError) {
-          console.error('Credit update error:', creditError); // Debug log
-          throw creditError;
-        }
+        if (creditError) throw creditError;
 
         toast.success(`${classDates.length} class${classDates.length > 1 ? 'es' : ''} scheduled successfully`);
       }
