@@ -104,16 +104,16 @@ const Summary = () => {
 
   if (isLoading) {
     return (
-      <div className="lg:col-start-3 lg:row-end-1">
+      <div className="lg:col-start-3 lg:row-end-1 skeleton">
         <h2 className="sr-only">Summary</h2>
-        <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 rounded-md ring-1 ring-gray-900/5 w-full max-h-[227px]">
-          <div className="space-y-4 animate-pulse">
-            <div className="flex items-center gap-4">
-              <div className="bg-gray-200 rounded-full w-6 h-6"></div>
-              <div className="bg-gray-200 rounded w-1/4 h-4"></div>
+        <div className="gap-x-4 shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full max-h-[227px] skeleton">
+          <div className="space-y-4 skeleton">
+            <div className="flex items-center gap-4 skeleton">
+              <div className="rounded-full w-6 h-6 skeleton"></div>
+              <div className="rounded w-1/4 h-4 skeleton"></div>
             </div>
-            <div className="bg-gray-200 rounded w-1/2 h-4"></div>
-            <div className="bg-gray-200 rounded w-3/4 h-4"></div>
+            <div className="rounded w-1/2 h-4 skeleton"></div>
+            <div className="rounded w-3/4 h-4 skeleton"></div>
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ const Summary = () => {
     return (
       <div className="lg:col-start-3 lg:row-end-1">
         <h2 className="sr-only">Summary</h2>
-        <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 rounded-md ring-1 ring-gray-900/5 w-full max-h-[227px]">
+        <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full max-h-[227px]">
           <p className="text-gray-500">No profile information available</p>
         </div>
       </div>
@@ -134,7 +134,7 @@ const Summary = () => {
   return (
     <div className="lg:col-start-3 lg:row-end-1">
       <h2 className="sr-only">Summary</h2>
-      <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 rounded-md ring-1 ring-gray-900/5 w-full max-h-[227px]">
+      <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full h-full">
         <dl className="flex flex-wrap items-center">
           <div className="flex flex-row flex-auto items-center gap-4">
             <dt>
@@ -185,16 +185,11 @@ const Summary = () => {
                 : "Unknown"}
             </dd>
           </div>
-          <div className="flex flex-none gap-x-4 mt-2 w-full">
-            <dt className="flex-none">
-              <span className="text-gray-500 text-sm/6">Scheduled Lessons:</span>
-            </dt>
-            <dd className="text-gray-500 text-sm/6">
-              {profile.scheduled_lessons || 0}
-            </dd>
-          </div>
         </dl>
-        <div className="border-gray-900/5 mt-3 py-5 border-t">
+        
+        <div className="divider"></div>
+
+        <div className="py-5">
           <Link href="/profile" className="font-semibold text-gray-900 text-sm/6">
             View profile <span aria-hidden="true">&rarr;</span>
           </Link>
