@@ -18,16 +18,16 @@ export const Preferences = ({
 }: PreferencesProps) => {
   return (
     <div>
-      <h2 className="text-base font-semibold text-gray-900">Preferences</h2>
-      <p className="mt-1 text-sm text-gray-500">
+      <h2 className="font-semibold text-base text-gray-900">Preferences</h2>
+      <p className="mt-1 text-gray-500 text-sm">
         Customize your learning experience and schedule preferences.
       </p>
 
-      <dl className="mt-6 space-y-6 divide-y divide-gray-100 border-t border-gray-200 text-sm">
+      <dl className="space-y-6 border-gray-200 mt-6 border-t divide-y divide-gray-100 text-sm">
         {/* Class Type Preferences */}
-        <div className="border-b pb-8">
-          <h3 className="text-lg pt-6 font-medium text-gray-900">Class Type Preferences</h3>
-          <div className="mt-4 space-y-4">
+        <div className="pb-8 border-b">
+          <h3 className="pt-6 font-medium text-gray-900 text-lg">Class Type Preferences</h3>
+          <div className="space-y-4 mt-4">
             {['one-on-one', 'group', 'self-paced', 'intensive'].map((type) => (
               <label key={type} className="flex items-center space-x-3">
                 <input
@@ -48,9 +48,9 @@ export const Preferences = ({
         </div>
 
         {/* Schedule Preferences */}
-        <div className="border-b pb-8">
-          <h3 className="text-lg font-medium text-gray-900">Schedule Preferences</h3>
-          <div className="mt-4 space-y-4">
+        <div className="pb-8 border-b">
+          <h3 className="font-medium text-gray-900 text-lg">Schedule Preferences</h3>
+          <div className="space-y-4 mt-4">
             {['morning', 'afternoon', 'evening', 'night'].map((time) => (
               <label key={time} className="flex items-center space-x-3">
                 <input
@@ -71,9 +71,9 @@ export const Preferences = ({
         </div>
 
         {/* Timezone Settings */}
-        <div className="border-b pb-8">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Automatic Timezone</h3>
+        <div className="pb-8 border-b">
+          <div className="flex justify-between items-center">
+            <h3 className="font-medium text-gray-900 text-lg">Automatic Timezone</h3>
             <Switch
               checked={automaticTimezoneEnabled}
               onChange={setAutomaticTimezoneEnabled}
@@ -90,24 +90,30 @@ export const Preferences = ({
           </div>
           {!automaticTimezoneEnabled && (
             <select
-              className="mt-4 select select-bordered w-full"
+              className="mt-4 w-full select-bordered select"
               value={profile.time_zone || ''}
-              onChange={(e) => {
-                // You'll need to add handleUpdate to the props and implementation
-              }}
+              onChange={(e) => handleUpdate('time_zone', e.target.value)}
             >
               <option value="">Select timezone</option>
-              {/* Add timezone options */}
+              <option value="America/Puerto_Rico">Atlantic Standard Time (Puerto Rico)</option>
+              <option value="America/Halifax">Atlantic Standard Time (Canada)</option>
+              <option value="America/New_York">Eastern Standard Time</option>
+              <option value="America/Chicago">Central Standard Time</option>
+              <option value="America/Denver">Mountain Standard Time</option>
+              <option value="America/Phoenix">Mountain Standard Time (Arizona)</option>
+              <option value="America/Los_Angeles">Pacific Standard Time</option>
+              <option value="America/Anchorage">Alaska Standard Time</option>
+              <option value="Pacific/Honolulu">Hawaii-Aleutian Standard Time</option>
             </select>
           )}
         </div>
 
         {/* Availability Hours */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Weekly Availability</h3>
+          <h3 className="font-medium text-gray-900 text-lg">Weekly Availability</h3>
           <input
             type="number"
-            className="mt-2 input input-bordered w-full"
+            className="mt-2 input-bordered w-full input"
             value={profile.availability_hours || ''}
             onChange={(e) => handleUpdate('availability_hours', parseInt(e.target.value, 10))}
             placeholder="Hours per week"
