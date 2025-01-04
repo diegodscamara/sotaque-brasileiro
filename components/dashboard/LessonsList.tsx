@@ -85,7 +85,7 @@ const LessonsList = () => {
         supabase.removeChannel(channel);
       }
     };
-  }, []);
+  }, [lessons]);
 
   if (isLoading) {
     return (

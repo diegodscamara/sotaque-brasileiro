@@ -21,15 +21,15 @@ export const TimeSlotPicker = ({ timeSlots, selectedTime, onSelect, disabled }: 
 
   return (
     <div>
-      <label className="text-sm font-medium mb-2 block">Time slot</label>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <label className="block mb-2 font-medium text-sm">Time slot</label>
+      <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
         {timeSlots.map((slot) => (
           <button
             key={slot.start}
             type="button"
             className={`
               btn btn-sm w-full
-              ${isSelected(slot) ? 'btn-primary' : 'btn-outline'}
+              ${isSelected(slot) ? 'btn-primary text-base-200' : 'btn-outline'}
               ${disabled ? 'btn-disabled' : ''}
             `}
             onClick={() => onSelect(slot.start, slot.end)}
@@ -39,7 +39,7 @@ export const TimeSlotPicker = ({ timeSlots, selectedTime, onSelect, disabled }: 
           </button>
         ))}
       </div>
-      <p className="text-xs text-base-content/70 mt-1">
+      <p className="mt-1 text-base-content/70 text-xs">
         All classes are 1 hour long
       </p>
     </div>

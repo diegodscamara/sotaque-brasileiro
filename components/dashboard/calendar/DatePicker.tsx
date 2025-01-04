@@ -1,4 +1,4 @@
-import { addDays, format } from "date-fns";
+import { addBusinessDays, addDays, format, isBefore, setHours } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 
 import { CaretDown } from "@phosphor-icons/react";
@@ -8,9 +8,16 @@ interface DatePickerProps {
   mode: 'single' | 'multiple';
   selected: Date | Date[] | undefined;
   onSelect: (date: Date | Date[] | undefined) => void;
+  minDate?: Date;
 }
 
-export const DatePicker = ({ mode, selected, onSelect }: DatePickerProps) => {
+const isDateDisabled = (date: Date) => {
+  const now = new Date();
+  const earliestDate = setHours(addBusinessDays(now, 1), 9);
+  return isBefore(date, earliestDate);
+};
+
+export const DatePicker = ({ mode, selected, onSelect, minDate }: DatePickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +57,7 @@ export const DatePicker = ({ mode, selected, onSelect }: DatePickerProps) => {
     <div className="space-y-2" ref={containerRef}>
       <button
         type="button"
-        className="justify-start gap-2 px-0 w-full font-normal btn btn-ghost"
+        className="justify-start gap-2 px-2 w-fit font-normal btn btn-outline"
         onClick={() => setIsOpen(!isOpen)}
       >
         {getDisplayText()}
@@ -58,14 +65,18 @@ export const DatePicker = ({ mode, selected, onSelect }: DatePickerProps) => {
       </button>
       
       {isOpen && (
-        <div className="relative">
-          <div className="top-0 left-0 z-10 absolute bg-base-100 shadow-lg border rounded-lg">
+        <div className="relative" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setIsOpen(!isOpen);
+          }
+        }}>
+          <div className="top-0 left-0 z-10 absolute bg-base-200 shadow-lg border rounded-md">
             {mode === 'multiple' ? (
               <DayPicker
                 mode="multiple"
                 selected={selected as Date[]}
                 onSelect={(dates) => handleSelect(dates || [])}
-                disabled={[{ before: new Date() }, { after: addDays(new Date(), 30) }]}
+                disabled={isDateDisabled}
                 modifiersStyles={{
                   selected: {
                     backgroundColor: 'hsl(var(--p))',
@@ -97,7 +108,7 @@ export const DatePicker = ({ mode, selected, onSelect }: DatePickerProps) => {
                 mode="single"
                 selected={selected as Date}
                 onSelect={(date) => handleSelect(date)}
-                disabled={[{ before: new Date() }, { after: addDays(new Date(), 30) }]}
+                disabled={isDateDisabled}
                 modifiersStyles={{
                   selected: {
                     backgroundColor: 'hsl(var(--p))',
