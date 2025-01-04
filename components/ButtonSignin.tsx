@@ -39,7 +39,7 @@ const ButtonSignin = ({
 
   return (
     <Link
-      className={`btn ${extraStyle ? extraStyle : ""}`}
+      className={`btn text-base-200 ${extraStyle ? extraStyle : ""}`}
       href={config.auth.loginUrl}
     >
       {text}
