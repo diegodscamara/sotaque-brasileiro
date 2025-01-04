@@ -62,36 +62,43 @@ const StudentProfile = () => {
 
   const [activeTab, setActiveTab] = useState('basic');
 
-  const handleUpdate = async (field: string, value: string | number) => {
+  const handleUpdate = async (field: string, value: string | number | string[]) => {
     try {
-      if (!user?.id) {
-        toast.error("No user found");
-        return;
+      if (field === 'time_zone' && automaticTimezoneEnabled) {
+        // Automatically detect user's time zone
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        value = timeZone;
       }
 
-      const finalValue = field === 'availability_hours' ? Number(value) : value;
-
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from('profiles')
-        .update({
-          [field]: finalValue,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+        .update({ [field]: value, updated_at: new Date().toISOString() })
+        .eq('id', user?.id);
 
-      if (updateError) {
-        toast.error("Failed to update profile");
-        throw updateError;
-      }
+      if (error) throw error;
 
-      setProfile(prev => prev ? { ...prev, [field]: finalValue } : null);
-      setIsEditing(null);
-      setEditValue("");
-      toast.success("Profile updated successfully");
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        [field]: value,
+      }));
 
+      const fieldNameMap: Record<string, string> = {
+        name: 'Name',
+        gender: 'Gender',
+        country: 'Country',
+        portuguese_level: 'Portuguese Level',
+        native_language: 'Native Language',
+        learning_goals: 'Learning Goals',
+        motivation_for_learning: 'Motivation for Learning',
+        time_zone: 'Time Zone',
+        availability_hours: 'Weekly Availability',
+      };
+
+      const fieldName = fieldNameMap[field] || field.replace(/_/g, ' ');
+      toast.success(`${fieldName} updated successfully`);
     } catch (error) {
-      console.error("Error in handleUpdate:", error);
-      toast.error("An error occurred");
+      console.error(`Error updating ${field}:`, error);
+      toast.error(`Failed to update ${field}`);
     }
   };
 
@@ -107,6 +114,18 @@ const StudentProfile = () => {
       setProfile(prev => prev ? { ...prev, [field]: values } : null);
     } catch (error) {
       console.error("Error updating profile:", error);
+    }
+  };
+
+  const handleAutomaticTimezoneChange = async (enabled: boolean) => {
+    setAutomaticTimezoneEnabled(enabled);
+
+    if (enabled) {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      await handleUpdate('time_zone', timeZone);
+      toast.success('Automatic time zone enabled');
+    } else {
+      toast.success('Automatic time zone disabled');
     }
   };
 
@@ -175,12 +194,12 @@ const StudentProfile = () => {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       <Breadcrumb />
       
-      <div className="mt-8 flex gap-x-8">
+      <div className="flex gap-x-8 mt-8">
         {/* Sidebar Tabs */}
-        <div className="w-64 flex-none">
+        <div className="flex-none w-64">
           <div className="tabs tabs-vertical">
             <a 
               className={`tab tab-bordered w-full justify-start ${activeTab === 'basic' ? 'tab-active' : ''}`}
@@ -214,7 +233,7 @@ const StudentProfile = () => {
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="p-6 bg-base-100 border border-base-300 rounded-md">
+          <div className="bg-base-100 p-6 border border-base-300 rounded-md">
             {activeTab === 'basic' && (
               <BasicInfo
                 profile={profile}
@@ -244,7 +263,7 @@ const StudentProfile = () => {
               <Preferences
                 profile={profile}
                 automaticTimezoneEnabled={automaticTimezoneEnabled}
-                setAutomaticTimezoneEnabled={setAutomaticTimezoneEnabled}
+                setAutomaticTimezoneEnabled={handleAutomaticTimezoneChange}
                 handleUpdate={handleUpdate}
                 handleMultiSelect={handleMultiSelect}
               />
@@ -252,7 +271,7 @@ const StudentProfile = () => {
           </div>
 
           {/* Save Changes Button */}
-          <div className="my-8 flex items-center justify-end gap-x-6">
+          <div className="flex justify-end items-center gap-x-6 my-8">
             <button
               type="button"
               className="btn btn-outline"
