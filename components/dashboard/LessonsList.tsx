@@ -68,7 +68,6 @@ const LessonsList = () => {
             filter: `student_id=eq.${user.id}`,
           },
           (payload) => {
-            console.log('Change received!', payload);
             fetchLessons(); // Refresh the lessons when a change occurs
           }
         )
@@ -85,7 +84,7 @@ const LessonsList = () => {
         supabase.removeChannel(channel);
       }
     };
-  }, [lessons]);
+  }, []);
 
   if (isLoading) {
     return (

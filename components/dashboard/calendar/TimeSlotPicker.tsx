@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { useState } from "react";
 
 interface TimeSlot {
   start: string;
@@ -10,38 +11,47 @@ interface TimeSlotPickerProps {
   selectedTime: string;
   onSelect: (startTime: string, endTime: string) => void;
   disabled?: boolean;
+  initialTime?: string;
 }
 
-export const TimeSlotPicker = ({ timeSlots, selectedTime, onSelect, disabled }: TimeSlotPickerProps) => {
-  const isSelected = (slot: TimeSlot) => {
-    if (!selectedTime) return false;
-    const selectedHour = format(new Date(selectedTime), 'HH:mm');
-    return selectedHour === slot.start;
+export const TimeSlotPicker = ({
+  timeSlots,
+  selectedTime,
+  onSelect,
+  disabled,
+  initialTime
+}: TimeSlotPickerProps) => {
+  const [activeTime, setActiveTime] = useState(initialTime || format(new Date(selectedTime), 'HH:mm'));
+
+  const handleTimeSelect = (start: string, end: string) => {
+    setActiveTime(start);
+    onSelect(start, end);
   };
 
   return (
-    <div>
-      <label className="block mb-2 font-medium text-sm">Time slot</label>
+    <div className="space-y-2">
+      <label className="block font-medium text-sm">Time</label>
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-        {timeSlots.map((slot) => (
-          <button
-            key={slot.start}
-            type="button"
-            className={`
-              btn btn-sm w-full
-              ${isSelected(slot) ? 'btn-primary text-base-200' : 'btn-outline'}
-              ${disabled ? 'btn-disabled' : ''}
-            `}
-            onClick={() => onSelect(slot.start, slot.end)}
-            disabled={disabled}
-          >
-            {slot.start}
-          </button>
-        ))}
+        {timeSlots.map(({ start, end }) => {
+          const isSelected = start === activeTime;
+          
+          return (
+            <button
+              key={start}
+              type="button"
+              disabled={disabled}
+              className={`
+                px-4 py-2 rounded-md text-sm font-medium transition-colors
+                ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-primary-content'}
+                ${isSelected ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'}
+              `}
+              onClick={() => handleTimeSelect(start, end)}
+            >
+              {start} - {end}
+            </button>
+          );
+        })}
       </div>
-      <p className="mt-1 text-base-content/70 text-xs">
-        All classes are 1 hour long
-      </p>
     </div>
   );
 }; 

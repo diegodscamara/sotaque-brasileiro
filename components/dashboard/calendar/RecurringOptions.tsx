@@ -21,14 +21,14 @@ const DAYS_OF_WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 export const RecurringOptions = ({ config, onChange, maxOccurrences }: RecurringOptionsProps) => {
   return (
     <div className="flex items-start gap-3">
-      <Calendar className="w-5 h-5 mt-2 text-base-content/70" />
+      <Calendar className="mt-2 w-5 h-5 text-base-content/70" />
       <div className="flex-1 space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">Repeats on</label>
+          <label className="block mb-2 font-medium text-sm">Repeats on</label>
           <div className="flex flex-wrap gap-2">
             {DAYS_OF_WEEK.map((day, index) => (
               <button
-                key={day}
+                key={index}
                 type="button"
                 className={`
                   w-9 h-9 rounded-full flex items-center justify-center
@@ -54,7 +54,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Ends</label>
+          <label className="font-medium text-sm">Ends</label>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -68,7 +68,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                className="input input-bordered input-sm w-20"
+                className="input-bordered w-20 input input-sm"
                 min="1"
                 max={maxOccurrences}
                 value={config.occurrences}
@@ -93,7 +93,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
             </label>
             <input
               type="date"
-              className="input input-bordered input-sm"
+              className="input-bordered input input-sm"
               disabled={config.endType !== 'on'}
               min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
               max={format(addDays(new Date(), 30), 'yyyy-MM-dd')}

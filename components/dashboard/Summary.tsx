@@ -69,7 +69,6 @@ const Summary = () => {
           filter: `id=eq.${session.id}`,
         },
         (payload: ProfilePayload) => {
-          console.log("Profile change received:", payload);
           if ('new' in payload && payload.new) {
             setProfile(payload.new as UserProfileData);
           }
@@ -84,19 +83,14 @@ const Summary = () => {
           filter: `student_id=eq.${session.id}`,
         },
         (payload: ClassPayload) => {
-          console.log("Class change received:", payload);
           fetchProfile();
         }
       )
-      .subscribe((status) => {
-        console.log("Subscription status:", status);
-      });
 
     setChannel(channel);
 
     return () => {
       if (channel) {
-        console.log("Removing channel subscription");
         supabase.removeChannel(channel);
       }
     };
@@ -155,7 +149,7 @@ const Summary = () => {
               className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
                 ? "bg-green-50 text-green-700 ring-green-600/20"
                 : "bg-red-50 text-red-700 ring-red-600/20"
-              }`}
+                }`}
             >
               {profile.has_access ? "Active" : "Inactive"}
             </dd>
@@ -186,7 +180,7 @@ const Summary = () => {
             </dd>
           </div>
         </dl>
-        
+
         <div className="divider"></div>
 
         <div className="py-5">
