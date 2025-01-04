@@ -3,6 +3,7 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { createContext, useEffect, useState } from "react";
 
+import React from "react";
 import { createBrowserClient } from "@supabase/ssr";
 
 type SupabaseContext = {
