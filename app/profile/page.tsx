@@ -1,16 +1,15 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
 import {
-  Gear,
   GraduationCap,
   User as UserIcon
 } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
 
 import { BasicInfo } from "./components/BasicInfo";
 import Breadcrumb from '@/components/Breadcrumb';
+import { FloppyDisk } from "@phosphor-icons/react";
 import { LanguageLearning } from "./components/LanguageLearning";
-import { Preferences } from "./components/Preferences";
 import { StudentProfileData } from '@/types/profile';
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/libs/supabase/client";
@@ -55,7 +54,6 @@ const StudentProfile = () => {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
-  const [automaticTimezoneEnabled, setAutomaticTimezoneEnabled] = useState(true)
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -64,12 +62,6 @@ const StudentProfile = () => {
 
   const handleUpdate = async (field: string, value: string | number | string[]) => {
     try {
-      if (field === 'time_zone' && automaticTimezoneEnabled) {
-        // Automatically detect user's time zone
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        value = timeZone;
-      }
-
       const { error } = await supabase
         .from('profiles')
         .update({ [field]: value, updated_at: new Date().toISOString() })
@@ -90,8 +82,6 @@ const StudentProfile = () => {
         native_language: 'Native Language',
         learning_goals: 'Learning Goals',
         motivation_for_learning: 'Motivation for Learning',
-        time_zone: 'Time Zone',
-        availability_hours: 'Weekly Availability',
       };
 
       const fieldName = fieldNameMap[field] || field.replace(/_/g, ' ');
@@ -114,18 +104,6 @@ const StudentProfile = () => {
       setProfile(prev => prev ? { ...prev, [field]: values } : null);
     } catch (error) {
       console.error("Error updating profile:", error);
-    }
-  };
-
-  const handleAutomaticTimezoneChange = async (enabled: boolean) => {
-    setAutomaticTimezoneEnabled(enabled);
-
-    if (enabled) {
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      await handleUpdate('time_zone', timeZone);
-      toast.success('Automatic time zone enabled');
-    } else {
-      toast.success('Automatic time zone disabled');
     }
   };
 
@@ -196,13 +174,13 @@ const StudentProfile = () => {
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       <Breadcrumb />
-      
-      <div className="flex gap-x-8 mt-8">
+
+      <div className="flex lg:flex-row flex-col gap-y-8 lg:gap-x-8 mt-8">
         {/* Sidebar Tabs */}
-        <div className="flex-none w-64">
-          <div className="tabs tabs-vertical">
-            <a 
-              className={`tab tab-bordered w-full justify-start ${activeTab === 'basic' ? 'tab-active' : ''}`}
+        <div className="flex-none lg:w-64">
+          <div className="lg:flex-col tabs tabs-vertical">
+            <a
+              className={`tab tab-bordered w-full h-fit rounded-md justify-start ${activeTab === 'basic' ? 'tab-active' : ''}`}
               onClick={() => setActiveTab('basic')}
             >
               <div className="flex items-center gap-x-3">
@@ -210,8 +188,8 @@ const StudentProfile = () => {
                 Basic Information
               </div>
             </a>
-            <a 
-              className={`tab tab-bordered w-full justify-start ${activeTab === 'learning' ? 'tab-active' : ''}`}
+            <a
+              className={`tab tab-bordered w-full h-fit rounded-md justify-start ${activeTab === 'learning' ? 'tab-active ' : ''}`}
               onClick={() => setActiveTab('learning')}
             >
               <div className="flex items-center gap-x-3">
@@ -219,21 +197,12 @@ const StudentProfile = () => {
                 Language Learning
               </div>
             </a>
-            <a 
-              className={`tab tab-bordered w-full justify-start ${activeTab === 'preferences' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('preferences')}
-            >
-              <div className="flex items-center gap-x-3">
-                <Gear className="w-5 h-5" />
-                Preferences
-              </div>
-            </a>
           </div>
         </div>
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="bg-base-100 p-6 border border-base-300 rounded-md">
+          <div className="bg-white shadow-sm p-6 border rounded-md">
             {activeTab === 'basic' && (
               <BasicInfo
                 profile={profile}
@@ -259,22 +228,13 @@ const StudentProfile = () => {
                 setEditValue={setEditValue}
               />
             )}
-            {activeTab === 'preferences' && (
-              <Preferences
-                profile={profile}
-                automaticTimezoneEnabled={automaticTimezoneEnabled}
-                setAutomaticTimezoneEnabled={handleAutomaticTimezoneChange}
-                handleUpdate={handleUpdate}
-                handleMultiSelect={handleMultiSelect}
-              />
-            )}
           </div>
 
           {/* Save Changes Button */}
-          <div className="flex justify-end items-center gap-x-6 my-8">
+          <div className="flex justify-end items-center gap-x-4 my-8">
             <button
               type="button"
-              className="btn btn-outline"
+              className="btn btn-outline btn-sm"
               onClick={() => {
                 setIsEditing(null);
                 setEditValue("");
@@ -284,12 +244,10 @@ const StudentProfile = () => {
             </button>
             <button
               type="submit"
-              className="btn btn-accent"
+              className="text-base-200 btn btn-primary btn-sm"
               onClick={async () => {
                 try {
                   await Promise.all([
-                    handleMultiSelect('preferred_schedule', profile.preferred_schedule || []),
-                    handleMultiSelect('preferred_class_type', profile.preferred_class_type || []),
                     handleMultiSelect('learning_style', profile.learning_style || []),
                     handleMultiSelect('interests', profile.interests || []),
                     handleMultiSelect('other_languages', profile.other_languages || [])
@@ -311,6 +269,7 @@ const StudentProfile = () => {
                 }
               }}
             >
+              <FloppyDisk className="w-5 h-5" />
               Save all changes
             </button>
           </div>
