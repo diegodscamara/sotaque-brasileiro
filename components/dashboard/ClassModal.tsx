@@ -1,13 +1,18 @@
 "use client";
 
-import { CaretDown, Clock, NotePencil, X } from "@phosphor-icons/react";
 import { addBusinessDays, addDays, getDay, setHours } from "date-fns";
 import { useEffect, useState } from "react";
 
+import BookingTypeDropdown from "./class-modal/BookingTypeDropdown";
+import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
-import { DatePicker } from "./calendar/DatePicker";
-import { RecurringOptions } from "./calendar/RecurringOptions";
-import { TimeSlotPicker } from "./calendar/TimeSlotPicker";
+import DateTimeSection from "./class-modal/DateTimeSection";
+import NotesSection from "./class-modal/NotesSection";
+import RecurringEditDialog from "./class-modal/RecurringEditDialog";
+import { RecurringOptions } from "./class-modal/RecurringOptions";
+import SummarySection from "./class-modal/SummarySection";
+import TitleSection from "./class-modal/TitleSection";
+import { X } from "@phosphor-icons/react";
 import { createClient } from "@/libs/supabase/client";
 import { isDateBookable } from "@/utils/date";
 import { toast } from "react-hot-toast";
@@ -33,17 +38,6 @@ interface ClassModalProps {
   selectedClass?: Class;
   onClassUpdated: () => void;
 }
-
-const timeSlots = [
-  { start: '09:00', end: '10:00' },
-  { start: '10:00', end: '11:00' },
-  { start: '11:00', end: '12:00' },
-  { start: '14:00', end: '15:00' },
-  { start: '15:00', end: '16:00' },
-  { start: '16:00', end: '17:00' },
-  { start: '17:00', end: '18:00' },
-  { start: '18:00', end: '19:00' },
-];
 
 export const ClassModal = ({
   isOpen,
@@ -515,108 +509,54 @@ export const ClassModal = ({
 
         <form onSubmit={handleSubmit} className="divide-y divide-base-200 h-[calc(100%-54px)] max-h-fit overflow-auto">
           {/* Title Section */}
-          <div className="p-4">
-            <div className="flex items-center gap-3">
-              <NotePencil className="w-5 h-5 text-base-content/70" />
-              <input
-                type="text"
-                className="focus:bg-transparent px-2 w-full font-medium text-lg input input-primary input-sm"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Add title"
-                required
-              />
-            </div>
-          </div>
+          <TitleSection
+            title={formData.title}
+            onChange={(title) => setFormData({ ...formData, title })}
+          />
 
           {/* Booking Type Section */}
           {!selectedClass && (
             <div className="p-4">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">Booking type:</span>
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="border-primary w-full max-w-xs btn btn-outline btn-primary btn-sm">
-                    {bookingType === 'single' && 'Single Class'}
-                    {bookingType === 'multiple' && 'Multiple Classes'}
-                    {bookingType === 'recurring' && 'Recurring Classes'}
-                    <CaretDown className="w-4 h-4 text-primary" />
-                  </div>
-                  <ul tabIndex={0} className="bg-base-200 shadow-lg p-2 rounded-md w-52 dropdown-content menu">
-                    <li>
-                      <a
-                        className={bookingType === 'single' ? 'active' : ''}
-                        onClick={() => setBookingType('single')}
-                      >
-                        Single Class
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className={bookingType === 'multiple' ? 'active' : ''}
-                        onClick={() => setBookingType('multiple')}
-                      >
-                        Multiple Classes
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className={bookingType === 'recurring' ? 'active' : ''}
-                        onClick={() => setBookingType('recurring')}
-                      >
-                        Recurring Classes
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+              <BookingTypeDropdown
+                bookingType={bookingType}
+                onChange={setBookingType}
+              />
             </div>
           )}
 
           {/* Date & Time Section */}
-          <div className="space-y-4 p-4">
-            <div className="flex items-start gap-3">
-              <Clock className="mt-3 w-5 h-5 text-base-content/70" />
-              <div className="flex-1 space-y-4 w-fit">
-                <DatePicker
-                  mode={bookingType === 'multiple' ? 'multiple' : 'single'}
-                  selected={bookingType === 'multiple' ? selectedDates : selectedDate}
-                  onSelect={(date) => {
-                    if (bookingType === 'multiple') {
-                      setSelectedDates(Array.isArray(date) ? date : []);
-                    } else {
-                      const newDate = date as Date;
-                      setSelectedDate(newDate);
-                      if (newDate) {
-                        const startTime = new Date(formData.start_time);
-                        const newStartTime = new Date(newDate);
-                        newStartTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
-                        const newEndTime = new Date(newStartTime);
-                        newEndTime.setHours(newEndTime.getHours() + 1);
+          <DateTimeSection
+            bookingType={bookingType}
+            selectedDate={selectedDate}
+            selectedDates={selectedDates}
+            formData={{
+              start_time: formData.start_time,
+              end_time: formData.end_time,
+            }}
+            earliestDate={earliestDate}
+            onDateSelect={(date) => {
+              if (bookingType === 'multiple') {
+                setSelectedDates(Array.isArray(date) ? date : []);
+              } else {
+                const newDate = date as Date;
+                setSelectedDate(newDate);
+                if (newDate) {
+                  const startTime = new Date(formData.start_time);
+                  const newStartTime = new Date(newDate);
+                  newStartTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+                  const newEndTime = new Date(newStartTime);
+                  newEndTime.setHours(newEndTime.getHours() + 1);
 
-                        setFormData({
-                          ...formData,
-                          start_time: newStartTime.toISOString(),
-                          end_time: newEndTime.toISOString(),
-                        });
-                      }
-                    }
-                  }}
-                  minDate={earliestDate}
-                />
-
-                <TimeSlotPicker
-                  timeSlots={timeSlots}
-                  selectedTime={formData.start_time}
-                  onSelect={handleTimeSelect}
-                  disabled={!selectedDate}
-                />
-
-                <p className="text-base-content/70 text-sm">
-                  Note: Classes can only be scheduled at least 24 business hours in advance.
-                </p>
-              </div>
-            </div>
-          </div>
+                  setFormData({
+                    ...formData,
+                    start_time: newStartTime.toISOString(),
+                    end_time: newEndTime.toISOString(),
+                  });
+                }
+              }
+            }}
+            onTimeSelect={handleTimeSelect}
+          />
 
           {/* Recurring Options */}
           {bookingType === 'recurring' && (
@@ -630,160 +570,42 @@ export const ClassModal = ({
           )}
 
           {/* Notes Section */}
-          <div className="p-4">
-            <div className="flex items-start gap-3">
-              <NotePencil className="mt-2 w-5 h-5 text-base-content/70" />
-              <textarea
-                className="focus:bg-transparent px-2 border w-full min-h-[100px] textarea textarea-primary"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Add description or special requests..."
-                rows={3}
-              />
-            </div>
-          </div>
+          <NotesSection
+            notes={formData.notes}
+            onChange={(notes) => setFormData({ ...formData, notes })}
+          />
 
           {/* Summary Section */}
-          <div className="bg-base-200/50 p-4">
-            <div className="flex justify-between items-center text-sm">
-              <div className="space-y-1">
-                {!selectedClass && (
-                  <>
-                    <p>Classes to book: {getClassDates().length}</p>
-                    <p>Credits required: {getClassDates().length}</p>
-                    <p>Credits available: {availableCredits}</p>
-                  </>
-                )}
-              </div>
-              <div className="flex gap-2">
-                {selectedClass ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleCancel}
-                      className="btn btn-error btn-sm"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                      Cancel Class
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="btn btn-outline btn-primary btn-sm"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                      Abandon Changes
-                    </button>
-                    <button
-                      type="submit"
-                      className="text-base-200 btn btn-primary btn-sm"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                      {isSubmitting ? "Saving..." : "Update"}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="btn btn-error btn-sm"
-                    >
-                      {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="text-base-200 btn btn-primary btn-sm"
-                      disabled={
-                        isSubmitting ||
-                        !selectedDate ||
-                        (bookingType === 'recurring' && recurringConfig.daysOfWeek.length === 0) ||
-                        (bookingType === 'multiple' && selectedDates.length === 0)
-                      }
-                    >
-                      {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                      {isSubmitting ? "Saving..." : `Schedule ${getClassDates().length > 1 ? 'Classes' : 'Class'}`}
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
+          <SummarySection
+            selectedClass={selectedClass}
+            getClassDates={getClassDates}
+            availableCredits={availableCredits}
+            isSubmitting={isSubmitting}
+            onCancel={handleCancel}
+            onClose={handleClose}
+            onSubmit={handleSubmit}
+          />
         </form>
       </div>
 
       {/* Recurring Edit Dialog */}
       {showRecurringEditDialog && (
-        <div className="z-[60] fixed inset-0 flex justify-center items-center bg-black/50">
-          <div className="bg-base-100 p-6 rounded-lg w-full max-w-sm">
-            <h3 className="mb-4 font-medium text-lg">Edit Recurring Class</h3>
-            <p className="mb-6 text-base-content/70">
-              Would you like to edit this class only, or all classes in the series?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                className="btn btn-ghost"
-                onClick={() => setShowRecurringEditDialog(false)}
-              >
-                {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                Cancel
-              </button>
-              <button
-                className="btn btn-outline btn-primary"
-                onClick={() => submitChanges('single')}
-              >
-                {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                This class
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={() => submitChanges('all')}
-              >
-                {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                All classes
-              </button>
-            </div>
-          </div>
-        </div>
+        <RecurringEditDialog
+          isOpen={showRecurringEditDialog}
+          onClose={() => setShowRecurringEditDialog(false)}
+          onSubmit={submitChanges}
+          isSubmitting={isSubmitting}
+        />
       )}
 
       {/* Cancel Dialog */}
       {showCancelDialog && (
-        <div className="z-[60] fixed inset-0 flex justify-center items-center bg-black/50">
-          <div className="bg-base-100 shadow-lg p-6 rounded-lg w-full max-w-md">
-            <h3 className="mb-4 font-medium text-lg">Cancel Recurring Class</h3>
-            <p className="mb-6 text-base-content/70">
-              Would you like to cancel this class only, or all future classes in the series?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                className="btn btn-outline btn-primary btn-sm"
-                onClick={() => setShowCancelDialog(false)}
-              >
-                {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                Keep Classes
-              </button>
-              <button
-                className="btn btn-accent btn-sm"
-                onClick={() => cancelClass('single')}
-              >
-                {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                This class
-              </button>
-              <button
-                className="btn btn-error btn-sm"
-                onClick={() => cancelClass('all')}
-              >
-                {isSubmitting && <span className="loading loading-spinner loading-xs" />}
-                All future classes
-              </button>
-            </div>
-          </div>
-        </div>
+        <CancelDialog
+          isOpen={showCancelDialog}
+          onClose={() => setShowCancelDialog(false)}
+          onSubmit={cancelClass}
+          isSubmitting={isSubmitting}
+        />
       )}
     </div>
   );

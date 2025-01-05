@@ -1,7 +1,5 @@
-import { addBusinessDays, isBefore, setHours } from "date-fns";
-
 export const isDateBookable = (date: Date) => {
   const now = new Date();
-  const earliestBookableDate = setHours(addBusinessDays(now, 1), 9);
-  return !isBefore(date, earliestBookableDate);
+  const earliestBookableDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  return date >= earliestBookableDate;
 }; 

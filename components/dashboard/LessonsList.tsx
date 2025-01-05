@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, CalendarBlank, CaretLeft, CaretRight, Clock, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
+import { Calendar, CalendarBlank, CaretLeft, CaretRight, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { Class } from "@/types/class";
