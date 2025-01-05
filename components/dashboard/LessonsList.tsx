@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarBlank, CaretLeft, CaretRight, Clock, NotePencil } from "@phosphor-icons/react";
+import { CalendarBlank, CaretLeft, CaretRight, Clock, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { Class } from "@/types/class";
@@ -15,6 +15,7 @@ const LessonsList = () => {
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const LESSONS_PER_PAGE = 4;
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
   const fetchLessons = async () => {
     try {
@@ -25,7 +26,6 @@ const LessonsList = () => {
         .from("classes")
         .select("*")
         .eq("student_id", user.id)
-        .eq("status", "scheduled")
         .order("start_time", { ascending: true });
 
       if (error) throw error;
@@ -40,8 +40,11 @@ const LessonsList = () => {
   // Pagination logic
   const indexOfLastLesson = currentPage * LESSONS_PER_PAGE;
   const indexOfFirstLesson = indexOfLastLesson - LESSONS_PER_PAGE;
-  const currentLessons = lessons.slice(indexOfFirstLesson, indexOfLastLesson);
-  const totalPages = Math.ceil(lessons.length / LESSONS_PER_PAGE);
+  const filteredLessons = lessons.filter(lesson => 
+    statusFilter ? lesson.status === statusFilter : true
+  );
+  const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson);
+  const totalPages = Math.ceil(filteredLessons.length / LESSONS_PER_PAGE);
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -85,6 +88,36 @@ const LessonsList = () => {
       }
     };
   }, []);
+
+  const getPageNumbers = (currentPage: number, totalPages: number) => {
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (currentPage - delta > 2) {
+      rangeWithDots.push(1, '...');
+    } else {
+      rangeWithDots.push(1);
+    }
+
+    rangeWithDots.push(...range);
+
+    if (currentPage + delta < totalPages - 1) {
+      rangeWithDots.push('...', totalPages);
+    } else if (totalPages > 1) {
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
+  };
 
   if (isLoading) {
     return (
@@ -140,9 +173,9 @@ const LessonsList = () => {
     return (
       <div className="py-12 text-center">
         <CalendarBlank className="mx-auto w-12 h-12 text-base-content/70" />
-        <h3 className="mt-2 font-semibold text-sm">No lessons scheduled</h3>
+        <h3 className="mt-2 font-semibold text-sm">No classes scheduled</h3>
         <p className="mt-1 text-base-content/70 text-sm">
-          Get started by scheduling your first lesson.
+          Get started by scheduling your first class.
         </p>
       </div>
     );
@@ -150,7 +183,61 @@ const LessonsList = () => {
 
   return (
     <div className="flex flex-col gap-4 bg-white shadow-sm p-6 border rounded-md divide-y divide">
-      <h2 className="font-semibold text-lg">Lessons List</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="font-semibold text-lg">Classes List</h2>
+        <div className="dropdown dropdown-end">
+          <div tabIndex={0} role="button" className="flex items-center gap-2 btn btn-outline btn-sm">
+            <FunnelSimple className="w-4 h-4 text-primary" />
+            {statusFilter ? statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1) : 'All'}
+          </div>
+          <ul tabIndex={0} className="z-[1] bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
+            <li>
+              <a 
+                className={!statusFilter ? 'active' : ''} 
+                onClick={() => {
+                  setStatusFilter(null);
+                  setCurrentPage(1);
+                }}
+              >
+                All
+              </a>
+            </li>
+            <li>
+              <a 
+                className={statusFilter === 'scheduled' ? 'active' : ''} 
+                onClick={() => {
+                  setStatusFilter('scheduled');
+                  setCurrentPage(1);
+                }}
+              >
+                Scheduled
+              </a>
+            </li>
+            <li>
+              <a 
+                className={statusFilter === 'completed' ? 'active' : ''} 
+                onClick={() => {
+                  setStatusFilter('completed');
+                  setCurrentPage(1);
+                }}
+              >
+                Completed
+              </a>
+            </li>
+            <li>
+              <a 
+                className={statusFilter === 'cancelled' ? 'active' : ''} 
+                onClick={() => {
+                  setStatusFilter('cancelled');
+                  setCurrentPage(1);
+                }}
+              >
+                Cancelled
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
       {currentLessons.map((lesson) => (
         <div key={lesson.id} className="py-4">
           <div className="flex justify-between items-start">
@@ -177,12 +264,15 @@ const LessonsList = () => {
             </div>
             <div className="ml-4">
               <span
-                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${lesson.recurring_group_id
-                  ? "bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10"
-                  : "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                  }`}
+                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+                  lesson.status === "scheduled" 
+                    ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-700/10"
+                    : lesson.status === "completed"
+                      ? "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10" 
+                      : "bg-red-50 text-red-700 ring-1 ring-inset ring-red-700/10"
+                }`}
               >
-                {lesson.recurring_group_id ? "Recurring" : "One-time"}
+                {lesson.status.charAt(0).toUpperCase() + lesson.status.slice(1)}
               </span>
             </div>
           </div>
@@ -190,18 +280,37 @@ const LessonsList = () => {
       ))}
 
       {/* Pagination */}
-      {lessons.length > LESSONS_PER_PAGE && (
+      {filteredLessons.length > LESSONS_PER_PAGE && (
         <div className="flex justify-between items-center border-gray-200 bg-white py-3 border-t">
-          <div className="sm:flex sm:flex-1 sm:justify-between sm:items-center hidden">
+          <div className="sm:flex flex-wrap sm:flex-1 sm:justify-between sm:items-center gap-2 hidden">
             <div>
               <p className="text-gray-700 text-sm">
                 Showing{' '}
-                <span className="font-medium">{indexOfFirstLesson + 1}</span>{' '}
+                <span className="font-bold">{indexOfFirstLesson + 1}</span>{' '}
                 to{' '}
-                <span className="font-medium">{Math.min(indexOfLastLesson, lessons.length)}</span>{' '}
+                <span className="font-bold">
+                  {Math.min(indexOfLastLesson, filteredLessons.length)}
+                </span>{' '}
                 of{' '}
-                <span className="font-medium">{lessons.length}</span>{' '}
+                <span className="font-medium">{filteredLessons.length}</span>{' '}
                 lessons
+                {statusFilter && (
+                  <span className="ml-2">
+                    filtered by{' '}
+                    <span className="font-medium">
+                      {statusFilter}
+                    </span>
+                    <button 
+                      onClick={() => {
+                        setStatusFilter(null);
+                        setCurrentPage(1);
+                      }}
+                      className="ml-2 text-primary hover:text-primary-focus"
+                    >
+                      <X className="inline w-4 h-4" />
+                    </button>
+                  </span>
+                )}
               </p>
             </div>
             <div>
@@ -214,20 +323,26 @@ const LessonsList = () => {
                   <span className="sr-only">Previous</span>
                   <CaretLeft aria-hidden="true" className="w-5 h-5" />
                 </button>
-                {[...Array(totalPages)].map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handlePageChange(index + 1)}
-                    className={`
-                      relative inline-flex items-center px-4 py-2 text-sm font-semibold 
-                      ${currentPage === index + 1 
-                        ? 'bg-primary text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                        : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                      }
-                    `}
-                  >
-                    {index + 1}
-                  </button>
+                {getPageNumbers(currentPage, totalPages).map((pageNumber, index) => (
+                  pageNumber === '...' ? (
+                    <span key={`dots-${index}`} className="inline-flex relative items-center px-4 py-2 font-semibold text-gray-700 text-sm">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={index}
+                      onClick={() => handlePageChange(pageNumber as number)}
+                      className={`
+                        relative inline-flex items-center px-4 py-2 text-sm font-semibold 
+                        ${currentPage === pageNumber 
+                          ? 'bg-primary text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                          : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                        }
+                      `}
+                    >
+                      {pageNumber}
+                    </button>
+                  )
                 ))}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
@@ -246,14 +361,14 @@ const LessonsList = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="inline-flex relative items-center border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 px-4 py-2 border rounded-md font-medium text-gray-700 text-sm disabled:cursor-not-allowed"
+              className="inline-flex relative rounded-md font-medium text-base-200 text-sm disabled:cursor-not-allowed btn btn-primary btn-sm disabled:btn-disabled"
             >
               Previous
             </button>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="inline-flex relative items-center border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 ml-3 px-4 py-2 border rounded-md font-medium text-gray-700 text-sm disabled:cursor-not-allowed"
+              className="inline-flex relative rounded-md font-medium text-base-200 text-sm disabled:cursor-not-allowed btn btn-primary btn-sm disabled:btn-disabled"
             >
               Next
             </button>
