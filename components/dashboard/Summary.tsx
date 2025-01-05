@@ -3,6 +3,7 @@
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
+import { ArrowRight } from "@phosphor-icons/react";
 import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { useSupabase } from "@/hooks/useSupabase";
@@ -98,95 +99,95 @@ const Summary = () => {
 
   if (isLoading) {
     return (
-      <div className="lg:col-start-3 lg:row-end-1 skeleton">
-        <h2 className="sr-only">Summary</h2>
-        <div className="gap-x-4 shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full max-h-[227px] skeleton">
-          <div className="space-y-4 skeleton">
-            <div className="flex items-center gap-4 skeleton">
-              <div className="rounded-full w-6 h-6 skeleton"></div>
-              <div className="rounded w-1/4 h-4 skeleton"></div>
-            </div>
-            <div className="rounded w-1/2 h-4 skeleton"></div>
-            <div className="rounded w-3/4 h-4 skeleton"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      <div className="lg:col-start-3 lg:row-end-1 rounded-md w-full skeleton">
+        <div className="gap-x-4 w-full h-full">
+          <div className="flex flex-col">
+            <div className="flex flex-wrap justify-between items-center px-6 py-4">
+              <div className="flex flex-row flex-auto items-center gap-4">
+                <div className="rounded-full w-16 h-16 skeleton"></div>
+                <div className="flex flex-col gap-2">
+                  <div className="rounded w-32 h-4 skeleton"></div>
+                  <div className="rounded w-16 h-4 skeleton"></div>
+                </div>
 
-  if (!session || !profile) {
-    return (
-      <div className="lg:col-start-3 lg:row-end-1">
-        <h2 className="sr-only">Summary</h2>
-        <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full max-h-[227px]">
-          <p className="text-gray-500">No profile information available</p>
+              </div>
+
+              <div className="rounded w-16 h-8 skeleton"></div>
+            </div>
+
+            <div className="flex lg:flex-row flex-col justify-between items-center skeleton">
+              <div className="flex gap-2 px-6 py-4 w-full">
+                <div className="w-1/4 h-4 skeleton"></div>
+                <div className="w-1/2 h-4 skeleton"></div>
+              </div>
+
+              <div className="flex gap-2 px-6 py-4 w-full">
+                <div className="w-1/4 h-4 skeleton"></div>
+                <div className="w-1/2 h-4 skeleton"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="lg:col-start-3 lg:row-end-1 w-full">
-      <h2 className="sr-only">Summary</h2>
-      <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full h-full">
-        <dl className="flex flex-wrap items-center">
-          <div className="flex flex-row flex-auto items-center gap-4">
-            <dt>
+    <div className="lg:col-start-3 lg:row-end-1 rounded-md w-full">
+      <div className="gap-x-4 bg-white shadow-md rounded-md w-full h-full">
+        <div className="flex flex-col rounded-md">
+          <div className="flex flex-wrap justify-between items-center px-6 py-4">
+            <div className="flex flex-row flex-auto items-center gap-4">
               <Avatar
                 src={profile.image}
                 alt={profile.name}
-                width={24}
-                height={24}
+                width={64}
+                height={64}
               />
-            </dt>
-            <dd className="font-semibold text-base text-gray-900">
-              {profile.name}
-            </dd>
-          </div>
-          <div className="flex-none mb-3 self-end">
-            <dt className="sr-only">Status</dt>
-            <dd
-              className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
-                ? "bg-green-50 text-green-700 ring-green-600/20"
-                : "bg-red-50 text-red-700 ring-red-600/20"
-                }`}
-            >
-              {profile.has_access ? "Active" : "Inactive"}
-            </dd>
+              <div className="flex flex-col gap-2">
+                <span className="font-semibold text-base text-gray-900">
+                  {profile.name}
+                </span>
+                <span
+                  className={`w-fit rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
+                    ? "bg-green-50 text-green-700 ring-green-600/20"
+                    : "bg-red-50 text-red-700 ring-red-600/20"
+                    }`}
+                >
+                  {profile.has_access ? "Active" : "Inactive"}
+                </span>
+              </div>
+
+            </div>
+
+            <Link href="/profile" className="btn btn-outline btn-primary btn-sm">
+              View profile
+            </Link>
           </div>
 
-          <div className="flex flex-none gap-x-4 mt-2 w-full">
-            <dt className="flex-none">
-              <span className="text-gray-500 text-sm/6">Enrolled:</span>
-            </dt>
-            <dd className="text-gray-500 text-sm/6">
-              <time dateTime={new Date(profile.created_at).toISOString()}>
-                {new Date(profile.created_at).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-            </dd>
-          </div>
-          <div className="flex flex-none gap-x-4 mt-2 w-full">
-            <dt className="flex-none">
-              <span className="text-gray-500 text-sm/6">Level:</span>
-            </dt>
-            <dd className="text-gray-500 text-sm/6">
-              {profile.portuguese_level
-                ? profile.portuguese_level.charAt(0).toUpperCase() + profile.portuguese_level.slice(1)
-                : "Unknown"}
-            </dd>
-          </div>
-        </dl>
+          <div className="flex lg:flex-row flex-col justify-between items-center border-gray-200 bg-gray-50 border-t rounded-b-md divide-x divide-gray-200">
+            <div className="flex gap-2 px-6 py-4 w-full">
+              <span className="font-semibold text-gray-500 text-sm/6">Enrolled:</span>
+              <span className="text-gray-500 text-sm/6">
+                <time dateTime={new Date(profile.created_at).toISOString()}>
+                  {new Date(profile.created_at).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </span>
+            </div>
 
-        <div className="divider"></div>
-
-        <div className="py-5">
-          <Link href="/profile" className="font-semibold text-gray-900 text-sm/6">
-            View profile <span aria-hidden="true">&rarr;</span>
-          </Link>
+            <div className="flex gap-2 px-6 py-4 w-full">
+              <span className="font-semibold text-gray-500 text-sm/6">Level:</span>
+              <span className="text-gray-500 text-sm/6">
+                {profile.portuguese_level
+                  ? profile.portuguese_level.charAt(0).toUpperCase() + profile.portuguese_level.slice(1)
+                  : "Unknown"}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
