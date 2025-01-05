@@ -5,7 +5,7 @@ export interface Class {
   start_time: string;
   end_time: string;
   notes?: string;
-  status: 'scheduled' | 'confirmed' | 'cancelled';
+  status: 'scheduled' | 'completed' | 'cancelled' | 'confirmed';
   type: 'private' | 'group';
   credits_cost: number;
   recurring_group_id?: string | null;
