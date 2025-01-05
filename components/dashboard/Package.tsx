@@ -45,6 +45,7 @@ export default function Package() {
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching stats:", error);
+      setIsLoading(false);
     }
   };
 
@@ -97,6 +98,34 @@ export default function Package() {
     };
   }, [supabase]);
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col justify-between gap-4 px-6 rounded-md divide-y h-fit divide skeleton">
+        <div className="flex justify-between items-center py-4">
+          <div>
+            <div className="rounded w-32 h-6 skeleton"></div>
+            <div className="mt-2 rounded w-16 h-4 skeleton"></div>
+          </div>
+          <div className="flex gap-2">
+            <div className="rounded-md w-32 h-6 skeleton"></div>
+          </div>
+        </div>
+        <div className="flex flex-col justify-between gap-4 py-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <div className="rounded w-1/4 h-4 skeleton"></div>
+              <div className="rounded w-16 h-6 skeleton"></div>
+            </div>
+            <div className="flex items-center rounded-full w-full h-2.5 skeleton"></div>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="rounded w-1/4 h-4 skeleton"></div>
+            <div className="rounded w-16 h-6 skeleton"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!packageData) return null;
 
@@ -110,44 +139,10 @@ export default function Package() {
     : "Not available";
   const progress = totalLessons > 0 ? (scheduledLessons / totalLessons) * 100 : 0;
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col justify-between gap-4 shadow-sm p-6 border rounded-lg h-fit divide skeleton">
-        <div className="skeletonflex justify-between items-center">
-          <div>
-            <div className="rounded w-1/3 h-6 skeleton"></div>
-            <div className="mt-1 rounded w-1/5 h-5 skeleton"></div>
-          </div>
-          <div className="flex gap-2 skeleton">
-            <div className="rounded w-24 h-10 skeleton"></div>
-          </div>
-        </div>
-
-        <div className="divider skeleton"></div>
-
-        <div className="flex flex-col gap-4 skeleton">
-          <div className="flex flex-col gap-1 skeleton">
-            <div className="flex justify-between items-center skeleton">
-              <div className="rounded w-1/3 h-5 skeleton"></div>
-              <div className="rounded w-1/4 h-5 skeleton"></div>
-            </div>
-            <div className="bg-secondary rounded-full w-full h-2.5 skeleton">
-              <div className="bg-primary rounded-full h-2.5 skeleton"></div>
-            </div>
-          </div>
-          <div className="flex justify-between items-center skeleton">
-            <div className="rounded w-1/4 h-5 skeleton"></div>
-            <div className="rounded w-1/5 h-5 skeleton"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="flex flex-col justify-between gap-4 bg-white shadow-sm p-6 border rounded-md h-fit divide">
-        <div className="flex justify-between items-center">
+      <div className="flex flex-col justify-between gap-4 bg-white shadow-md px-6 rounded-md divide-y h-fit divide">
+        <div className="flex justify-between items-center py-4">
           <div>
             <h2 className="font-semibold text-lg">
               Classes Package
@@ -166,17 +161,15 @@ export default function Package() {
           </div>
         </div>
 
-        <div className="divider"></div>
-
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
+        <div className="flex flex-col justify-between gap-4 py-4">
+          <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground text-sm">Scheduled Classes</p>
               <p className="font-semibold">
                 {scheduledLessons}/{totalLessons}
               </p>
             </div>
-            <div className="bg-base-200 rounded-full w-full h-2.5">
+            <div className="flex items-center bg-base-200 rounded-full w-full">
               <div
                 className="bg-primary rounded-full h-2.5 transition-all duration-300"
                 style={{ width: `${progress}%` }}
