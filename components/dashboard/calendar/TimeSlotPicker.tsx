@@ -41,9 +41,9 @@ export const TimeSlotPicker = ({
               type="button"
               disabled={disabled}
               className={`
-                px-4 py-2 rounded-md text-sm font-medium transition-colors
-                ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-primary-content'}
-                ${isSelected ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'}
+                px-4 py-2 rounded-md text-sm font-medium btn
+                ${disabled ?? 'btn-disabled cursor-not-allowed'}
+                ${isSelected ? 'btn-primary text-base-100' : 'btn-outline'}
               `}
               onClick={() => handleTimeSelect(start, end)}
             >
