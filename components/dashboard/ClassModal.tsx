@@ -45,12 +45,12 @@ const timeSlots = [
   { start: '18:00', end: '19:00' },
 ];
 
-export const ClassModal = ({ 
-  isOpen, 
-  onClose, 
-  selectedDate: defaultDate, 
-  selectedClass, 
-  onClassUpdated 
+export const ClassModal = ({
+  isOpen,
+  onClose,
+  selectedDate: defaultDate,
+  selectedClass,
+  onClassUpdated
 }: ClassModalProps) => {
   const supabase = createClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,10 +67,10 @@ export const ClassModal = ({
   const [availableCredits, setAvailableCredits] = useState(0);
   const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  
+
   const [formData, setFormData] = useState(() => {
     let startTime: Date;
-    
+
     if (selectedClass?.start_time) {
       startTime = new Date(selectedClass.start_time);
     } else if (defaultDate) {
@@ -96,7 +96,7 @@ export const ClassModal = ({
   useEffect(() => {
     const timeZone = getUserTimeZone();
     setUserTimeZone(timeZone);
-    
+
     setFormData(prev => ({
       ...prev,
       time_zone: timeZone
@@ -113,7 +113,7 @@ export const ClassModal = ({
           .select("credits")
           .eq("id", user.id)
           .single();
-        
+
         setAvailableCredits(profile?.credits || 0);
       }
     };
@@ -130,7 +130,7 @@ export const ClassModal = ({
           .select("time_zone")
           .eq("id", user.id)
           .single();
-        
+
         setUserTimeZone(profile?.time_zone || '');
       }
     };
@@ -140,7 +140,7 @@ export const ClassModal = ({
   // Calculate class dates based on booking type
   const getClassDates = (): Date[] => {
     if (!selectedDate) return [];
-    
+
     const startTime = new Date(formData.start_time);
     const hours = startTime.getHours();
     const minutes = startTime.getMinutes();
@@ -150,7 +150,7 @@ export const ClassModal = ({
       date.setHours(hours, minutes, 0, 0);
       return [date];
     }
-    
+
     if (bookingType === 'multiple') {
       return selectedDates.map(date => {
         const newDate = new Date(date);
@@ -158,16 +158,16 @@ export const ClassModal = ({
         return newDate;
       });
     }
-    
+
     if (bookingType === 'recurring' && recurringConfig.daysOfWeek.length > 0) {
       const dates: Date[] = [];
       let currentDate = new Date(selectedDate);
       let count = 0;
       let maxDays = 365; // Safety limit to prevent infinite loops
-      
+
       // Ensure we start from the selected date
       currentDate.setHours(hours, minutes, 0, 0);
-      
+
       while (count < recurringConfig.occurrences && maxDays > 0) {
         const dayOfWeek = getDay(currentDate);
         if (recurringConfig.daysOfWeek.includes(dayOfWeek)) {
@@ -180,13 +180,13 @@ export const ClassModal = ({
 
       return dates;
     }
-    
+
     return [];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check if the selected date is bookable
     const startTime = new Date(formData.start_time);
     if (!isDateBookable(startTime)) {
@@ -335,7 +335,7 @@ export const ClassModal = ({
 
     try {
       setIsSubmitting(true);
-      
+
       if (cancelType === 'single') {
         // Cancel single class and remove it from the recurring group
         const { error } = await supabase
@@ -386,8 +386,8 @@ export const ClassModal = ({
       }
 
       // The trigger function will handle credit refunds automatically
-      toast.success(cancelType === 'single' 
-        ? "Class cancelled successfully" 
+      toast.success(cancelType === 'single'
+        ? "Class cancelled successfully"
         : "All future recurring classes cancelled successfully"
       );
       onClassUpdated();
@@ -412,7 +412,7 @@ export const ClassModal = ({
     newStartTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     const newEndTime = new Date(newStartTime);
     newEndTime.setHours(newEndTime.getHours() + 1);
-    
+
     setFormData({
       ...formData,
       start_time: newStartTime.toISOString(),
@@ -438,8 +438,8 @@ export const ClassModal = ({
 
     setFormData({
       title: "Portuguese Class",
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
+      start_time: startTime instanceof Date ? startTime.toISOString() : "",
+      end_time: endTime instanceof Date ? endTime.toISOString() : "",
       notes: "",
       time_zone: '',
     });
@@ -482,8 +482,8 @@ export const ClassModal = ({
 
       setFormData({
         title: "Portuguese Class",
-        start_time: startTime.toISOString(),
-        end_time: endTime.toISOString(),
+        start_time: startTime instanceof Date ? startTime.toISOString() : "",
+        end_time: endTime instanceof Date ? endTime.toISOString() : "",
         notes: "",
         time_zone: '',
       });
@@ -501,7 +501,7 @@ export const ClassModal = ({
       if (e.target === e.currentTarget) {
         handleClose();
       }
-    } }>
+    }}>
       <div className="relative bg-white shadow-xl rounded-md w-full max-w-2xl h-[90%] max-h-fit overflow-hidden" >
         {/* Header */}
         <div className="flex justify-between items-center bg-primary p-4 text-primary-content text">
@@ -513,14 +513,14 @@ export const ClassModal = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="divide-y divide-base-200 h-[calc(100%-64px)] max-h-fit overflow-auto">
+        <form onSubmit={handleSubmit} className="divide-y divide-base-200 h-[calc(100%-54px)] max-h-fit overflow-auto">
           {/* Title Section */}
           <div className="p-4">
             <div className="flex items-center gap-3">
               <NotePencil className="w-5 h-5 text-base-content/70" />
               <input
                 type="text"
-                className="focus:bg-transparent px-0 w-full font-medium text-lg input input-ghost"
+                className="focus:bg-transparent px-2 w-full font-medium text-lg input input-primary"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Add title"
@@ -535,15 +535,15 @@ export const ClassModal = ({
               <div className="flex items-center gap-2">
                 <span className="font-medium text-sm">Booking type:</span>
                 <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="w-full max-w-xs btn btn-outline">
+                  <div tabIndex={0} role="button" className="border-primary w-full max-w-xs btn btn-outline">
                     {bookingType === 'single' && 'Single Class'}
                     {bookingType === 'multiple' && 'Multiple Classes'}
                     {bookingType === 'recurring' && 'Recurring Classes'}
-                    <CaretDown className="w-4 h-4" />
+                    <CaretDown className="w-4 h-4 text-primary" />
                   </div>
-                  <ul tabIndex={0} className="bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
+                  <ul tabIndex={0} className="bg-base-200 shadow-lg p-2 rounded-md w-52 dropdown-content menu">
                     <li>
-                      <a 
+                      <a
                         className={bookingType === 'single' ? 'active' : ''}
                         onClick={() => setBookingType('single')}
                       >
@@ -592,7 +592,7 @@ export const ClassModal = ({
                         newStartTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
                         const newEndTime = new Date(newStartTime);
                         newEndTime.setHours(newEndTime.getHours() + 1);
-                        
+
                         setFormData({
                           ...formData,
                           start_time: newStartTime.toISOString(),
@@ -603,9 +603,6 @@ export const ClassModal = ({
                   }}
                   minDate={earliestDate}
                 />
-                <p className="text-base-content/70 text-sm">
-                  Note: Classes can only be scheduled at least 24 business hours in advance.
-                </p>
 
                 <TimeSlotPicker
                   timeSlots={timeSlots}
@@ -613,6 +610,10 @@ export const ClassModal = ({
                   onSelect={handleTimeSelect}
                   disabled={!selectedDate}
                 />
+
+                <p className="text-base-content/70 text-sm">
+                  Note: Classes can only be scheduled at least 24 business hours in advance.
+                </p>
               </div>
             </div>
           </div>
@@ -633,7 +634,7 @@ export const ClassModal = ({
             <div className="flex items-start gap-3">
               <NotePencil className="mt-2 w-5 h-5 text-base-content/70" />
               <textarea
-                className="focus:bg-transparent px-2 border w-full min-h-[100px] textarea textarea-ghost"
+                className="focus:bg-transparent px-2 border w-full min-h-[100px] textarea textarea-primary"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Add description or special requests..."
@@ -698,8 +699,8 @@ export const ClassModal = ({
                       type="submit"
                       className="text-base-200 btn btn-primary btn-sm"
                       disabled={
-                        isSubmitting || 
-                        !selectedDate || 
+                        isSubmitting ||
+                        !selectedDate ||
                         (bookingType === 'recurring' && recurringConfig.daysOfWeek.length === 0) ||
                         (bookingType === 'multiple' && selectedDates.length === 0)
                       }
@@ -753,28 +754,28 @@ export const ClassModal = ({
       {/* Cancel Dialog */}
       {showCancelDialog && (
         <div className="z-[60] fixed inset-0 flex justify-center items-center bg-black/50">
-          <div className="bg-base-100 p-6 rounded-lg w-full max-w-md">
+          <div className="bg-base-100 shadow-lg p-6 rounded-lg w-full max-w-md">
             <h3 className="mb-4 font-medium text-lg">Cancel Recurring Class</h3>
             <p className="mb-6 text-base-content/70">
               Would you like to cancel this class only, or all future classes in the series?
             </p>
             <div className="flex justify-end gap-2">
               <button
-                className="btn btn-outline"
+                className="btn btn-outline btn-sm"
                 onClick={() => setShowCancelDialog(false)}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 Keep Classes
               </button>
               <button
-                className="btn btn-accent"
+                className="btn btn-accent btn-sm"
                 onClick={() => cancelClass('single')}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 This class
               </button>
               <button
-                className="btn btn-error"
+                className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-sm"
                 onClick={() => cancelClass('all')}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
