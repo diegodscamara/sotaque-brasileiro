@@ -46,7 +46,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
+                  className="btn btn-error btn-sm"
                 >
                   Cancel
                 </button>
@@ -60,7 +60,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing('name');
                     setEditValue(profile.name || '');
                   }}
-                  className="btn btn-outline btn-sm"
+                  className="btn btn-outline btn-primary btn-sm"
                 >
                   <PencilLine className="w-5 h-5" />
                   Update
@@ -107,7 +107,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
+                  className="btn btn-error btn-sm"
                 >
                   Cancel
                 </button>
@@ -123,7 +123,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing('gender');
                     setEditValue(profile.gender || '');
                   }}
-                  className="btn btn-outline btn-sm"
+                  className="btn btn-outline btn-primary btn-sm"
                 >
                   <PencilLine className="w-5 h-5" />
                   Update
@@ -158,7 +158,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
+                  className="btn btn-error btn-sm"
                 >
                   Cancel
                 </button>
@@ -174,7 +174,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing('country');
                     setEditValue(profile.country || '');
                   }}
-                  className="btn btn-outline btn-sm"
+                  className="btn btn-outline btn-primary btn-sm"
                 >
                   <PencilLine className="w-5 h-5" />
                   Update

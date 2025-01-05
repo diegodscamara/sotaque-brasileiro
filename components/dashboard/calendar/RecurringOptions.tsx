@@ -35,7 +35,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
                    text-sm font-medium btn min-h-fit h-6 w-6 px-5 py-2.5
                   ${config.daysOfWeek.includes(index)
                     ? 'btn-primary text-base-100'
-                    : 'btn-outline'
+                    : 'btn-outline btn-primary'
                   }
                 `}
                 onClick={() => {

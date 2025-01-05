@@ -57,7 +57,7 @@ export const DatePicker = ({ mode, selected, onSelect, minDate }: DatePickerProp
     <div className="space-y-2" ref={containerRef}>
       <button
         type="button"
-        className="justify-start gap-2 px-2 w-fit font-normal btn btn-outline"
+        className="justify-start gap-2 px-2 w-fit btn btn-outline btn-primary btn-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
         {getDisplayText()}

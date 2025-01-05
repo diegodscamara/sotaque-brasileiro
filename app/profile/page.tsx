@@ -172,10 +172,9 @@ const StudentProfile = () => {
   }
 
   return (
-    <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-      <Breadcrumb />
-
-      <div className="flex lg:flex-row flex-col gap-y-8 lg:gap-x-8 mt-8">
+    <div className="flex flex-col gap-6 w-full">
+        <Breadcrumb />
+      <div className="flex lg:flex-row flex-col gap-6 w-full">
         {/* Sidebar Tabs */}
         <div className="flex-none lg:w-64">
           <div className="lg:flex-col tabs tabs-vertical">
@@ -201,7 +200,7 @@ const StudentProfile = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1">
+        <div className="w-full">
           <div className="bg-white shadow-sm p-6 border rounded-md">
             {activeTab === 'basic' && (
               <BasicInfo
@@ -234,7 +233,7 @@ const StudentProfile = () => {
           <div className="flex justify-end items-center gap-x-4 my-8">
             <button
               type="button"
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-primary btn-sm"
               onClick={() => {
                 setIsEditing(null);
                 setEditValue("");

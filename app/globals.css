@@ -26,38 +26,17 @@ progress::-webkit-progress-value {
 }
 
 .tabs-vertical .tab {
-  @apply border-l-2 border-transparent px-4 py-3 text-sm;
+  @apply px-4 py-3 border-transparent border-l-2 text-sm;
 }
 
 .tabs-vertical .tab-active {
-  @apply border-l-2 border-primary text-primary bg-base-200;
+  @apply  bg-primary/10 border-l-2 text-primary font-bold;
 }
 
-/* Drag and Drop Styles */
-.drop-target {
-  position: relative;
+.tabs-vertical .tab-active:hover {
+  @apply cursor-default;
 }
 
-.drop-target::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px dashed hsl(var(--p));
-  border-radius: 0.5rem;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.drop-target:hover::after {
-  opacity: 1;
-}
-
-[draggable="true"] {
-  cursor: move;
-  user-select: none;
-}
-
-[draggable="true"]:active {
-  opacity: 0.5;
+.tabs-vertical .tab:not(.tab-active):hover {
+  @apply bg-primary/20;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { House } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -29,10 +30,13 @@ const Breadcrumb = () => {
   };
 
   return (
-    <div className="breadcrumbs text-sm">
+    <div className="text-sm breadcrumbs">
       <ul>
         <li>
-          <Link href="/">Home</Link>
+          <Link href="/" className="flex items-center gap-2">
+            <House  className="w-4 h-4" />
+            Home
+          </Link>
         </li>
         {renderBreadcrumbs()}
       </ul>

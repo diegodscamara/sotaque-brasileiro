@@ -504,11 +504,11 @@ export const ClassModal = ({
     }}>
       <div className="relative bg-white shadow-xl rounded-md w-full max-w-2xl h-[90%] max-h-fit overflow-hidden" >
         {/* Header */}
-        <div className="flex justify-between items-center bg-primary p-4 text-primary-content text">
+        <div className="flex justify-between items-center bg-gray-200 p-4 text-primary-content text">
           <h2 className="font-medium text-lg">
             {selectedClass ? "Edit Class" : "Schedule Classes"}
           </h2>
-          <button onClick={handleClose} className="text-primary-content btn btn-outline btn-sm btn-square">
+          <button onClick={handleClose} className="btn btn-circle btn-outline btn-sm">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -520,7 +520,7 @@ export const ClassModal = ({
               <NotePencil className="w-5 h-5 text-base-content/70" />
               <input
                 type="text"
-                className="focus:bg-transparent px-2 w-full font-medium text-lg input input-primary"
+                className="focus:bg-transparent px-2 w-full font-medium text-lg input input-primary input-sm"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Add title"
@@ -535,7 +535,7 @@ export const ClassModal = ({
               <div className="flex items-center gap-2">
                 <span className="font-medium text-sm">Booking type:</span>
                 <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="border-primary w-full max-w-xs btn btn-outline">
+                  <div tabIndex={0} role="button" className="border-primary w-full max-w-xs btn btn-outline btn-primary btn-sm">
                     {bookingType === 'single' && 'Single Class'}
                     {bookingType === 'multiple' && 'Multiple Classes'}
                     {bookingType === 'recurring' && 'Recurring Classes'}
@@ -661,7 +661,7 @@ export const ClassModal = ({
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-error btn-sm"
+                      className="btn btn-error btn-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting && <span className="loading loading-spinner loading-xs" />}
@@ -670,7 +670,7 @@ export const ClassModal = ({
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="btn btn-outline btn-sm"
+                      className="btn btn-outline btn-primary btn-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting && <span className="loading loading-spinner loading-xs" />}
@@ -690,7 +690,7 @@ export const ClassModal = ({
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-error btn-sm"
+                      className="btn btn-error btn-sm"
                     >
                       {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                       Cancel
@@ -733,7 +733,7 @@ export const ClassModal = ({
                 Cancel
               </button>
               <button
-                className="btn btn-outline"
+                className="btn btn-outline btn-primary"
                 onClick={() => submitChanges('single')}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
@@ -761,7 +761,7 @@ export const ClassModal = ({
             </p>
             <div className="flex justify-end gap-2">
               <button
-                className="btn btn-outline btn-sm"
+                className="btn btn-outline btn-primary btn-sm"
                 onClick={() => setShowCancelDialog(false)}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
@@ -775,7 +775,7 @@ export const ClassModal = ({
                 This class
               </button>
               <button
-                className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-sm"
+                className="btn btn-error btn-sm"
                 onClick={() => cancelClass('all')}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}

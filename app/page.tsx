@@ -4,7 +4,7 @@ import FeaturesAccordion from "@/components/landing-page/FeaturesAccordion";
 import FeaturesGrid from "@/components/landing-page/FeaturesGrid";
 import FeaturesListicle from "@/components/landing-page/FeaturesListicle";
 import Footer from "@/components/Footer";
-import Header from "@/components/landing-page/Header";
+import Header from "@/components/Header";
 import Hero from "@/components/landing-page/Hero";
 import Pricing from "@/components/landing-page/Pricing";
 import Problem from "@/components/landing-page/Problem";

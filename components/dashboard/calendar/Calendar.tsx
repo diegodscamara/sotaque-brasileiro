@@ -312,7 +312,7 @@ export const MonthCalendar = () => {
           </button>
           
           <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="flex items-center gap-2 m-1 btn btn-outline btn-sm">
+            <div tabIndex={0} role="button" className="flex items-center gap-2 m-1 btn btn-outline btn-primary btn-sm">
               {view === 'monthly' ? 'Monthly' : 'Weekly'} View
               <CaretDown className="w-4 h-4" />
             </div>

@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import Footer from "@/components/Footer";
-import Header from "@/components/landing-page/Header";
+import Header from "@/components/Header";
 import { ReactNode } from "react";
 import { Suspense } from "react";
 import config from "@/config";
@@ -31,8 +31,7 @@ export default async function LayoutPrivate({
       <Suspense>
         <Header />
       </Suspense>
-      <main className="flex flex-col gap-6 mx-auto p-4 md:p-6 lg:p-8 max-w-7xl">
-        <Breadcrumb />
+      <main className="flex flex-col justify-between items-center mx-auto p-8 container">
         {children}
       </main>
       <Footer />

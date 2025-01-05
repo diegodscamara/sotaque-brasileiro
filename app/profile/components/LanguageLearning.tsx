@@ -91,7 +91,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
+                  className="btn btn-error btn-sm"
                 >
                   Cancel
                 </button>
@@ -108,7 +108,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
                   setIsEditing('learning_goals');
                   setEditValue(profile.learning_goals?.join('\n') || '');
                 }}
-                className="btn btn-outline btn-sm"
+                className="btn btn-outline btn-primary btn-sm"
               >
                 <PencilLine className="w-5 h-5" />
                 Update
@@ -187,7 +187,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
                   setIsEditing(null);
                   setEditValue("");
                 }}
-                className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
+                className="btn btn-error btn-sm"
               >
                   Cancel
                 </button>
@@ -204,7 +204,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
                   setIsEditing('motivation_for_learning');
                   setEditValue(profile.motivation_for_learning || '');
                 }}
-                className="btn btn-outline btn-sm"
+                className="btn btn-outline btn-primary btn-sm"
               >
                 <PencilLine className="w-5 h-5" />
                 Update

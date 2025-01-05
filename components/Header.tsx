@@ -2,47 +2,64 @@
 
 import { useEffect, useState } from "react";
 
-import ButtonSignin from "./ButtonSignin";
+import ButtonSignin from "@/components/ButtonSignin";
 import Image from "next/image";
 import type { JSX } from "react";
 import Link from "next/link";
+import { User } from "@supabase/supabase-js";
 import config from "@/config";
+import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { useSearchParams } from "next/navigation";
 
-const links: {
-  href: string;
-  label: string;
-}[] = [
-  {
-    href: "/#pricing",
-    label: "Pricing",
-  },
-  {
-    href: "/#testimonials",
-    label: "Reviews",
-  },
-  {
-    href: "/#faq",
-    label: "FAQ",
-  },
-];
-
-const cta: JSX.Element = <ButtonSignin extraStyle="btn-primary text-base-200" />;
+const cta: JSX.Element = <ButtonSignin extraStyle="btn-primary" />;
 
 // A header with a logo on the left, links in the center (like Pricing, etc...), and a CTA (like Get Started or Login) on the right.
 // The header is responsive, and on mobile, the links are hidden behind a burger button.
 const Header = () => {
+  const supabase = createClient();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [user, setUser] = useState<User>(null);
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
     setIsOpen(false);
   }, [searchParams]);
 
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setUser(user);
+    };
+
+    getUser();
+  }, [supabase]);
+
+  const links: {
+    href: string;
+    label: string;
+  }[] = [
+    {
+      href: "/#pricing",
+      label: "Pricing",
+    },
+    {
+      href: "/#testimonials",
+      label: "Reviews",
+    },
+    {
+      href: "/#faq",
+      label: "FAQ",
+    },
+    ...(user ? [{ href: "/dashboard", label: "Dashboard" }] : []),
+  ];
+
   return (
-    <header className="bg-base-200/50 shadow-lg">
+    <header className="bg-base-100">
       <nav
         className="flex justify-between items-center mx-auto px-8 py-4 container"
         aria-label="Global"
