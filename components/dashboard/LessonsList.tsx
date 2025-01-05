@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarBlank, CaretLeft, CaretRight, Clock, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
+import { Calendar, CalendarBlank, CaretLeft, CaretRight, Clock, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { Class } from "@/types/class";
@@ -182,13 +182,13 @@ const LessonsList = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-white shadow-sm p-6 border rounded-md divide-y divide">
-      <div className="flex justify-between items-center">
+    <div className="flex flex-col bg-white shadow-md px-6 rounded-md divide-y divide">
+      <div className="flex justify-between items-center py-4">
         <h2 className="font-semibold text-lg">Classes List</h2>
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="flex items-center gap-2 btn btn-outline btn-sm">
-            <FunnelSimple className="w-4 h-4 text-primary" />
-            {statusFilter ? statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1) : 'All'}
+          <div tabIndex={0} role="button" className="flex items-center gap-2 btn btn-outline btn-primary btn-sm">
+            <FunnelSimple className="w-4 h-4" />
+            {statusFilter ? statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1) : 'All Classes'}
           </div>
           <ul tabIndex={0} className="z-[1] bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
             <li>
@@ -199,7 +199,7 @@ const LessonsList = () => {
                   setCurrentPage(1);
                 }}
               >
-                All
+                All Classes
               </a>
             </li>
             <li>
@@ -245,7 +245,7 @@ const LessonsList = () => {
               <h3 className="font-semibold text-base">{lesson.title}</h3>
               <div className="space-y-1 mt-1">
                 <div className="flex items-center text-base-content/70 text-sm">
-                  <Clock className="flex-shrink-0 mr-1.5 w-4 h-4" />
+                  <Calendar className="flex-shrink-0 mr-1.5 w-4 h-4" />
                   <time dateTime={lesson.start_time}>
                     {format(new Date(lesson.start_time), "EEEE, MMMM d, yyyy")}
                   </time>
@@ -281,7 +281,7 @@ const LessonsList = () => {
 
       {/* Pagination */}
       {filteredLessons.length > LESSONS_PER_PAGE && (
-        <div className="flex justify-between items-center border-gray-200 bg-white py-3 border-t">
+        <div className="flex justify-between items-center border-gray-200 bg-white py-4 border-t">
           <div className="sm:flex flex-wrap sm:flex-1 sm:justify-between sm:items-center gap-2 hidden">
             <div>
               <p className="text-gray-700 text-sm">
