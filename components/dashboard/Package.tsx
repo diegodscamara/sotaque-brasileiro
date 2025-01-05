@@ -150,7 +150,7 @@ export default function Package() {
         <div className="flex justify-between items-center">
           <div>
             <h2 className="font-semibold text-lg">
-              Lesson Package
+              Classes Package
             </h2>
             <p className="text-muted-foreground text-sm">
               Portuguese
@@ -159,7 +159,7 @@ export default function Package() {
           <div className="flex gap-2">
             <button
               onClick={() => setIsCalendarModalOpen(true)}
-              className="text-base-200 btn btn-primary btn-sm"
+              className="rounded-md text-base-200 btn btn-primary btn-sm"
             >
               <Calendar className="mr-2" /> Schedule Class
             </button>
@@ -171,7 +171,7 @@ export default function Package() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center">
-              <p className="text-muted-foreground text-sm">Scheduled Lessons</p>
+              <p className="text-muted-foreground text-sm">Scheduled Classes</p>
               <p className="font-semibold">
                 {scheduledLessons}/{totalLessons}
               </p>
