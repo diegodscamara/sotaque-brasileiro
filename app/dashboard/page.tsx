@@ -7,20 +7,16 @@ import Summary from "@/components/dashboard/Summary";
 
 export default function Dashboard() {
   return (
-    <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
-      <div className="md:col-span-2">
-        <Stats />
-      </div>
-      <div className="gap-6 grid grid-cols-1 md:col-span-1">
-        <div className="md:col-span-1">
+    <div className="flex flex-col gap-6">
+      <Stats />
+      <div className="flex lg:flex-row flex-col gap-6">
+        <div className="flex flex-col gap-6 w-full">
           <Summary />
-        </div>
-        <div className="md:col-span-1">
           <Package />
         </div>
-      </div>
-      <div className="md:col-span-1">
-        <LessonsList />
+        <div className="w-full">
+          <LessonsList />
+        </div>
       </div>
     </div>
   );
