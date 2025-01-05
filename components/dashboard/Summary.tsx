@@ -126,7 +126,7 @@ const Summary = () => {
   }
 
   return (
-    <div className="lg:col-start-3 lg:row-end-1">
+    <div className="lg:col-start-3 lg:row-end-1 w-full">
       <h2 className="sr-only">Summary</h2>
       <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 border rounded-md w-full h-full">
         <dl className="flex flex-wrap items-center">
