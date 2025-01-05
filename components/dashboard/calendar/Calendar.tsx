@@ -1,7 +1,7 @@
 "use client";
 
-import { Calendar as CalendarIcon, CaretDown, CaretLeft, CaretRight, Clock, List } from "@phosphor-icons/react";
-import { addBusinessDays, addDays, addMonths, addWeeks, differenceInHours, eachDayOfInterval, endOfWeek, format, isAfter, isBefore, isSameDay, setHours, startOfWeek, subMonths, subWeeks } from "date-fns";
+import { Calendar as CalendarIcon, CaretDown, CaretLeft, CaretRight, List } from "@phosphor-icons/react";
+import { addMonths, addWeeks, eachDayOfInterval, endOfWeek, format, isSameDay, startOfWeek, subMonths, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 
 import type { Class } from "@/types/class";
@@ -17,34 +17,12 @@ interface CalendarDay {
   events: Class[];
 }
 
-interface TimeSlot {
-  start: string;
-  end: string;
-}
-
-const timeSlots: TimeSlot[] = [
-  { start: '09:00', end: '10:00' },
-  { start: '10:00', end: '11:00' },
-  { start: '11:00', end: '12:00' },
-  { start: '14:00', end: '15:00' },
-  { start: '15:00', end: '16:00' },
-  { start: '16:00', end: '17:00' },
-  { start: '17:00', end: '18:00' },
-  { start: '18:00', end: '19:00' },
-];
-
 const HOURS = [
   '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', 
   '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', 
   '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', 
   '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
 ];
-
-const isDateDisabled = (date: Date) => {
-  const now = new Date();
-  const earliestDate = setHours(addBusinessDays(now, 1), 9);
-  return isBefore(date, earliestDate);
-};
 
 export const MonthCalendar = () => {
   const supabase = createClient();
