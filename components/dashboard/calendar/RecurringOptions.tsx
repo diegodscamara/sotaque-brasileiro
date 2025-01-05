@@ -31,11 +31,11 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
                 key={index}
                 type="button"
                 className={`
-                  w-9 h-9 rounded-full flex items-center justify-center
-                  transition-colors text-sm font-medium
+                  rounded-full
+                   text-sm font-medium btn min-h-fit h-6 w-6 px-5 py-2.5
                   ${config.daysOfWeek.includes(index)
-                    ? 'bg-primary text-primary-content'
-                    : 'bg-base-200 hover:bg-base-300'
+                    ? 'btn-primary text-base-100'
+                    : 'btn-outline'
                   }
                 `}
                 onClick={() => {
@@ -59,7 +59,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                className="radio radio-sm"
+                className="radio radio-primary radio-sm"
                 checked={config.endType === 'after'}
                 onChange={() => onChange({ ...config, endType: 'after' })}
               />
@@ -68,7 +68,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                className="input-bordered w-20 input input-sm"
+                className="input-bordered w-20 input input-primary input-sm"
                 min="1"
                 max={maxOccurrences}
                 value={config.occurrences}
@@ -85,7 +85,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                className="radio radio-sm"
+                className="radio radio-primary radio-sm"
                 checked={config.endType === 'on'}
                 onChange={() => onChange({ ...config, endType: 'on' })}
               />
@@ -93,7 +93,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
             </label>
             <input
               type="date"
-              className="input-bordered input input-sm"
+              className="input-bordered input input-primary input-sm"
               disabled={config.endType !== 'on'}
               min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
               max={format(addDays(new Date(), 30), 'yyyy-MM-dd')}
