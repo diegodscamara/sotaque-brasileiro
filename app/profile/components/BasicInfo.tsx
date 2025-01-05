@@ -1,6 +1,8 @@
 import { Combobox } from "@/components/ui/combobox";
+import { PencilLine } from "@phosphor-icons/react";
 import { StudentProfileData } from '@/types/profile';
 import { countries } from '@/data/countries';
+import { is } from "date-fns/locale";
 
 interface BasicInfoProps {
   profile: StudentProfileData;
@@ -15,27 +17,27 @@ interface BasicInfoProps {
 export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEditValue, handleUpdate, genderOptions }: BasicInfoProps) => {
   return (
     <div>
-      <h2 className="text-base font-semibold text-gray-900">Basic Information</h2>
-      <p className="mt-1 text-sm text-gray-500">
+      <h2 className="font-semibold text-base text-gray-900">Basic Information</h2>
+      <p className="mt-1 text-gray-500 text-sm">
         This information will be displayed publicly so be careful what you share.
       </p>
 
-      <dl className="mt-6 space-y-6 divide-y divide-gray-100 border-t border-gray-200 text-sm">
+      <dl className="space-y-6 border-gray-200 mt-6 border-t divide-y divide-gray-100 text-sm">
         {/* Name */}
-        <div className="pt-6 sm:flex">
-          <dt className="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Name</dt>
-          <dd className="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
+        <div className="sm:flex pt-6">
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Name</dt>
+          <dd className="flex sm:flex-auto justify-between items-center gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'name' ? (
-              <div className="flex gap-x-4 w-full">
+              <div className="flex items-center gap-x-4 w-full">
                 <input
                   type="text"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="input input-bordered w-full"
+                  className="input-bordered w-full input input-primary input-sm"
                 />
                 <button
                   onClick={() => handleUpdate('name', editValue)}
-                  className="btn btn-success btn-sm"
+                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
                 </button>
@@ -44,7 +46,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
+                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
                 >
                   Cancel
                 </button>
@@ -58,8 +60,9 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing('name');
                     setEditValue(profile.name || '');
                   }}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-outline btn-sm"
                 >
+                  <PencilLine className="w-5 h-5" />
                   Update
                 </button>
               </>
@@ -68,23 +71,23 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
         </div>
 
         {/* Email */}
-        <div className="pt-6 sm:flex">
-          <dt className="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Email</dt>
-          <dd className="mt-1 sm:mt-0 sm:flex-auto">
+        <div className="sm:flex pt-6">
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Email</dt>
+          <dd className="sm:flex-auto mt-1 sm:mt-0">
             <div className="text-gray-900">{profile.email}</div>
           </dd>
         </div>
 
         {/* Gender */}
-        <div className="pt-6 sm:flex">
-          <dt className="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Gender</dt>
-          <dd className="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
+        <div className="sm:flex pt-6">
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Gender</dt>
+          <dd className="flex sm:flex-auto justify-between gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'gender' ? (
-              <div className="flex gap-x-4 w-full">
+              <div className="flex items-center gap-x-4 w-full">
                 <select
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="select select-bordered w-full"
+                  className="w-full select-bordered select-primary select-sm select"
                 >
                   <option value="">Select gender</option>
                   {genderOptions.map((option) => (
@@ -95,7 +98,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                 </select>
                 <button
                   onClick={() => handleUpdate('gender', editValue)}
-                  className="btn btn-success btn-sm"
+                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
                 </button>
@@ -104,7 +107,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
+                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
                 >
                   Cancel
                 </button>
@@ -120,8 +123,9 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing('gender');
                     setEditValue(profile.gender || '');
                   }}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-outline btn-sm"
                 >
+                  <PencilLine className="w-5 h-5" />
                   Update
                 </button>
               </>
@@ -130,11 +134,11 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
         </div>
 
         {/* Country */}
-        <div className="pt-6 sm:flex">
-          <dt className="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">Country</dt>
-          <dd className="flex justify-between mt-1 gap-x-6 sm:mt-0 sm:flex-auto">
+        <div className="sm:flex pt-6">
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Country</dt>
+          <dd className="flex sm:flex-auto justify-between gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'country' ? (
-              <div className="flex gap-x-4 w-full">
+              <div className="flex items-center gap-x-4 w-full">
                 <div className="flex-1">
                   <Combobox
                     options={countries}
@@ -145,7 +149,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                 </div>
                 <button
                   onClick={() => handleUpdate('country', editValue)}
-                  className="btn btn-success btn-sm"
+                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
                 </button>
@@ -154,7 +158,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
+                  className="bg-red-600 hover:bg-red-700 text-base-200 btn btn-ghost btn-sm"
                 >
                   Cancel
                 </button>
@@ -170,8 +174,9 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     setIsEditing('country');
                     setEditValue(profile.country || '');
                   }}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-outline btn-sm"
                 >
+                  <PencilLine className="w-5 h-5" />
                   Update
                 </button>
               </>
