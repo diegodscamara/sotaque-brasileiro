@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { CreditCard, SignOut, UserCircle } from "@phosphor-icons/react";
 import { Popover, Transition } from "@headlessui/react";
 import { useEffect, useState } from "react";
 
@@ -8,6 +9,7 @@ import Avatar from "@/components/Avatar";
 import { User } from "@supabase/supabase-js";
 import apiClient from "@/libs/api";
 import { createClient } from "@/libs/supabase/client";
+import router from "next/dist/client/router";
 
 // A button to show user some account actions
 //  1. Billing: open a Stripe Customer Portal to manage their billing (cancel subscription, update payment method, etc.).
@@ -48,7 +50,8 @@ const ButtonAccount = () => {
         }
       );
 
-      window.location.href = url;
+      const router = (await import('next/router')).default;
+      router.push(url);
     } catch (e) {
       console.error(e);
     }
@@ -67,7 +70,7 @@ const ButtonAccount = () => {
                 alt={"Profile picture"}
               />
             ) : (
-              <span className="flex items-center justify-center w-8 h-8 capitalize rounded-full bg-base-100 shrink-0">
+              <span className="flex justify-center items-center bg-base-100 rounded-full w-8 h-8 capitalize shrink-0">
                 {user?.email?.charAt(0)}
               </span>
             )}
@@ -88,48 +91,32 @@ const ButtonAccount = () => {
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Popover.Panel className="absolute right-0 z-10 mt-3 w-screen max-w-[16rem] transform">
-              <div className="p-1 overflow-hidden rounded-md shadow-xl ring-1 ring-base-content ring-opacity-5 bg-base-100">
-                <div className="space-y-0.5 text-sm">
+            <Popover.Panel className="right-0 z-10 absolute mt-3 w-screen max-w-[16rem] transform">
+              <div className="bg-base-100 ring-opacity-5 shadow-xl p-1 rounded-md ring-1 ring-base-content overflow-hidden">
+                <div className="flex flex-col items-start space-y-0.5 text-sm">
                   <button
-                    className="flex items-center gap-2 hover:bg-base-300 duration-200 py-1.5 px-4 w-full rounded-lg font-medium"
-                    onClick={handleBilling}
+                    className="flex justify-start items-center gap-2 w-full btn btn-ghost btn-sm"
+                    onClick={() => {
+                      window.location.href = "/profile";
+                    }}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2.5 4A1.5 1.5 0 001 5.5V6h18v-.5A1.5 1.5 0 0017.5 4h-15zM19 8.5H1v6A1.5 1.5 0 002.5 16h15a1.5 1.5 0 001.5-1.5v-6zM3 13.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm4.75-.75a.75.75 0 000 1.5h3.5a.75.75 0 000-1.5h-3.5z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Billing
+                    <UserCircle className="w-5 h-5" />
+                    Profile
                   </button>
                   <button
-                    className="flex items-center gap-2 hover:bg-error/20 hover:text-error duration-200 py-1.5 px-4 w-full rounded-lg font-medium"
+                    className="flex justify-start items-center gap-2 w-full btn btn-ghost btn-sm"
+                    onClick={handleBilling}
+                  >
+                    <CreditCard className="w-5 h-5" />
+                    Billing
+                  </button>
+
+                  <div className="bg-base-200 w-full h-px"></div>
+                  <button
+                    className="flex justify-start items-center gap-2 w-full btn btn-ghost btn-sm"
                     onClick={handleSignOut}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z"
-                        clipRule="evenodd"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        d="M6 10a.75.75 0 01.75-.75h9.546l-1.048-.943a.75.75 0 111.004-1.114l2.5 2.25a.75.75 0 010 1.114l-2.5 2.25a.75.75 0 11-1.004-1.114l1.048-.943H6.75A.75.75 0 016 10z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <SignOut className="w-5 h-5" />
                     Logout
                   </button>
                 </div>

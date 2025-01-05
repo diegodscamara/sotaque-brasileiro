@@ -37,33 +37,30 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="select select-bordered w-full text-left flex items-center justify-between"
+        className="flex justify-between items-center w-full text-left select-bordered select-primary select-sm select"
       >
         <span className="block truncate">
           {selectedOptions.length > 0 
             ? selectedOptions.map(o => o.name).join(", ")
             : placeholder}
         </span>
-        <span className="pointer-events-none">
-          <CaretDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </span>
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full rounded-md bg-base-100 shadow-lg border border-base-300">
+        <div className="z-10 absolute bg-base-100 shadow-lg mt-1 border border-base-300 rounded-md w-full">
           <div className="p-2">
             <input
               type="text"
-              className="input input-bordered w-full"
+              className="input-bordered w-full input input-primary input-sm"
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onClick={(e) => e.stopPropagation()}
             />
           </div>
-          <ul className="max-h-60 overflow-auto py-1">
+          <ul className="py-1 max-h-60 overflow-auto">
             {filteredOptions.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-gray-500">No results found</li>
+              <li className="px-3 py-2 text-gray-500 text-sm">No results found</li>
             ) : (
               filteredOptions.map((option) => (
                 <li
@@ -81,7 +78,7 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
                   {option.name}
                   {values.includes(option.id) && (
                     <Check 
-                      className="mr-2 h-4 w-4" 
+                      className="mr-2 rounded-full w-6 h-6 text-primary" 
                       weight={values.includes(option.id) ? "fill" : "regular"} 
                     />
                   )}
