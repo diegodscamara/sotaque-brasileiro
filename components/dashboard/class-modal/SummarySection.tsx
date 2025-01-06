@@ -21,7 +21,7 @@ const SummarySection = ({
   onSubmit,
 }: SummarySectionProps) => {
   return (
-    <div className="bg-base-200/50 p-4">
+    <div className={`bg-base-200/50 p-4 ${selectedClass?.status === 'completed' || selectedClass?.status === 'cancelled' ? 'hidden' : ''}`}>
       <div className="flex justify-between items-center text-sm">
         <div className="space-y-1">
           {!selectedClass && (
@@ -33,7 +33,7 @@ const SummarySection = ({
           )}
         </div>
         <div className="flex gap-2">
-          {selectedClass ? (
+          {selectedClass && (selectedClass.status !== 'completed' && selectedClass.status !== 'cancelled') && (
             <>
               <button
                 type="button"
@@ -62,7 +62,8 @@ const SummarySection = ({
                 {isSubmitting ? "Saving..." : "Update"}
               </button>
             </>
-          ) : (
+          )}
+          {!selectedClass && (
             <>
               <button
                 type="button"
