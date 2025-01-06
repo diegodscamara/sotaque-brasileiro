@@ -1,15 +1,13 @@
 export interface Class {
   id: string;
-  student_id: string;
   title: string;
   start_time: string;
   end_time: string;
   notes?: string;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'confirmed';
-  type: 'private' | 'group';
-  credits_cost: number;
-  recurring_group_id?: string | null;
+  time_zone: string;
+  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
+  recurring_group_id?: string;
+  user_id: string;
   created_at: string;
   updated_at: string;
-  time_zone?: string;
 } 
