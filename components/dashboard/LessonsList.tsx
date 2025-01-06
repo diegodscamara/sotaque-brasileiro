@@ -137,10 +137,17 @@ const LessonsList = () => {
   };
 
   const handleReschedule = (lesson: Class) => {
+    if (lesson.status === 'completed' || lesson.status === 'cancelled') {
+      return;
+    }
     openClassModal(lesson);
   };
 
   const handleCancel = async (lesson: Class) => {
+    if (lesson.status === 'completed' || lesson.status === 'cancelled') {
+      return;
+    }
+
     setSelectedClass(lesson);
 
     if (lesson.recurring_group_id) {
@@ -348,19 +355,25 @@ const LessonsList = () => {
               >
                 {lesson.status.charAt(0).toUpperCase() + lesson.status.slice(1)}
               </span>
-              <div className="dropdown dropdown-end">
-                <div tabIndex={0} className="btn btn-circle btn-ghost btn-sm">
-                  <DotsThreeVertical className="w-5 h-5" />
+              {lesson.status !== 'completed' && lesson.status !== 'cancelled' && (
+                <div className="dropdown dropdown-end">
+                  <div tabIndex={0} className="btn btn-circle btn-ghost btn-sm">
+                    <DotsThreeVertical className="w-5 h-5" />
+                  </div>
+                  <ul tabIndex={0} className="bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
+                    <li>
+                      <a onClick={() => handleReschedule(lesson)}>
+                        Reschedule
+                      </a>
+                    </li>
+                    <li>
+                      <a onClick={() => handleCancel(lesson)}>
+                        Cancel
+                      </a>
+                    </li>
+                  </ul>
                 </div>
-                <ul tabIndex={0} className="bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
-                  <li>
-                    <a onClick={() => handleReschedule(lesson)}>Reschedule</a>
-                  </li>
-                  <li>
-                    <a onClick={() => handleCancel(lesson)}>Cancel</a>
-                  </li>
-                </ul>
-              </div>
+              )}
             </div>
           </div>
         </div>
