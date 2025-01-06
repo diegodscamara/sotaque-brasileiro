@@ -18,6 +18,8 @@ import { createClient } from "@/libs/supabase/client";
 import { isDateBookable } from "@/utils/date";
 import { toast } from "react-hot-toast";
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
 const getUserTimeZone = () => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
@@ -321,6 +323,10 @@ export const ClassModal = ({
   const handleCancel = async () => {
     if (!selectedClass) return;
 
+    if (selectedClass.status === 'completed' || selectedClass.status === 'cancelled') {
+      return;
+    }
+
     if (selectedClass.recurring_group_id) {
       // Check if the selected class is the last one in the series
       const { data: lessons, error: selectError } = await supabase
@@ -457,7 +463,7 @@ export const ClassModal = ({
         {/* Header */}
         <div className="flex justify-between items-center bg-gray-200 p-4 text-primary-content text">
           <h2 className="font-medium text-lg">
-            {selectedClass ? "Edit Class" : "Schedule Classes"}
+            {selectedClass?.status === 'completed' || selectedClass?.status === 'cancelled' ? "Class Details" : selectedClass ? "Edit Class" : "Schedule Classes"}
           </h2>
           <button onClick={handleClose} className="btn btn-circle btn-outline btn-sm">
             <X className="w-5 h-5" />
@@ -469,6 +475,7 @@ export const ClassModal = ({
           <TitleSection
             title={formData.title}
             onChange={(title) => setFormData({ ...formData, title })}
+            selectedClass={selectedClass}
           />
 
           {/* Booking Type Section */}
@@ -513,10 +520,11 @@ export const ClassModal = ({
               }
             }}
             onTimeSelect={handleTimeSelect}
+            selectedClass={selectedClass}
           />
 
           {/* Recurring Options */}
-          {bookingType === 'recurring' && (
+          {bookingType === 'recurring' && !selectedClass?.status && (
             <div className="p-4">
               <RecurringOptions
                 config={recurringConfig}
@@ -530,6 +538,7 @@ export const ClassModal = ({
           <NotesSection
             notes={formData.notes}
             onChange={(notes) => setFormData({ ...formData, notes })}
+            selectedClass={selectedClass}
           />
 
           {/* Summary Section */}
@@ -538,10 +547,16 @@ export const ClassModal = ({
             getClassDates={getClassDates}
             availableCredits={availableCredits}
             isSubmitting={isSubmitting}
-            onCancel={handleCancel}
+            onCancel={selectedClass?.status !== 'completed' && selectedClass?.status !== 'cancelled' ? handleCancel : undefined}
             onClose={handleClose}
-            onSubmit={handleSubmit}
+            onSubmit={selectedClass?.status !== 'completed' && selectedClass?.status !== 'cancelled' ? handleSubmit : undefined}
           />
+
+          {selectedClass?.status === 'completed' || selectedClass?.status === 'cancelled' ? (
+            <div className="bg-yellow-50 p-4 text-yellow-800">
+              This class cannot be modified as it has already been {selectedClass.status}.
+            </div>
+          ) : null}
         </form>
       </div>
 
