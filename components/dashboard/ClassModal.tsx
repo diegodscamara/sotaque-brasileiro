@@ -13,6 +13,7 @@ import { RecurringOptions } from "./class-modal/RecurringOptions";
 import SummarySection from "./class-modal/SummarySection";
 import TitleSection from "./class-modal/TitleSection";
 import { X } from "@phosphor-icons/react";
+import { cancelClass } from "@/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
 import { isDateBookable } from "@/utils/date";
 import { toast } from "react-hot-toast";
@@ -61,6 +62,7 @@ export const ClassModal = ({
   const [availableCredits, setAvailableCredits] = useState(0);
   const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [futureLessons, setFutureLessons] = useState<Class[]>([]);
 
   const [formData, setFormData] = useState(() => {
     let startTime: Date;
@@ -316,82 +318,37 @@ export const ClassModal = ({
     }
   };
 
-  const handleCancel = () => {
-    if (selectedClass?.recurring_group_id) {
-      setShowCancelDialog(true);
-    } else {
-      cancelClass('single');
-    }
-  };
-
-  const cancelClass = async (cancelType: 'single' | 'all') => {
+  const handleCancel = async () => {
     if (!selectedClass) return;
 
-    try {
-      setIsSubmitting(true);
+    if (selectedClass.recurring_group_id) {
+      // Check if the selected class is the last one in the series
+      const { data: lessons, error: selectError } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("recurring_group_id", selectedClass.recurring_group_id)
+        .gt("start_time", selectedClass.start_time);
 
-      if (cancelType === 'single') {
-        // Cancel single class and remove it from the recurring group
-        const { error } = await supabase
-          .from("classes")
-          .update({
-            status: "cancelled",
-            recurring_group_id: null, // Remove from recurring group
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", selectedClass.id);
-
-        if (error) throw error;
-
-        // Refund 1 credit for the cancelled class
-        await supabase
-          .from("profiles")
-          .update({
-            credits: availableCredits + 1, // Refund 1 credit
-          })
-          .eq("id", selectedClass.student_id); // Ensure refund goes to the correct user
-      } else {
-        // Cancel all future classes in the recurring group
-        const { error } = await supabase
-          .from("classes")
-          .update({
-            status: "cancelled",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("recurring_group_id", selectedClass.recurring_group_id)
-          .gte("start_time", new Date().toISOString()); // Only cancel future classes
-
-        if (error) throw error;
-
-        // Refund credits for all cancelled classes
-        const { count } = await supabase
-          .from("classes")
-          .select("id", { count: 'exact' }) // Get the count of classes to be refunded
-          .eq("recurring_group_id", selectedClass.recurring_group_id)
-          .gte("start_time", new Date().toISOString());
-
-        // Refund credits based on the number of cancelled classes
-        await supabase
-          .from("profiles")
-          .update({
-            credits: availableCredits + count, // Refund credits based on the number of cancelled classes
-          })
-          .eq("id", selectedClass.student_id);
+      if (selectError) {
+        console.error("Error fetching future lessons:", selectError);
+        return;
       }
 
-      // The trigger function will handle credit refunds automatically
-      toast.success(cancelType === 'single'
-        ? "Class cancelled successfully"
-        : "All future recurring classes cancelled successfully"
-      );
+      setFutureLessons(lessons);
+
+      if (lessons.length === 0) {
+        // If it's the last class, cancel it directly
+        await cancelClass('single', selectedClass);
+        onClassUpdated();
+        onClose();
+      } else {
+        // If it's not the last class, open the CancelDialog
+        setShowCancelDialog(true);
+      }
+    } else {
+      await cancelClass('single', selectedClass);
       onClassUpdated();
       onClose();
-    } catch (error) {
-      console.error("Error cancelling class:", error);
-      toast.error("Failed to cancel class");
-    } finally {
-      setIsSubmitting(false);
-      setShowCancelDialog(false);
     }
   };
 
@@ -603,8 +560,15 @@ export const ClassModal = ({
         <CancelDialog
           isOpen={showCancelDialog}
           onClose={() => setShowCancelDialog(false)}
-          onSubmit={cancelClass}
+          onSubmit={async (cancelType) => {
+            await cancelClass(cancelType, selectedClass);
+            onClassUpdated();
+            setShowCancelDialog(false);
+            onClose();
+          }}
           isSubmitting={isSubmitting}
+          isRecurring={!!selectedClass?.recurring_group_id}
+          isLastInSeries={futureLessons.length === 0}
         />
       )}
     </div>
