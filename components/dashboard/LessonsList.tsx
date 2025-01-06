@@ -1,10 +1,13 @@
 "use client";
 
-import { Calendar, CalendarBlank, CaretLeft, CaretRight, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
+import { Calendar, CalendarBlank, CaretLeft, CaretRight, DotsThreeVertical, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
+import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
+import { ClassModal } from "./ClassModal";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { cancelClass } from "@/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
 import { format } from "date-fns";
 
@@ -16,6 +19,10 @@ const LessonsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const LESSONS_PER_PAGE = 4;
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [isClassModalOpen, setIsClassModalOpen] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [futureLessons, setFutureLessons] = useState<Class[]>([]);
 
   const fetchLessons = async () => {
     try {
@@ -117,6 +124,73 @@ const LessonsList = () => {
     }
 
     return rangeWithDots;
+  };
+
+  const openClassModal = (lesson: Class) => {
+    setSelectedClass(lesson);
+    setIsClassModalOpen(true);
+  };
+
+  const closeClassModal = () => {
+    setSelectedClass(null);
+    setIsClassModalOpen(false);
+  };
+
+  const handleReschedule = (lesson: Class) => {
+    openClassModal(lesson);
+  };
+
+  const handleCancel = async (lesson: Class) => {
+    setSelectedClass(lesson);
+
+    if (lesson.recurring_group_id) {
+      // Check if the selected class is the last one in the series
+      const { data: lessons, error: selectError } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("recurring_group_id", lesson.recurring_group_id)
+        .gt("start_time", lesson.start_time);
+
+      if (selectError) {
+        console.error("Error fetching future lessons:", selectError);
+        return;
+      }
+
+      setFutureLessons(lessons);
+
+      if (lessons.length === 0) {
+        // If it's the last class, cancel it directly
+        try {
+          await cancelClass('single', lesson);
+          fetchLessons();
+        } catch (error) {
+          console.error("Error cancelling class:", error);
+        }
+      } else {
+        // If it's not the last class, open the CancelDialog
+        setShowCancelDialog(true);
+      }
+    } else {
+      try {
+        await cancelClass('single', lesson);
+        fetchLessons();
+      } catch (error) {
+        console.error("Error cancelling class:", error);
+      }
+    }
+  };
+
+  const confirmCancel = async (cancelType: 'single' | 'all') => {
+    if (!selectedClass) return;
+
+    try {
+      await cancelClass(cancelType, selectedClass);
+      fetchLessons();
+    } catch (error) {
+      console.error("Error cancelling class:", error);
+    } finally {
+      setShowCancelDialog(false);
+    }
   };
 
   if (isLoading) {
@@ -262,7 +336,7 @@ const LessonsList = () => {
                 )}
               </div>
             </div>
-            <div className="ml-4">
+            <div className="flex items-center gap-2 ml-4">
               <span
                 className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
                   lesson.status === "scheduled" 
@@ -274,6 +348,19 @@ const LessonsList = () => {
               >
                 {lesson.status.charAt(0).toUpperCase() + lesson.status.slice(1)}
               </span>
+              <div className="dropdown dropdown-end">
+                <div tabIndex={0} className="btn btn-circle btn-ghost btn-sm">
+                  <DotsThreeVertical className="w-5 h-5" />
+                </div>
+                <ul tabIndex={0} className="bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
+                  <li>
+                    <a onClick={() => handleReschedule(lesson)}>Reschedule</a>
+                  </li>
+                  <li>
+                    <a onClick={() => handleCancel(lesson)}>Cancel</a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -375,6 +462,23 @@ const LessonsList = () => {
           </div>
         </div>
       )}
+
+      <ClassModal
+        isOpen={isClassModalOpen}
+        onClose={closeClassModal}
+        selectedDate={selectedClass?.start_time ? new Date(selectedClass.start_time) : new Date()}
+        selectedClass={selectedClass || undefined}
+        onClassUpdated={fetchLessons}
+      />
+
+      <CancelDialog
+        isOpen={showCancelDialog}
+        onClose={() => setShowCancelDialog(false)}
+        onSubmit={confirmCancel}
+        isSubmitting={false}
+        isRecurring={!!selectedClass?.recurring_group_id}
+        isLastInSeries={futureLessons.length === 0}
+      />
     </div>
   );
 };
