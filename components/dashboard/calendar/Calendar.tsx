@@ -52,7 +52,6 @@ export const MonthCalendar = () => {
           .from("classes")
           .select("*")
           .eq("student_id", user.id)
-          .neq("status", "cancelled")
           .gte("start_time", startDate.toISOString())
           .lte("start_time", endDate.toISOString());
 
@@ -108,7 +107,12 @@ export const MonthCalendar = () => {
       return hourClasses.map((cls) => (
         <div 
           key={cls.id} 
-          className="bg-primary/10 hover:bg-primary/20 p-1 rounded text-primary text-xs cursor-pointer"
+          className={`
+            p-1 rounded text-xs cursor-pointer
+            ${cls.status === 'scheduled' ? 'bg-primary/10 hover:bg-primary/20 text-primary' : ''}  
+            ${cls.status === 'completed' ? 'bg-success/10 hover:bg-success/20 text-success' : ''}
+            ${cls.status === 'cancelled' ? 'bg-error/10 hover:bg-error/20 text-error' : ''}
+          `}
           onClick={() => {
             setSelectedClass(cls);
             setIsModalOpen(true);
@@ -263,7 +267,12 @@ export const MonthCalendar = () => {
               {day.isCurrentMonth && day.events.map((event) => (
                 <div 
                   key={event.id} 
-                  className="bg-primary/10 hover:bg-primary/20 mb-1 p-1 rounded text-primary text-xs cursor-pointer"
+                  className={`
+                    mb-1 p-1 rounded text-xs cursor-pointer
+                    ${event.status === 'scheduled' ? 'bg-primary/10 hover:bg-primary/20 text-primary' : ''}
+                    ${event.status === 'completed' ? 'bg-success/10 hover:bg-success/20 text-success' : ''}  
+                    ${event.status === 'cancelled' ? 'bg-error/10 hover:bg-error/20 text-error' : ''}
+                  `}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedClass(event);
