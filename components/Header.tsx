@@ -59,7 +59,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="bg-base-100">
+    <header className="bg-base-200">
       <nav
         className="flex justify-between items-center mx-auto px-8 py-4 container"
         aria-label="Global"
