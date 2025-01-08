@@ -4,10 +4,17 @@ import {
   GraduationCap,
   User as UserIcon
 } from "@phosphor-icons/react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 
 import { BasicInfo } from "./components/BasicInfo";
 import Breadcrumb from '@/components/Breadcrumb';
+import { Button } from "@/components/ui/button";
 import { FloppyDisk } from "@phosphor-icons/react";
 import { LanguageLearning } from "./components/LanguageLearning";
 import { StudentProfileData } from '@/types/profile';
@@ -57,8 +64,6 @@ const StudentProfile = () => {
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
-
-  const [activeTab, setActiveTab] = useState('basic');
 
   const handleUpdate = async (field: string, value: string | number | string[]) => {
     try {
@@ -173,106 +178,98 @@ const StudentProfile = () => {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-        <Breadcrumb />
+      <Breadcrumb />
       <div className="flex lg:flex-row flex-col gap-6 w-full">
         {/* Sidebar Tabs */}
-        <div className="flex-none lg:w-64">
-          <div className="lg:flex-col tabs tabs-vertical">
-            <a
-              className={`tab tab-bordered w-full h-fit rounded-md justify-start ${activeTab === 'basic' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('basic')}
-            >
+        <Tabs defaultValue="basic" className="w-full">
+          <TabsList>
+            <TabsTrigger value="basic">
               <div className="flex items-center gap-x-3">
                 <UserIcon className="w-5 h-5" />
                 Basic Information
               </div>
-            </a>
-            <a
-              className={`tab tab-bordered w-full h-fit rounded-md justify-start ${activeTab === 'learning' ? 'tab-active ' : ''}`}
-              onClick={() => setActiveTab('learning')}
-            >
+            </TabsTrigger>
+            <TabsTrigger value="learning">
               <div className="flex items-center gap-x-3">
                 <GraduationCap className="w-5 h-5" />
                 Language Learning
               </div>
-            </a>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Content Area */}
+          <div className="w-full">
+            <div className="bg-white shadow-sm p-6 border rounded-md">
+              <TabsContent value="basic">
+                <BasicInfo
+                  profile={profile}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                  editValue={editValue}
+                  setEditValue={setEditValue}
+                  handleUpdate={handleUpdate}
+                  genderOptions={genderOptions}
+                />
+              </TabsContent>
+              <TabsContent value="learning">
+                <LanguageLearning
+                  profile={profile}
+                  handleUpdate={handleUpdate}
+                  handleMultiSelect={handleMultiSelect}
+                  languageOptions={languageOptions}
+                  learningStyles={learningStyles}
+                  interestOptions={interestOptions}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                  editValue={editValue}
+                  setEditValue={setEditValue}
+                />
+              </TabsContent>
+            </div>
+
+            {/* Save Changes Button */}
+            <div className="flex justify-end items-center gap-x-4 my-8">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsEditing(null);
+                  setEditValue("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                onClick={async () => {
+                  try {
+                    await Promise.all([
+                      handleMultiSelect('learning_style', profile.learning_style || []),
+                      handleMultiSelect('interests', profile.interests || []),
+                      handleMultiSelect('other_languages', profile.other_languages || [])
+                    ]);
+
+                    const { error } = await supabase
+                      .from('profiles')
+                      .update({
+                        ...profile,
+                        updated_at: new Date().toISOString()
+                      })
+                      .eq('id', user?.id);
+
+                    if (error) throw error;
+                    toast.success('All changes saved successfully');
+                  } catch (error) {
+                    console.error('Error updating profile:', error);
+                    toast.error('Failed to save changes');
+                  }
+                }}
+              >
+                <FloppyDisk className="w-5 h-5" />
+                Save all changes
+              </Button>
+            </div>
           </div>
-        </div>
-
-        {/* Content Area */}
-        <div className="w-full">
-          <div className="bg-white shadow-sm p-6 border rounded-md">
-            {activeTab === 'basic' && (
-              <BasicInfo
-                profile={profile}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                editValue={editValue}
-                setEditValue={setEditValue}
-                handleUpdate={handleUpdate}
-                genderOptions={genderOptions}
-              />
-            )}
-            {activeTab === 'learning' && (
-              <LanguageLearning
-                profile={profile}
-                handleUpdate={handleUpdate}
-                handleMultiSelect={handleMultiSelect}
-                languageOptions={languageOptions}
-                learningStyles={learningStyles}
-                interestOptions={interestOptions}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                editValue={editValue}
-                setEditValue={setEditValue}
-              />
-            )}
-          </div>
-
-          {/* Save Changes Button */}
-          <div className="flex justify-end items-center gap-x-4 my-8">
-            <button
-              type="button"
-              className="btn btn-outline btn-primary btn-sm"
-              onClick={() => {
-                setIsEditing(null);
-                setEditValue("");
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="text-base-200 btn btn-primary btn-sm"
-              onClick={async () => {
-                try {
-                  await Promise.all([
-                    handleMultiSelect('learning_style', profile.learning_style || []),
-                    handleMultiSelect('interests', profile.interests || []),
-                    handleMultiSelect('other_languages', profile.other_languages || [])
-                  ]);
-
-                  const { error } = await supabase
-                    .from('profiles')
-                    .update({
-                      ...profile,
-                      updated_at: new Date().toISOString()
-                    })
-                    .eq('id', user?.id);
-
-                  if (error) throw error;
-                  toast.success('All changes saved successfully');
-                } catch (error) {
-                  console.error('Error updating profile:', error);
-                  toast.error('Failed to save changes');
-                }
-              }}
-            >
-              <FloppyDisk className="w-5 h-5" />
-              Save all changes
-            </button>
-          </div>
-        </div>
+        </Tabs>
       </div>
     </div>
   );

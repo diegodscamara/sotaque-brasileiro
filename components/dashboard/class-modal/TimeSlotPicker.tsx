@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -34,21 +35,16 @@ export const TimeSlotPicker = ({
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
         {timeSlots.map(({ start, end }) => {
           const isSelected = start === activeTime;
-          
+
           return (
-            <button
+            <Button
               key={start}
-              type="button"
               disabled={disabled}
-              className={`
-                px-4 py-2 rounded-md btn btn-sm
-                ${disabled ?? 'btn-disabled cursor-not-allowed'}
-                ${isSelected ? 'btn-primary text-base-100' : 'btn-outline btn-primary'}
-              `}
+              variant={isSelected ? "default" : "outline"}
               onClick={() => handleTimeSelect(start, end)}
             >
               {start} - {end}
-            </button>
+            </Button>
           );
         })}
       </div>

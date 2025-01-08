@@ -1,9 +1,17 @@
-import { DateRange, DayPicker } from "react-day-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { addBusinessDays, format, isBefore, setHours } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 
-import { CaretDown } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react"
 import { Class } from "@/types/class";
+import { DateRange } from "react-day-picker";
+import { cn } from "@/libs/utils"
 
 interface SingleDatePickerProps {
   mode: 'single';
@@ -27,10 +35,6 @@ const isDateDisabled = (date: Date) => {
   const now = new Date();
   const earliestDate = setHours(addBusinessDays(now, 1), 9);
   return isBefore(date, earliestDate);
-};
-
-const isSingleDatePicker = (props: DatePickerProps): props is SingleDatePickerProps => {
-  return props.mode === 'single';
 };
 
 export const DatePicker = (props: DatePickerProps) => {
@@ -59,76 +63,56 @@ export const DatePicker = (props: DatePickerProps) => {
     }
   };
 
-  const getDisplayText = () => {
-    if (props.mode === 'multiple') {
-      const dateRange = props.selected as DateRange;
-      return dateRange?.from && dateRange?.to
-        ? `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d')}`
-        : 'Select date range';
-    } else {
-      const date = props.selected as Date;
-      return date
-        ? format(date, 'EEEE, MMMM d, yyyy')
-        : 'Select a date';
-    }
-  };
-
-  const renderDayPicker = () => {
-    if (props.mode === 'single') {
-      return (
-        <DayPicker
-          mode="single"
-          selected={props.selected}
-          onSelect={props.onSelect}
-          modifiers={{
-            disabled: props.selectedClass?.status === 'completed' || props.selectedClass?.status === 'cancelled'
-          }}
-          modifiersClassNames={{
-            selected: 'bg-primary text-white',
-          }}
-          fromDate={props.minDate}
-        />
-      );
-    }
-
-    return (
-      <DayPicker
-        mode="range"
-        selected={props.selected}
-        onSelect={props.onSelect}
-        modifiers={{
-          disabled: props.selectedClass?.status === 'completed' || props.selectedClass?.status === 'cancelled'
-        }}
-        modifiersClassNames={{
-          selected: 'bg-primary text-white',
-        }}
-        fromDate={props.minDate}
-      />
-    );
-  };
-
   return (
-    <div className="space-y-2" ref={containerRef}>
-      <button
-        type="button"
-        className="justify-start gap-2 px-2 w-fit btn btn-outline btn-primary btn-sm"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {getDisplayText()}
-        <CaretDown className="w-4 h-4" />
-      </button>
-      
-      {isOpen && (
-        <div className="relative" onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setIsOpen(!isOpen);
-          }
-        }}>
-          <div className="top-0 left-0 z-10 absolute bg-base-200 shadow-lg border rounded-md">
-            {renderDayPicker()}
-          </div>
-        </div>
-      )}
-    </div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className={cn(
+            "w-[240px] justify-start text-left font-normal",
+            !props.selected && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon />
+          {props.mode === 'single' ? (
+            props.selected ? format(props.selected as Date, "PPP") : <span>Pick a date</span>
+          ) : (
+            props.selected && props.selected.from && props.selected.to ? (
+              `${format(props.selected.from as Date, "PPP")} - ${format(props.selected.to as Date, "PPP")}`
+            ) : (
+              <span>Pick a date range</span>
+            )
+          )}        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-auto" align="start">
+        {props.mode === 'single' ? (
+          <Calendar
+            mode="single"
+            selected={props.selected}
+            onSelect={props.onSelect}
+            modifiers={{
+              disabled: props.selectedClass?.status === 'completed' || props.selectedClass?.status === 'cancelled'
+            }}
+            modifiersClassNames={{
+              selected: 'bg-primary text-white',
+            }}
+            fromDate={props.minDate}
+          />
+        ) : (
+          <Calendar
+            mode="range"
+            selected={props.selected}
+            onSelect={props.onSelect}
+            modifiers={{
+              disabled: props.selectedClass?.status === 'completed' || props.selectedClass?.status === 'cancelled'
+            }}
+            modifiersClassNames={{
+              selected: 'bg-primary text-white',
+            }}
+            fromDate={props.minDate}
+          />
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }; 

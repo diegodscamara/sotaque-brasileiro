@@ -1,4 +1,5 @@
 import { Class } from "@/types/class";
+import { Input } from "@/components/ui/input";
 import { TextAlignLeft } from "@phosphor-icons/react";
 
 interface TitleSectionProps {
@@ -18,12 +19,11 @@ const TitleSection = ({ title, onChange, selectedClass }: TitleSectionProps) => 
           {isImmutable ? (
             <p className="mt-2 text-base-content text-lg">{title}</p>
           ) : (
-            <input
+            <Input
               type="text"
               value={title}
               onChange={(e) => onChange(e.target.value)}
               placeholder="Class Title"
-              className="input-bordered w-full input"
             />
           )}
         </div>

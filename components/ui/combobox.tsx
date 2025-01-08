@@ -2,7 +2,24 @@
 
 import * as React from "react";
 
-import { CaretDown, Check } from "@phosphor-icons/react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { Button } from "@/components/ui/button";
+import { Check } from "@phosphor-icons/react";
+import { ChevronsUpDown } from "lucide-react";
+import { cn } from "@/libs/utils";
 
 interface ComboboxProps {
   options: { code: string; name: string }[];
@@ -12,77 +29,66 @@ interface ComboboxProps {
 }
 
 export function Combobox({ options, value, onChange, placeholder = "Select..." }: ComboboxProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
-  // Close dropdown when clicking outside
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const filteredOptions = options.filter(option =>
-    option.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const selectedOption = options.find(option => option.code === value);
+  // Filter options based on the search term
+  const filteredOptions = React.useMemo(() => {
+    return options.filter((option) =>
+      option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [options, searchTerm]);
 
   return (
-    <div className="relative w-full" ref={wrapperRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex justify-between items-center w-full text-left select-bordered select-primary select-sm select"
-      >
-        <span className="block truncate">
-          {selectedOption ? selectedOption.name : placeholder}
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="z-10 absolute bg-base-100 shadow-lg mt-1 border border-base-300 rounded-md w-full">
-          <div className="p-2">
-            <input
-              type="text"
-              className="input-bordered w-full input input-primary input-sm"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-          <ul className="py-1 max-h-60 overflow-auto">
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="justify-between w-full"
+        >
+          {value
+            ? options.find((option) => option.code === value)?.name || placeholder
+            : placeholder}
+          <ChevronsUpDown className="opacity-50 ml-2 w-4 h-4 shrink-0" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-full">
+        <Command>
+          <CommandInput
+            placeholder="Search by name..."
+            value={searchTerm}
+            onValueChange={(term) => setSearchTerm(term)} // Update search term
+          />
+          <CommandList>
             {filteredOptions.length === 0 ? (
-              <li className="px-3 py-2 text-gray-500 text-sm">No results found</li>
+              <CommandEmpty>No results found.</CommandEmpty>
             ) : (
-              filteredOptions.map((option) => (
-                <li
-                  key={option.code}
-                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-base-200 flex items-center justify-between ${
-                    value === option.code ? 'bg-base-200' : ''
-                  }`}
-                  onClick={() => {
-                    onChange(option.code);
-                    setIsOpen(false);
-                    setSearchQuery("");
-                  }}
-                >
-                  {option.name}
-                  {value === option.code && (
-                    <Check className="mr-2 rounded-full w-6 h-6 text-primary" weight="fill" />
-                  )}
-                </li>
-              ))
+              <CommandGroup>
+                {filteredOptions.map((option) => (
+                  <CommandItem
+                    key={option.code}
+                    value={option.code}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option.code ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             )}
-          </ul>
-        </div>
-      )}
-    </div>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
-} 
+}

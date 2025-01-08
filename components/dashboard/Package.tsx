@@ -3,6 +3,7 @@
 import { Calendar, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
+import { Button } from "../ui/button";
 import { MonthCalendar } from "./calendar/Calendar";
 import { enUS } from "date-fns/locale";
 import { formatDistanceToNow } from "date-fns";
@@ -152,12 +153,12 @@ export default function Package() {
             </p>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => setIsCalendarModalOpen(true)}
-              className="rounded-md text-base-200 btn btn-primary btn-sm"
+              variant="default"
             >
               <Calendar className="mr-2" /> Schedule Class
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -196,11 +197,14 @@ export default function Package() {
           <div className="bg-white shadow-xl rounded-lg w-[95%] max-w-[1200px] h-[90%] overflow-hidden">
             <div className="flex justify-between items-center bg-gray-200 p-4 border-b">
               <h2 className="font-semibold text-xl">Schedule Classes</h2>
-              <button
+              <Button
                 onClick={() => setIsCalendarModalOpen(false)}
-                className="btn btn-circle btn-outline btn-sm">
+                size="icon"
+                variant="outline"
+                className="rounded-full"
+              >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
             <div className="h-[calc(100%-60px)] overflow-auto">
               <MonthCalendar />

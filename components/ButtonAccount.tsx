@@ -9,7 +9,6 @@ import Avatar from "@/components/Avatar";
 import { User } from "@supabase/supabase-js";
 import apiClient from "@/libs/api";
 import { createClient } from "@/libs/supabase/client";
-import router from "next/dist/client/router";
 
 // A button to show user some account actions
 //  1. Billing: open a Stripe Customer Portal to manage their billing (cancel subscription, update payment method, etc.).

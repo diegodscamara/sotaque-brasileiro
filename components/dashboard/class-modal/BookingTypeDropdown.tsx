@@ -1,50 +1,37 @@
-import { CaretDown } from "@phosphor-icons/react";
+import * as React from "react";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type BookingType = 'single' | 'multiple' | 'recurring';
 
 interface BookingTypeDropdownProps {
-  bookingType: BookingType;
+  bookingType?: BookingType;
   onChange: (type: BookingType) => void;
 }
 
-const BookingTypeDropdown = ({ bookingType, onChange }: BookingTypeDropdownProps) => {
+const BookingTypeDropdown = ({ bookingType = 'single', onChange }: BookingTypeDropdownProps) => {
   return (
     <div className="flex items-center gap-2">
       <span className="font-medium text-sm">Booking type:</span>
-      <div className="dropdown dropdown-end">
-        <div tabIndex={0} role="button" className="border-primary w-full max-w-xs btn btn-outline btn-primary btn-sm">
-          {bookingType === 'single' && 'Single Class'}
-          {bookingType === 'multiple' && 'Multiple Classes'}
-          {bookingType === 'recurring' && 'Recurring Classes'}
-          <CaretDown className="w-4 h-4 text-primary" />
-        </div>
-        <ul tabIndex={0} className="bg-base-200 shadow-lg p-2 rounded-md w-52 dropdown-content menu">
-          <li>
-            <a
-              className={bookingType === 'single' ? 'active' : ''}
-              onClick={() => onChange('single')}
-            >
-              Single Class
-            </a>
-          </li>
-          <li>
-            <a
-              className={bookingType === 'multiple' ? 'active' : ''}
-              onClick={() => onChange('multiple')}
-            >
-              Multiple Classes
-            </a>
-          </li>
-          <li>
-            <a
-              className={bookingType === 'recurring' ? 'active' : ''}
-              onClick={() => onChange('recurring')}
-            >
-              Recurring Classes
-            </a>
-          </li>
-        </ul>
-      </div>
+      <Select
+        value={bookingType || undefined}
+        onValueChange={(value) => onChange(value as BookingType)}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Select booking type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="single">Single Class</SelectItem>
+          <SelectItem value="multiple">Multiple Classes</SelectItem>
+          <SelectItem value="recurring">Recurring Classes</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon, CaretDown, CaretLeft, CaretRight, List } from
 import { addMonths, addWeeks, eachDayOfInterval, endOfWeek, format, isSameDay, startOfWeek, subMonths, subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import type { Class } from "@/types/class";
 import { ClassModal } from "../ClassModal";
 import React from "react";
@@ -18,9 +19,9 @@ interface CalendarDay {
 }
 
 const HOURS = [
-  '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', 
-  '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', 
-  '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', 
+  '00:00', '01:00', '02:00', '03:00', '04:00', '05:00',
+  '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
+  '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
   '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
 ];
 
@@ -40,10 +41,10 @@ export const MonthCalendar = () => {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const startDate = view === 'monthly' 
+        const startDate = view === 'monthly'
           ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
           : startOfWeek(currentDate);
-        
+
         const endDate = view === 'monthly'
           ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
           : endOfWeek(currentDate);
@@ -67,13 +68,13 @@ export const MonthCalendar = () => {
   }, [currentDate, view]);
 
   const handlePreviousPeriod = () => {
-    setCurrentDate(prevDate => 
+    setCurrentDate(prevDate =>
       view === 'monthly' ? subMonths(prevDate, 1) : subWeeks(prevDate, 1)
     );
   };
 
   const handleNextPeriod = () => {
-    setCurrentDate(prevDate => 
+    setCurrentDate(prevDate =>
       view === 'monthly' ? addMonths(prevDate, 1) : addWeeks(prevDate, 1)
     );
   };
@@ -105,8 +106,8 @@ export const MonthCalendar = () => {
       });
 
       return hourClasses.map((cls) => (
-        <div 
-          key={cls.id} 
+        <div
+          key={cls.id}
           className={`
             p-1 rounded text-xs cursor-pointer
             ${cls.status === 'scheduled' ? 'bg-primary/10 hover:bg-primary/20 text-primary' : ''}  
@@ -129,8 +130,8 @@ export const MonthCalendar = () => {
         <div className="col-span-1 border-r">
           <div className="flex justify-center items-center border-b h-12 font-medium">Time</div>
           {HOURS.map(hour => (
-            <div 
-              key={hour} 
+            <div
+              key={hour}
               className="flex justify-center items-center border-b h-12 text-base-content/70 text-sm"
             >
               {hour}
@@ -141,7 +142,7 @@ export const MonthCalendar = () => {
         {/* Days Columns */}
         {weekDays.map(day => (
           <div key={day.toISOString()} className="col-span-1 border-r">
-            <div 
+            <div
               className={`h-12 border-b flex flex-col items-center justify-center font-medium 
                 ${isSameDay(day, new Date()) ? 'bg-primary/10 text-primary' : ''}`}
             >
@@ -152,10 +153,10 @@ export const MonthCalendar = () => {
               const dayWithHour = new Date(day);
               const [hourNum] = hour.split(':').map(Number);
               dayWithHour.setHours(hourNum, 0, 0, 0);
-              
+
               return (
-                <div 
-                  key={hour} 
+                <div
+                  key={hour}
                   className={`
                     space-y-1 p-1 border-b h-12 overflow-y-hidden
                     ${isDateBookable(dayWithHour) ? 'hover:bg-base-200 cursor-pointer' : 'opacity-50 cursor-not-allowed'}
@@ -237,11 +238,11 @@ export const MonthCalendar = () => {
         {/* Days */}
         {days.map((day, index) => {
           const fullDate = new Date(
-            day.isCurrentMonth 
-              ? currentDate.getFullYear() 
+            day.isCurrentMonth
+              ? currentDate.getFullYear()
               : (day.date > 20 ? currentDate.getFullYear() : currentDate.getFullYear() + 1),
-            day.isCurrentMonth 
-              ? currentDate.getMonth() 
+            day.isCurrentMonth
+              ? currentDate.getMonth()
               : (day.date > 20 ? currentDate.getMonth() - 1 : currentDate.getMonth() + 1),
             day.date
           );
@@ -249,8 +250,8 @@ export const MonthCalendar = () => {
           const isBookable = isDateBookable(fullDate);
 
           return (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`
                 border p-1 min-h-[100px] 
                 ${!day.isCurrentMonth ? 'bg-base-200/50 text-base-content/50' : ''}
@@ -265,8 +266,8 @@ export const MonthCalendar = () => {
             >
               <div className="mb-1 font-medium text-sm">{day.date}</div>
               {day.isCurrentMonth && day.events.map((event) => (
-                <div 
-                  key={event.id} 
+                <div
+                  key={event.id}
                   className={`
                     mb-1 p-1 rounded text-xs cursor-pointer
                     ${event.status === 'scheduled' ? 'bg-primary/10 hover:bg-primary/20 text-primary' : ''}
@@ -294,39 +295,41 @@ export const MonthCalendar = () => {
       {/* Navigation */}
       <div className="flex justify-between items-center bg-base-200/50 p-4 border">
         <div className="flex items-center gap-2">
-          <button 
-            onClick={handlePreviousPeriod} 
-            className="btn btn-ghost btn-sm"
+          <Button
+            onClick={handlePreviousPeriod}
+            variant="ghost"
+            size="icon"
           >
             <CaretLeft />
-          </button>
+          </Button>
           <h2 className="font-semibold text-xl">
-            {view === 'monthly' 
-              ? format(currentDate, 'MMMM yyyy') 
+            {view === 'monthly'
+              ? format(currentDate, 'MMMM yyyy')
               : `${format(currentDate, 'MMMM yyyy')} - Week of ${format(startOfWeek(currentDate), 'dd MMM')}`}
           </h2>
-          <button 
-            onClick={handleNextPeriod} 
-            className="btn btn-ghost btn-sm"
+          <Button
+            onClick={handleNextPeriod}
+            variant="ghost"
+            size="icon"
           >
             <CaretRight />
-          </button>
+          </Button>
         </div>
         <div className="flex items-center gap-2">
-          <button 
-            onClick={handleToday} 
-            className="mr-2 btn btn-accent btn-sm"
+          <Button
+            onClick={handleToday}
+            variant="secondary"
           >
             Today
-          </button>
-          
+          </Button>
+
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="flex items-center gap-2 m-1 btn btn-outline btn-primary btn-sm">
               {view === 'monthly' ? 'Monthly' : 'Weekly'} View
               <CaretDown className="w-4 h-4" />
             </div>
-            <ul 
-              tabIndex={0} 
+            <ul
+              tabIndex={0}
               className="z-[1] bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu"
               onBlur={() => {
                 const dropdown = document.activeElement?.closest('.dropdown');
@@ -334,7 +337,7 @@ export const MonthCalendar = () => {
               }}
             >
               <li>
-                <a 
+                <a
                   className={view === 'monthly' ? 'active' : ''}
                   onClick={() => setView('monthly')}
                 >
@@ -352,15 +355,15 @@ export const MonthCalendar = () => {
             </ul>
           </div>
 
-          <button 
+          <Button
             onClick={() => {
               setSelectedDate(new Date());
               setIsModalOpen(true);
-            }} 
-            className="ml-2 text-base-200 btn btn-primary btn-sm"
+            }}
+            variant="default"
           >
             Schedule Class
-          </button>
+          </Button>
         </div>
       </div>
 

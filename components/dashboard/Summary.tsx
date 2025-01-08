@@ -4,6 +4,7 @@ import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supab
 import { useEffect, useState } from "react";
 
 import Avatar from "@/components/Avatar";
+import { Button } from "../ui/button";
 import Link from "next/link";
 import { useSupabase } from "@/hooks/useSupabase";
 
@@ -159,9 +160,13 @@ const Summary = () => {
 
             </div>
 
-            <Link href="/profile" className="btn btn-outline btn-primary btn-sm">
-              View profile
-            </Link>
+            <Button
+              variant="outline" asChild
+            >
+              <Link href="/profile">
+                View profile
+              </Link>
+            </Button>
           </div>
 
           <div className="flex lg:flex-row flex-col justify-between items-center border-gray-200 bg-gray-50 border-t rounded-b-md divide-x divide-gray-200">

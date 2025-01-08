@@ -8,7 +8,7 @@ interface SummarySectionProps {
   isSubmitting: boolean;
   onCancel: () => void;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }
 
 const SummarySection = ({
@@ -17,8 +17,7 @@ const SummarySection = ({
   availableCredits,
   isSubmitting,
   onCancel,
-  onClose,
-  onSubmit,
+  onClose
 }: SummarySectionProps) => {
   return (
     <div className={`bg-base-200/50 p-4 ${selectedClass?.status === 'completed' || selectedClass?.status === 'cancelled' ? 'hidden' : ''}`}>

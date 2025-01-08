@@ -4,6 +4,7 @@ import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { addWeeks, eachDayOfInterval, endOfWeek, format, isSameDay, startOfWeek, subWeeks } from 'date-fns';
 import { useEffect, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { Class } from '@/types/class';
 import { ClassModal } from '../ClassModal';
 import { createClient } from '@/libs/supabase/client';
@@ -107,22 +108,23 @@ export const WeeklyView = () => {
           <h2 className="font-semibold text-xl">
             {format(currentDate, 'MMMM yyyy')} - Week of {format(startOfWeek(currentDate), 'dd MMM')}
           </h2>
-          <button 
-            onClick={handleNextWeek} 
-            className="btn btn-ghost btn-sm"
+          <Button
+            onClick={handleNextWeek}
+            variant="ghost"
+            size="icon"
           >
             <CaretRight />
-          </button>
+          </Button>
         </div>
-        <button 
+        <Button 
           onClick={() => {
             setSelectedDate(new Date());
             setIsModalOpen(true);
           }} 
-          className="btn btn-primary btn-sm"
+          variant="default"
         >
           Schedule Class
-        </button>
+        </Button>
       </div>
 
       {/* Weekly Grid */}

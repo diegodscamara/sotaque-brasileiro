@@ -1,6 +1,11 @@
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { MultiCombobox } from "@/components/ui/multi-combobox";
 import { PencilLine } from "@phosphor-icons/react";
 import { StudentProfileData } from '@/types/profile';
+import { Textarea } from "@/components/ui/textarea";
 
 interface LanguageLearningProps {
   profile: StudentProfileData;
@@ -27,32 +32,40 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
         {/* Portuguese Level */}
         <div className="pb-8 border-b">
           <h3 className="pt-6 font-medium text-gray-900 text-lg">Portuguese Level</h3>
-          <select
+          <Select
             value={profile.portuguese_level || ''}
-            onChange={(e) => handleUpdate('portuguese_level', e.target.value)}
-            className="mt-2 w-full select-bordered select-primary select-sm select"
+            onValueChange={(value) => handleUpdate('portuguese_level', value)}
           >
-            <option value="">Select your level</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-            <option value="native">Native</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select your level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="beginner">Beginner</SelectItem>
+              <SelectItem value="intermediate">Intermediate</SelectItem>
+              <SelectItem value="advanced">Advanced</SelectItem>
+              <SelectItem value="native">Native</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Native Language */}
         <div className="pb-8 border-b">
           <h3 className="font-medium text-gray-900 text-lg">Native Language</h3>
-          <select
+          <Select
             value={profile.native_language || ''}
-            onChange={(e) => handleUpdate('native_language', e.target.value)}
-            className="mt-2 w-full select-bordered select-primary select-sm select"
+            onValueChange={(value) => handleUpdate('native_language', value)}
           >
-            <option value="">Select your native language</option>
-            {languageOptions.map((lang) => (
-              <option key={lang.id} value={lang.id}>{lang.name}</option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select your native language" />
+            </SelectTrigger>
+            <SelectContent>
+              {languageOptions.map((lang) => (
+                <SelectItem key={lang.id} value={lang.id}>
+                  {lang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Other Languages */}
@@ -73,28 +86,28 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
           <h3 className="font-medium text-gray-900 text-lg">Learning Goals</h3>
           {isEditing === 'learning_goals' ? (
             <div className="flex flex-col gap-4">
-              <textarea
+              <Textarea
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 placeholder="What are your goals for learning Portuguese? (One per line)"
                 className="mt-2 textarea-bordered w-full h-32 textarea textarea-primary textarea-sm"
               />
               <div className="flex gap-x-4">
-                <button
+                <Button
+                  variant="default"
                   onClick={() => handleUpdate('learning_goals', editValue.split('\n').filter(Boolean))}
-                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={() => {
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -102,17 +115,16 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
               <div className="my-6 text-gray-900 whitespace-pre-line">
                 {profile.learning_goals?.join('\n') || 'Not specified'}
               </div>
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 onClick={() => {
                   setIsEditing('learning_goals');
                   setEditValue(profile.learning_goals?.join('\n') || '');
                 }}
-                className="btn btn-outline btn-primary btn-sm"
               >
                 <PencilLine className="w-5 h-5" />
                 Update
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -123,12 +135,10 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
           <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 mt-4">
             {learningStyles.map((style) => (
               <label key={style.id} className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-primary"
+                <Checkbox
                   checked={profile.learning_style?.includes(style.id as any)}
-                  onChange={(e) => {
-                    const newStyles = e.target.checked
+                  onCheckedChange={(checked) => {
+                    const newStyles = checked
                       ? [...(profile.learning_style || []), style.id]
                       : (profile.learning_style || []).filter(s => s !== style.id);
                     handleMultiSelect('learning_style', newStyles);
@@ -147,12 +157,10 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
           <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 mt-4">
             {interestOptions.map((interest) => (
               <label key={interest.id} className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-primary"
+                <Checkbox
                   checked={profile.interests?.includes(interest.id)}
-                  onChange={(e) => {
-                    const newInterests = e.target.checked
+                  onCheckedChange={(checked) => {
+                    const newInterests = checked
                       ? [...(profile.interests || []), interest.id]
                       : (profile.interests || []).filter(i => i !== interest.id);
                     handleMultiSelect('interests', newInterests);
@@ -169,28 +177,28 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
           <h3 className="font-medium text-gray-900 text-lg">Motivation</h3>
           {isEditing === 'motivation_for_learning' ? (
             <div className="flex flex-col gap-4 w-full">
-              <textarea
+              <Textarea
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 placeholder="What motivated you to learn Portuguese?"
                 className="mt-2 textarea-bordered w-full h-32 textarea textarea-primary textarea-sm"
               />
               <div className="flex gap-4">
-                <button
+                <Button
+                  variant="default"
                   onClick={() => handleUpdate('motivation_for_learning', editValue)}
-                  className="text-base-200 btn btn-primary btn-sm"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => {
-                  setIsEditing(null);
-                  setEditValue("");
-                }}
-                className="btn btn-error btn-sm"
-              >
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setIsEditing(null);
+                    setEditValue("");
+                  }}
+                >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -198,17 +206,16 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
               <div className="my-6 text-gray-900 whitespace-pre-line">
                 {profile.motivation_for_learning || 'Not specified'}
               </div>
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 onClick={() => {
                   setIsEditing('motivation_for_learning');
                   setEditValue(profile.motivation_for_learning || '');
                 }}
-                className="btn btn-outline btn-primary btn-sm"
               >
                 <PencilLine className="w-5 h-5" />
                 Update
-              </button>
+              </Button>
             </>
           )}
         </div>

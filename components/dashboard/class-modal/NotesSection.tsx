@@ -1,5 +1,6 @@
 import { Class } from "@/types/class";
 import { NotePencil } from "@phosphor-icons/react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface NotesSectionProps {
   notes: string;
@@ -22,11 +23,11 @@ const NotesSection = ({ notes, onChange, selectedClass }: NotesSectionProps) => 
               <p className="mt-2 text-base-content/50 italic">No notes</p>
             )
           ) : (
-            <textarea
+            <Textarea
               value={notes}
               onChange={(e) => onChange(e.target.value)}
               placeholder="Add notes"
-              className="textarea-bordered w-full h-24 textarea"
+              className="w-full h-24"
             />
           )}
         </div>

@@ -1,6 +1,6 @@
 import { Class } from "@/types/class";
 import { createClient } from "@/libs/supabase/client";
-import { isDateBookable } from "@/utils/date";
+import { isDateBookable } from "@/libs/utils/date";
 import { toast } from "react-hot-toast";
 
 export const cancelClass = async (cancelType: 'single' | 'all', selectedClass: Class) => {
@@ -53,7 +53,7 @@ export const cancelClass = async (cancelType: 'single' | 'all', selectedClass: C
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("credits")
-        .eq("id", selectedClass.student_id)
+        .eq("id", selectedClass.user_id)
         .single();
 
       if (profileError) throw profileError;

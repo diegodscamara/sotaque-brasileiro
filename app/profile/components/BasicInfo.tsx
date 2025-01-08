@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { Input } from "@/components/ui/input";
 import { PencilLine } from "@phosphor-icons/react";
 import { StudentProfileData } from '@/types/profile';
 import { countries } from '@/data/countries';
@@ -28,42 +30,41 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
           <dd className="flex sm:flex-auto justify-between items-center gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'name' ? (
               <div className="flex items-center gap-x-4 w-full">
-                <input
+                <Input
                   type="text"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   className="input-bordered w-full input input-primary input-sm"
                 />
-                <button
+                <Button
+                  variant="default"
                   onClick={() => handleUpdate('name', editValue)}
-                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={() => {
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             ) : (
               <>
                 <div className="text-gray-900">{profile.name}</div>
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setIsEditing('name');
                     setEditValue(profile.name || '');
                   }}
-                  className="btn btn-outline btn-primary btn-sm"
                 >
                   <PencilLine className="w-5 h-5" />
                   Update
-                </button>
+                </Button>
               </>
             )}
           </dd>
@@ -95,38 +96,37 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     </option>
                   ))}
                 </select>
-                <button
+                <Button
+                  variant="default"
                   onClick={() => handleUpdate('gender', editValue)}
-                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={() => {
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             ) : (
               <>
                 <div className="text-gray-900">
                   {genderOptions.find(g => g.id === profile.gender)?.name || 'Not specified'}
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setIsEditing('gender');
                     setEditValue(profile.gender || '');
                   }}
-                  className="btn btn-outline btn-primary btn-sm"
                 >
                   <PencilLine className="w-5 h-5" />
                   Update
-                </button>
+                </Button>
               </>
             )}
           </dd>
@@ -146,38 +146,37 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                     placeholder="Select country"
                   />
                 </div>
-                <button
+                <Button
+                  variant="default"
                   onClick={() => handleUpdate('country', editValue)}
-                  className="text-base-200 btn btn-primary btn-sm"
                 >
                   Save
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={() => {
                     setIsEditing(null);
                     setEditValue("");
                   }}
-                  className="btn btn-error btn-sm"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             ) : (
               <>
                 <div className="text-gray-900">
                   {countries.find(c => c.code === profile.country)?.name || 'Not specified'}
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setIsEditing('country');
                     setEditValue(profile.country || '');
                   }}
-                  className="btn btn-outline btn-primary btn-sm"
                 >
                   <PencilLine className="w-5 h-5" />
                   Update
-                </button>
+                </Button>
               </>
             )}
           </dd>

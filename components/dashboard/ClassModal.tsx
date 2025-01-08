@@ -4,6 +4,7 @@ import { addBusinessDays, addDays, getDay, setHours } from "date-fns";
 import { useEffect, useState } from "react";
 
 import BookingTypeDropdown from "./class-modal/BookingTypeDropdown";
+import { Button } from "../ui/button";
 import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
 import DateTimeSection from "./class-modal/DateTimeSection";
@@ -13,9 +14,9 @@ import { RecurringOptions } from "./class-modal/RecurringOptions";
 import SummarySection from "./class-modal/SummarySection";
 import TitleSection from "./class-modal/TitleSection";
 import { X } from "@phosphor-icons/react";
-import { cancelClass } from "@/utils/classActions";
+import { cancelClass } from "@/libs/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
-import { isDateBookable } from "@/utils/date";
+import { isDateBookable } from "@/libs/utils/date";
 import { toast } from "react-hot-toast";
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -40,6 +41,16 @@ interface ClassModalProps {
   selectedDate: Date;
   selectedClass?: Class;
   onClassUpdated: () => void;
+}
+
+interface SummarySectionProps {
+  selectedClass?: Class;
+  getClassDates: () => Date[];
+  availableCredits: number;
+  isSubmitting: boolean;
+  onCancel?: () => void;
+  onClose: () => void;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
 export const ClassModal = ({
@@ -181,10 +192,8 @@ export const ClassModal = ({
 
     return [];
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     // Check if the selected date is bookable
     const startTime = new Date(formData.start_time);
     if (!isDateBookable(startTime)) {
@@ -465,12 +474,12 @@ export const ClassModal = ({
           <h2 className="font-medium text-lg">
             {selectedClass?.status === 'completed' || selectedClass?.status === 'cancelled' ? "Class Details" : selectedClass ? "Edit Class" : "Schedule Classes"}
           </h2>
-          <button onClick={handleClose} className="btn btn-circle btn-outline btn-sm">
+          <Button onClick={handleClose} className="rounded-full" variant="outline" size="icon">
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="divide-y divide-base-200 h-[calc(100%-54px)] max-h-fit overflow-auto">
+        <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSubmit(e)} className="divide-y divide-base-200 h-[calc(100%-54px)] max-h-fit overflow-auto">
           {/* Title Section */}
           <TitleSection
             title={formData.title}
@@ -549,7 +558,7 @@ export const ClassModal = ({
             isSubmitting={isSubmitting}
             onCancel={selectedClass?.status !== 'completed' && selectedClass?.status !== 'cancelled' ? handleCancel : undefined}
             onClose={handleClose}
-            onSubmit={selectedClass?.status !== 'completed' && selectedClass?.status !== 'cancelled' ? handleSubmit : undefined}
+            onSubmit={selectedClass?.status !== 'completed' && selectedClass?.status !== 'cancelled' ? async (e: React.FormEvent<HTMLFormElement>) => await handleSubmit(e) : undefined}
           />
 
           {selectedClass?.status === 'completed' || selectedClass?.status === 'cancelled' ? (

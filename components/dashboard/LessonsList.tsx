@@ -1,12 +1,22 @@
 "use client";
 
 import { Calendar, CalendarBlank, CaretLeft, CaretRight, DotsThreeVertical, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectTrigger } from "../ui/select";
 import { useEffect, useState } from "react";
 
+import { Button } from "../ui/button";
 import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
 import { ClassModal } from "./ClassModal";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { SelectItem } from "../ui/select";
 import { cancelClass } from "@/libs/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
 import { format } from "date-fns";
@@ -266,58 +276,24 @@ const LessonsList = () => {
     <div className="flex flex-col bg-white shadow-md px-6 rounded-md divide-y divide">
       <div className="flex justify-between items-center py-4">
         <h2 className="font-semibold text-lg">Classes List</h2>
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="flex items-center gap-2 btn btn-outline btn-primary btn-sm">
+        <Select
+          value={statusFilter || "all"}
+          onValueChange={(value) => {
+            setStatusFilter(value === "all" ? null : value);
+            setCurrentPage(1);
+          }}
+        >
+          <SelectTrigger className="w-40">
             <FunnelSimple className="w-4 h-4" />
             {statusFilter ? statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1) : 'All Classes'}
-          </div>
-          <ul tabIndex={0} className="z-[1] bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
-            <li>
-              <a
-                className={!statusFilter ? 'active' : ''}
-                onClick={() => {
-                  setStatusFilter(null);
-                  setCurrentPage(1);
-                }}
-              >
-                All Classes
-              </a>
-            </li>
-            <li>
-              <a
-                className={statusFilter === 'scheduled' ? 'active' : ''}
-                onClick={() => {
-                  setStatusFilter('scheduled');
-                  setCurrentPage(1);
-                }}
-              >
-                Scheduled
-              </a>
-            </li>
-            <li>
-              <a
-                className={statusFilter === 'completed' ? 'active' : ''}
-                onClick={() => {
-                  setStatusFilter('completed');
-                  setCurrentPage(1);
-                }}
-              >
-                Completed
-              </a>
-            </li>
-            <li>
-              <a
-                className={statusFilter === 'cancelled' ? 'active' : ''}
-                onClick={() => {
-                  setStatusFilter('cancelled');
-                  setCurrentPage(1);
-                }}
-              >
-                Cancelled
-              </a>
-            </li>
-          </ul>
-        </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Classes</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       {currentLessons.map((lesson) => (
         <div key={lesson.id} className="py-4">
@@ -346,32 +322,30 @@ const LessonsList = () => {
             <div className="flex items-center gap-2 ml-4">
               <span
                 className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${lesson.status === "scheduled"
-                    ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-700/10"
-                    : lesson.status === "completed"
-                      ? "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                      : "bg-red-50 text-red-700 ring-1 ring-inset ring-red-700/10"
+                  ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-700/10"
+                  : lesson.status === "completed"
+                    ? "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                    : "bg-red-50 text-red-700 ring-1 ring-inset ring-red-700/10"
                   }`}
               >
                 {lesson.status.charAt(0).toUpperCase() + lesson.status.slice(1)}
               </span>
               {lesson.status !== 'completed' && lesson.status !== 'cancelled' && (
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} className="btn btn-circle btn-ghost btn-sm">
-                    <DotsThreeVertical className="w-5 h-5" />
-                  </div>
-                  <ul tabIndex={0} className="bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
-                    <li>
-                      <a onClick={() => handleReschedule(lesson)}>
-                        Reschedule
-                      </a>
-                    </li>
-                    <li>
-                      <a onClick={() => handleCancel(lesson)}>
-                        Cancel
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <DotsThreeVertical className="w-5 h-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40">
+                    <DropdownMenuItem onClick={() => handleReschedule(lesson)}>
+                      Reschedule
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleCancel(lesson)}>
+                      Cancel
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
@@ -399,78 +373,77 @@ const LessonsList = () => {
                     <span className="font-medium">
                       {statusFilter}
                     </span>
-                    <button
+                    <Button
                       onClick={() => {
                         setStatusFilter(null);
                         setCurrentPage(1);
                       }}
-                      className="ml-2 text-primary hover:text-primary-focus"
+                      variant="outline"
                     >
                       <X className="inline w-4 h-4" />
-                    </button>
+                    </Button>
                   </span>
                 )}
               </p>
             </div>
             <div>
-              <nav aria-label="Pagination" className="inline-flex -space-x-px shadow-sm rounded-md isolate">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="inline-flex relative focus:z-20 items-center hover:bg-gray-50 disabled:opacity-50 px-2 py-2 rounded-l-md ring-1 ring-gray-300 ring-inset text-gray-400 disabled:cursor-not-allowed focus:outline-offset-0"
-                >
-                  <span className="sr-only">Previous</span>
-                  <CaretLeft aria-hidden="true" className="w-5 h-5" />
-                </button>
-                {getPageNumbers(currentPage, totalPages).map((pageNumber, index) => (
-                  pageNumber === '...' ? (
-                    <span key={`dots-${index}`} className="inline-flex relative items-center px-4 py-2 font-semibold text-gray-700 text-sm">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={index}
-                      onClick={() => handlePageChange(pageNumber as number)}
-                      className={`
-                        relative inline-flex items-center px-4 py-2 text-sm font-semibold 
-                        ${currentPage === pageNumber
-                          ? 'bg-primary text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                          : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                        }
-                      `}
-                    >
-                      {pageNumber}
-                    </button>
-                  )
-                ))}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="inline-flex relative focus:z-20 items-center hover:bg-gray-50 disabled:opacity-50 px-2 py-2 rounded-r-md ring-1 ring-gray-300 ring-inset text-gray-400 disabled:cursor-not-allowed focus:outline-offset-0"
-                >
-                  <span className="sr-only">Next</span>
-                  <CaretRight aria-hidden="true" className="w-5 h-5" />
-                </button>
-              </nav>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    {currentPage === 1 ? (
+                      <span className="cursor-not-allowed">
+                        <CaretLeft className="w-5 h-5 text-gray-400" />
+                      </span>
+                    ) : (
+                      <PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
+                    )}
+                  </PaginationItem>
+                  {getPageNumbers(currentPage, totalPages).map((pageNumber, index) => (
+                    pageNumber === '...' ? (
+                      <PaginationItem key={`dots-${index}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={index}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(pageNumber as number)}
+                          isActive={pageNumber === currentPage}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  ))}
+                  <PaginationItem>
+                    {currentPage === totalPages ? (
+                      <span className="cursor-not-allowed">
+                        <CaretRight className="w-5 h-5 text-gray-400" />
+                      </span>
+                    ) : (
+                      <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
+                    )}
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           </div>
 
           {/* Mobile pagination */}
           <div className="flex flex-1 justify-between sm:hidden">
-            <button
+            <Button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="inline-flex relative rounded-md font-medium text-base-200 text-sm disabled:cursor-not-allowed btn btn-primary btn-sm disabled:btn-disabled"
+              variant="default"
             >
               Previous
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="inline-flex relative rounded-md font-medium text-base-200 text-sm disabled:cursor-not-allowed btn btn-primary btn-sm disabled:btn-disabled"
+              variant="default"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}
