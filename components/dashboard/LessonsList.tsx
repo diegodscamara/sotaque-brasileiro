@@ -333,7 +333,7 @@ const LessonsList = () => {
               {lesson.status !== 'completed' && lesson.status !== 'cancelled' && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="rounded-full">
                       <DotsThreeVertical className="w-5 h-5" />
                     </Button>
                   </DropdownMenuTrigger>
