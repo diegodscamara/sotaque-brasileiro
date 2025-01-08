@@ -2,7 +2,6 @@ import { Combobox } from "@/components/ui/combobox";
 import { PencilLine } from "@phosphor-icons/react";
 import { StudentProfileData } from '@/types/profile';
 import { countries } from '@/data/countries';
-import { is } from "date-fns/locale";
 
 interface BasicInfoProps {
   profile: StudentProfileData;

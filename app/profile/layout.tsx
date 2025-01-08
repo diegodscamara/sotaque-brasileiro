@@ -1,4 +1,3 @@
-import Breadcrumb from "@/components/Breadcrumb";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { ReactNode } from "react";

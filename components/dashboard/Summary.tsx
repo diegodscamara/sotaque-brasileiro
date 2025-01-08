@@ -3,7 +3,6 @@
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-import { ArrowRight } from "@phosphor-icons/react";
 import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { useSupabase } from "@/hooks/useSupabase";

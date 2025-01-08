@@ -7,7 +7,7 @@ import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
 import { ClassModal } from "./ClassModal";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { cancelClass } from "@/utils/classActions";
+import { cancelClass } from "@/libs/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
 import { format } from "date-fns";
 
@@ -47,7 +47,7 @@ const LessonsList = () => {
   // Pagination logic
   const indexOfLastLesson = currentPage * LESSONS_PER_PAGE;
   const indexOfFirstLesson = indexOfLastLesson - LESSONS_PER_PAGE;
-  const filteredLessons = lessons.filter(lesson => 
+  const filteredLessons = lessons.filter(lesson =>
     statusFilter ? lesson.status === statusFilter : true
   );
   const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson);
@@ -273,8 +273,8 @@ const LessonsList = () => {
           </div>
           <ul tabIndex={0} className="z-[1] bg-base-100 shadow p-2 rounded-box w-52 dropdown-content menu">
             <li>
-              <a 
-                className={!statusFilter ? 'active' : ''} 
+              <a
+                className={!statusFilter ? 'active' : ''}
                 onClick={() => {
                   setStatusFilter(null);
                   setCurrentPage(1);
@@ -284,8 +284,8 @@ const LessonsList = () => {
               </a>
             </li>
             <li>
-              <a 
-                className={statusFilter === 'scheduled' ? 'active' : ''} 
+              <a
+                className={statusFilter === 'scheduled' ? 'active' : ''}
                 onClick={() => {
                   setStatusFilter('scheduled');
                   setCurrentPage(1);
@@ -295,8 +295,8 @@ const LessonsList = () => {
               </a>
             </li>
             <li>
-              <a 
-                className={statusFilter === 'completed' ? 'active' : ''} 
+              <a
+                className={statusFilter === 'completed' ? 'active' : ''}
                 onClick={() => {
                   setStatusFilter('completed');
                   setCurrentPage(1);
@@ -306,8 +306,8 @@ const LessonsList = () => {
               </a>
             </li>
             <li>
-              <a 
-                className={statusFilter === 'cancelled' ? 'active' : ''} 
+              <a
+                className={statusFilter === 'cancelled' ? 'active' : ''}
                 onClick={() => {
                   setStatusFilter('cancelled');
                   setCurrentPage(1);
@@ -345,13 +345,12 @@ const LessonsList = () => {
             </div>
             <div className="flex items-center gap-2 ml-4">
               <span
-                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                  lesson.status === "scheduled" 
+                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${lesson.status === "scheduled"
                     ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-700/10"
                     : lesson.status === "completed"
-                      ? "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10" 
+                      ? "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10"
                       : "bg-red-50 text-red-700 ring-1 ring-inset ring-red-700/10"
-                }`}
+                  }`}
               >
                 {lesson.status.charAt(0).toUpperCase() + lesson.status.slice(1)}
               </span>
@@ -400,7 +399,7 @@ const LessonsList = () => {
                     <span className="font-medium">
                       {statusFilter}
                     </span>
-                    <button 
+                    <button
                       onClick={() => {
                         setStatusFilter(null);
                         setCurrentPage(1);
@@ -434,7 +433,7 @@ const LessonsList = () => {
                       onClick={() => handlePageChange(pageNumber as number)}
                       className={`
                         relative inline-flex items-center px-4 py-2 text-sm font-semibold 
-                        ${currentPage === pageNumber 
+                        ${currentPage === pageNumber
                           ? 'bg-primary text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
                           : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                         }

@@ -8,7 +8,7 @@ import type { Class } from "@/types/class";
 import { ClassModal } from "../ClassModal";
 import React from "react";
 import { createClient } from "@/libs/supabase/client";
-import { isDateBookable } from "@/utils/date";
+import { isDateBookable } from "@/libs/utils/date";
 import { toast } from "react-hot-toast";
 
 interface CalendarDay {
