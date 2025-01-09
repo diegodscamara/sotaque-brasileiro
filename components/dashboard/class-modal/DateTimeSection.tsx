@@ -1,9 +1,10 @@
+import { format, parse } from "date-fns";
+
 import { Class } from "@/types/class";
 import { Clock } from "@phosphor-icons/react";
 import { DatePicker } from "./DatePicker";
 import { DateRange } from "react-day-picker";
 import { TimeSlotPicker } from "./TimeSlotPicker";
-import { format } from "date-fns";
 
 type BookingType = 'single' | 'multiple' | 'recurring';
 
@@ -20,17 +21,6 @@ interface DateTimeSectionProps {
   onTimeSelect: (startTime: string, endTime: string) => void;
   selectedClass?: Class;
 }
-
-const timeSlots = [
-  { start: '09:00', end: '10:00' },
-  { start: '10:00', end: '11:00' },
-  { start: '11:00', end: '12:00' },
-  { start: '14:00', end: '15:00' },
-  { start: '15:00', end: '16:00' },
-  { start: '16:00', end: '17:00' },
-  { start: '17:00', end: '18:00' },
-  { start: '18:00', end: '19:00' },
-];
 
 const DateTimeSection = ({
   bookingType,
@@ -56,6 +46,14 @@ const DateTimeSection = ({
     } else {
       onDateSelect(date as Date);
     }
+  };
+
+  const handleTimeSelect = (time: string) => {
+    const [hours, minutes, period] = time.split(/:|\s/);
+    const formattedHours = period === 'PM' ? (parseInt(hours) + 12).toString() : hours.padStart(2, '0');
+    const startTime = `${formattedHours}:${minutes}`;
+    const endTime = `${(parseInt(formattedHours) + 1).toString().padStart(2, '0')}:${minutes}`;
+    onTimeSelect(startTime, endTime);
   };
 
   if (isImmutable && selectedDate) {
@@ -99,10 +97,10 @@ const DateTimeSection = ({
           )}
 
           <TimeSlotPicker
-            timeSlots={timeSlots}
             selectedTime={formData.start_time}
-            onSelect={onTimeSelect}
+            onSelect={handleTimeSelect}
             disabled={!selectedDate}
+            initialTime={formData.start_time}
           />
 
           <p className="text-base-content/70 text-sm">

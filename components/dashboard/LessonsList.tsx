@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Calendar, CalendarBlank, CaretLeft, CaretRight, DotsThreeVertical, FunnelSimple, NotePencil, X } from "@phosphor-icons/react";
 import {
   DropdownMenu,
@@ -12,7 +22,6 @@ import { Select, SelectContent, SelectTrigger } from "../ui/select";
 import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
-import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
 import { ClassModal } from "./ClassModal";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -20,6 +29,7 @@ import { SelectItem } from "../ui/select";
 import { cancelClass } from "@/libs/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
 import { format } from "date-fns";
+import { toast } from "react-hot-toast";
 
 const LessonsList = () => {
   const supabase = createClient();
@@ -33,6 +43,7 @@ const LessonsList = () => {
   const [isClassModalOpen, setIsClassModalOpen] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [futureLessons, setFutureLessons] = useState<Class[]>([]);
+  const [cancelType, setCancelType] = useState<'single' | 'all'>('single');
 
   const fetchLessons = async () => {
     try {
@@ -176,35 +187,44 @@ const LessonsList = () => {
       setFutureLessons(lessons);
 
       if (lessons.length === 0) {
-        // If it's the last class, cancel it directly
-        try {
-          await cancelClass('single', lesson);
+        // If it's the last class, check if it's less than 24 hours away
+        const shouldShowDialog = await cancelClass('single', lesson);
+        if (shouldShowDialog) {
+          setCancelType('single');
+          setShowCancelDialog(true);
+        } else {
           fetchLessons();
-        } catch (error) {
-          console.error("Error cancelling class:", error);
         }
       } else {
-        // If it's not the last class, open the CancelDialog
+        // If it's not the last class, show the dialog to choose single or all
+        setCancelType('all');
         setShowCancelDialog(true);
       }
     } else {
-      try {
-        await cancelClass('single', lesson);
+      // Check if the single class is less than 24 hours away
+      const shouldShowDialog = await cancelClass('single', lesson);
+      if (shouldShowDialog) {
+        setCancelType('single');
+        setShowCancelDialog(true);
+      } else {
         fetchLessons();
-      } catch (error) {
-        console.error("Error cancelling class:", error);
       }
     }
   };
 
-  const confirmCancel = async (cancelType: 'single' | 'all') => {
+  const confirmCancel = async () => {
     if (!selectedClass) return;
 
     try {
-      await cancelClass(cancelType, selectedClass);
-      fetchLessons();
+      await cancelClass(cancelType, selectedClass, true);
+      await fetchLessons();
+      toast.success(cancelType === 'single'
+        ? "Class cancelled successfully"
+        : "All future recurring classes cancelled successfully"
+      );
     } catch (error) {
       console.error("Error cancelling class:", error);
+      toast.error("Failed to cancel class");
     } finally {
       setShowCancelDialog(false);
     }
@@ -378,7 +398,9 @@ const LessonsList = () => {
                         setStatusFilter(null);
                         setCurrentPage(1);
                       }}
-                      variant="outline"
+                      variant="ghost"
+                      size="icon"
+                      className="ml-2 rounded-full"
                     >
                       <X className="inline w-4 h-4" />
                     </Button>
@@ -456,14 +478,37 @@ const LessonsList = () => {
         onClassUpdated={fetchLessons}
       />
 
-      <CancelDialog
-        isOpen={showCancelDialog}
-        onClose={() => setShowCancelDialog(false)}
-        onSubmit={confirmCancel}
-        isSubmitting={false}
-        isRecurring={!!selectedClass?.recurring_group_id}
-        isLastInSeries={futureLessons.length === 0}
-      />
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to cancel?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {cancelType === 'single'
+                ? "This class is less than 24 hours away. Cancelling now will result in losing the credit."
+                : "Do you want to cancel only this class or all future classes in the series?"
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Don't Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmCancel}
+            >
+              {cancelType === 'single' ? "Cancel Anyway" : "Cancel This Class"}
+            </AlertDialogAction>
+            {cancelType === 'all' && (
+              <AlertDialogAction
+                onClick={() => {
+                  setCancelType('all');
+                  confirmCancel();
+                }}
+              >
+                Cancel All Future Classes
+              </AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

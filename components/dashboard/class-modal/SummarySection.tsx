@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Class } from "@/types/class";
 import React from "react";
 
@@ -34,52 +35,52 @@ const SummarySection = ({
         <div className="flex gap-2">
           {selectedClass && (selectedClass.status !== 'completed' && selectedClass.status !== 'cancelled') && (
             <>
-              <button
+              <Button
                 type="button"
+                variant="destructive"
                 onClick={onCancel}
-                className="btn btn-error btn-sm"
                 disabled={isSubmitting}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 Cancel Class
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
                 onClick={onClose}
-                className="btn btn-outline btn-primary btn-sm"
                 disabled={isSubmitting}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 Abandon Changes
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="text-base-200 btn btn-primary btn-sm"
+                variant="default"
                 disabled={isSubmitting}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 {isSubmitting ? "Saving..." : "Update"}
-              </button>
+              </Button>
             </>
           )}
           {!selectedClass && (
             <>
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
-                className="btn btn-error btn-sm"
+                variant="destructive"
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="text-base-200 btn btn-primary btn-sm"
+                variant="default"
                 disabled={isSubmitting}
               >
                 {isSubmitting && <span className="loading loading-spinner loading-xs" />}
                 {isSubmitting ? "Saving..." : `Schedule ${getClassDates().length > 1 ? 'Classes' : 'Class'}`}
-              </button>
+              </Button>
             </>
           )}
         </div>

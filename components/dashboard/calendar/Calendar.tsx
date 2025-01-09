@@ -65,7 +65,7 @@ export const MonthCalendar = () => {
 
   useEffect(() => {
     fetchClasses();
-  }, [currentDate, view]);
+  }, [currentDate, view, selectedClass]);
 
   const handlePreviousPeriod = () => {
     setCurrentDate(prevDate =>

@@ -20,7 +20,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 export async function POST(req: NextRequest) {
   const body = await req.text();
 
-  const signature = headers().get("stripe-signature");
+  const signature = (await headers()).get("stripe-signature");
 
   let eventType;
   let event;
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         if (!plan) break;
 
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("students")
           .select("credits")
           .eq("id", userId)
           .single();
@@ -68,25 +68,22 @@ export async function POST(req: NextRequest) {
         if (customerId && priceId && units > 0) {
           // Calculate expiration date based on plan interval
           let expirationDate = new Date();
-          switch (plan.interval) {
-            case "monthly":
-              expirationDate = addMonths(expirationDate, 1);
-              break;
-            case "yearly":
-              expirationDate = addYears(expirationDate, 1);
-              break;
-            case "one-time":
-              expirationDate = addMonths(expirationDate, 1);
-              break;
+          if (plan.interval === "monthly") {
+            expirationDate = addMonths(expirationDate, 1);
+          } else if (plan.interval === "yearly") {
+            expirationDate = addYears(expirationDate, 1);
+          } else if (plan.interval === "one-time") {
+            expirationDate = addMonths(expirationDate, 1);
           }
 
           await supabase
-            .from("profiles")
+            .from("students")
             .update({
               customer_id: customerId,
               price_id: priceId,
               has_access: true,
               credits: (profile?.credits || 0) + units,
+              package_name: plan.name,
               package_expiration: expirationDate.toISOString(),
             })
             .eq("id", userId);
@@ -118,7 +115,7 @@ export async function POST(req: NextRequest) {
         );
 
         await supabase
-          .from("profiles")
+          .from("students")
           .update({ 
             has_access: false,
             package_expiration: null
@@ -140,7 +137,7 @@ export async function POST(req: NextRequest) {
 
         // Find profile where customer_id equals the customerId (in table called 'profiles')
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("students")
           .select("*")
           .eq("customer_id", customerId)
           .single();
@@ -150,21 +147,17 @@ export async function POST(req: NextRequest) {
 
         // Calculate new expiration date based on plan interval
         let expirationDate = new Date();
-        switch (plan.interval) {
-          case "monthly":
-            expirationDate = addMonths(expirationDate, 1);
-            break;
-          case "yearly":
-            expirationDate = addYears(expirationDate, 1);
-            break;
-          case "one-time":
-            expirationDate = addMonths(expirationDate, 1);
-            break;
+        if (plan.interval === "monthly") {
+          expirationDate = addMonths(expirationDate, 1);
+        } else if (plan.interval === "yearly") {
+          expirationDate = addYears(expirationDate, 1);
+        } else if (plan.interval === "one-time") {
+          expirationDate = addMonths(expirationDate, 1);
         }
 
         // Grant the profile access to your product and update expiration
         await supabase
-          .from("profiles")
+          .from("students")
           .update({ 
             has_access: true,
             package_expiration: expirationDate.toISOString()

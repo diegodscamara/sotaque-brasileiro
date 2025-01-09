@@ -1,11 +1,20 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { addBusinessDays, addDays, getDay, setHours } from "date-fns";
 import { useEffect, useState } from "react";
 
 import BookingTypeDropdown from "./class-modal/BookingTypeDropdown";
 import { Button } from "../ui/button";
-import CancelDialog from "./class-modal/CancelDialog";
 import { Class } from "@/types/class";
 import DateTimeSection from "./class-modal/DateTimeSection";
 import NotesSection from "./class-modal/NotesSection";
@@ -118,7 +127,7 @@ export const ClassModal = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("students")
           .select("credits")
           .eq("id", user.id)
           .single();
@@ -135,7 +144,7 @@ export const ClassModal = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("students")
           .select("time_zone")
           .eq("id", user.id)
           .single();
@@ -330,38 +339,28 @@ export const ClassModal = ({
   };
 
   const handleCancel = async () => {
-    if (!selectedClass) return;
-
-    if (selectedClass.status === 'completed' || selectedClass.status === 'cancelled') {
+    if (!selectedClass) {
+      console.error("No class selected to cancel");
       return;
     }
 
-    if (selectedClass.recurring_group_id) {
-      // Check if the selected class is the last one in the series
-      const { data: lessons, error: selectError } = await supabase
-        .from("classes")
-        .select("*")
-        .eq("recurring_group_id", selectedClass.recurring_group_id)
-        .gt("start_time", selectedClass.start_time);
+    setIsSubmitting(true);
+    
+    let shouldShowDialog = false;
+    try {
+      shouldShowDialog = await cancelClass('single', selectedClass);
+      console.log("shouldShowDialog after cancelClass:", shouldShowDialog);
+    } catch (error) {
+      console.error("Error in cancelClass:", error);
+    }
+    
+    setIsSubmitting(false);
 
-      if (selectError) {
-        console.error("Error fetching future lessons:", selectError);
-        return;
-      }
-
-      setFutureLessons(lessons);
-
-      if (lessons.length === 0) {
-        // If it's the last class, cancel it directly
-        await cancelClass('single', selectedClass);
-        onClassUpdated();
-        onClose();
-      } else {
-        // If it's not the last class, open the CancelDialog
-        setShowCancelDialog(true);
-      }
+    if (shouldShowDialog) {
+      setShowCancelDialog(true);
+      console.log("showCancelDialog after setting to true:", showCancelDialog);
     } else {
-      await cancelClass('single', selectedClass);
+      toast.success("Class cancelled successfully");
       onClassUpdated();
       onClose();
     }
@@ -580,21 +579,32 @@ export const ClassModal = ({
       )}
 
       {/* Cancel Dialog */}
-      {showCancelDialog && (
-        <CancelDialog
-          isOpen={showCancelDialog}
-          onClose={() => setShowCancelDialog(false)}
-          onSubmit={async (cancelType) => {
-            await cancelClass(cancelType, selectedClass);
-            onClassUpdated();
-            setShowCancelDialog(false);
-            onClose();
-          }}
-          isSubmitting={isSubmitting}
-          isRecurring={!!selectedClass?.recurring_group_id}
-          isLastInSeries={futureLessons.length === 0}
-        />
-      )}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to cancel?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This class is less than 24 hours away. Cancelling now will result in losing the credit.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Don't Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                setIsSubmitting(true);
+                await cancelClass('single', selectedClass);
+                setIsSubmitting(false);
+                setShowCancelDialog(false);
+                toast.success("Class cancelled");
+                onClassUpdated();
+                onClose();
+              }}
+            >
+              Cancel Anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

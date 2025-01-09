@@ -8,7 +8,7 @@ const config = {
   appDescription:
     "The NextJS boilerplate with all you need to build your SaaS, AI tool, or any other web app.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "sotaquebrasileiro.ca",
+  domainName: "sotaquebrasileiro.com",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (resend.supportEmail) otherwise customer support won't work.
     id: "",
@@ -47,25 +47,6 @@ const config = {
           process.env.NODE_ENV === "development"
             ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
             : "price_456",
-        interval: "one-time",
-        name: "Starter",
-        description: "Best for casual learners or those testing the waters.",
-        price: 400,
-        priceAnchor: 420,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
-            : "price_456",
         interval: "yearly",
         name: "Starter",
         description: "Best for casual learners or those testing the waters.",
@@ -78,28 +59,6 @@ const config = {
           { name: "User oauth" },
           { name: "Database" },
           { name: "Emails" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
-            : "price_456",
-        isFeatured: true,
-        interval: "one-time",
-        name: "Pro",
-        description: "You need more power",
-        price: 480,
-        priceAnchor: 500,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
         ],
       },
       {
@@ -135,28 +94,6 @@ const config = {
         description: "You need more power",
         price: 4800,
         priceAnchor: 5200,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
-            : "price_456",
-        isFeatured: false,
-        interval: "one-time",
-        name: "Premium",
-        description: "You need more power",
-        price: 560,
-        priceAnchor: 580,
         features: [
           {
             name: "NextJS boilerplate",

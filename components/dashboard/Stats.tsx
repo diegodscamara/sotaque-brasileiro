@@ -1,14 +1,87 @@
 "use client";
 
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, CreditCard, Trophy } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
+import { Button } from "../ui/button";
 import Link from "next/link";
 import { useSupabase } from "@/hooks/useSupabase";
 
+const cardConfigs: CardConfig[] = [
+  {
+    icon: <CreditCard className="w-6 h-6 text-primary" weight="duotone" />,
+    title: "Available Credits",
+    statKey: "credits",
+    link: "/classes",
+    linkText: "Buy more credits",
+  },
+  {
+    icon: <Clock className="w-6 h-6 text-primary" weight="duotone" />,
+    title: "Scheduled Classes",
+    statKey: "scheduledClasses",
+    link: "/classes",
+    linkText: "View all",
+  },
+  {
+    icon: <Trophy className="w-6 h-6 text-primary" weight="duotone" />,
+    title: "Completed Classes",
+    statKey: "completedClasses",
+    link: "/classes",
+    linkText: "View all",
+  },
+];
+
+type CardConfig = {
+  icon: React.ReactNode;
+  title: string;
+  statKey: keyof DashboardStats;
+  link: string;
+  linkText: string;
+};
+
+type DashboardStats = {
+  credits: number;
+  scheduledClasses: number;
+  completedClasses: number;
+};
+
+function StatsCard({
+  config,
+  isLoading,
+  dashboardStats,
+}: {
+  config: CardConfig;
+  isLoading: boolean;
+  dashboardStats: DashboardStats;
+}) {
+  return (
+    <Card className="flex flex-col justify-between">
+      <CardHeader className="flex flex-row items-center gap-4">
+        <div className="bg-primary/10 p-3 rounded-lg">{config.icon}</div>
+        <div>
+          <p className="text-muted-foreground text-sm">{config.title}</p>
+          <p className="font-semibold text-2xl">
+            {isLoading ? (
+              <div className="rounded w-1/2 h-6 skeleton" />
+            ) : (
+              dashboardStats[config.statKey]
+            )}
+          </p>
+        </div>
+      </CardHeader>
+      <CardFooter>
+        <Button asChild variant="outline">
+          <Link href={config.link}>{config.linkText}</Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
 export default function Stats() {
   const { supabase } = useSupabase();
-  const [stats, setStats] = useState({
+  const [dashboardStats, setDashboardStats] = useState({
     credits: 0,
     scheduledClasses: 0,
     completedClasses: 0,
@@ -22,7 +95,7 @@ export default function Stats() {
 
       // Fetch profile for credits
       const { data: profile } = await supabase
-        .from("profiles")
+        .from("students")
         .select("credits")
         .eq("id", user.id)
         .single();
@@ -41,7 +114,7 @@ export default function Stats() {
         .eq("student_id", user.id)
         .eq("status", "completed");
 
-      setStats({
+      setDashboardStats({
         credits: profile?.credits || 0,
         scheduledClasses: scheduledCount || 0,
         completedClasses: completedCount || 0,
@@ -101,96 +174,17 @@ export default function Stats() {
     };
   }, [supabase]);
 
-  if (isLoading) {
-    return (
-      <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
-        <div className="flex flex-col justify-between shadow-md rounded-md skeleton">
-          <div className="flex items-center gap-4 px-6 py-4">
-            <div className="p-3 rounded-lg w-12 h-12 skeleton"></div>
-            <div>
-              <p className="mb-2 rounded w-32 h-4 skeleton"></p>
-              <p className="rounded w-1/2 h-6 skeleton"></p>
-            </div>
-          </div>
-          <div className="flex px-6 py-4 rounded-b-md">
-            <div className="rounded w-1/4 h-4 skeleton"></div>
-          </div>
-        </div>
-        <div className="flex flex-col justify-between shadow-md rounded-md skeleton">
-          <div className="flex items-center gap-4 px-6 py-4">
-            <div className="p-3 rounded-lg w-12 h-12 skeleton"></div>
-            <div>
-              <p className="mb-2 rounded w-32 h-4 skeleton"></p>
-              <p className="rounded w-1/2 h-6 skeleton"></p>
-            </div>
-          </div>
-          <div className="flex px-6 py-4 rounded-b-md">
-            <div className="rounded w-1/4 h-4 skeleton"></div>
-          </div>
-        </div>
-        <div className="flex flex-col justify-between shadow-md rounded-md skeleton">
-          <div className="flex items-center gap-4 px-6 py-4">
-            <div className="p-3 rounded-lg w-12 h-12 skeleton"></div>
-            <div>
-              <p className="mb-2 rounded w-32 h-4 skeleton"></p>
-              <p className="rounded w-1/2 h-6 skeleton"></p>
-            </div>
-          </div>
-          <div className="flex px-6 py-4 rounded-b-md">
-            <div className="rounded w-1/4 h-4 skeleton"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
-      <div className="flex flex-col justify-between bg-white shadow-md rounded-md">
-        <div className="flex items-center gap-4 px-6 py-4">
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <CreditCard className="w-6 h-6 text-primary" weight="duotone" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Available Credits</p>
-            <p className="font-semibold text-2xl">{stats.credits}</p>
-          </div>
-        </div>
-        <div className="flex bg-gray-50 px-6 py-4 rounded-b-md">
-          <Link href="/classes" className="text-primary link link-hover">Buy more credits</Link>
-        </div>
-      </div>
-
-      <div className="flex flex-col justify-between bg-white shadow-md rounded-md">
-        <div className="flex items-center gap-4 px-6 py-4">
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <Clock className="w-6 h-6 text-primary" weight="duotone" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Scheduled Classes</p>
-            <p className="font-semibold text-2xl">{stats.scheduledClasses}</p>
-          </div>
-        </div>
-        <div className="flex bg-gray-50 px-6 py-4 rounded-b-md">
-          <Link href="/classes" className="text-primary link link-hover">View all</Link>
-        </div>
-      </div>
-
-      <div className="flex flex-col justify-between bg-white shadow-md rounded-md">
-        <div className="flex items-center gap-4 px-6 py-4">
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <Trophy className="w-6 h-6 text-primary" weight="duotone" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Completed Classes</p>
-            <p className="font-semibold text-2xl">{stats.completedClasses}</p>
-          </div>
-        </div>
-        <div className="flex bg-gray-50 px-6 py-4 rounded-b-md">
-          <Link href="/classes" className="text-primary link link-hover">View all</Link>
-        </div>
-      </div>
-    </div>
+    <>
+      {cardConfigs.map((config) => (
+        <StatsCard
+          key={config.title}
+          config={config}
+          isLoading={isLoading}
+          dashboardStats={dashboardStats}
+        />
+      ))}
+    </>
   );
 }
 

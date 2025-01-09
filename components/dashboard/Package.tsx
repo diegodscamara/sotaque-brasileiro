@@ -29,7 +29,7 @@ export default function Package() {
 
       // Fetch profile for credits
       const { data: profile } = await supabase
-        .from("profiles")
+        .from("students")
         .select("credits, package_expiration, scheduled_lessons")
         .eq("id", user.id)
         .single();

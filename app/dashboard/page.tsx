@@ -1,25 +1,52 @@
-"use client";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
-import Breadcrumb from "@/components/Breadcrumb";
-import LessonsList from "@/components/dashboard/LessonsList";
-import Package from "@/components/dashboard/Package";
-import Stats from "@/components/dashboard/Stats";
-import Summary from "@/components/dashboard/Summary";
+import { AppSidebar } from "@/components/app-sidebar"
+import { Separator } from "@/components/ui/separator"
+import Stats from "@/components/dashboard/Stats"
 
-export default function Dashboard() {
+export default function Page() {
   return (
-    <div className="flex flex-col gap-6 w-full">
-        <Breadcrumb />
-      <Stats />
-      <div className="flex lg:flex-row flex-col gap-6">
-        <div className="flex flex-col gap-6 w-full">
-          <Summary />
-          <Package />
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 flex items-center gap-2 h-16 transition-[width,height] ease-linear shrink-0">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="md:block hidden">
+                  <BreadcrumbLink href="/">
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="md:block hidden" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <div className="flex flex-col flex-1 gap-4 p-4 pt-0">
+          <div className="gap-4 grid md:grid-cols-3 auto-rows-min">
+            <Stats />
+          </div>
+          <div className="flex-1 bg-muted/50 rounded-xl min-h-[100vh] md:min-h-min" />
         </div>
-        <div className="w-full">
-          <LessonsList />
-        </div>
-      </div>
-    </div>
-  );
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }

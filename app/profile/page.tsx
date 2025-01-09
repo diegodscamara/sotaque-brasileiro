@@ -130,7 +130,7 @@ const StudentProfile = () => {
         if (user) {
           // Try to get existing profile
           const { data: profile, error: profileError } = await supabase
-            .from("profiles")
+            .from("students")
             .select("*")
             .eq("id", user.id)
             .single();
@@ -142,7 +142,7 @@ const StudentProfile = () => {
           if (!profile) {
             // Create new profile if it doesn't exist
             const { data: newProfile, error: createError } = await supabase
-              .from("profiles")
+              .from("students")
               .insert([
                 {
                   id: user.id,

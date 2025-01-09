@@ -3,16 +3,14 @@
 import { useEffect, useState } from "react";
 
 import ButtonSignin from "@/components/ButtonSignin";
+import ButtonSignup from "@/components/ButtonSignup";
 import Image from "next/image";
-import type { JSX } from "react";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { useSearchParams } from "next/navigation";
-
-const cta: JSX.Element = <ButtonSignin extraStyle="btn-primary" />;
 
 // A header with a logo on the left, links in the center (like Pricing, etc...), and a CTA (like Get Started or Login) on the right.
 // The header is responsive, and on mobile, the links are hidden behind a burger button.
@@ -21,6 +19,7 @@ const Header = () => {
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
 
   // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
@@ -33,6 +32,16 @@ const Header = () => {
         data: { user },
       } = await supabase.auth.getUser();
 
+      if (user) {
+        const { data: student } = await supabase
+          .from('students')
+          .select('has_access')
+          .eq('id', user.id)
+          .single();
+
+        setHasAccess(student?.has_access || false);
+      }
+
       setUser(user);
     };
 
@@ -43,20 +52,20 @@ const Header = () => {
     href: string;
     label: string;
   }[] = [
-    {
-      href: "/#pricing",
-      label: "Pricing",
-    },
-    {
-      href: "/#testimonials",
-      label: "Reviews",
-    },
-    {
-      href: "/#faq",
-      label: "FAQ",
-    },
-    ...(user ? [{ href: "/dashboard", label: "Dashboard" }] : []),
-  ];
+      {
+        href: "/#pricing",
+        label: "Pricing",
+      },
+      {
+        href: "/#testimonials",
+        label: "Reviews",
+      },
+      {
+        href: "/#faq",
+        label: "FAQ",
+      },
+      ...(user && hasAccess ? [{ href: "/dashboard", label: "Dashboard" }] : []),
+    ];
 
   return (
     <header className="bg-base-200">
@@ -123,7 +132,10 @@ const Header = () => {
         </div>
 
         {/* CTA on large screens */}
-        <div className="lg:flex lg:flex-1 lg:justify-end hidden">{cta}</div>
+        <div className="lg:flex lg:flex-1 lg:justify-end gap-2 hidden">
+          <ButtonSignin />
+          <ButtonSignup />
+        </div>
       </nav>
 
       {/* Mobile menu, show/hide based on menu state. */}
@@ -190,7 +202,11 @@ const Header = () => {
             </div>
             <div className="divider"></div>
             {/* Your CTA on small screens */}
-            <div className="flex flex-col">{cta}</div>
+            <div className="flex flex-col">
+              <ButtonSignin />
+              <div className="divider">or</div>
+              <ButtonSignup />
+            </div>
           </div>
         </div>
       </div>

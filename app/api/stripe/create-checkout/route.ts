@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { createCheckout } from "@/libs/stripe";
 import { createClient } from "@/libs/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
 
 // This function is used to create a Stripe Checkout Session (one-time payment or subscription)
 // It's called by the <ButtonCheckout /> component
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     const { priceId, mode, successUrl, cancelUrl } = body;
 
     const { data } = await supabase
-      .from("profiles")
+      .from("students")
       .select("*")
       .eq("id", user?.id)
       .single();
