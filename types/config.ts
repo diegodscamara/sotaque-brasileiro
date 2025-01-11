@@ -33,6 +33,7 @@ export interface ConfigProps {
   };
   stripe: {
     plans: {
+      units: number;
       isFeatured?: boolean;
       interval?: "monthly" | "yearly" | "one-time";
       priceId: string;
@@ -62,5 +63,6 @@ export interface ConfigProps {
   auth: {
     loginUrl: string;
     callbackUrl: string;
+    studentWithoutPlanUrl: string;
   };
 }

@@ -1,6 +1,18 @@
 import { ConfigProps } from "./types/config";
 import themes from "daisyui/src/theming/themes";
 
+export type StripePlan = {
+  isFeatured?: boolean;
+  interval?: "monthly" | "yearly" | "one-time";
+  priceId: string;
+  name: string;
+  description?: string;
+  price: number;
+  priceAnchor?: number;
+  features: { name: string; }[];
+  units: number;
+};
+
 const config = {
   // REQUIRED
   appName: "Sotaque Brasileiro",
@@ -22,132 +34,122 @@ const config = {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr33tyaZPNd"
+            ? "price_1QfVt5G0hzDtxXr3D7YiNwRq"
             : "price_456",
         //  REQUIRED - Name of the plan, displayed on the pricing page
         interval: "monthly",
-        name: "Starter",
+        name: "Explorer",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
-        description: "Best for casual learners or those testing the waters.",
+        description: "Perfect for beginners testing the waters or casual learners who want flexibility. Includes 8 hours of classes per month.",
         // The price you want to display, the one user will be charged on Stripe.
-        price: 340,
+        price: 260,
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 360,
         features: [
           {
-            name: "NextJS boilerplate",
+            name: "Flexible scheduling to fit your lifestyle.",
           },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
+          { name: "Native Brazilian instructors with expertise." },
+          { name: "Cultural and conversational lessons." },
+          { name: "Automated reminders for class schedules." },
+          { name: "Cancel or reschedule easily." },
         ],
+        units: 8,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfVxyG0hzDtxXr3GGFsKXQV"
             : "price_456",
         interval: "yearly",
-        name: "Starter",
-        description: "Best for casual learners or those testing the waters.",
-        price: 4000,
-        priceAnchor: 4200,
+        name: "Explorer",
+        description: "Perfect for beginners testing the waters or casual learners who want flexibility. Includes 8 hours of classes per month.",
+        price: 2880,
         features: [
           {
-            name: "NextJS boilerplate",
+            name: "Flexible scheduling to fit your lifestyle.",
           },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
+          { name: "Native Brazilian instructors with expertise." },
+          { name: "Cultural and conversational lessons." },
+          { name: "Automated reminders for class schedules." },
+          { name: "Cancel or reschedule easily." },
         ],
+        units: 96,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfW3jG0hzDtxXr3Om5klqsl"
             : "price_456",
         isFeatured: true,
         interval: "monthly",
-        name: "Pro",
-        description: "You need more power",
-        price: 460,
-        priceAnchor: 480,
+        name: "Enthusiast",
+        description: "Ideal for consistent learners aiming for steady progress with more regular practice. Includes 12 hours of classes per month.",
+        price: 380,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "Priority access to experienced instructors." },
+          { name: "Advanced cultural and conversational content." },
+          { name: "Flexible scheduling for steady progress." },
+          { name: "Automated reminders and progress tracking." },
+          { name: "One free top-up hour after three months of subscription." },
         ],
+        units: 12,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfW6PG0hzDtxXr3DxLeHB8c"
             : "price_456",
         isFeatured: true,
         interval: "yearly",
-        name: "Pro",
-        description: "You need more power",
-        price: 4800,
-        priceAnchor: 5200,
+        name: "Enthusiast",
+        description: "Ideal for consistent learners aiming for steady progress with more regular practice. Includes 12 hours of classes per month.",
+        price: 4320,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "Priority access to experienced instructors." },
+          { name: "Advanced cultural and conversational content." },
+          { name: "Flexible scheduling for steady progress." },
+          { name: "Automated reminders and progress tracking." },
+          { name: "One free top-up hour after three months of subscription." },
         ],
+        units: 144,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfWBBG0hzDtxXr3FlRtiwr0"
             : "price_456",
         isFeatured: false,
         interval: "monthly",
-        name: "Premium",
-        description: "You need more power",
-        price: 540,
-        priceAnchor: 560,
+        name: "Master",
+        description: "Designed for dedicated learners or professionals with ambitious goals and a focus on fluency. Includes 16 hours of classes per month.",
+        price: 450,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "Dedicated sessions with senior instructors." },
+          { name: "Business, cultural, and conversational modules." },
+          { name: "Most cost-effective plan (up to 20% savings annually)." },
+          { name: "Premium support and priority scheduling." },
+          { name: "Bonus: Free cultural immersion workshop after six months." },
         ],
+        units: 16,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfWEfG0hzDtxXr3TetQvd8v"
             : "price_456",
         isFeatured: false,
         interval: "yearly",
-        name: "Premium",
-        description: "You need more power",
-        price: 5760,
-        priceAnchor: 5940,
+        name: "Master",
+        description: "Designed for dedicated learners or professionals with ambitious goals and a focus on fluency. Includes 16 hours of classes per month.",
+        price: 4860,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "Dedicated sessions with senior instructors." },
+          { name: "Business, cultural, and conversational modules." },
+          { name: "Most cost-effective plan (up to 20% savings annually)." },
+          { name: "Premium support and priority scheduling." },
+          { name: "Bonus: Free cultural immersion workshop after six months." },
         ],
+        units: 192,
       },
     ],
   },
