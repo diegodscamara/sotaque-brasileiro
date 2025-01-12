@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import React from "react";
 import { createClient } from "@/libs/supabase/client";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -31,13 +31,15 @@ export default function SignInForm() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithOtp({
                 email,
-                password,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+                },
             });
 
             if (error) throw error;
-            router.push("/dashboard");
+            toast.success("Check your emails!");
         } catch (error) {
             setError(error.message);
         } finally {
@@ -52,6 +54,13 @@ export default function SignInForm() {
         try {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                },
             });
 
             if (error) throw error;
@@ -71,10 +80,10 @@ export default function SignInForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
+                {error && <div className="text-red-500">{error}</div>}
                 <form onSubmit={handleSignIn}>
                     <div className="flex flex-col gap-6">
                         <div className="gap-2 grid">
-
                             <Label htmlFor="email">Email</Label>
                             <Input
                                 id="email"
@@ -85,34 +94,12 @@ export default function SignInForm() {
                                 required
                             />
                         </div>
-                        <div className="gap-2 grid">
-                            <div className="flex items-center">
-                                <Label htmlFor="password">Password</Label>
-                                <Link href="/forgot-password" className="inline-block ml-auto text-sm underline-offset-4 hover:underline"
-                                >
-                                    Forgot your password?
-                                </Link>
-                            </div>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        {error && (
-                            <div className="text-red-500 text-sm">
-                                {error}
-                            </div>
-                        )}
 
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? (
                                 <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                             ) : null}
-                            Sign in
+                            Sign in with Magic Link
                         </Button>
                     </div>
 
@@ -160,15 +147,6 @@ export default function SignInForm() {
                     )}
                     Continue with Google
                 </Button>
-
-
-
-                <div className="mt-4 text-center text-sm">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="underline underline-offset-4">
-                        Sign up
-                    </Link>
-                </div>
             </CardContent>
         </Card>
     )

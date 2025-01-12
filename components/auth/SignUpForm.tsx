@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import React from "react";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -60,13 +61,6 @@ export default function SignUpForm() {
         try {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
-                options: {
-                    queryParams: {
-                        access_type: 'offline',
-                        prompt: 'consent',
-                    },
-                    redirectTo: `${window.location.origin}/auth/callback`,
-                },
             });
 
             if (error) throw error;

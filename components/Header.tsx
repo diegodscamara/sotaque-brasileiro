@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import ButtonSignin from "@/components/ButtonSignin";
-import ButtonSignup from "@/components/ButtonSignup";
 import Image from "next/image";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
@@ -134,7 +133,6 @@ const Header = () => {
         {/* CTA on large screens */}
         <div className="lg:flex lg:flex-1 lg:justify-end gap-2 hidden">
           <ButtonSignin />
-          <ButtonSignup />
         </div>
       </nav>
 
@@ -202,11 +200,7 @@ const Header = () => {
             </div>
             <div className="divider"></div>
             {/* Your CTA on small screens */}
-            <div className="flex flex-col">
-              <ButtonSignin />
-              <div className="divider">or</div>
-              <ButtonSignup />
-            </div>
+            <ButtonSignin />
           </div>
         </div>
       </div>

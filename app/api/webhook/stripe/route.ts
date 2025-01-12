@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addMonths, addYears } from "date-fns";
 
 import Stripe from "stripe";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -53,41 +52,64 @@ export async function POST(req: NextRequest) {
 
         const customerId = session?.customer;
         const priceId = session?.line_items?.data[0]?.price.id;
-        const units = session?.line_items?.data[0].price?.transform_quantity.divide_by || 0; // Units purchased
         const userId = stripeObject.client_reference_id;
         const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
+        const units = session?.metadata?.hours_per_month || configFile.stripe.plans.find((p) => p.priceId === priceId)?.units || 0; // Retrieve units from metadata
+        const planName = plan?.name || configFile.stripe.plans.find((p) => p.priceId === priceId)?.name;
+
+        const customer = (await stripe.customers.retrieve(
+          customerId as string
+        )) as Stripe.Customer;
 
         if (!plan) break;
 
-        const { data: profile } = await supabase
-          .from("students")
-          .select("credits")
-          .eq("id", userId)
-          .single();
-
-        if (customerId && priceId && units > 0) {
-          // Calculate expiration date based on plan interval
-          let expirationDate = new Date();
-          if (plan.interval === "monthly") {
-            expirationDate = addMonths(expirationDate, 1);
-          } else if (plan.interval === "yearly") {
-            expirationDate = addYears(expirationDate, 1);
-          } else if (plan.interval === "one-time") {
-            expirationDate = addMonths(expirationDate, 1);
-          }
-
-          await supabase
+        let user;
+        if (!userId) {
+          // check if user already exists
+          const { data: student } = await supabase
             .from("students")
-            .update({
-              customer_id: customerId,
-              price_id: priceId,
-              has_access: true,
-              credits: (profile?.credits || 0) + units,
-              package_name: plan.name,
-              package_expiration: expirationDate.toISOString(),
-            })
-            .eq("id", userId);
+            .select("*")
+            .eq("email", customer.email)
+            .single();
+          if (student) {
+            user = student;
+          } else {
+            // create a new user using supabase auth admin
+            const { data } = await supabase.auth.admin.createUser({
+              email: customer.email,
+            });
+
+            user = data?.user;
+          }
+        } else {
+          // find user by ID
+          const { data: student } = await supabase
+            .from("students")
+            .select("*")
+            .eq("id", userId)
+            .single();
+
+          user = student;
         }
+
+        await supabase
+          .from("students")
+          .update({
+            customer_id: customerId,
+            price_id: priceId,
+            has_access: true,
+            role: "student",
+            credits: (user?.credits || 0) + units,
+            package_name: planName,
+          })
+          .eq("id", user?.id);
+
+        // Extra: send email with user link, product page, etc...
+        // try {
+        //   await sendEmail(...);
+        // } catch (e) {
+        //   console.error("Email issue:" + e?.message);
+        // }
 
         break;
       }
@@ -116,10 +138,7 @@ export async function POST(req: NextRequest) {
 
         await supabase
           .from("students")
-          .update({ 
-            has_access: false,
-            package_expiration: null
-          })
+          .update({ has_access: false })
           .eq("customer_id", subscription.customer);
         break;
       }
@@ -131,37 +150,21 @@ export async function POST(req: NextRequest) {
           .object as Stripe.Invoice;
         const priceId = stripeObject.lines.data[0].price.id;
         const customerId = stripeObject.customer;
-        const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
 
-        if (!plan) break;
-
-        // Find profile where customer_id equals the customerId (in table called 'profiles')
-        const { data: profile } = await supabase
+        // Find student where customer_id equals the customerId (in table called 'students')
+        const { data: student } = await supabase
           .from("students")
           .select("*")
           .eq("customer_id", customerId)
           .single();
 
         // Make sure the invoice is for the same plan (priceId) the user subscribed to
-        if (profile.price_id !== priceId) break;
+        if (student.price_id !== priceId) break;
 
-        // Calculate new expiration date based on plan interval
-        let expirationDate = new Date();
-        if (plan.interval === "monthly") {
-          expirationDate = addMonths(expirationDate, 1);
-        } else if (plan.interval === "yearly") {
-          expirationDate = addYears(expirationDate, 1);
-        } else if (plan.interval === "one-time") {
-          expirationDate = addMonths(expirationDate, 1);
-        }
-
-        // Grant the profile access to your product and update expiration
+        // Grant the student access to your product. It's a boolean in the database, but could be a number of credits, etc...
         await supabase
           .from("students")
-          .update({ 
-            has_access: true,
-            package_expiration: expirationDate.toISOString()
-          })
+          .update({ has_access: true })
           .eq("customer_id", customerId);
 
         break;

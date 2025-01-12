@@ -1,47 +1,4 @@
 -- ===========================
--- COUNTRIES TABLE
--- ===========================
-create table public.countries (
-    id serial primary key,
-    code char(2) not null unique, -- ISO 3166-1 alpha-2 country codes
-    name text not null unique
-);
-
--- Insert some common countries
-insert into public.countries (code, name) values
-('US', 'United States'),
-('CA', 'Canada'),
-('GB', 'United Kingdom'),
-('AU', 'Australia'),
-('BR', 'Brazil'),
-('IN', 'India'),
-('FR', 'France'),
-('DE', 'Germany'),
-('JP', 'Japan'),
-('CN', 'China');
-
--- ===========================
--- GENDERS TABLE
--- ===========================
-create table public.genders (
-    id serial primary key,
-    name text not null unique -- 'male', 'female', 'other', etc.
-);
-
--- Insert default genders
-insert into public.genders (name) values ('male'), ('female'), ('other'), ('prefer not to say');
-
--- ===========================
--- ROLES TABLE
--- ===========================
-create table public.roles (
-    id serial primary key,
-    name text not null unique -- 'admin', 'student', 'teacher'
-);
-
-insert into public.roles (id, name) values (1, 'admin'), (2, 'student'), (3, 'teacher');
-
--- ===========================
 -- STUDENTS TABLE
 -- ===========================
 create table public.students (
@@ -55,9 +12,9 @@ create table public.students (
     has_access boolean default false,
     package_name text,
     package_expiration timestamp with time zone,
-    role_id integer not null default 2 references public.roles (id),
-    country char(2) references public.countries (code),
-    gender integer references public.genders (id),
+    role text not null default 'student',
+    country text,
+    gender text,
     portuguese_level character varying(20) check (portuguese_level = any (array['beginner', 'intermediate', 'advanced', 'native', 'unknown'])),
     learning_goals text[],
     availability_hours integer,
@@ -78,8 +35,8 @@ create table public.students (
 create or replace function assign_default_role_students()
 returns trigger as $$
 begin
-    if new.role_id is null then
-        new.role_id := 2; -- Default role: 'student'
+    if new.role is null then
+        new.role := 'student'; -- Default role: 'student'
     end if;
     return new;
 end;
@@ -117,9 +74,9 @@ create table public.teachers (
     biography text,
     specialties text[],
     languages text[],
-    role_id integer not null default 3 references public.roles (id),
-    country char(2) references public.countries (code),
-    gender integer references public.genders (id),
+    role text not null default 'teacher',
+    country text,
+    gender text,
     availability_hours integer not null,
     total_classes_given integer not null default 0,
     created_at timestamp with time zone default current_timestamp,
@@ -131,8 +88,8 @@ create table public.teachers (
 create or replace function assign_default_role_teachers()
 returns trigger as $$
 begin
-    if new.role_id is null then
-        new.role_id := 3; -- Default role: 'teacher'
+    if new.role is null then
+        new.role := 'teacher'; -- Default role: 'teacher'
     end if;
     return new;
 end;
@@ -337,7 +294,7 @@ begin
       email,
       name,
       avatar_url,
-      role_id,
+      role,
       availability_hours,
       total_classes_given
     ) values (
@@ -345,7 +302,7 @@ begin
       new.email,
       coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
       coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
-      3,
+      'teacher',
       0,
       0
     );
@@ -355,7 +312,7 @@ begin
       email,
       name,
       avatar_url,
-      role_id,
+      role,
       has_access,
       credits,
       has_completed_onboarding
@@ -364,7 +321,7 @@ begin
       new.email,
       coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
       coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
-      2,
+      'student',
       false,
       0,
       false

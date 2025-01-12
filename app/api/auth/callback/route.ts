@@ -1,19 +1,18 @@
-import { NextResponse, NextRequest } from "next/server";
-import { createClient } from "@/libs/supabase/server";
-import config from "@/config";
+import { NextResponse } from 'next/server'
+// The client you created from the Server-Side Auth instructions
+import { createClient } from '@/libs/supabase/server'
 
-export const dynamic = "force-dynamic";
-
-// This route is called after a successful login. It exchanges the code for a session and redirects to the callback URL (see config.js).
-export async function GET(req: NextRequest) {
-  const requestUrl = new URL(req.url);
-  const code = requestUrl.searchParams.get("code");
-
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get('code');
+  const next = searchParams.get('next') || '/dashboard';
+  
   if (code) {
-    const supabase = createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+      const supabase = await createClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (!error) {
+          return NextResponse.redirect(`${origin}${next}`);
+      }
   }
-
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin + config.auth.callbackUrl);
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`);  
 }
