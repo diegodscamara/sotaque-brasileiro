@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/sidebar"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import LessonsList from "@/components/dashboard/LessonsList"
+import Package from "@/components/dashboard/Package"
 import { Separator } from "@/components/ui/separator"
 import Stats from "@/components/dashboard/Stats"
+import Summary from "@/components/dashboard/Summary"
 
 export default function Page() {
   return (
@@ -44,7 +47,11 @@ export default function Page() {
           <div className="gap-4 grid md:grid-cols-3 auto-rows-min">
             <Stats />
           </div>
-          <div className="flex-1 bg-muted/50 rounded-xl min-h-[100vh] md:min-h-min" />
+          <div className="gap-4 grid md:grid-cols-2 auto-rows-min">
+            <Summary />
+            <Package />
+          </div>
+          <LessonsList />
         </div>
       </SidebarInset>
     </SidebarProvider>

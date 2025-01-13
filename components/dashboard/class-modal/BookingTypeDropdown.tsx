@@ -17,7 +17,7 @@ interface BookingTypeDropdownProps {
 
 const BookingTypeDropdown = ({ bookingType = 'single', onChange }: BookingTypeDropdownProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 p-4">
       <span className="font-medium text-sm">Booking type:</span>
       <Select
         value={bookingType || undefined}

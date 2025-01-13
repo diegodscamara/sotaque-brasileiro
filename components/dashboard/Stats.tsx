@@ -147,13 +147,13 @@ export default function Stats() {
         )
         .subscribe();
 
-      const profilesChannel = supabase.channel('stats-profiles-changes')
+      const studentsChannel = supabase.channel('stats-students-changes')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'profiles',
+            table: 'students',
             filter: `id=eq.${user.id}`,
           },
           () => {
@@ -164,7 +164,7 @@ export default function Stats() {
 
       return () => {
         supabase.removeChannel(classesChannel);
-        supabase.removeChannel(profilesChannel);
+        supabase.removeChannel(studentsChannel);
       };
     };
 

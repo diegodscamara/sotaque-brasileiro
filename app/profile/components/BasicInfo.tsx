@@ -1,3 +1,5 @@
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
@@ -84,18 +86,21 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
           <dd className="flex sm:flex-auto justify-between gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'gender' ? (
               <div className="flex items-center gap-x-4 w-full">
-                <select
+                <Select
                   value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  className="w-full select-bordered select-primary select-sm select"
+                  onValueChange={(value) => setEditValue(value)}
                 >
-                  <option value="">Select gender</option>
-                  {genderOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {genderOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button
                   variant="default"
                   onClick={() => handleUpdate('gender', editValue)}

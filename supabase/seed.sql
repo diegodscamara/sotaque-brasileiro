@@ -55,7 +55,7 @@ create table public.recurring_groups (
     pattern text not null check (pattern = any (array['daily', 'weekly', 'monthly', 'custom'])),
     days_of_week integer[] not null check (array_length(days_of_week, 1) <= 7 and days_of_week <@ array[1, 2, 3, 4, 5, 6, 7]),
     occurrences integer not null check (occurrences > 0),
-    end_type text not null check (end_type = any (array['date', 'occurrences', 'infinite'])),
+    end_type text check (end_type in ('after', 'on')),
     end_date timestamp with time zone,
     created_at timestamp with time zone default current_timestamp,
     updated_at timestamp with time zone default current_timestamp,

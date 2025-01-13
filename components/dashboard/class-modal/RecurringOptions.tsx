@@ -19,6 +19,10 @@ interface RecurringOptionsProps {
 const DAYS_OF_WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export const RecurringOptions = ({ config, onChange, maxOccurrences }: RecurringOptionsProps) => {
+  const handleEndTypeChange = (type: 'after' | 'on') => {
+    onChange({ ...config, endType: type });
+  };
+
   return (
     <div className="flex items-start gap-3">
       <Calendar className="mt-2 w-5 h-5 text-base-content/70" />
@@ -61,7 +65,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
                 type="radio"
                 className="radio radio-primary radio-sm"
                 checked={config.endType === 'after'}
-                onChange={() => onChange({ ...config, endType: 'after' })}
+                onChange={() => handleEndTypeChange('after')}
               />
               <span>After</span>
             </label>
@@ -87,7 +91,7 @@ export const RecurringOptions = ({ config, onChange, maxOccurrences }: Recurring
                 type="radio"
                 className="radio radio-primary radio-sm"
                 checked={config.endType === 'on'}
-                onChange={() => onChange({ ...config, endType: 'on' })}
+                onChange={() => handleEndTypeChange('on')}
               />
               <span>On</span>
             </label>

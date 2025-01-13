@@ -1,10 +1,19 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-import Avatar from "@/components/Avatar";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useSupabase } from "@/hooks/useSupabase";
 
@@ -12,7 +21,7 @@ interface UserProfileData {
   id: string;
   portuguese_level: string;
   name: string;
-  image: string;
+  avatar_url: string;
   has_access: boolean;
   created_at: string;
   credits: number;
@@ -22,11 +31,6 @@ interface UserProfileData {
 type ProfilePayload = RealtimePostgresChangesPayload<{
   new: UserProfileData;
   old: UserProfileData;
-}>;
-
-type ClassPayload = RealtimePostgresChangesPayload<{
-  new: { student_id: string };
-  old: { student_id: string };
 }>;
 
 const Summary = () => {
@@ -58,7 +62,7 @@ const Summary = () => {
 
     fetchProfile();
 
-    // Set up realtime subscription for both profiles and classes
+    // Set up realtime subscription for both students and classes
     const channel = supabase
       .channel("summary_changes")
       .on(
@@ -66,7 +70,7 @@ const Summary = () => {
         {
           event: "*",
           schema: "public",
-          table: "profiles",
+          table: "students",
           filter: `id=eq.${session.id}`,
         },
         (payload: ProfilePayload) => {
@@ -83,10 +87,10 @@ const Summary = () => {
           table: "classes",
           filter: `student_id=eq.${session.id}`,
         },
-        (payload: ClassPayload) => {
+        () => {
           fetchProfile();
         }
-      )
+      );
 
     setChannel(channel);
 
@@ -109,18 +113,14 @@ const Summary = () => {
                   <div className="rounded w-32 h-4 skeleton"></div>
                   <div className="rounded w-16 h-4 skeleton"></div>
                 </div>
-
               </div>
-
               <div className="rounded w-16 h-8 skeleton"></div>
             </div>
-
             <div className="flex lg:flex-row flex-col justify-between items-center skeleton">
               <div className="flex gap-2 px-6 py-4 w-full">
                 <div className="w-1/4 h-4 skeleton"></div>
                 <div className="w-1/2 h-4 skeleton"></div>
               </div>
-
               <div className="flex gap-2 px-6 py-4 w-full">
                 <div className="w-1/4 h-4 skeleton"></div>
                 <div className="w-1/2 h-4 skeleton"></div>
@@ -132,69 +132,64 @@ const Summary = () => {
     );
   }
 
+  if (!profile) return null;
+
   return (
-    <div className="lg:col-start-3 lg:row-end-1 rounded-md w-full">
-      <div className="gap-x-4 bg-white shadow-md rounded-md w-full h-full">
-        <div className="flex flex-col rounded-md">
-          <div className="flex flex-wrap justify-between items-center px-6 py-4">
-            <div className="flex flex-row flex-auto items-center gap-4">
-              <Avatar
-                src={profile.image}
-                alt={profile.name}
-                width={64}
-                height={64}
-              />
-              <div className="flex flex-col gap-2">
-                <span className="font-semibold text-base text-gray-900">
-                  {profile.name}
-                </span>
-                <span
-                  className={`w-fit rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
-                    ? "bg-green-50 text-green-700 ring-green-600/20"
-                    : "bg-red-50 text-red-700 ring-red-600/20"
-                    }`}
-                >
-                  {profile.has_access ? "Active" : "Inactive"}
-                </span>
-              </div>
-
-            </div>
-
-            <Button
-              variant="outline" asChild
-            >
-              <Link href="/profile">
-                View profile
-              </Link>
-            </Button>
-          </div>
-
-          <div className="flex lg:flex-row flex-col justify-between items-center border-gray-200 bg-gray-50 border-t rounded-b-md divide-x divide-gray-200">
-            <div className="flex gap-2 px-6 py-4 w-full">
-              <span className="font-semibold text-gray-500 text-sm/6">Enrolled:</span>
-              <span className="text-gray-500 text-sm/6">
-                <time dateTime={new Date(profile.created_at).toISOString()}>
-                  {new Date(profile.created_at).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
-              </span>
-            </div>
-
-            <div className="flex gap-2 px-6 py-4 w-full">
-              <span className="font-semibold text-gray-500 text-sm/6">Level:</span>
-              <span className="text-gray-500 text-sm/6">
-                {profile.portuguese_level
-                  ? profile.portuguese_level.charAt(0).toUpperCase() + profile.portuguese_level.slice(1)
-                  : "Unknown"}
-              </span>
-            </div>
-          </div>
+    <Card>
+      <CardHeader>
+        <div className="flex flex-row justify-between gap-2 w-full">
+          <Avatar className="w-16 h-16">
+            <AvatarImage
+              src={profile.avatar_url}
+              alt={profile.name}
+              width={64}
+              height={64}
+            />
+            <AvatarFallback>
+              {profile.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span
+            className={`w-fit flex items-center justify-center h-fit rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
+              ? "bg-green-50 text-green-700 ring-green-600/20"
+              : "bg-red-50 text-red-700 ring-red-600/20"
+              }`}
+          >
+            {profile.has_access ? "Active" : "Inactive"}
+          </span>
         </div>
-      </div>
-    </div>
+        <CardTitle className="font-semibold text-base text-gray-900">
+          {profile.name}
+        </CardTitle>
+
+      </CardHeader>
+      <CardContent>
+        <div className="flex gap-2 w-full">
+          <span className="font-semibold text-gray-500 text-sm/6">Enrolled:</span>
+          <span className="text-gray-500 text-sm/6">
+            <time dateTime={new Date(profile.created_at).toISOString()}>
+              {new Date(profile.created_at).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+          </span>
+        </div>
+        {profile.portuguese_level && <div className="flex gap-2 w-full">
+          <span className="font-semibold text-gray-500 text-sm/6">Level:</span>
+          <span className="text-gray-500 text-sm/6">
+            {profile.portuguese_level.charAt(0).toUpperCase() + profile.portuguese_level.slice(1)}
+          </span>
+        </div>
+        }
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline" asChild>
+          <Link href="/profile">View profile</Link>
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

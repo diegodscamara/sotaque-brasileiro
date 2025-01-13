@@ -18,17 +18,17 @@ import { Button } from "../ui/button";
 import { Class } from "@/types/class";
 import DateTimeSection from "./class-modal/DateTimeSection";
 import NotesSection from "./class-modal/NotesSection";
+import React from "react";
 import RecurringEditDialog from "./class-modal/RecurringEditDialog";
 import { RecurringOptions } from "./class-modal/RecurringOptions";
 import SummarySection from "./class-modal/SummarySection";
+import TeacherDropdown from "./class-modal/TeacherDropdown";
 import TitleSection from "./class-modal/TitleSection";
 import { X } from "@phosphor-icons/react";
 import { cancelClass } from "@/libs/utils/classActions";
 import { createClient } from "@/libs/supabase/client";
 import { isDateBookable } from "@/libs/utils/date";
 import { toast } from "react-hot-toast";
-
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 
 const getUserTimeZone = () => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -52,14 +52,15 @@ interface ClassModalProps {
   onClassUpdated: () => void;
 }
 
-interface SummarySectionProps {
-  selectedClass?: Class;
-  getClassDates: () => Date[];
-  availableCredits: number;
-  isSubmitting: boolean;
-  onCancel?: () => void;
-  onClose: () => void;
-  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+// Define the interface for the recurring group
+interface RecurringGroup {
+  id: string; // Add other properties as needed
+  student_id: string;
+  pattern: string;
+  days_of_week: number[];
+  occurrences: number;
+  end_type: string;
+  end_date?: Date;
 }
 
 export const ClassModal = ({
@@ -84,7 +85,8 @@ export const ClassModal = ({
   const [availableCredits, setAvailableCredits] = useState(0);
   const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [futureLessons, setFutureLessons] = useState<Class[]>([]);
+  const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
+  const [availableTeachers, setAvailableTeachers] = useState([]);
 
   const [formData, setFormData] = useState(() => {
     let startTime: Date;
@@ -136,7 +138,7 @@ export const ClassModal = ({
       }
     };
     fetchCredits();
-  }, [selectedClass]);
+  }, [selectedClass, supabase]);
 
   // Fetch user's time zone from the database
   useEffect(() => {
@@ -153,7 +155,7 @@ export const ClassModal = ({
       }
     };
     fetchUserTimeZone();
-  }, []);
+  }, [selectedClass, supabase]);
 
   // Calculate class dates based on booking type
   const getClassDates = (): Date[] => {
@@ -203,6 +205,13 @@ export const ClassModal = ({
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Check if a teacher is selected
+    if (!selectedTeacher) {
+      toast.error("Please select a teacher before scheduling a class.");
+      return;
+    }
+
     // Check if the selected date is bookable
     const startTime = new Date(formData.start_time);
     if (!isDateBookable(startTime)) {
@@ -222,9 +231,7 @@ export const ClassModal = ({
     setIsSubmitting(true);
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
         toast.error("You must be logged in to schedule classes");
@@ -241,7 +248,7 @@ export const ClassModal = ({
             return;
           }
 
-          const { error: updateError } = await supabase
+          const { error: updateClassError } = await supabase
             .from("classes")
             .update({
               title: formData.title,
@@ -253,10 +260,33 @@ export const ClassModal = ({
             })
             .eq("id", selectedClass.id);
 
-          if (updateError) throw updateError;
+          if (updateClassError) throw updateClassError;
+
+          // Fetch user again to get updated profile
+          const { data: studentProfile, error: profileError } = await supabase
+            .from("students")
+            .select("credits, scheduled_lessons")
+            .eq("id", user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          const newCredits = studentProfile.credits - 1;
+          const newScheduledLessons = studentProfile.scheduled_lessons + 1;
+
+          // Update student credits and lessons
+          const { error: updateStudentError } = await supabase
+            .from("students")
+            .update({
+              credits: newCredits,
+              scheduled_lessons: newScheduledLessons,
+            })
+            .eq("id", user.id);
+
+          if (updateStudentError) throw updateStudentError;
         } else {
           // Update all recurring events
-          const { error: updateError } = await supabase
+          const { error: updateRecurringError } = await supabase
             .from("classes")
             .update({
               title: formData.title,
@@ -267,11 +297,10 @@ export const ClassModal = ({
             .eq("recurring_group_id", selectedClass.recurring_group_id)
             .gte("start_time", new Date().toISOString()); // Only update future events
 
-          if (updateError) throw updateError;
+          if (updateRecurringError) throw updateRecurringError;
         }
         toast.success(editType === 'single' ? "Class updated successfully" : "All recurring classes updated successfully");
       } else {
-        // Create new class(es)
         const classDates = getClassDates();
         if (classDates.length === 0) {
           toast.error("Please select at least one class date");
@@ -293,36 +322,114 @@ export const ClassModal = ({
           return;
         }
 
-        // Generate a recurring group ID if it's a recurring booking
-        const recurringGroupId = bookingType === 'recurring' ? crypto.randomUUID() : null;
-
-        const classesToCreate = classDates.map(date => {
-          const startTime = new Date(date);
-          const endTime = new Date(startTime);
-          endTime.setHours(endTime.getHours() + 1);
-
-          return {
+        // Handle booking types
+        if (bookingType === 'single') {
+          // Create a single class
+          const classToCreate = {
             student_id: user.id,
             title: formData.title,
-            start_time: startTime.toISOString(),
-            end_time: endTime.toISOString(),
+            teacher_id: selectedTeacher,
+            start_time: classDates[0].toISOString(),
+            end_time: new Date(classDates[0].getTime() + 60 * 60 * 1000).toISOString(), // 1 hour later
             notes: formData.notes,
             status: "scheduled",
-            type: "private",
-            credits_cost: 1, // Each class costs 1 credit
-            recurring_group_id: recurringGroupId,
+            credits_cost: 1,
             time_zone: userTimeZone,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           };
-        });
 
-        // Insert the new classes into the database
-        const { error: insertError } = await supabase
-          .from("classes")
-          .insert(classesToCreate);
+          const { error: insertError } = await supabase
+            .from("classes")
+            .insert([classToCreate]);
 
-        if (insertError) throw insertError;
+          if (insertError) throw insertError;
+
+        } else if (bookingType === 'multiple') {
+          // Create multiple classes
+          const classesToCreate = classDates.map(date => ({
+            student_id: user.id,
+            title: formData.title,
+            teacher_id: selectedTeacher,
+            start_time: date.toISOString(),
+            end_time: new Date(date.getTime() + 60 * 60 * 1000).toISOString(),
+            notes: formData.notes,
+            status: "scheduled",
+            credits_cost: 1,
+            time_zone: userTimeZone,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }));
+
+          const { error: insertError } = await supabase
+            .from("classes")
+            .insert(classesToCreate);
+
+          if (insertError) throw insertError;
+
+        } else if (bookingType === 'recurring') {
+          // Create a recurring group entry first
+          const { error: recurringGroupError, data: recurringGroup } = await supabase
+            .from("recurring_groups")
+            .insert({
+              student_id: user.id,
+              pattern: recurringConfig.pattern,
+              days_of_week: recurringConfig.daysOfWeek,
+              occurrences: recurringConfig.occurrences,
+              end_type: recurringConfig.endType,
+              end_date: recurringConfig.endDate,
+            })
+            .select()
+            .single<RecurringGroup>();
+
+          if (recurringGroupError) throw recurringGroupError;
+
+          const recurringGroupId = recurringGroup.id; // Now TypeScript knows that recurringGroup has an id property
+
+          // Create recurring classes
+          const classesToCreate = getRecurringClassDates().map(date => ({
+            student_id: user.id,
+            title: formData.title,
+            teacher_id: selectedTeacher,
+            start_time: date.toISOString(),
+            end_time: new Date(date.getTime() + 60 * 60 * 1000).toISOString(),
+            notes: formData.notes,
+            status: "scheduled",
+            credits_cost: 1,
+            recurring_group_id: recurringGroupId, // Use the ID of the recurring group
+            time_zone: userTimeZone,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }));
+
+          const { error: insertError } = await supabase
+            .from("classes")
+            .insert(classesToCreate);
+
+          if (insertError) throw insertError;
+        }
+
+        // Update credits and lessons
+        const { data: studentProfile, error: profileError } = await supabase
+          .from("students")
+          .select("credits, scheduled_lessons")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        const newCredits = studentProfile.credits - creditsCost;
+        const newScheduledLessons = studentProfile.scheduled_lessons + classDates.length;
+
+        const { error: updateError } = await supabase
+          .from("students")
+          .update({
+            credits: newCredits,
+            scheduled_lessons: newScheduledLessons,
+          })
+          .eq("id", user.id);
+
+        if (updateError) throw updateError;
 
         toast.success(`${classDates.length} class${classDates.length > 1 ? 'es' : ''} scheduled successfully`);
       }
@@ -345,7 +452,7 @@ export const ClassModal = ({
     }
 
     setIsSubmitting(true);
-    
+
     let shouldShowDialog = false;
     try {
       shouldShowDialog = await cancelClass('single', selectedClass);
@@ -353,7 +460,7 @@ export const ClassModal = ({
     } catch (error) {
       console.error("Error in cancelClass:", error);
     }
-    
+
     setIsSubmitting(false);
 
     if (shouldShowDialog) {
@@ -366,7 +473,7 @@ export const ClassModal = ({
     }
   };
 
-  const handleTimeSelect = (startTime: string, endTime: string) => {
+  const handleTimeSelect = (startTime: string) => {
     if (!selectedDate) {
       toast.error("Please select a date first");
       return;
@@ -459,6 +566,42 @@ export const ClassModal = ({
   const now = new Date();
   const earliestDate = setHours(addBusinessDays(now, 1), 9);
 
+  // Fetch available teachers based on selected date
+  useEffect(() => {
+    const fetchAvailableTeachers = async () => {
+      const { data: teachers, error } = await supabase
+        .from("teachers")
+        .select("*")
+
+      if (error) {
+        console.error("Error fetching teachers:", error);
+        return;
+      }
+
+      setAvailableTeachers(teachers);
+    };
+
+    fetchAvailableTeachers();
+  }, [selectedDate, supabase]); // Fetch teachers whenever the selected date changes
+
+  const getRecurringClassDates = (): Date[] => {
+    const dates: Date[] = [];
+    const { daysOfWeek, occurrences } = recurringConfig;
+    const startDate = new Date(selectedDate); // Use the selected date as the starting point
+
+    for (let i = 0; i < occurrences; i++) {
+      const nextDate = new Date(startDate);
+      nextDate.setDate(startDate.getDate() + (7 * i)); // Move to the next week for each occurrence
+
+      // Check if the nextDate falls on one of the selected days of the week
+      if (daysOfWeek.includes(getDay(nextDate))) {
+        dates.push(nextDate);
+      }
+    }
+
+    return dates;
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -486,14 +629,18 @@ export const ClassModal = ({
             selectedClass={selectedClass}
           />
 
+          <TeacherDropdown
+            selectedTeacher={selectedTeacher}
+            onChange={setSelectedTeacher}
+            availableTeachers={availableTeachers}
+          />
+
           {/* Booking Type Section */}
           {!selectedClass && (
-            <div className="p-4">
-              <BookingTypeDropdown
-                bookingType={bookingType}
-                onChange={setBookingType}
-              />
-            </div>
+            <BookingTypeDropdown
+              bookingType={bookingType}
+              onChange={setBookingType}
+            />
           )}
 
           {/* Date & Time Section */}
@@ -588,7 +735,7 @@ export const ClassModal = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Don't Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Don&apos;t Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 setIsSubmitting(true);

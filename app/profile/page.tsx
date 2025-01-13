@@ -22,13 +22,6 @@ import { User } from "@supabase/supabase-js";
 import { createClient } from "@/libs/supabase/client";
 import toast from "react-hot-toast";
 
-const learningStyles = [
-  { id: 'visual', name: 'Visual Learning' },
-  { id: 'auditory', name: 'Auditory Learning' },
-  { id: 'reading', name: 'Reading/Writing' },
-  { id: 'kinesthetic', name: 'Practice-Based Learning' },
-]
-
 const genderOptions = [
   { id: 'male', name: 'Male' },
   { id: 'female', name: 'Female' },
@@ -46,17 +39,6 @@ const languageOptions = [
   // Add more languages as needed
 ];
 
-const interestOptions = [
-  { id: 'business', name: 'Business' },
-  { id: 'culture', name: 'Culture' },
-  { id: 'travel', name: 'Travel' },
-  { id: 'music', name: 'Music' },
-  { id: 'literature', name: 'Literature' },
-  { id: 'movies', name: 'Movies & TV Shows' },
-  { id: 'cooking', name: 'Cooking' },
-  { id: 'sports', name: 'Sports' },
-];
-
 const StudentProfile = () => {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
@@ -68,7 +50,7 @@ const StudentProfile = () => {
   const handleUpdate = async (field: string, value: string | number | string[]) => {
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('students')
         .update({ [field]: value, updated_at: new Date().toISOString() })
         .eq('id', user?.id);
 
@@ -100,7 +82,7 @@ const StudentProfile = () => {
   const handleMultiSelect = async (field: string, values: string[]) => {
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('students')
         .update({ [field]: values })
         .eq('id', user?.id);
 
@@ -217,8 +199,6 @@ const StudentProfile = () => {
                   handleUpdate={handleUpdate}
                   handleMultiSelect={handleMultiSelect}
                   languageOptions={languageOptions}
-                  learningStyles={learningStyles}
-                  interestOptions={interestOptions}
                   isEditing={isEditing}
                   setIsEditing={setIsEditing}
                   editValue={editValue}
@@ -243,13 +223,11 @@ const StudentProfile = () => {
                 onClick={async () => {
                   try {
                     await Promise.all([
-                      handleMultiSelect('learning_style', profile.learning_style || []),
-                      handleMultiSelect('interests', profile.interests || []),
                       handleMultiSelect('other_languages', profile.other_languages || [])
                     ]);
 
                     const { error } = await supabase
-                      .from('profiles')
+                      .from('students')
                       .update({
                         ...profile,
                         updated_at: new Date().toISOString()

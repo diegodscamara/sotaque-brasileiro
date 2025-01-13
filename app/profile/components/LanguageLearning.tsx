@@ -12,15 +12,13 @@ interface LanguageLearningProps {
   handleUpdate: (field: string, value: string | number | string[]) => void;
   handleMultiSelect: (field: string, values: string[]) => void;
   languageOptions: Array<{ id: string; name: string }>;
-  learningStyles: Array<{ id: string; name: string }>;
-  interestOptions: Array<{ id: string; name: string }>;
   isEditing: string | null;
   setIsEditing: (value: string | null) => void;
   editValue: string;
   setEditValue: (value: string) => void;
 }
 
-export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, languageOptions, learningStyles, interestOptions, isEditing, setIsEditing, editValue, setEditValue }: LanguageLearningProps) => {
+export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, languageOptions, isEditing, setIsEditing, editValue, setEditValue }: LanguageLearningProps) => {
   return (
     <div>
       <h2 className="font-semibold text-base text-gray-900">Language Learning</h2>
@@ -127,49 +125,6 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
               </Button>
             </>
           )}
-        </div>
-
-        {/* Learning Style */}
-        <div className="pb-8 border-b">
-          <h3 className="font-medium text-gray-900 text-lg">Learning Style</h3>
-          <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 mt-4">
-            {learningStyles.map((style) => (
-              <label key={style.id} className="flex items-center space-x-3">
-                <Checkbox
-                  checked={profile.learning_style?.includes(style.id as any)}
-                  onCheckedChange={(checked) => {
-                    const newStyles = checked
-                      ? [...(profile.learning_style || []), style.id]
-                      : (profile.learning_style || []).filter(s => s !== style.id);
-                    handleMultiSelect('learning_style', newStyles);
-                  }}
-                />
-                <span className="text-sm">{style.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Interests */}
-        <div className="pb-8 border-b">
-          <h3 className="font-medium text-gray-900 text-lg">Interests</h3>
-          <p className="mt-1 text-gray-500 text-sm">Select topics you're interested in learning about</p>
-          <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 mt-4">
-            {interestOptions.map((interest) => (
-              <label key={interest.id} className="flex items-center space-x-3">
-                <Checkbox
-                  checked={profile.interests?.includes(interest.id)}
-                  onCheckedChange={(checked) => {
-                    const newInterests = checked
-                      ? [...(profile.interests || []), interest.id]
-                      : (profile.interests || []).filter(i => i !== interest.id);
-                    handleMultiSelect('interests', newInterests);
-                  }}
-                />
-                <span className="text-sm">{interest.name}</span>
-              </label>
-            ))}
-          </div>
         </div>
 
         {/* Motivation */}

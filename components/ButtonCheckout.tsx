@@ -2,6 +2,7 @@
 
 import apiClient from "@/libs/api";
 import config from "@/config";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // This component is used to create Stripe Checkout Sessions
@@ -10,13 +11,14 @@ import { useState } from "react";
 // You can also change the mode to "subscription" if you want to create a subscription instead of a one-time payment
 const ButtonCheckout = ({
   priceId,
-  mode = "payment",
+  mode = "subscription",
 }: {
   priceId: string;
   mode?: "payment" | "subscription";
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const router = useRouter();
+  
   const handlePayment = async () => {
     setIsLoading(true);
 
@@ -25,13 +27,13 @@ const ButtonCheckout = ({
         "/stripe/create-checkout",
         {
           priceId,
-          successUrl: window.location.href,
+          successUrl: window.location.href + "/dashboard",
           cancelUrl: window.location.href,
           mode,
         }
       );
 
-      window.location.href = url;
+      router.push(url);
     } catch (e) {
       console.error(e);
     }
@@ -48,7 +50,7 @@ const ButtonCheckout = ({
         <span className="loading loading-spinner loading-xs"></span>
       ) : (
         <svg
-          className="w-5 h-5 fill-primary-content group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-200"
+          className="group-hover:scale-110 group-hover:-rotate-3 w-5 h-5 transition-transform duration-200 fill-primary-content"
           viewBox="0 0 375 509"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

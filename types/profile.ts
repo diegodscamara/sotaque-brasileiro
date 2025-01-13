@@ -4,9 +4,10 @@ export interface StudentProfileData {
   country: string;
   name: string;
   email: string;
-  image: string;
+  avatar_url: string;
   has_access: boolean;
   created_at: string;
+  package_name: string;
   updated_at: string;
   credits: number;
   portuguese_level: 'beginner' | 'intermediate' | 'advanced' | 'native' | 'unknown';
@@ -15,11 +16,8 @@ export interface StudentProfileData {
   preferred_schedule: ('morning' | 'afternoon' | 'evening' | 'night')[];
   native_language: string;
   other_languages: string[];
-  learning_style: ('visual' | 'auditory' | 'reading' | 'kinesthetic')[];
-  interests: string[];
   professional_background: string;
   motivation_for_learning: string;
   has_completed_onboarding: boolean;
-  preferred_class_type: ('one-on-one' | 'group' | 'self-paced' | 'intensive')[];
   time_zone: string;
 } 
