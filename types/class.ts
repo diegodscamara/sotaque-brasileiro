@@ -10,4 +10,6 @@ export interface Class {
   user_id: string;
   created_at: string;
   updated_at: string;
+  teacher_id: string;
+  student_id: string;
 } 

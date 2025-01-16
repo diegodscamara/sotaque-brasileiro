@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import Link from "next/link";
+import React from "react";
 import { useSupabase } from "@/hooks/useSupabase";
 
 const cardConfigs: CardConfig[] = [

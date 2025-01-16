@@ -24,55 +24,64 @@ import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Class } from "@/types/class";
 import { ClassModal } from "./ClassModal";
-import { RealtimeChannel } from "@supabase/supabase-js";
 import { SelectItem } from "../ui/select";
-import { cancelClass } from "@/libs/utils/classActions";
-import { createClient } from "@/libs/supabase/client";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
+import useClassApi from "@/hooks/useClassApi";
+
+const LESSONS_PER_PAGE = 4; // Define the constant for lessons per page
 
 const LessonsList = () => {
-  const supabase = createClient();
-  const [lessons, setLessons] = useState<Class[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const LESSONS_PER_PAGE = 4;
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const { classes, loading, error, fetchClasses, editClass, cancelClass } = useClassApi();
   const [isClassModalOpen, setIsClassModalOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [futureLessons, setFutureLessons] = useState<Class[]>([]);
   const [cancelType, setCancelType] = useState<'single' | 'all'>('single');
 
-  const fetchLessons = async () => {
+  const filteredLessons = classes.filter(lesson =>
+    statusFilter ? lesson.status === statusFilter : true
+  );
+
+  const totalPages = Math.ceil(filteredLessons.length / LESSONS_PER_PAGE); // Calculate total pages
+
+  const indexOfLastLesson = currentPage * LESSONS_PER_PAGE; // Calculate the last lesson index
+  const indexOfFirstLesson = indexOfLastLesson - LESSONS_PER_PAGE; // Calculate the first lesson index
+
+  useEffect(() => {
+    fetchClasses({});
+  }, [fetchClasses]);
+
+  const handleCancel = async (lesson: Class) => {
+    setSelectedClass(lesson);
+    setShowCancelDialog(true);
+  };
+
+  const confirmCancel = async () => {
+    if (!selectedClass) return;
+
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: lessons, error } = await supabase
-        .from("classes")
-        .select("*")
-        .eq("student_id", user.id)
-        .order("start_time", { ascending: true });
-
-      if (error) throw error;
-      setLessons(lessons || []);
+      await cancelClass(selectedClass.id);
+      await fetchClasses({});
+      toast.success("Class cancelled successfully");
     } catch (error) {
-      console.error("Error fetching lessons:", error);
+      console.error("Error cancelling class:", error);
+      toast.error("Failed to cancel class");
     } finally {
-      setIsLoading(false);
+      setShowCancelDialog(false);
     }
   };
 
-  // Pagination logic
-  const indexOfLastLesson = currentPage * LESSONS_PER_PAGE;
-  const indexOfFirstLesson = indexOfLastLesson - LESSONS_PER_PAGE;
-  const filteredLessons = lessons.filter(lesson =>
-    statusFilter ? lesson.status === statusFilter : true
-  );
-  const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson);
-  const totalPages = Math.ceil(filteredLessons.length / LESSONS_PER_PAGE);
+  const handleReschedule = (lesson: Class) => {
+    setSelectedClass(lesson);
+    setIsClassModalOpen(true);
+  };
+
+  const handleEdit = (lesson: Class) => {
+    setSelectedClass(lesson);
+    setIsClassModalOpen(true);
+  };
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -80,45 +89,8 @@ const LessonsList = () => {
     }
   };
 
-  useEffect(() => {
-    fetchLessons();
-
-    const setupSubscription = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Subscribe to changes
-      const channel = supabase
-        .channel('lessons_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*', // Listen to all changes
-            schema: 'public',
-            table: 'classes',
-            filter: `student_id=eq.${user.id}`,
-          },
-          (payload) => {
-            fetchLessons(); // Refresh the lessons when a change occurs
-          }
-        )
-        .subscribe();
-
-      setChannel(channel);
-    };
-
-    setupSubscription();
-
-    // Cleanup subscription on unmount
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
-    };
-  }, []);
-
   const getPageNumbers = (currentPage: number, totalPages: number) => {
-    const delta = 2;
+    const delta = 2; // Number of pages to show around the current page
     const range = [];
     const rangeWithDots = [];
 
@@ -147,140 +119,11 @@ const LessonsList = () => {
     return rangeWithDots;
   };
 
-  const openClassModal = (lesson: Class) => {
-    setSelectedClass(lesson);
-    setIsClassModalOpen(true);
-  };
-
-  const closeClassModal = () => {
-    setSelectedClass(null);
-    setIsClassModalOpen(false);
-  };
-
-  const handleReschedule = (lesson: Class) => {
-    if (lesson.status === 'completed' || lesson.status === 'cancelled') {
-      return;
-    }
-    openClassModal(lesson);
-  };
-
-  const handleCancel = async (lesson: Class) => {
-    if (lesson.status === 'completed' || lesson.status === 'cancelled') {
-      return;
-    }
-
-    setSelectedClass(lesson);
-
-    if (lesson.recurring_group_id) {
-      // Check if the selected class is the last one in the series
-      const { data: lessons, error: selectError } = await supabase
-        .from("classes")
-        .select("*")
-        .eq("recurring_group_id", lesson.recurring_group_id)
-        .gt("start_time", lesson.start_time);
-
-      if (selectError) {
-        console.error("Error fetching future lessons:", selectError);
-        return;
-      }
-
-      setFutureLessons(lessons);
-
-      if (lessons.length === 0) {
-        // If it's the last class, check if it's less than 24 hours away
-        const shouldShowDialog = await cancelClass('single', lesson);
-        if (shouldShowDialog) {
-          setCancelType('single');
-          setShowCancelDialog(true);
-        } else {
-          fetchLessons();
-        }
-      } else {
-        // If it's not the last class, show the dialog to choose single or all
-        setCancelType('all');
-        setShowCancelDialog(true);
-      }
-    } else {
-      // Check if the single class is less than 24 hours away
-      const shouldShowDialog = await cancelClass('single', lesson);
-      if (shouldShowDialog) {
-        setCancelType('single');
-        setShowCancelDialog(true);
-      } else {
-        fetchLessons();
-      }
-    }
-  };
-
-  const confirmCancel = async () => {
-    if (!selectedClass) return;
-
-    try {
-      await cancelClass(cancelType, selectedClass, true);
-      await fetchLessons();
-      toast.success(cancelType === 'single'
-        ? "Class cancelled successfully"
-        : "All future recurring classes cancelled successfully"
-      );
-    } catch (error) {
-      console.error("Error cancelling class:", error);
-      toast.error("Failed to cancel class");
-    } finally {
-      setShowCancelDialog(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-4 shadow-sm p-6 border rounded-md divide-y animate-pulse skeleton">
-        <div className="rounded w-full h-6 skeleton"></div>
-        <div className="py-4">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <div className="mt-2 rounded w-1/2 h-4 skeleton"></div>
-              <div className="space-y-1 mt-1">
-                <div className="flex items-center">
-                  <div className="mr-1.5 rounded w-4 h-4 skeleton"></div>
-                  <div className="mr-1 rounded w-1/2 h-4 skeleton"></div>
-                </div>
-                <div className="flex items-start">
-                  <div className="mt-0.5 mr-1.5 rounded w-4 h-4 skeleton"></div>
-                  <div className="rounded w-1/2 h-4 skeleton"></div>
-                </div>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="inline-flex items-center px-2 py-1 rounded-md w-24 h-4 skeleton">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="py-4">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <div className="mt-2 rounded w-1/2 h-4 skeleton"></div>
-              <div className="space-y-1 mt-1">
-                <div className="flex items-center text-base-content/70 text-sm">
-                  <div className="mr-1.5 rounded w-4 h-4 skeleton"></div>
-                  <div className="mr-1 rounded w-1/2 h-4 skeleton"></div>
-                </div>
-                <div className="flex items-start text-base-content/70 text-sm">
-                  <div className="mt-0.5 mr-1.5 rounded w-4 h-4 skeleton"></div>
-                  <div className="rounded w-1/2 h-4 skeleton"></div>
-                </div>
-              </div>
-            </div>
-            <div className="ml-4">
-              <div className="inline-flex items-center px-2 py-1 rounded-md ring-inset w-24 h-4 font-medium skeleton">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <div>Loading...</div>; // Add a loading state
   }
 
-  if (lessons.length === 0) {
+  if (classes.length === 0) {
     return (
       <div className="py-12 text-center">
         <CalendarBlank className="mx-auto w-12 h-12 text-base-content/70" />
@@ -315,7 +158,7 @@ const LessonsList = () => {
           </SelectContent>
         </Select>
       </div>
-      {currentLessons.map((lesson) => (
+      {filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson).map((lesson) => (
         <div key={lesson.id} className="py-4">
           <div className="flex justify-between items-start">
             <div className="flex-1">
@@ -360,6 +203,9 @@ const LessonsList = () => {
                   <DropdownMenuContent className="w-40">
                     <DropdownMenuItem onClick={() => handleReschedule(lesson)}>
                       Reschedule
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEdit(lesson)}>
+                      Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleCancel(lesson)}>
                       Cancel
@@ -472,10 +318,11 @@ const LessonsList = () => {
 
       <ClassModal
         isOpen={isClassModalOpen}
-        onClose={closeClassModal}
+        onClose={() => setIsClassModalOpen(false)}
         selectedDate={selectedClass?.start_time ? new Date(selectedClass.start_time) : new Date()}
         selectedClass={selectedClass || undefined}
-        onClassUpdated={fetchLessons}
+        onClassUpdated={fetchClasses}
+        mode={selectedClass ? 'edit' : 'schedule'}
       />
 
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
@@ -490,10 +337,8 @@ const LessonsList = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Don't Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmCancel}
-            >
+            <AlertDialogCancel>Don&apos;t Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancel}>
               {cancelType === 'single' ? "Cancel Anyway" : "Cancel This Class"}
             </AlertDialogAction>
             {cancelType === 'all' && (
