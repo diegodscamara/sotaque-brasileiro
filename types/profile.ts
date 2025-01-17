@@ -12,7 +12,6 @@ export interface StudentProfileData {
   credits: number;
   portuguese_level: 'beginner' | 'intermediate' | 'advanced' | 'native' | 'unknown';
   learning_goals: string[];
-  availability_hours: number;
   preferred_schedule: ('morning' | 'afternoon' | 'evening' | 'night')[];
   native_language: string;
   other_languages: string[];

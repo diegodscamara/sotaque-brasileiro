@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
@@ -15,6 +16,7 @@ import React from "react";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-hot-toast";
 import useClassApi from '@/hooks/useClassApi';
+import useTeacherApi from '@/hooks/useTeacherApi';
 
 interface ClassModalProps {
   isOpen: boolean;
@@ -34,60 +36,96 @@ export const ClassModal = ({
   mode, // New prop
 }: ClassModalProps) => {
   const { editClass, scheduleClass, cancelClass } = useClassApi();
+  const { getTeacher, getTeachers } = useTeacherApi();
   const [formData, setFormData] = useState({
     title: "",
     start_time: "",
     end_time: "",
     notes: "",
+    teacher_id: "",
   });
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [teachers, setTeachers] = useState([]);
 
   useEffect(() => {
-    if (selectedClass) {
-      setFormData({
-        title: selectedClass.title,
-        start_time: new Date(selectedClass.start_time).toISOString(),
-        end_time: new Date(selectedClass.end_time).toISOString(),
-        notes: selectedClass.notes || "",
-      });
-    } else {
-      // Reset form data for scheduling a new class
-      setFormData({
-        title: "",
-        start_time: new Date(selectedDate).toISOString(),
-        end_time: new Date(selectedDate).toISOString(),
-        notes: "",
-      });
-    }
-  }, [selectedClass, selectedDate]);
+    const fetchTeacherName = async (teacherId: string) => {
+      const name = await getTeacher(teacherId);
+      return name;
+    };
+
+    const initializeFormData = async () => {
+      if (selectedClass) {
+        const teacherName = await fetchTeacherName(selectedClass.teacher_id);
+        setFormData({
+          title: `Private class with ${teacherName}`,
+          start_time: new Date(selectedClass.start_time).toISOString().slice(0, 16),
+          end_time: new Date(selectedClass.end_time).toISOString().slice(0, 16),
+          notes: selectedClass.notes || "",
+          teacher_id: selectedClass.teacher_id,
+        });
+        setSelectedTeacher(selectedClass.teacher_id);
+      } else {
+        // Reset form data for scheduling a new class
+        setFormData({
+          title: "",
+          start_time: new Date(selectedDate).toISOString().slice(0, 16),
+          end_time: new Date(selectedDate).toISOString().slice(0, 16),
+          notes: "",
+          teacher_id: selectedTeacher,
+        });
+      }
+    };
+
+    initializeFormData();
+  }, [selectedClass, selectedDate, selectedTeacher]);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      const response = await getTeachers();
+      setTeachers(response);
+    };
+
+    fetchTeachers();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if (mode === 'edit' && selectedClass) {
-        await editClass(selectedClass.id, formData);
-        toast.success("Class updated successfully");
-      } else if (mode === 'schedule') {
-        await scheduleClass(formData);
-        toast.success("Class scheduled successfully");
+      if (!selectedTeacher) {
+        toast.error("Please select a teacher before scheduling the class.");
+        return; // Prevent submission if no teacher is selected
       }
-      onClassUpdated(); // Refresh the class list
-      onClose(); // Close the modal
+
+      // Prepare the data to be sent to the API
+      const classData = {
+        ...formData,
+        teacher_id: selectedTeacher,
+      };
+
+      const response = await scheduleClass(classData);
+      if (response && response.status === 200) {
+        toast.success("Class scheduled successfully");
+        onClassUpdated(); // Refresh the class list
+        onClose(); // Close the modal
+      } 
     } catch (error) {
       console.error("Error processing class:", error);
-      toast.error("Failed to process class");
+      // No need to show toast here since it's already handled in useClassApi
     }
   };
 
   const handleCancel = async () => {
     if (selectedClass) {
       try {
-        await cancelClass(selectedClass.id);
-        onClassUpdated(); // Refresh the class list
-        onClose(); // Close the modal
-        toast.success("Class cancelled successfully");
+        const response = await cancelClass(selectedClass.id);
+        if (response && response.status === 200) {
+          onClassUpdated(); // Refresh the class list
+          onClose(); // Close the modal
+          toast.success("Class cancelled successfully");
+        } 
       } catch (error) {
         console.error("Error cancelling class:", error);
-        toast.error("Failed to cancel class");
+        // No need to show toast here since it's already handled in useClassApi
       }
     }
   };
@@ -101,13 +139,23 @@ export const ClassModal = ({
           <DialogTitle>{mode === 'view' ? "Class Details" : mode === 'edit' ? "Edit Class" : "Schedule Class"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <Input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Class Title"
-            required
-          />
+          <p className="font-semibold text-lg">{formData.title}</p>
+          <Select onValueChange={(value) => {
+            const teacherId = value;
+            setSelectedTeacher(teacherId);
+            setFormData({ ...formData, teacher_id: teacherId });
+          }}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a teacher" />
+            </SelectTrigger>
+            <SelectContent>
+              {teachers.map((teacher) => (
+                <SelectItem key={teacher.id} value={teacher.id}>
+                  {teacher.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             type="datetime-local"
             value={formData.start_time}

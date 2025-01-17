@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
         console.error('Error fetching classes:', error);
-        return NextResponse.json({ message: error.message }, { status: 500 });
+        return NextResponse.json({ message: error.message || "Error fetching classes" }, { status: 500 });
     }
 
     return NextResponse.json(data, { status: 200 });

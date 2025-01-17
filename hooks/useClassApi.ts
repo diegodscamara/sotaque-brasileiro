@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { toast } from 'react-hot-toast';
 import { useSupabase } from '@/hooks/useSupabase';
 
 const useClassApi = () => {
@@ -74,7 +75,9 @@ const useClassApi = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Error editing class: ${response.status} ${response.statusText}`);
+                const errorData = await response.json();
+                console.error(`Error editing class: ${response.status} ${response.statusText}`, errorData);
+                throw new Error(errorData.message || `Error editing class: ${response.statusText}`);
             }
 
             const result = await response.json();
@@ -82,6 +85,7 @@ const useClassApi = () => {
         } catch (err) {
             console.error('Error in editClass:', err);
             setError(err.message);
+            toast.error(err.message);
         } finally {
             setLoading(false);
         }
@@ -107,7 +111,9 @@ const useClassApi = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Error canceling class: ${response.status} ${response.statusText}`);
+                const errorData = await response.json();
+                console.error(`Error canceling class: ${response.status} ${response.statusText}`, errorData);
+                throw new Error(errorData.message || `Error canceling class: ${response.statusText}`);
             }
 
             const result = await response.json();
@@ -115,6 +121,7 @@ const useClassApi = () => {
         } catch (err) {
             console.error('Error in cancelClass:', err);
             setError(err.message);
+            toast.error(err.message);
         } finally {
             setLoading(false);
         }
@@ -140,7 +147,9 @@ const useClassApi = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Error scheduling class: ${response.status} ${response.statusText}`);
+                const errorData = await response.json();
+                console.error(`Error scheduling class: ${response.status} ${response.statusText}`, errorData);
+                throw new Error(errorData.message || `Error scheduling class: ${response.statusText}`);
             }
 
             const result = await response.json();
@@ -148,6 +157,7 @@ const useClassApi = () => {
         } catch (err) {
             console.error('Error in scheduleClass:', err);
             setError(err.message);
+            toast.error(err.message);
         } finally {
             setLoading(false);
         }

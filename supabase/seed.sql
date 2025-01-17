@@ -17,7 +17,6 @@ create table public.students (
     gender text,
     portuguese_level character varying(20) check (portuguese_level = any (array['beginner', 'intermediate', 'advanced', 'native', 'unknown'])),
     learning_goals text[],
-    availability_hours integer,
     preferred_schedule text[] check (preferred_schedule <@ array['morning', 'afternoon', 'evening', 'night']),
     native_language character varying(100),
     other_languages text[],
@@ -77,8 +76,6 @@ create table public.teachers (
     role text not null default 'teacher',
     country text,
     gender text,
-    availability_hours integer not null,
-    total_classes_given integer not null default 0,
     created_at timestamp with time zone default current_timestamp,
     updated_at timestamp with time zone default current_timestamp,
     constraint teachers_pkey primary key (id)
@@ -113,27 +110,6 @@ create table public.teacher_availability (
     updated_at timestamp with time zone default current_timestamp
 );
 
--- Prevent overlapping availability for the same teacher
-create or replace function prevent_availability_overlap()
-returns trigger as $$
-begin
-    if exists (
-        select 1
-        from public.teacher_availability
-        where teacher_id = new.teacher_id
-          and date = new.date
-          and (new.start_time, new.end_time) overlaps (start_time, end_time)
-    ) then
-        raise exception 'Overlapping availability times for the same teacher.';
-    end if;
-    return new;
-end;
-$$ language plpgsql;
-
-create trigger trg_prevent_availability_overlap
-before insert or update on public.teacher_availability
-for each row execute function prevent_availability_overlap();
-
 -- Enable realtime for teacher_availability
 alter table public.teacher_availability replica identity full;
 
@@ -151,56 +127,102 @@ create table public.classes (
         status = any (array['pending', 'scheduled', 'cancelled', 'completed'])
     ),
     notes text,
-    credits_cost integer not null default 1,
-    refund_credit boolean not null default true,
     recurring_group_id uuid default null references public.recurring_groups (id),
-    is_rescheduled boolean default false,
-    rescheduled_from_class_id uuid references public.classes (id),
     time_zone text not null,
     created_at timestamp with time zone default current_timestamp,
     updated_at timestamp with time zone default current_timestamp,
-    stripe_payment_id text,
-    receipt_url text,
     constraint classes_pkey primary key (id)
 );
 
--- Prevent scheduling without sufficient credits
-create or replace function prevent_insufficient_credits()
+-- Enable realtime for classes table
+alter table public.classes replica identity full;
+
+-- ===========================
+-- TRIGGERS
+-- ===========================
+
+-- Refund credits on cancellation
+create or replace function refund_credits_on_cancellation()
+returns trigger as $$
+declare
+    class_start_time timestamp with time zone;
+begin
+    -- Fetch the class start time
+    select start_time into class_start_time from public.classes where id = new.id;
+
+    -- Check if the class is cancelled and if it's at least 24 hours before the class start time
+    if (new.status = 'cancelled' and (class_start_time - current_timestamp >= interval '24 hours')) then
+        update public.students
+        set credits = credits + 1 -- Assuming 1 credit per class
+        where id = new.student_id;
+    end if;
+
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger trg_refund_credits_on_cancellation
+after update on public.classes
+for each row execute function refund_credits_on_cancellation();
+
+-- Check class duration
+create or replace function validate_class_duration()
 returns trigger as $$
 begin
-    if (new.credits_cost > (select credits from public.students where id = new.student_id)) then
-        raise exception 'Insufficient credits to schedule the class.';
+    if (new.end_time - new.start_time < interval '30 minutes') then
+        raise exception 'Class duration must be at least 30 minutes.';
+    end if;
+    if (new.end_time - new.start_time > interval '3 hours') then
+        raise exception 'Class duration cannot exceed 3 hours.';
     end if;
     return new;
 end;
 $$ language plpgsql;
 
-create trigger trg_prevent_insufficient_credits
-before insert on public.classes
-for each row execute function prevent_insufficient_credits();
+create trigger trg_validate_class_duration
+before insert or update on public.classes
+for each row execute function validate_class_duration();
 
--- Prevent overlapping classes for the same teacher
+-- Prevent scheduling without sufficient credits
+create or replace function prevent_insufficient_credits()
+returns trigger as $$
+declare
+    student_credits integer;
+begin
+    -- Fetch the student's current credits
+    select credits into student_credits from public.students where id = new.student_id;
+
+    -- Check if the student has enough credits
+    if (student_credits < 1) then
+        raise exception 'Insufficient credits to schedule the class.';
+    end if;
+
+    return new;
+end;
+$$ language plpgsql;
+
+-- Prevent overlapping classes
 create or replace function prevent_class_overlap()
 returns trigger as $$
 begin
     if exists (
         select 1
         from public.classes
-        where teacher_id = new.teacher_id
+        where (teacher_id = new.teacher_id or student_id = new.student_id) -- Check for both teacher and student
         and (new.start_time, new.end_time) overlaps (start_time, end_time)
+        and (status = 'pending' or status = 'scheduled') -- Check only relevant statuses
+        and id != new.id -- Exclude the current class being updated
     ) then
-        raise exception 'Overlapping classes for the same teacher are not allowed.';
+        raise exception 'Overlapping classes are not allowed.';
     end if;
     return new;
 end;
 $$ language plpgsql;
 
+-- Create the trigger after ensuring the table exists
 create trigger trg_prevent_class_overlap
 before insert or update on public.classes
 for each row execute function prevent_class_overlap();
-
--- Enable realtime for classes table
-alter table public.classes replica identity full;
 
 -- ===========================
 -- NOTIFICATIONS
@@ -294,9 +316,7 @@ begin
       email,
       name,
       avatar_url,
-      role,
-      availability_hours,
-      total_classes_given
+      role
     ) values (
       new.id,
       new.email,

@@ -40,10 +40,10 @@ export default function Page() {
       <AppSidebar />
       <SidebarInset>
         <header className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 flex items-center gap-2 h-16 transition-[width,height] ease-linear shrink-0">
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 px-4 w-full">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <div className="flex items-center gap-2">
+            <div className="flex justify-between items-center gap-2 w-full">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="md:block hidden">
