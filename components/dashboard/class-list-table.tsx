@@ -58,13 +58,10 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
 
     useEffect(() => {
         const fetchTeacher = async () => {
-            console.log("Classes:", classes);
             if (classes.length > 0) {
                 const teacherData = await getTeacher(classes[0].teacher_id);
-                console.log("Teacher Data:", teacherData);
                 if (teacherData && teacherData.name !== teacher?.name) {
                     setTeacher(teacherData);
-                    console.log("Fetched Teacher:", teacherData);
                 }
             } else {
                 console.log("No classes available to fetch teacher.");

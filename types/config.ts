@@ -1,28 +1,3 @@
-export type Theme =
-  | "light"
-  | "dark"
-  | "cupcake"
-  | "bumblebee"
-  | "emerald"
-  | "corporate"
-  | "synthwave"
-  | "retro"
-  | "cyberpunk"
-  | "valentine"
-  | "halloween"
-  | "garden"
-  | "forest"
-  | "aqua"
-  | "lofi"
-  | "pastel"
-  | "fantasy"
-  | "wireframe"
-  | "black"
-  | "luxury"
-  | "dracula"
-  | "lemonade"
-  | "";
-
 export interface ConfigProps {
   appName: string;
   appDescription: string;
@@ -55,10 +30,6 @@ export interface ConfigProps {
     fromNoReply: string;
     fromAdmin: string;
     supportEmail?: string;
-  };
-  colors: {
-    theme: Theme;
-    main: string;
   };
   auth: {
     loginUrl: string;

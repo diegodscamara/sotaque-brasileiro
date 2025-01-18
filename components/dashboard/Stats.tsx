@@ -62,13 +62,13 @@ function StatsCard({
         <div className="bg-primary/10 p-3 rounded-lg">{config.icon}</div>
         <div>
           <p className="text-muted-foreground text-sm">{config.title}</p>
-          <p className="font-semibold text-2xl">
+          <div className="rounded w-1/2 h-6 skeleton">
             {isLoading ? (
-              <div className="rounded w-1/2 h-6 skeleton" />
+              <p className="font-semibold text-2xl" />
             ) : (
               dashboardStats[config.statKey]
             )}
-          </p>
+          </div>
         </div>
       </CardHeader>
       <CardFooter>

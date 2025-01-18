@@ -71,7 +71,7 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       {/* Show a progress bar at the top when navigating between pages */}
-      <NextTopLoader color={config.colors.main} showSpinner={false} />
+      <NextTopLoader showSpinner={false} />
 
       {/* Content inside app/page.js files  */}
       {children}
@@ -87,7 +87,7 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
       {/* Show tooltips if any JSX elements has these 2 attributes: data-tooltip-id="tooltip" data-tooltip-content="" */}
       <Tooltip
         id="tooltip"
-        className="z-[60] !opacity-100 max-w-sm shadow-lg"
+        className="z-[60] !opacity-100 shadow-lg max-w-sm"
       />
 
       {/* Set Crisp customer chat support */}

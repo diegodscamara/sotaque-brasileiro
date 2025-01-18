@@ -57,7 +57,7 @@ export default function Page() {
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
-              <Button onClick={handleBookClass} variant="default" className="ml-4">
+              <Button onClick={handleBookClass} variant="default" effect="shine" className="ml-4">
                 Book Class
               </Button>
             </div>
