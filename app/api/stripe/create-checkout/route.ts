@@ -9,6 +9,14 @@ import { createClient } from "@/libs/supabase/server";
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
+  const supabase = createClient();
+
+  // Check if a user is logged in
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    return NextResponse.json({ error: "User not authenticated" }, { status: 401 }); // Return 401 status
+  }
+
   if (!body.priceId) {
     return NextResponse.json(
       { error: "Price ID is required" },
@@ -30,12 +38,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const supabase = createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     const { priceId, mode, successUrl, cancelUrl } = body;
 
     const { data } = await supabase

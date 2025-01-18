@@ -15,6 +15,7 @@ const nextConfig = {
       "images.unsplash.com",
       "logos-world.net",
       "via.placeholder.com",
+      "avatar.vercel.sh"
     ],
   },
 };

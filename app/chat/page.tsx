@@ -17,6 +17,7 @@ import { Markdown } from "@/components/markdown";
 import React from "react";
 import { SendIcon } from "lucide-react";
 import { StopIcon } from "@radix-ui/react-icons";
+import apiClient from "@/libs/api"; // Ensure you're importing the apiClient
 import { toast } from "react-hot-toast";
 import { useChat } from "ai/react";
 
@@ -43,6 +44,26 @@ function TextFilePreview({ file }: { file: File }) {
       {content.length >= 100 && "..."}
     </div>
   );
+}
+
+async function handleCheckout() {
+  try {
+    const response = await apiClient.post('/stripe/create-checkout', {
+      // your request body
+    });
+    // Proceed to checkout with response.url
+  } catch (error) {
+    if (error.response?.status === 401) {
+      // Handle the redirect to login if the user is not authenticated
+      // This could be a redirect or a toast message
+      console.error("User not authenticated, redirecting to login...");
+      // Optionally, you can use a router to redirect
+      // router.push('/login'); // If using Next.js router
+    } else {
+      // Handle other errors
+      console.error("Error during checkout:", error.message);
+    }
+  }
 }
 
 export default function Page() {
