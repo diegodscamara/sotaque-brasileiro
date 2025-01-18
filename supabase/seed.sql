@@ -322,9 +322,7 @@ begin
       new.email,
       coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
       coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
-      'teacher',
-      0,
-      0
+      'teacher'
     );
   else
     insert into public.students (

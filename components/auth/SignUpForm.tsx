@@ -48,6 +48,7 @@ export default function SignUpForm() {
             if (error) throw error;
             router.push("/dashboard");
         } catch (error) {
+            console.error("Sign up error:", error);
             setError(error.message);
         } finally {
             setLoading(false);

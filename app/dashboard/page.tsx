@@ -17,8 +17,8 @@ import { addBusinessDays, setHours } from "date-fns"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button"
+import ClassList from "@/components/dashboard/class-list"
 import { ClassModal } from "@/components/dashboard/ClassModal"
-import LessonsList from "@/components/dashboard/LessonsList"
 import { Separator } from "@/components/ui/separator"
 import Stats from "@/components/dashboard/Stats"
 import { useState } from "react"
@@ -68,7 +68,7 @@ export default function Page() {
             <Stats />
           </div>
           <div className="gap-4 grid md:grid-cols-1 auto-rows-min">
-            <LessonsList />
+            <ClassList />
           </div>
         </div>
       </SidebarInset>

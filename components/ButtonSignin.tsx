@@ -33,11 +33,11 @@ const ButtonSignin = () => {
   }
 
   return (
-    <Button variant="default" asChild>
+    <Button variant="outline" asChild>
       <Link
         href={config.auth.loginUrl}
       >
-        Get started
+        Sign in
       </Link>
     </Button>
   );

@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -11,7 +12,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Class } from "@/types/class";
-import { Input } from "../ui/input";
+import { DateTimePicker24h } from "./DateTimePicker24h";
 import React from "react";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-hot-toast";
@@ -35,17 +36,17 @@ export const ClassModal = ({
   onClassUpdated,
   mode, // New prop
 }: ClassModalProps) => {
-  const { editClass, scheduleClass, cancelClass } = useClassApi();
+  const { scheduleClass, cancelClass } = useClassApi();
   const { getTeacher, getTeachers } = useTeacherApi();
   const [formData, setFormData] = useState({
     title: "",
     start_time: "",
-    end_time: "",
     notes: "",
     teacher_id: "",
   });
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [teachers, setTeachers] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchTeacherName = async (teacherId: string) => {
@@ -58,8 +59,7 @@ export const ClassModal = ({
         const teacherName = await fetchTeacherName(selectedClass.teacher_id);
         setFormData({
           title: `Private class with ${teacherName}`,
-          start_time: new Date(selectedClass.start_time).toISOString().slice(0, 16),
-          end_time: new Date(selectedClass.end_time).toISOString().slice(0, 16),
+          start_time: new Date(selectedClass.start_time).toISOString(),
           notes: selectedClass.notes || "",
           teacher_id: selectedClass.teacher_id,
         });
@@ -68,8 +68,7 @@ export const ClassModal = ({
         // Reset form data for scheduling a new class
         setFormData({
           title: "",
-          start_time: new Date(selectedDate).toISOString().slice(0, 16),
-          end_time: new Date(selectedDate).toISOString().slice(0, 16),
+          start_time: new Date(selectedDate).toISOString(),
           notes: "",
           teacher_id: selectedTeacher,
         });
@@ -90,6 +89,8 @@ export const ClassModal = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true); // Set loading state
     try {
       if (!selectedTeacher) {
         toast.error("Please select a teacher before scheduling the class.");
@@ -97,20 +98,31 @@ export const ClassModal = ({
       }
 
       // Prepare the data to be sent to the API
+      const startTime = new Date(formData.start_time);
+      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Calculate end time (1 hour later)
+
       const classData = {
         ...formData,
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
         teacher_id: selectedTeacher,
       };
 
       const response = await scheduleClass(classData);
-      if (response && response.status === 200) {
-        toast.success("Class scheduled successfully");
-        onClassUpdated(); // Refresh the class list
-        onClose(); // Close the modal
-      } 
+      if (response) {
+        if (response.status === 200) {
+          toast.success(response.message); // Show success message
+          onClassUpdated(); // Refresh the class list
+          onClose(); // Close the modal
+        } else {
+          toast.error(response.message || "Failed to schedule class."); // Show error message
+        }
+      }
     } catch (error) {
       console.error("Error processing class:", error);
-      // No need to show toast here since it's already handled in useClassApi
+      toast.error("An error occurred while scheduling the class.");
+    } finally {
+      setIsSubmitting(false); // Reset loading state
     }
   };
 
@@ -118,14 +130,18 @@ export const ClassModal = ({
     if (selectedClass) {
       try {
         const response = await cancelClass(selectedClass.id);
-        if (response && response.status === 200) {
-          onClassUpdated(); // Refresh the class list
-          onClose(); // Close the modal
-          toast.success("Class cancelled successfully");
-        } 
+        if (response) {
+          if (response.status === 200) {
+            toast.success(response.message); // Show success message
+            onClassUpdated(); // Refresh the class list
+            onClose(); // Close the modal
+          } else {
+            toast.error(response.message || "Failed to cancel class."); // Show error message
+          }
+        }
       } catch (error) {
         console.error("Error cancelling class:", error);
-        // No need to show toast here since it's already handled in useClassApi
+        toast.error("An error occurred while cancelling the class.");
       }
     }
   };
@@ -138,7 +154,7 @@ export const ClassModal = ({
         <DialogHeader>
           <DialogTitle>{mode === 'view' ? "Class Details" : mode === 'edit' ? "Edit Class" : "Schedule Class"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <p className="font-semibold text-lg">{formData.title}</p>
           <Select onValueChange={(value) => {
             const teacherId = value;
@@ -156,28 +172,22 @@ export const ClassModal = ({
               ))}
             </SelectContent>
           </Select>
-          <Input
-            type="datetime-local"
-            value={formData.start_time}
-            onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-            required
-          />
-          <Input
-            type="datetime-local"
-            value={formData.end_time}
-            onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-            required
-          />
+          <DateTimePicker24h formData={formData} setFormData={setFormData} />
           <Textarea
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             placeholder="Notes"
           />
-          <Button variant="outline" type="submit">{mode === 'schedule' ? "Schedule Class" : "Save Changes"}</Button>
+          <DialogFooter>
+            {mode === 'edit' && selectedClass && (
+              <Button variant="destructive" onClick={handleCancel}>Cancel Class</Button>
+            )}
+            <Button type="submit" disabled={isSubmitting}>
+              {mode === 'schedule' ? "Schedule Class" : "Save Changes"}
+            </Button>
+          </DialogFooter>
         </form>
-        {mode === 'edit' && selectedClass && (
-          <Button variant="destructive" onClick={handleCancel}>Cancel Class</Button>
-        )}
+
       </DialogContent>
     </Dialog>
   );

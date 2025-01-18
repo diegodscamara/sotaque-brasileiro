@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 
-import { toast } from 'react-hot-toast';
 import { useSupabase } from '@/hooks/useSupabase';
 
 const useClassApi = () => {
@@ -53,7 +52,7 @@ const useClassApi = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [supabase]);
 
     const editClass = useCallback(async (classId: string, classData: any) => {
         setLoading(true);
@@ -85,7 +84,6 @@ const useClassApi = () => {
         } catch (err) {
             console.error('Error in editClass:', err);
             setError(err.message);
-            toast.error(err.message);
         } finally {
             setLoading(false);
         }
@@ -121,7 +119,6 @@ const useClassApi = () => {
         } catch (err) {
             console.error('Error in cancelClass:', err);
             setError(err.message);
-            toast.error(err.message);
         } finally {
             setLoading(false);
         }
@@ -146,18 +143,18 @@ const useClassApi = () => {
                 body: JSON.stringify({ userId: user.id, classData }),
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error(`Error scheduling class: ${response.status} ${response.statusText}`, errorData);
-                throw new Error(errorData.message || `Error scheduling class: ${response.statusText}`);
+                console.error(`Error scheduling class: ${response.status} ${response.statusText}`, result);
+                throw new Error(result.message || `Error scheduling class: ${response.statusText}`);
             }
 
-            const result = await response.json();
-            return result;
+            return { status: response.status, message: result.message };
         } catch (err) {
             console.error('Error in scheduleClass:', err);
             setError(err.message);
-            toast.error(err.message);
+            return { status: 500, message: err.message };
         } finally {
             setLoading(false);
         }

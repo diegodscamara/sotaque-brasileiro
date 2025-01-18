@@ -18,7 +18,7 @@ const ButtonCheckout = ({
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
-  
+
   const handlePayment = async () => {
     setIsLoading(true);
 
@@ -27,7 +27,7 @@ const ButtonCheckout = ({
         "/stripe/create-checkout",
         {
           priceId,
-          successUrl: window.location.href + "/dashboard",
+          successUrl: `${window.location.origin}/dashboard`,
           cancelUrl: window.location.href,
           mode,
         }
