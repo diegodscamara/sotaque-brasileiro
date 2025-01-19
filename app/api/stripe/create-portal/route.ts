@@ -1,4 +1,5 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
 import { createClient } from "@/libs/supabase/server";
 import { createCustomerPortal } from "@/libs/stripe";
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data } = await supabase
-      .from("profiles")
+      .from("students")
       .select("*")
       .eq("id", user?.id)
       .single();

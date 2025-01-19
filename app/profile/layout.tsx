@@ -1,5 +1,5 @@
 import Footer from "@/components/Footer";
-import Header from "@/components/landing-page/Header";
+import Header from "@/components/Header";
 import { ReactNode } from "react";
 import { Suspense } from "react";
 import config from "@/config";
@@ -31,7 +31,9 @@ export default async function LayoutPrivate({
       <Suspense>
         <Header />
       </Suspense>
-      {children}
+      <main className="flex flex-col justify-between items-center mx-auto py-24 container">
+        {children}
+      </main>
       <Footer />
     </>
   );

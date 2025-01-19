@@ -8,14 +8,14 @@ import logo from "@/app/icon.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-base-200 border-t border-base-content/10">
-      <div className="max-w-7xl mx-auto px-8 py-24">
-        <div className=" flex lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
-          <div className="w-64 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
+    <footer>
+      <div className="mx-auto px-8 py-24 max-w-7xl container">
+        <div className="flex md:flex-row flex-col flex-wrap md:flex-nowrap lg:items-start">
+          <div className="flex-shrink-0 mx-auto md:mx-0 w-64 text-center md:text-left">
             <Link
               href="/#"
               aria-current="page"
-              className="flex gap-2 justify-center md:justify-start items-center"
+              className="flex justify-center md:justify-start items-center gap-2"
             >
               <Image
                 src={logo}
@@ -25,21 +25,21 @@ const Footer = () => {
                 width={24}
                 height={24}
               />
-              <strong className="font-extrabold tracking-tight text-base md:text-lg">
+              <strong className="font-extrabold text-base md:text-lg tracking-tight">
                 {config.appName}
               </strong>
             </Link>
 
-            <p className="mt-3 text-sm text-base-content/80">
+            <p className="mt-3 text-base-content/80 text-sm">
               {config.appDescription}
             </p>
-            <p className="mt-3 text-sm text-base-content/60">
+            <p className="mt-3 text-base-content/60 text-sm">
               Copyright © {new Date().getFullYear()} - All rights reserved
             </p>
           </div>
-          <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">
-            <div className="lg:w-1/3 md:w-1/2 w-full px-4">
-              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+          <div className="flex flex-wrap flex-grow justify-center mt-10 md:mt-0 -mb-10 text-center">
+            <div className="px-4 w-full md:w-1/2 lg:w-1/3">
+              <div className="mb-3 font-semibold text-base-content text-sm md:text-left tracking-widest footer-title">
                 LINKS
               </div>
 
@@ -66,8 +66,8 @@ const Footer = () => {
               </div>
             </div>
 
-            <div className="lg:w-1/3 md:w-1/2 w-full px-4">
-              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+            <div className="px-4 w-full md:w-1/2 lg:w-1/3">
+              <div className="mb-3 font-semibold text-base-content text-sm md:text-left tracking-widest footer-title">
                 LEGAL
               </div>
 

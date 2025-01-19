@@ -1,15 +1,16 @@
 "use client";
 
-import type { JSX } from "react";
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { Popover, Transition } from "@headlessui/react";
-import Link from "next/link";
-import Image from "next/image";
-import logo from "@/app/icon.png";
-import config from "@/config";
-import { categories } from "../content";
+import { useEffect, useState } from "react";
+
 import ButtonSignin from "@/components/ButtonSignin";
+import Image from "next/image";
+import type { JSX } from "react";
+import Link from "next/link";
+import { categories } from "../content";
+import config from "@/config";
+import logo from "@/app/icon.png";
+import { useSearchParams } from "next/navigation";
 
 const links: {
   href: string;
@@ -31,7 +32,7 @@ const ButtonPopoverCategories = () => {
       {({ open }) => (
         <>
           <Popover.Button
-            className="link no-underline flex flex-nowrap items-center gap-1 text-base-content/80 hover:text-base-content active:text-base-content focus:text-base-content duration-100"
+            className="flex flex-nowrap items-center gap-1 text-base-content/80 hover:text-base-content focus:text-base-content active:text-base-content no-underline duration-100 link"
             title="Open Blog categories"
           >
             Categories
@@ -58,21 +59,21 @@ const ButtonPopoverCategories = () => {
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Popover.Panel className="absolute left-0 z-30 mt-3 w-screen max-w-full sm:max-w-sm transform">
+            <Popover.Panel className="left-0 z-30 absolute mt-3 w-screen max-w-full sm:max-w-sm transform">
               {({ close }) => (
-                <div className="overflow-hidden rounded-box shadow-lg ring-1 ring-base-content ring-opacity-5">
-                  <div className="relative grid gap-2 bg-base-100 p-2 overflow-hidden">
+                <div className="ring-opacity-5 shadow-lg rounded-box ring-1 ring-base-content overflow-hidden">
+                  <div className="relative gap-2 grid bg-base-100 p-2 overflow-hidden">
                     {categories.map((category) => (
                       <div key={category.slug} onClick={() => close()}>
                         <Link
-                          className="block text-left p-3 -m-1 cursor-pointer hover:bg-base-200 rounded-box duration-200"
+                          className="block hover:bg-base-200 -m-1 p-3 rounded-box text-left duration-200 cursor-pointer"
                           href={`/blog/category/${category.slug}`}
                         >
                           <div className="">
-                            <p className="font-medium mb-0.5">
+                            <p className="mb-0.5 font-medium">
                               {category?.titleShort || category.title}
                             </p>
-                            <p className="text-sm opacity-80">
+                            <p className="opacity-80 text-sm">
                               {category?.descriptionShort ||
                                 category.description}
                             </p>
@@ -103,7 +104,7 @@ const ButtonAccordionCategories = () => {
         }}
         aria-expanded={isOpen}
         type="button"
-        className="link no-underline flex justify-between items-center w-full "
+        className="flex justify-between items-center w-full no-underline link"
       >
         Categories
         <svg
@@ -153,12 +154,12 @@ const HeaderBlog = () => {
   }, [searchParams]);
 
   return (
-    <header className="bg-base-200">
-      <nav className="max-w-7xl flex items-center justify-between px-8 py-3 mx-auto">
+    <header className="bg-base-300 shadow-lg">
+      <nav className="flex justify-between items-center mx-auto px-8 py-3 max-w-7xl">
         {/* Your logo/name on large screens */}
         <div className="flex lg:flex-1">
           <Link
-            className="flex items-center gap-2 shrink-0 "
+            className="flex items-center gap-2 shrink-0"
             href="/"
             title={`${config.appName} homepage`}
           >
@@ -177,7 +178,7 @@ const HeaderBlog = () => {
         <div className="flex lg:hidden">
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-box p-2.5"
+            className="inline-flex justify-center items-center -m-2.5 p-2.5 rounded-box"
             onClick={() => setIsOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
@@ -199,12 +200,12 @@ const HeaderBlog = () => {
         </div>
 
         {/* Your links on large screens */}
-        <div className="hidden lg:flex lg:justify-center lg:gap-12 lg:items-center">
+        <div className="lg:flex lg:justify-center lg:items-center lg:gap-12 hidden">
           {links.map((link) => (
             <Link
               href={link.href}
               key={link.href}
-              className="link link-hover text-base-content/80 hover:text-base-content active:text-base-content focus:text-base-content duration-100"
+              className="text-base-content/80 hover:text-base-content focus:text-base-content active:text-base-content duration-100 link link-hover"
               title={link.label}
             >
               {link.label}
@@ -215,7 +216,7 @@ const HeaderBlog = () => {
         </div>
 
         {/* CTA on large screens */}
-        <div className="hidden lg:flex lg:justify-end lg:flex-1">{cta}</div>
+        <div className="lg:flex lg:flex-1 lg:justify-end hidden">{cta}</div>
       </nav>
 
       {/* Mobile menu, show/hide based on menu state. */}
@@ -224,9 +225,9 @@ const HeaderBlog = () => {
           className={`fixed inset-y-0 right-0 z-10 w-full px-8 py-3 overflow-y-auto bg-base-200 sm:max-w-sm sm:ring-1 sm:ring-neutral/10 transform origin-right transition ease-in-out duration-300`}
         >
           {/* Your logo/name on small screens */}
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <Link
-              className="flex items-center gap-2 shrink-0 "
+              className="flex items-center gap-2 shrink-0"
               title={`${config.appName} homepage`}
               href="/"
             >
@@ -243,7 +244,7 @@ const HeaderBlog = () => {
             </Link>
             <button
               type="button"
-              className="-m-2.5 rounded-box p-2.5"
+              className="-m-2.5 p-2.5 rounded-box"
               onClick={() => setIsOpen(false)}
             >
               <span className="sr-only">Close menu</span>
@@ -265,9 +266,9 @@ const HeaderBlog = () => {
           </div>
 
           {/* Your links on small screens */}
-          <div className="flow-root mt-6">
+          <div className="mt-6 flow-root">
             <div className="py-4">
-              <div className="flex flex-col gap-y-4 items-start">
+              <div className="flex flex-col items-start gap-y-4">
                 {links.map((link) => (
                   <Link
                     href={link.href}

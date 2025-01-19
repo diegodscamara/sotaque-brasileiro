@@ -2,7 +2,24 @@
 
 import * as React from "react";
 
-import { CaretDown, Check } from "@phosphor-icons/react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { Button } from "@/components/ui/button";
+import { Check } from "@phosphor-icons/react";
+import { ChevronsUpDown } from "lucide-react";
+import { cn } from "@/libs/utils";
 
 interface ComboboxProps {
   options: { code: string; name: string }[];
@@ -12,80 +29,66 @@ interface ComboboxProps {
 }
 
 export function Combobox({ options, value, onChange, placeholder = "Select..." }: ComboboxProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
-  // Close dropdown when clicking outside
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const filteredOptions = options.filter(option =>
-    option.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const selectedOption = options.find(option => option.code === value);
+  // Filter options based on the search term
+  const filteredOptions = React.useMemo(() => {
+    return options.filter((option) =>
+      option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [options, searchTerm]);
 
   return (
-    <div className="relative w-full" ref={wrapperRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="select select-bordered w-full text-left flex items-center justify-between"
-      >
-        <span className="block truncate">
-          {selectedOption ? selectedOption.name : placeholder}
-        </span>
-        <span className="pointer-events-none">
-          <CaretDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-10 mt-1 w-full rounded-md bg-base-100 shadow-lg border border-base-300">
-          <div className="p-2">
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-          <ul className="max-h-60 overflow-auto py-1">
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="justify-between w-full"
+        >
+          {value
+            ? options.find((option) => option.code === value)?.name || placeholder
+            : placeholder}
+          <ChevronsUpDown className="opacity-50 ml-2 w-4 h-4 shrink-0" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-full">
+        <Command>
+          <CommandInput
+            placeholder="Search by name..."
+            value={searchTerm}
+            onValueChange={(term) => setSearchTerm(term)} // Update search term
+          />
+          <CommandList>
             {filteredOptions.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-gray-500">No results found</li>
+              <CommandEmpty>No results found.</CommandEmpty>
             ) : (
-              filteredOptions.map((option) => (
-                <li
-                  key={option.code}
-                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-base-200 flex items-center justify-between ${
-                    value === option.code ? 'bg-base-200' : ''
-                  }`}
-                  onClick={() => {
-                    onChange(option.code);
-                    setIsOpen(false);
-                    setSearchQuery("");
-                  }}
-                >
-                  {option.name}
-                  {value === option.code && (
-                    <Check className="mr-2 h-4 w-4" weight="fill" />
-                  )}
-                </li>
-              ))
+              <CommandGroup>
+                {filteredOptions.map((option) => (
+                  <CommandItem
+                    key={option.code}
+                    value={option.code}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option.code ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             )}
-          </ul>
-        </div>
-      )}
-    </div>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
-} 
+}

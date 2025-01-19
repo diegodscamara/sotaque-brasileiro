@@ -1,5 +1,5 @@
 import Footer from "@/components/Footer";
-import Header from "@/components/landing-page/Header";
+import Header from "@/components/Header";
 import { ReactNode } from "react";
 import { Suspense } from "react";
 import config from "@/config";

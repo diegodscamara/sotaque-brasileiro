@@ -1,9 +1,17 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-import Avatar from "@/components/Avatar";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSupabase } from "@/hooks/useSupabase";
 
@@ -11,7 +19,7 @@ interface UserProfileData {
   id: string;
   portuguese_level: string;
   name: string;
-  image: string;
+  avatar_url: string;
   has_access: boolean;
   created_at: string;
   credits: number;
@@ -21,11 +29,6 @@ interface UserProfileData {
 type ProfilePayload = RealtimePostgresChangesPayload<{
   new: UserProfileData;
   old: UserProfileData;
-}>;
-
-type ClassPayload = RealtimePostgresChangesPayload<{
-  new: { student_id: string };
-  old: { student_id: string };
 }>;
 
 const Summary = () => {
@@ -38,7 +41,7 @@ const Summary = () => {
     if (!session) return;
     try {
       const { data: profile, error } = await supabase
-        .from("profiles")
+        .from("students")
         .select("*")
         .eq("id", session.id)
         .single();
@@ -57,7 +60,7 @@ const Summary = () => {
 
     fetchProfile();
 
-    // Set up realtime subscription for both profiles and classes
+    // Set up realtime subscription for both students and classes
     const channel = supabase
       .channel("summary_changes")
       .on(
@@ -65,11 +68,10 @@ const Summary = () => {
         {
           event: "*",
           schema: "public",
-          table: "profiles",
+          table: "students",
           filter: `id=eq.${session.id}`,
         },
         (payload: ProfilePayload) => {
-          console.log("Profile change received:", payload);
           if ('new' in payload && payload.new) {
             setProfile(payload.new as UserProfileData);
           }
@@ -83,20 +85,15 @@ const Summary = () => {
           table: "classes",
           filter: `student_id=eq.${session.id}`,
         },
-        (payload: ClassPayload) => {
-          console.log("Class change received:", payload);
+        () => {
           fetchProfile();
         }
-      )
-      .subscribe((status) => {
-        console.log("Subscription status:", status);
-      });
+      );
 
     setChannel(channel);
 
     return () => {
       if (channel) {
-        console.log("Removing channel subscription");
         supabase.removeChannel(channel);
       }
     };
@@ -104,103 +101,93 @@ const Summary = () => {
 
   if (isLoading) {
     return (
-      <div className="lg:col-start-3 lg:row-end-1">
-        <h2 className="sr-only">Summary</h2>
-        <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 rounded-md ring-1 ring-gray-900/5 w-full max-h-[227px]">
-          <div className="space-y-4 animate-pulse">
-            <div className="flex items-center gap-4">
-              <div className="bg-gray-200 rounded-full w-6 h-6"></div>
-              <div className="bg-gray-200 rounded w-1/4 h-4"></div>
+      <div className="lg:col-start-3 lg:row-end-1 rounded-md w-full skeleton">
+        <div className="gap-x-4 w-full h-full">
+          <div className="flex flex-col">
+            <div className="flex flex-wrap justify-between items-center px-6 py-4">
+              <div className="flex flex-row flex-auto items-center gap-4">
+                <div className="rounded-full w-16 h-16 skeleton"></div>
+                <div className="flex flex-col gap-2">
+                  <div className="rounded w-32 h-4 skeleton"></div>
+                  <div className="rounded w-16 h-4 skeleton"></div>
+                </div>
+              </div>
+              <div className="rounded w-16 h-8 skeleton"></div>
             </div>
-            <div className="bg-gray-200 rounded w-1/2 h-4"></div>
-            <div className="bg-gray-200 rounded w-3/4 h-4"></div>
+            <div className="flex lg:flex-row flex-col justify-between items-center skeleton">
+              <div className="flex gap-2 px-6 py-4 w-full">
+                <div className="w-1/4 h-4 skeleton"></div>
+                <div className="w-1/2 h-4 skeleton"></div>
+              </div>
+              <div className="flex gap-2 px-6 py-4 w-full">
+                <div className="w-1/4 h-4 skeleton"></div>
+                <div className="w-1/2 h-4 skeleton"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!session || !profile) {
-    return (
-      <div className="lg:col-start-3 lg:row-end-1">
-        <h2 className="sr-only">Summary</h2>
-        <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 rounded-md ring-1 ring-gray-900/5 w-full max-h-[227px]">
-          <p className="text-gray-500">No profile information available</p>
-        </div>
-      </div>
-    );
-  }
+  if (!profile) return null;
 
   return (
-    <div className="lg:col-start-3 lg:row-end-1">
-      <h2 className="sr-only">Summary</h2>
-      <div className="gap-x-4 bg-white shadow-sm px-4 sm:px-6 py-5 rounded-md ring-1 ring-gray-900/5 w-full max-h-[227px]">
-        <dl className="flex flex-wrap items-center">
-          <div className="flex flex-row flex-auto items-center gap-4">
-            <dt>
-              <Avatar
-                src={profile.image}
-                alt={profile.name}
-                width={24}
-                height={24}
-              />
-            </dt>
-            <dd className="font-semibold text-base text-gray-900">
-              {profile.name}
-            </dd>
-          </div>
-          <div className="flex-none mb-3 self-end">
-            <dt className="sr-only">Status</dt>
-            <dd
-              className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
-                ? "bg-green-50 text-green-700 ring-green-600/20"
-                : "bg-red-50 text-red-700 ring-red-600/20"
+    <Card>
+      <CardHeader>
+        <div className="flex flex-row justify-between gap-2 w-full">
+          <Avatar className="w-16 h-16">
+            <AvatarImage
+              src={profile.avatar_url}
+              alt={profile.name}
+              width={64}
+              height={64}
+            />
+            <AvatarFallback>
+              {profile.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span
+            className={`w-fit flex items-center justify-center h-fit rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${profile.has_access
+              ? "bg-green-50 text-green-700 ring-green-600/20"
+              : "bg-red-50 text-red-700 ring-red-600/20"
               }`}
-            >
-              {profile.has_access ? "Active" : "Inactive"}
-            </dd>
-          </div>
-
-          <div className="flex flex-none gap-x-4 mt-2 w-full">
-            <dt className="flex-none">
-              <span className="text-gray-500 text-sm/6">Enrolled:</span>
-            </dt>
-            <dd className="text-gray-500 text-sm/6">
-              <time dateTime={new Date(profile.created_at).toISOString()}>
-                {new Date(profile.created_at).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-            </dd>
-          </div>
-          <div className="flex flex-none gap-x-4 mt-2 w-full">
-            <dt className="flex-none">
-              <span className="text-gray-500 text-sm/6">Level:</span>
-            </dt>
-            <dd className="text-gray-500 text-sm/6">
-              {profile.portuguese_level
-                ? profile.portuguese_level.charAt(0).toUpperCase() + profile.portuguese_level.slice(1)
-                : "Unknown"}
-            </dd>
-          </div>
-          <div className="flex flex-none gap-x-4 mt-2 w-full">
-            <dt className="flex-none">
-              <span className="text-gray-500 text-sm/6">Scheduled Lessons:</span>
-            </dt>
-            <dd className="text-gray-500 text-sm/6">
-              {profile.scheduled_lessons || 0}
-            </dd>
-          </div>
-        </dl>
-        <div className="border-gray-900/5 mt-3 py-5 border-t">
-          <Link href="/profile" className="font-semibold text-gray-900 text-sm/6">
-            View profile <span aria-hidden="true">&rarr;</span>
-          </Link>
+          >
+            {profile.has_access ? "Active" : "Inactive"}
+          </span>
         </div>
-      </div>
-    </div>
+        <CardTitle className="font-semibold text-base text-gray-900">
+          {profile.name}
+        </CardTitle>
+
+      </CardHeader>
+      <CardContent>
+        <div className="flex gap-2 w-full">
+          <span className="font-semibold text-gray-500 text-sm/6">Enrolled:</span>
+          <span className="text-gray-500 text-sm/6">
+            <time dateTime={new Date(profile.created_at).toISOString()}>
+              {new Date(profile.created_at).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+          </span>
+        </div>
+        {profile.portuguese_level && <div className="flex gap-2 w-full">
+          <span className="font-semibold text-gray-500 text-sm/6">Level:</span>
+          <span className="text-gray-500 text-sm/6">
+            {profile.portuguese_level.charAt(0).toUpperCase() + profile.portuguese_level.slice(1)}
+          </span>
+        </div>
+        }
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline" asChild>
+          <Link href="/profile">View profile</Link>
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

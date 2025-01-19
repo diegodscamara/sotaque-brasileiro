@@ -9,23 +9,23 @@ const features = [
     styles: "bg-accent text-primary-content",
     demo: (
       <div className="flex items-stretch h-full overflow-hidden">
-        <div className="w-full h-full p-6 translate-x-12 bg-base-200 rounded-t-box">
-          <p className="mb-3 text-sm font-medium tracking-wide uppercase text-base-content/60">
+        <div className="bg-base-200 p-6 rounded-t-box w-full h-full translate-x-12">
+          <p className="mb-3 font-medium text-base-content/60 text-sm uppercase tracking-wide">
             Suggest a feature
           </p>
-          <div className="relative h-full py-4 mr-12 textarea bg-base-200 group-hover:bg-base-100 group-hover:border-base-content/10 text-base-content">
-            <div className="absolute flex items-center left-4 top-4 group-hover:hidden ">
+          <div className="group-hover:bg-base-100 relative bg-base-200 mr-12 py-4 group-hover:border-border h-full text-base-content textarea">
+            <div className="top-4 left-4 absolute flex items-center group-hover:hidden">
               <span>Notifica</span>
-              <span className="w-[2px] h-6 bg-accent animate-pulse"></span>
+              <span className="bg-accent w-[2px] h-6 animate-pulse"></span>
             </div>
-            <div className="duration-500 opacity-0 group-hover:opacity-100">
+            <div className="opacity-0 group-hover:opacity-100 duration-500">
               Notifications should be visible only on certain pages.
             </div>
-            <div className="opacity-0 group-hover:opacity-100 duration-1000 flex items-center gap-0.5">
+            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 duration-1000">
               <span>Terms & privacy pages don&apos;t need them</span>
-              <span className="w-[2px] h-6 bg-accent animate-pulse"></span>
+              <span className="bg-accent w-[2px] h-6 animate-pulse"></span>
             </div>
-            <button className="absolute duration-1000 shadow-lg opacity-0 btn btn-primary right-4 bottom-6 group-hover:opacity-100">
+            <button className="right-4 bottom-6 absolute opacity-0 group-hover:opacity-100 shadow-lg duration-1000 btn btn-primary">
               Submit
             </button>
           </div>
@@ -38,7 +38,7 @@ const features = [
     description: "Users upvote features they want. You know what to ship next.",
     styles: "md:col-span-2 bg-base-300 text-base-content",
     demo: (
-      <div className="px-6 max-w-[600px] flex flex-col gap-4 overflow-hidden">
+      <div className="flex flex-col gap-4 px-6 max-w-[600px] overflow-hidden">
         {[
           {
             text: "Add LemonSqueezy integration to the boilerplate",
@@ -96,8 +96,8 @@ const features = [
     description: "Customize your Insighto board with 7 themes.",
     styles: "md:col-span-2 bg-base-100 text-base-content",
     demo: (
-      <div className="left-0 flex w-full h-full pt-0 -mt-4 overflow-hidden lg:pt-8">
-        <div className="-rotate-[8deg] flex min-w-max overflow-x-visible h-full lg:pt-4">
+      <div className="left-0 flex -mt-4 pt-0 lg:pt-8 w-full h-full overflow-hidden">
+        <div className="flex lg:pt-4 min-w-max h-full overflow-x-visible -rotate-[8deg]">
           {[
             {
               buttonStyles: "bg-accent text-primary-content",
@@ -121,11 +121,11 @@ const features = [
             },
           ].map((theme, i) => (
             <div className={theme.css} key={i}>
-              <div className="mb-3 text-sm font-medium tracking-wide uppercase text-base-content/60">
+              <div className="mb-3 font-medium text-base-content/60 text-sm uppercase tracking-wide">
                 Trending feedback
               </div>
               <div className="space-y-2">
-                <div className="flex justify-between p-4 bg-base-100 rounded-box">
+                <div className="flex justify-between bg-base-100 p-4 rounded-box">
                   <div>
                     <p className="mb-1 font-semibold">Clickable cards</p>
                     <p className="opacity-80">Make cards more accessible</p>
@@ -150,7 +150,7 @@ const features = [
                     8
                   </button>
                 </div>
-                <div className="flex justify-between p-4 bg-base-100 rounded-box ">
+                <div className="flex justify-between bg-base-100 p-4 rounded-box">
                   <div>
                     <p className="mb-1 font-semibold">Bigger images</p>
                     <p className="opacity-80">Make cards more accessible</p>
@@ -187,7 +187,7 @@ const features = [
     description: "Users can chat and discuss features.",
     styles: "bg-neutral text-neutral-content",
     demo: (
-      <div className="px-6 space-y-4 text-neutral-content">
+      <div className="space-y-4 px-6 text-neutral-content">
         {[
           {
             id: 1,
@@ -213,7 +213,7 @@ const features = [
             className={`px-6 py-4 bg-neutral-content text-neutral rounded-box ${reply?.transition}`}
           >
             <div className="mb-2 whitespace-pre-wrap">{reply.text}</div>
-            <div className="flex items-center gap-2 text-sm text-neutral/80">
+            <div className="flex items-center gap-2 text-neutral/80 text-sm">
               <div className="flex items-center gap-2">
                 <div className="avatar">
                   <div className="rounded-full w-7">
@@ -239,23 +239,23 @@ const features = [
 ];
 const FeaturesGrid = () => {
   return (
-    <section className="flex items-center justify-center w-full py-20 bg-base-200/50 text-base-content lg:py-32">
-      <div className="flex flex-col max-w-[82rem] gap-16 md:gap-20 px-4">
+    <section className="flex justify-center items-center bg-base-200/50 py-20 lg:py-32 w-full text-base-content">
+      <div className="flex flex-col gap-16 md:gap-20 px-4 max-w-[82rem]">
         <h2 className="max-w-3xl font-black text-4xl md:text-6xl tracking-[-0.01em]">
           Ship features <br /> users{" "}
-          <span className="underline decoration-dashed underline-offset-8 decoration-base-300">
+          <span className="underline underline-offset-8 decoration-base-300 decoration-dashed">
             really want
           </span>
         </h2>
-        <div className="flex flex-col w-full h-fit gap-4 lg:gap-10 text-text-default max-w-[82rem]">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-10">
+        <div className="flex flex-col gap-4 lg:gap-10 w-full max-w-[82rem] h-fit text-text-default">
+          <div className="gap-4 lg:gap-10 grid grid-cols-1 md:grid-cols-3">
             {features.map((feature) => (
               <div
                 key={feature.title}
                 className={`${feature.styles} rounded-3xl flex flex-col gap-6 w-full h-[22rem] lg:h-[25rem] pt-6 overflow-hidden group`}
               >
-                <div className="px-6 space-y-2">
-                  <h3 className="text-xl font-bold tracking-tight lg:text-3xl">
+                <div className="space-y-2 px-6">
+                  <h3 className="font-bold text-xl lg:text-3xl tracking-tight">
                     {feature.title}
                   </h3>
                   <p className="opacity-80">{feature.description}</p>

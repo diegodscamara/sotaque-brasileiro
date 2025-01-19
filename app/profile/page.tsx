@@ -1,27 +1,27 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Gear,
   GraduationCap,
   User as UserIcon
 } from "@phosphor-icons/react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
 
 import { BasicInfo } from "./components/BasicInfo";
 import Breadcrumb from '@/components/Breadcrumb';
+import { Button } from "@/components/ui/button";
+import { FloppyDisk } from "@phosphor-icons/react";
 import { LanguageLearning } from "./components/LanguageLearning";
-import { Preferences } from "./components/Preferences";
 import { StudentProfileData } from '@/types/profile';
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/libs/supabase/client";
 import toast from "react-hot-toast";
-
-const learningStyles = [
-  { id: 'visual', name: 'Visual Learning' },
-  { id: 'auditory', name: 'Auditory Learning' },
-  { id: 'reading', name: 'Reading/Writing' },
-  { id: 'kinesthetic', name: 'Practice-Based Learning' },
-]
 
 const genderOptions = [
   { id: 'male', name: 'Male' },
@@ -40,65 +40,50 @@ const languageOptions = [
   // Add more languages as needed
 ];
 
-const interestOptions = [
-  { id: 'business', name: 'Business' },
-  { id: 'culture', name: 'Culture' },
-  { id: 'travel', name: 'Travel' },
-  { id: 'music', name: 'Music' },
-  { id: 'literature', name: 'Literature' },
-  { id: 'movies', name: 'Movies & TV Shows' },
-  { id: 'cooking', name: 'Cooking' },
-  { id: 'sports', name: 'Sports' },
-];
-
 const StudentProfile = () => {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
-  const [automaticTimezoneEnabled, setAutomaticTimezoneEnabled] = useState(true)
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
-  const [activeTab, setActiveTab] = useState('basic');
-
-  const handleUpdate = async (field: string, value: string | number) => {
+  const handleUpdate = async (field: string, value: string | number | string[]) => {
     try {
-      if (!user?.id) {
-        toast.error("No user found");
-        return;
-      }
+      const { error } = await supabase
+        .from('students')
+        .update({ [field]: value, updated_at: new Date().toISOString() })
+        .eq('id', user?.id);
 
-      const finalValue = field === 'availability_hours' ? Number(value) : value;
+      if (error) throw error;
 
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          [field]: finalValue,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        [field]: value,
+      }));
 
-      if (updateError) {
-        toast.error("Failed to update profile");
-        throw updateError;
-      }
+      const fieldNameMap: Record<string, string> = {
+        name: 'Name',
+        gender: 'Gender',
+        country: 'Country',
+        portuguese_level: 'Portuguese Level',
+        native_language: 'Native Language',
+        learning_goals: 'Learning Goals',
+        motivation_for_learning: 'Motivation for Learning',
+      };
 
-      setProfile(prev => prev ? { ...prev, [field]: finalValue } : null);
-      setIsEditing(null);
-      setEditValue("");
-      toast.success("Profile updated successfully");
-
+      const fieldName = fieldNameMap[field] || field.replace(/_/g, ' ');
+      toast.success(`${fieldName} updated successfully`);
     } catch (error) {
-      console.error("Error in handleUpdate:", error);
-      toast.error("An error occurred");
+      console.error(`Error updating ${field}:`, error);
+      toast.error(`Failed to update ${field}`);
     }
   };
 
   const handleMultiSelect = async (field: string, values: string[]) => {
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('students')
         .update({ [field]: values })
         .eq('id', user?.id);
 
@@ -128,7 +113,7 @@ const StudentProfile = () => {
         if (user) {
           // Try to get existing profile
           const { data: profile, error: profileError } = await supabase
-            .from("profiles")
+            .from("students")
             .select("*")
             .eq("id", user.id)
             .single();
@@ -140,7 +125,7 @@ const StudentProfile = () => {
           if (!profile) {
             // Create new profile if it doesn't exist
             const { data: newProfile, error: createError } = await supabase
-              .from("profiles")
+              .from("students")
               .insert([
                 {
                   id: user.id,
@@ -175,127 +160,97 @@ const StudentProfile = () => {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col gap-6 w-full max-w-screen-lg">
       <Breadcrumb />
-      
-      <div className="mt-8 flex gap-x-8">
+      <div className="flex lg:flex-row flex-col gap-6 w-full">
         {/* Sidebar Tabs */}
-        <div className="w-64 flex-none">
-          <div className="tabs tabs-vertical">
-            <a 
-              className={`tab tab-bordered w-full justify-start ${activeTab === 'basic' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('basic')}
-            >
+        <Tabs defaultValue="basic" className="flex flex-col gap-6 w-full">
+          <TabsList className="w-fit">
+            <TabsTrigger value="basic">
               <div className="flex items-center gap-x-3">
                 <UserIcon className="w-5 h-5" />
                 Basic Information
               </div>
-            </a>
-            <a 
-              className={`tab tab-bordered w-full justify-start ${activeTab === 'learning' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('learning')}
-            >
+            </TabsTrigger>
+            <TabsTrigger value="learning">
               <div className="flex items-center gap-x-3">
                 <GraduationCap className="w-5 h-5" />
                 Language Learning
               </div>
-            </a>
-            <a 
-              className={`tab tab-bordered w-full justify-start ${activeTab === 'preferences' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('preferences')}
-            >
-              <div className="flex items-center gap-x-3">
-                <Gear className="w-5 h-5" />
-                Preferences
-              </div>
-            </a>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Content Area */}
+          <div className="w-full">
+            <Card>
+              <CardContent>
+                <TabsContent value="basic">
+                  <BasicInfo
+                    profile={profile}
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                    editValue={editValue}
+                    setEditValue={setEditValue}
+                    handleUpdate={handleUpdate}
+                    genderOptions={genderOptions}
+                  />
+                </TabsContent>
+                <TabsContent value="learning">
+                  <LanguageLearning
+                    profile={profile}
+                    handleUpdate={handleUpdate}
+                    handleMultiSelect={handleMultiSelect}
+                    languageOptions={languageOptions}
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                    editValue={editValue}
+                    setEditValue={setEditValue}
+                  />
+                </TabsContent>
+              </CardContent>
+
+              <CardFooter className="flex justify-end items-center gap-x-4">
+                {/* Save Changes Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing(null);
+                    setEditValue("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={async () => {
+                    try {
+                      await Promise.all([
+                        handleMultiSelect('other_languages', profile.other_languages || [])
+                      ]);
+
+                      const { error } = await supabase
+                        .from('students')
+                        .update({
+                          ...profile,
+                          updated_at: new Date().toISOString()
+                        })
+                        .eq('id', user?.id);
+
+                      if (error) throw error;
+                      toast.success('All changes saved successfully');
+                    } catch (error) {
+                      console.error('Error updating profile:', error);
+                      toast.error('Failed to save changes');
+                    }
+                  }}
+                >
+                  <FloppyDisk className="w-5 h-5" />
+                  Save all changes
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
-        </div>
-
-        {/* Content Area */}
-        <div className="flex-1">
-          <div className="p-6 bg-base-100 border border-base-300 rounded-md">
-            {activeTab === 'basic' && (
-              <BasicInfo
-                profile={profile}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                editValue={editValue}
-                setEditValue={setEditValue}
-                handleUpdate={handleUpdate}
-                genderOptions={genderOptions}
-              />
-            )}
-            {activeTab === 'learning' && (
-              <LanguageLearning
-                profile={profile}
-                handleUpdate={handleUpdate}
-                handleMultiSelect={handleMultiSelect}
-                languageOptions={languageOptions}
-                learningStyles={learningStyles}
-                interestOptions={interestOptions}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                editValue={editValue}
-                setEditValue={setEditValue}
-              />
-            )}
-            {activeTab === 'preferences' && (
-              <Preferences
-                profile={profile}
-                automaticTimezoneEnabled={automaticTimezoneEnabled}
-                setAutomaticTimezoneEnabled={setAutomaticTimezoneEnabled}
-                handleUpdate={handleUpdate}
-                handleMultiSelect={handleMultiSelect}
-              />
-            )}
-          </div>
-
-          {/* Save Changes Button */}
-          <div className="my-8 flex items-center justify-end gap-x-6">
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => {
-                setIsEditing(null);
-                setEditValue("");
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-accent"
-              onClick={async () => {
-                try {
-                  await Promise.all([
-                    handleMultiSelect('preferred_schedule', profile.preferred_schedule || []),
-                    handleMultiSelect('preferred_class_type', profile.preferred_class_type || []),
-                    handleMultiSelect('learning_style', profile.learning_style || []),
-                    handleMultiSelect('interests', profile.interests || []),
-                    handleMultiSelect('other_languages', profile.other_languages || [])
-                  ]);
-
-                  const { error } = await supabase
-                    .from('profiles')
-                    .update({
-                      ...profile,
-                      updated_at: new Date().toISOString()
-                    })
-                    .eq('id', user?.id);
-
-                  if (error) throw error;
-                  toast.success('All changes saved successfully');
-                } catch (error) {
-                  console.error('Error updating profile:', error);
-                  toast.error('Failed to save changes');
-                }
-              }}
-            >
-              Save all changes
-            </button>
-          </div>
-        </div>
+        </Tabs>
       </div>
     </div>
   );

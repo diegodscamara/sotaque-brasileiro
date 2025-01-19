@@ -1,5 +1,16 @@
 import { ConfigProps } from "./types/config";
-import themes from "daisyui/src/theming/themes";
+
+export type StripePlan = {
+  isFeatured?: boolean;
+  interval?: "monthly" | "yearly" | "one-time";
+  priceId: string;
+  name: string;
+  description?: string;
+  price: number;
+  priceAnchor?: number;
+  features: { name: string; }[];
+  units: number;
+};
 
 const config = {
   // REQUIRED
@@ -8,7 +19,7 @@ const config = {
   appDescription:
     "The NextJS boilerplate with all you need to build your SaaS, AI tool, or any other web app.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "sotaquebrasileiro.ca",
+  domainName: "sotaquebrasileiro.com",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (resend.supportEmail) otherwise customer support won't work.
     id: "",
@@ -22,195 +33,122 @@ const config = {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr33tyaZPNd"
+            ? "price_1QfVt5G0hzDtxXr3D7YiNwRq"
             : "price_456",
         //  REQUIRED - Name of the plan, displayed on the pricing page
         interval: "monthly",
-        name: "Starter",
+        name: "Explorer",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
-        description: "Best for casual learners or those testing the waters.",
+        description: "Perfect for beginners testing the waters or casual learners who want flexibility.",
         // The price you want to display, the one user will be charged on Stripe.
-        price: 340,
+        price: 260,
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 360,
         features: [
           {
-            name: "NextJS boilerplate",
+            name: "8 hours of classes per month",
           },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
+          {
+            name: "Flexible scheduling to fit your lifestyle.",
+          },
+          { name: "Native Brazilian instructors with expertise." },
+          { name: "Cultural and conversational lessons." },
+          { name: "Cancel or reschedule easily." },
         ],
+        units: 8,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
-            : "price_456",
-        interval: "one-time",
-        name: "Starter",
-        description: "Best for casual learners or those testing the waters.",
-        price: 400,
-        priceAnchor: 420,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfVxyG0hzDtxXr3GGFsKXQV"
             : "price_456",
         interval: "yearly",
-        name: "Starter",
-        description: "Best for casual learners or those testing the waters.",
-        price: 4000,
-        priceAnchor: 4200,
+        name: "Explorer",
+        description: "Perfect for beginners testing the waters or casual learners who want flexibility.",
+        price: 2880,
         features: [
           {
-            name: "NextJS boilerplate",
+            name: "8 hours of classes per month",
           },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
+          {
+            name: "Flexible scheduling to fit your lifestyle.",
+          },
+          { name: "Native Brazilian instructors with expertise." },
+          { name: "Cultural and conversational lessons." },
+          { name: "Cancel or reschedule easily." },
         ],
+        units: 96,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
-            : "price_456",
-        isFeatured: true,
-        interval: "one-time",
-        name: "Pro",
-        description: "You need more power",
-        price: 480,
-        priceAnchor: 500,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfW3jG0hzDtxXr3Om5klqsl"
             : "price_456",
         isFeatured: true,
         interval: "monthly",
-        name: "Pro",
-        description: "You need more power",
-        price: 460,
-        priceAnchor: 480,
+        name: "Enthusiast",
+        description: "Ideal for consistent learners aiming for steady progress with more regular practice.",
+        price: 380,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "12 hours of classes per month" },
+          { name: "Everything in the Explorer plan" },
+          { name: "Priority access to experienced instructors." },
+          { name: "Automated reminders and progress tracking." },
         ],
+        units: 12,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfW6PG0hzDtxXr3DxLeHB8c"
             : "price_456",
         isFeatured: true,
         interval: "yearly",
-        name: "Pro",
-        description: "You need more power",
-        price: 4800,
-        priceAnchor: 5200,
+        name: "Enthusiast",
+        description: "Ideal for consistent learners aiming for steady progress with more regular practice.",
+        price: 4320,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "12 hours of classes per month" },
+          { name: "Everything in the Explorer plan" },
+          { name: "Priority access to experienced instructors." },
+          { name: "Automated reminders and progress tracking." },
         ],
+        units: 144,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
-            : "price_456",
-        isFeatured: false,
-        interval: "one-time",
-        name: "Premium",
-        description: "You need more power",
-        price: 560,
-        priceAnchor: 580,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfWBBG0hzDtxXr3FlRtiwr0"
             : "price_456",
         isFeatured: false,
         interval: "monthly",
-        name: "Premium",
-        description: "You need more power",
-        price: 540,
-        priceAnchor: 560,
+        name: "Master",
+        description: "Designed for dedicated learners or professionals with ambitious goals.",
+        price: 450,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "16 hours of classes per month" },
+          { name: "Everything in the Enthusiast plan" },
+          { name: "Most cost-effective plan (up to 20% savings annually)." },
+          { name: "Premium support and priority scheduling." },
         ],
+        units: 16,
       },
       {
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1QbVRdG0hzDtxXr3rIEE1cy2"
+            ? "price_1QfWEfG0hzDtxXr3TetQvd8v"
             : "price_456",
         isFeatured: false,
         interval: "yearly",
-        name: "Premium",
-        description: "You need more power",
-        price: 5760,
-        priceAnchor: 5940,
+        name: "Master",
+        description: "Designed for dedicated learners or professionals with ambitious goals.",
+        price: 4860,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "16 hours of classes per month" },
+          { name: "Everything in the Enthusiast plan" },
+          { name: "Most cost-effective plan (up to 20% savings annually)." },
+          { name: "Premium support and priority scheduling." },
         ],
+        units: 192,
       },
     ],
   },
@@ -227,13 +165,6 @@ const config = {
     fromAdmin: `Diego at Sotaque Brasileiro <contato@resend.sotaquebrasileiro.ca>`,
     // Email shown to customer if need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
     supportEmail: "sotaquebrasileiro@gmail.com",
-  },
-  colors: {
-    // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you any other theme than light/dark, you need to add it in config.tailwind.js in daisyui.themes.
-    theme: "lemonade",
-    // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..). By default it takes the primary color from your DaisyUI theme (make sure to update your the theme name after "data-theme=")
-    // OR you can just do this to use a custom color: main: "#f37055". HEX only.
-    main: themes["light"]["primary"],
   },
   auth: {
     // REQUIRED — the path to log in users. It's use to protect private routes (like /dashboard). It's used in apiClient (/libs/api.js) upon 401 errors from our API

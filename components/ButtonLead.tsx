@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { toast } from "react-hot-toast";
+import React, { useRef, useState } from "react";
+
+import { Input } from "./ui/input";
 import apiClient from "@/libs/api";
+import { toast } from "react-hot-toast";
 
 // This component is used to collect the emails from the landing page
 // You'd use this if your product isn't ready yet or you want to collect leads
@@ -38,19 +40,18 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
       className={`w-full max-w-xs space-y-3 ${extraStyle ? extraStyle : ""}`}
       onSubmit={handleSubmit}
     >
-      <input
+      <Input
         required
         type="email"
         value={email}
         ref={inputRef}
         autoComplete="email"
         placeholder="tom@cruise.com"
-        className="input input-bordered w-full placeholder:opacity-60"
         onChange={(e) => setEmail(e.target.value)}
       />
 
       <button
-        className="btn btn-primary btn-block"
+        className="btn-block btn btn-primary"
         type="submit"
         disabled={isDisabled}
       >

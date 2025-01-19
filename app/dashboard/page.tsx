@@ -1,45 +1,85 @@
-import Breadcrumb from "@/components/Breadcrumb";
-import LessonCard from "@/components/dashboard/LessonCard";
-import { MonthCalendar } from "@/components/dashboard/MonthCalendar";
-import Package from "@/components/dashboard/Package";
-import Stats from "@/components/dashboard/Stats";
-import Summary from "@/components/dashboard/Summary";
+"use client";
 
-export const dynamic = "force-dynamic";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { addBusinessDays, setHours } from "date-fns"
 
-export default async function Dashboard() {
+import { AppSidebar } from "@/components/app-sidebar"
+import { Button } from "@/components/ui/button"
+import ClassList from "@/components/dashboard/class-list"
+import { ClassModal } from "@/components/dashboard/ClassModal"
+import { Separator } from "@/components/ui/separator"
+import Stats from "@/components/dashboard/Stats"
+import { useState } from "react"
+
+export default function Page() {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleBookClass = () => {
+    const now = new Date()
+    const bookingDate = addBusinessDays(now, 1)
+    const bookingTime = setHours(bookingDate, 9)
+    setSelectedDate(bookingTime)
+    setIsModalOpen(true)
+  }
+
   return (
-    <main className="container flex flex-col gap-6 p-8 mx-auto">
-      {/* Breadcrumb */}
-      <Breadcrumb />
-
-      {/* Main Section */}
-      <section className="flex flex-col gap-6">
-        {/* Top: Stats */}
-        <div className="xl:col-span-2">
-          <Stats />
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 flex items-center gap-2 h-16 transition-[width,height] ease-linear shrink-0">
+          <div className="flex items-center gap-2 px-4 w-full">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <div className="flex justify-between items-center gap-2 w-full">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem className="md:block hidden">
+                    <BreadcrumbLink href="/">
+                      Home
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="md:block hidden" />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+              <Button onClick={handleBookClass} variant="default" effect="shine" className="ml-4">
+                Book Class
+              </Button>
+            </div>
+          </div>
+        </header>
+        <div className="flex flex-col flex-1 gap-4 p-4 pt-0">
+          <div className="gap-4 grid md:grid-cols-3 auto-rows-min">
+            <Stats />
+          </div>
+          <div className="gap-4 grid md:grid-cols-1 auto-rows-min">
+            <ClassList />
+          </div>
         </div>
+      </SidebarInset>
 
-        {/* Left: Summary and Package */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div className="xl:col-span-1">
-            <Summary />
-          </div>
-          <div className="xl:col-span-1">
-            <Package />
-          </div>
-        </div>
-
-        {/* Right: Packages and LessonCard */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div className="xl:col-span-1">
-            <LessonCard />
-          </div>
-          <div className="xl:col-span-1">
-            <MonthCalendar />
-          </div>
-        </div>
-      </section>
-    </main>
-  );
+      <ClassModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedDate={selectedDate || new Date()}
+        onClassUpdated={() => { /* Logic to refresh classes */ }}
+        mode="schedule"
+      />
+    </SidebarProvider>
+  )
 }
