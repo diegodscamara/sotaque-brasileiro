@@ -1,5 +1,4 @@
-import { ArrowRightIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import React from "react";
 import { ReactNode } from "react";
 import { cn } from "@/libs/utils";
 
@@ -14,8 +13,6 @@ type BentoCardProps = {
   background: ReactNode;
   Icon: React.ElementType;
   description: string;
-  href: string;
-  cta: string;
 };
 
 const BentoGrid = ({ children, className }: BentoGridProps) => {
@@ -37,8 +34,6 @@ const BentoCard = ({
   background,
   Icon,
   description,
-  href,
-  cta,
 }: BentoCardProps) => (
   <div
     key={name}
@@ -58,19 +53,6 @@ const BentoCard = ({
         {name}
       </h3>
       <p className="max-w-lg text-neutral-400">{description}</p>
-    </div>
-
-    <div
-      className={cn(
-        "pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
-      )}
-    >
-      <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
-        <a href={href}>
-          {cta}
-          <ArrowRightIcon className="ml-2 w-4 h-4" />
-        </a>
-      </Button>
     </div>
     <div className="group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10 absolute inset-0 transform-gpu transition-all duration-300 pointer-events-none" />
   </div>

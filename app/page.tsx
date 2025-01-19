@@ -9,9 +9,11 @@ import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { AnimatedList } from "@/components/ui/animated-list";
 import CTA from "@/components/landing-page/CTA";
 import { Calendar } from "@/components/ui/calendar";
+import { CompaniesCarousel } from "@/components/landing-page/companies-carousel";
 import FAQ from "@/components/landing-page/FAQ";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import Hero from "@/components/landing-page/Hero";
 import Image from "next/image";
 import Marquee from "@/components/ui/marquee";
 import Pricing from "@/components/landing-page/Pricing";
@@ -50,8 +52,6 @@ export default function Home() {
       Icon: FileTextIcon,
       name: "Save your files",
       description: "We automatically save your files as you type.",
-      href: "#",
-      cta: "Learn more",
       className: "col-span-3 lg:col-span-1",
       background: (
         <Marquee
@@ -85,8 +85,6 @@ export default function Home() {
       Icon: BellIcon,
       name: "Notifications",
       description: "Get notified when something happens.",
-      href: "#",
-      cta: "Learn more",
       className: "col-span-3 lg:col-span-2",
       background: (
         <AnimatedList className="group-hover:scale-105 top-4 [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] right-2 absolute border-none w-full h-[300px] transition-all duration-300 ease-out">
@@ -100,8 +98,6 @@ export default function Home() {
       Icon: Share2Icon,
       name: "Integrations",
       description: "Supports 100+ integrations and counting.",
-      href: "#",
-      cta: "Learn more",
       className: "col-span-3 lg:col-span-2",
       background: (
         <AnimatedBeam
@@ -117,8 +113,6 @@ export default function Home() {
       name: "Calendar",
       description: "Use the calendar to filter your files by date.",
       className: "col-span-3 lg:col-span-1",
-      href: "#",
-      cta: "Learn more",
       background: (
         <Calendar
           mode="single"
@@ -212,6 +206,17 @@ export default function Home() {
         <Header />
       </Suspense>
       <main className="flex flex-col justify-center items-center gap-12 mx-auto mt-24">
+        <Hero />
+        {/* Company logos */}
+        <CompaniesCarousel />
+        {/* Problem*/}
+        {/* Solution*/}
+        {/* How it works*/}
+        {/* Features*/}
+        {/* Testimonials*/}
+        {/* Pricing*/}
+        {/* FAQ*/}
+        {/* CTA*/}
         <BentoGrid>
           {features.map((feature, idx) => (
             <BentoCard key={idx} {...feature} />

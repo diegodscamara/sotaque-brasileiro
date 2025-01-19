@@ -3,7 +3,6 @@ import "./globals.css";
 import ClientLayout from "@/components/LayoutClient";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
-import ScrollProgress from "@/components/ui/scroll-progress";
 import SupabaseProvider from "./providers/SupabaseProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from 'react-hot-toast';
@@ -32,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			<body>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="light"
 					enableSystem
 					disableTransitionOnChange
 				>
