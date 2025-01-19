@@ -1,15 +1,12 @@
 "use client";
 
-import SignInForm from "@/components/auth/SignInForm";
+import SignInForm from "@/components/auth/sign-in-form";
 
 export default function SignIn() {
 
   return (
-    <div className="flex justify-center items-center p-6 md:p-10 w-full min-h-svh">
-      <div className="w-full max-w-sm">
+    <section className="flex justify-center items-center mx-auto py-24 w-full h-full container">
         <SignInForm />
-      </div>
-    </div>
-
+    </section>
   );
 }

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import React from "react";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -48,11 +49,11 @@ export default function ForgotPasswordForm() {
     };
 
     return (
-        <Card>
+        <Card className="w-full max-w-sm">
             <CardHeader>
                 <CardTitle className="text-2xl">Reset password</CardTitle>
                 <CardDescription>
-                    Enter your email address and we'll send you a link to reset your password
+                    Enter your email address and we&apos;ll send you a link to reset your password
                 </CardDescription>
             </CardHeader>
             <CardContent>

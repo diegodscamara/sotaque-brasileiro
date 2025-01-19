@@ -1,13 +1,11 @@
 "use client";
 
-import SignUpForm from "@/components/auth/SignUpForm";
+import SignUpForm from "@/components/auth/sign-up-form";
 
 export default function SignUp() {
     return (
-        <div className="flex justify-center items-center p-6 md:p-10 w-full min-h-svh">
-            <div className="w-full max-w-sm">
-                <SignUpForm />
-            </div>
-        </div>
+        <section className="flex justify-center items-center mx-auto py-24 w-full h-full container">
+            <SignUpForm />
+        </section>
     );
 } 

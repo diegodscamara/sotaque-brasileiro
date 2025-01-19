@@ -27,16 +27,16 @@ const ButtonDashboard = () => {
     <Link href={config.auth.callbackUrl} className="btn">
       <Image
         src={user?.user_metadata?.avatar_url}
-        alt={user?.user_metadata?.name || "Account"}
-        className="w-6 h-6 rounded-full shrink-0"
+        alt={user?.user_metadata?.first_name || "Account"}
+        className="rounded-full w-6 h-6 shrink-0"
         referrerPolicy="no-referrer"
         width={24}
         height={24}
       />
-      <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
-        {user?.user_metadata?.name?.charAt(0) || user?.email?.charAt(0)}
+      <span className="flex justify-center items-center bg-base-300 rounded-full w-6 h-6 shrink-0">
+        {user?.user_metadata?.first_name?.charAt(0) || user?.email?.charAt(0)}
       </span>
-      {user?.user_metadata?.name || user?.email || "Account"}
+      {user?.user_metadata?.first_name || user?.email || "Account"}
     </Link>
   );
 };

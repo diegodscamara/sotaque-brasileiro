@@ -108,11 +108,11 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="rounded-lg w-8 h-8">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.name} />
-                <AvatarFallback className="rounded-lg">{profile?.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={profile?.avatar_url} alt={profile?.first_name} />
+                <AvatarFallback className="rounded-lg">{profile?.first_name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 grid text-left text-sm leading-tight">
-                <span className="font-semibold truncate">{profile?.name}</span>
+                <span className="font-semibold truncate">{profile?.first_name} {profile?.last_name}</span>
                 <span className="text-xs truncate">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -127,11 +127,11 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="rounded-lg w-8 h-8">
-                  <AvatarImage src={profile?.avatar_url} alt={profile?.name} />
-                  <AvatarFallback className="rounded-lg">{profile?.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={profile?.avatar_url} alt={profile?.first_name} />
+                  <AvatarFallback className="rounded-lg">{profile?.first_name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 grid text-left text-sm leading-tight">
-                  <span className="font-semibold truncate">{profile?.name}</span>
+                  <span className="font-semibold truncate">{profile?.first_name} {profile?.last_name}</span>
                   <span className="text-xs truncate">{user?.email}</span>
                 </div>
               </div>

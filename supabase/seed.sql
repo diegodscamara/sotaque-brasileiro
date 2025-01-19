@@ -3,7 +3,8 @@
 -- ===========================
 create table public.students (
     id uuid not null default uuid_generate_v4(),
-    name text not null,
+    first_name text not null,
+    last_name text not null,
     email text not null unique,
     avatar_url text,
     credits integer not null default 0,
@@ -66,9 +67,9 @@ create table public.recurring_groups (
 -- ===========================
 create table public.teachers (
     id uuid not null default uuid_generate_v4(),
-    name text not null,
+    first_name text not null,
+    last_name text not null,
     email text not null unique,
-    full_name text,
     avatar_url text,
     biography text,
     specialties text[],
@@ -314,13 +315,15 @@ begin
     insert into public.teachers (
       id,
       email,
-      name,
+      first_name,
+      last_name,
       avatar_url,
       role
     ) values (
       new.id,
       new.email,
-      coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+      coalesce(new.raw_user_meta_data->>'first_name', split_part(new.email, '@', 1)),
+      coalesce(new.raw_user_meta_data->>'last_name', ''),
       coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
       'teacher'
     );
@@ -328,7 +331,8 @@ begin
     insert into public.students (
       id,
       email,
-      name,
+      first_name,
+      last_name,
       avatar_url,
       role,
       has_access,
@@ -337,7 +341,8 @@ begin
     ) values (
       new.id,
       new.email,
-      coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+      coalesce(new.raw_user_meta_data->>'first_name', split_part(new.email, '@', 1)),
+      coalesce(new.raw_user_meta_data->>'last_name', ''),
       coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
       'student',
       false,

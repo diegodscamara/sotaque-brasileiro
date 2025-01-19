@@ -112,9 +112,9 @@ const Header = () => {
 
         {/* Desktop CTA */}
         <div className="lg:flex lg:items-center lg:gap-2 hidden">
-          <ThemeToggle />
           <ButtonSignin />
           <ButtonSignup />
+          <ThemeToggle />
         </div>
 
         {/* Mobile Navigation */}
@@ -165,9 +165,9 @@ const Header = () => {
               </nav>
 
               <div className="flex flex-col gap-2 mt-auto pb-8">
-                <ThemeToggle />
                 <ButtonSignin />
                 <ButtonSignup />
+                <ThemeToggle />
               </div>
             </div>
           </SheetContent>

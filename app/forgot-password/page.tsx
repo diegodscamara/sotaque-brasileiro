@@ -1,14 +1,12 @@
 "use client";
 
-import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+import ForgotPasswordForm from "@/components/auth/forgot-password-form";
 
 export default function ForgotPassword() {
 
   return (
-    <div className="flex justify-center items-center p-6 md:p-10 w-full min-h-svh">
-      <div className="w-full max-w-sm">
-        <ForgotPasswordForm />
-      </div>
-    </div>
+    <section className="flex justify-center items-center mx-auto py-24 w-full h-full container">
+      <ForgotPasswordForm />
+    </section>
   );
 } 

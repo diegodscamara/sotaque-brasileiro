@@ -2,7 +2,8 @@ export interface StudentProfileData {
   id: string;
   gender: 'male' | 'female' | 'other' | 'prefer_not_to_say';
   country: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   avatar_url: string;
   has_access: boolean;
