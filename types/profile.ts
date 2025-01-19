@@ -6,6 +6,7 @@ export interface StudentProfileData {
   last_name: string;
   email: string;
   avatar_url: string;
+  role: 'student' | 'teacher';
   has_access: boolean;
   created_at: string;
   package_name: string;

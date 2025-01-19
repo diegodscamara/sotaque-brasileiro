@@ -9,6 +9,8 @@ import { Loader2 } from "lucide-react";
 import React from "react";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
+import useStudentApi from "@/hooks/useStudentApi";
+import useTeacherApi from "@/hooks/useTeacherApi";
 
 export default function SignInForm() {
     const [email, setEmail] = useState("");
@@ -17,6 +19,8 @@ export default function SignInForm() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const supabase = createClient();
+    const { getStudent } = useStudentApi();
+    const { getTeacher } = useTeacherApi();
 
     useEffect(() => {
         const checkUser = async () => {
@@ -38,7 +42,27 @@ export default function SignInForm() {
             });
 
             if (error) throw error;
-            router.push("/dashboard");
+
+            // Fetch user metadata to check role and access
+            const { data: { user } } = await supabase.auth.getUser();
+            const studentData = await getStudent(user.id);
+
+            if (studentData) {
+                if (studentData.has_access) {
+                    router.push("/dashboard");
+                } else {
+                    router.push("/pricing");
+                }
+            } else {
+                // If not a student, check if it's a teacher
+                const teacherData = await getTeacher(user.id);
+
+                if (teacherData) {
+                    router.push("/dashboard");
+                } else {
+                    setError("User not found.");
+                }
+            }
         } catch (error) {
             setError(error.message);
         } finally {

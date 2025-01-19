@@ -37,6 +37,8 @@ import apiClient from "@/libs/api"
 import config from "@/config"
 import { createClient } from "@/libs/supabase/client"
 import { useRouter } from "next/navigation";
+import useStudentApi from "@/hooks/useStudentApi";
+import useTeacherApi from "@/hooks/useTeacherApi";
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -45,17 +47,27 @@ export function NavUser() {
   const supabase = createClient()
   const [hasAccess, setHasAccess] = useState<boolean>(false);
   const router = useRouter();
+  const { getStudent } = useStudentApi();
+  const { getTeacher } = useTeacherApi();
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: userData } = await supabase.auth.getUser()
-      const { data: profileData } = await supabase.from('students').select('*').eq('id', userData.user?.id)
-      setUser(userData.user)
-      setProfile(profileData[0])
-      setHasAccess(profileData[0].has_access)
+      const { data: userData } = await supabase.auth.getUser();
+      setUser(userData.user);
+
+      const studentData = await getStudent(userData.user?.id);
+      if (studentData) {
+        setProfile(studentData);
+        setHasAccess(studentData.has_access);
+      } else {
+        const teacherData = await getTeacher(userData.user?.id);
+        if (teacherData) {
+          setProfile(teacherData);
+        }
+      }
     }
-    fetchUser()
-  }, [supabase])
+    fetchUser();
+  }, [supabase, getStudent, getTeacher]);
 
   const handleBilling = async () => {
     try {
@@ -95,7 +107,6 @@ export function NavUser() {
     } catch (e) {
       console.error(e);
     }
-
   };
 
   return (
@@ -109,7 +120,7 @@ export function NavUser() {
             >
               <Avatar className="rounded-lg w-8 h-8">
                 <AvatarImage src={profile?.avatar_url} alt={profile?.first_name} />
-                <AvatarFallback className="rounded-lg">{profile?.first_name.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{profile?.first_name ? profile?.first_name.charAt(0) : profile?.email?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 grid text-left text-sm leading-tight">
                 <span className="font-semibold truncate">{profile?.first_name} {profile?.last_name}</span>
@@ -128,7 +139,7 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="rounded-lg w-8 h-8">
                   <AvatarImage src={profile?.avatar_url} alt={profile?.first_name} />
-                  <AvatarFallback className="rounded-lg">{profile?.first_name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{profile?.first_name ? profile?.first_name.charAt(0) : profile?.email?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 grid text-left text-sm leading-tight">
                   <span className="font-semibold truncate">{profile?.first_name} {profile?.last_name}</span>
@@ -138,23 +149,24 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={handleUpgrade} className="cursor-pointer">
-                <Sparkles />
-                Upgrade to Master
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+              {profile && hasAccess && (
+                <DropdownMenuItem className="cursor-pointer" onClick={handleBilling}>
+                  <CreditCard />
+                  Billing
+                </DropdownMenuItem>
+              )}
+              {profile && profile.role === "student" && (
+                <DropdownMenuItem onClick={handleUpgrade} className="cursor-pointer">
+                  <Sparkles />
+                  Upgrade to Master
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem>
                 <BadgeCheck />
                 <Link href="/profile">
                   Account
                 </Link>
               </DropdownMenuItem>
-              {hasAccess && <DropdownMenuItem className="cursor-pointer" onClick={handleBilling}>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>}
               <DropdownMenuItem>
                 <Bell />
                 Notifications

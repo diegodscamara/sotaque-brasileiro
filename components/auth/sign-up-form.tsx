@@ -11,6 +11,8 @@ import { Loader2 } from "lucide-react";
 import React from "react";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
+import useStudentApi from "@/hooks/useStudentApi";
+import useTeacherApi from "@/hooks/useTeacherApi";
 
 export default function SignUpForm() {
     const [email, setEmail] = useState("");
@@ -22,6 +24,8 @@ export default function SignUpForm() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const supabase = createClient();
+    const { getStudent } = useStudentApi();
+    const { getTeacher } = useTeacherApi();
 
     useEffect(() => {
         const checkUser = async () => {
@@ -50,7 +54,22 @@ export default function SignUpForm() {
             });
 
             if (error) throw error;
-            router.push("/dashboard");
+
+            // Redirect based on role
+            if (role === "student") {
+                // Check if the student has access
+                const { data: { user } } = await supabase.auth.getUser();
+                const studentData = await getStudent(user.id);
+
+                if (studentData && studentData.has_access) {
+                    router.push("/dashboard");
+                } else {
+                    router.push("/pricing");
+                }
+            } else {
+                // If it's a teacher, redirect to dashboard
+                router.push("/dashboard");
+            }
         } catch (error) {
             console.error("Sign up error:", error);
             setError(error.message);
