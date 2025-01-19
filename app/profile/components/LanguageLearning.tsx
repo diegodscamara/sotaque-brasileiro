@@ -21,15 +21,15 @@ interface LanguageLearningProps {
 export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, languageOptions, isEditing, setIsEditing, editValue, setEditValue }: LanguageLearningProps) => {
   return (
     <div>
-      <h2 className="font-semibold text-base text-gray-900">Language Learning</h2>
+      <h2 className="mt-4 font-semibold text-base">Language Learning</h2>
       <p className="mt-1 text-gray-500 text-sm">
         Configure your language learning preferences and goals.
       </p>
 
-      <dl className="space-y-6 border-gray-200 mt-6 border-t text-sm">
+      <dl className="space-y-6 mt-6 text-sm">
         {/* Portuguese Level */}
-        <div className="pb-8 border-b">
-          <h3 className="pt-6 font-medium text-gray-900 text-lg">Portuguese Level</h3>
+        <div className="pb-8 border-b border-border">
+          <h3 className="pt-6 font-medium text-lg">Portuguese Level</h3>
           <Select
             value={profile.portuguese_level || ''}
             onValueChange={(value) => handleUpdate('portuguese_level', value)}
@@ -47,8 +47,8 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
         </div>
 
         {/* Native Language */}
-        <div className="pb-8 border-b">
-          <h3 className="font-medium text-gray-900 text-lg">Native Language</h3>
+        <div className="pb-8 border-b border-border">
+          <h3 className="font-medium text-lg">Native Language</h3>
           <Select
             value={profile.native_language || ''}
             onValueChange={(value) => handleUpdate('native_language', value)}
@@ -67,8 +67,8 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
         </div>
 
         {/* Other Languages */}
-        <div className="pb-8 border-b">
-          <h3 className="font-medium text-gray-900 text-lg">Other Languages</h3>
+        <div className="pb-8 border-b border-border">
+          <h3 className="font-medium text-lg">Other Languages</h3>
           <div className="mt-4">
             <MultiCombobox
               options={languageOptions}
@@ -80,8 +80,8 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
         </div>
 
         {/* Learning Goals */}
-        <div className="pb-8 border-b">
-          <h3 className="font-medium text-gray-900 text-lg">Learning Goals</h3>
+        <div className="pb-8 border-b border-border">
+          <h3 className="font-medium text-lg">Learning Goals</h3>
           {isEditing === 'learning_goals' ? (
             <div className="flex flex-col gap-4">
               <Textarea
@@ -110,7 +110,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
             </div>
           ) : (
             <>
-              <div className="my-6 text-gray-900 whitespace-pre-line">
+              <div className="my-6 whitespace-pre-line">
                 {profile.learning_goals?.join('\n') || 'Not specified'}
               </div>
               <Button
@@ -129,7 +129,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
 
         {/* Motivation */}
         <div className="pb-8">
-          <h3 className="font-medium text-gray-900 text-lg">Motivation</h3>
+          <h3 className="font-medium text-lg">Motivation</h3>
           {isEditing === 'motivation_for_learning' ? (
             <div className="flex flex-col gap-4 w-full">
               <Textarea
@@ -158,7 +158,7 @@ export const LanguageLearning = ({ profile, handleUpdate, handleMultiSelect, lan
             </div>
           ) : (
             <>
-              <div className="my-6 text-gray-900 whitespace-pre-line">
+              <div className="my-6 whitespace-pre-line">
                 {profile.motivation_for_learning || 'Not specified'}
               </div>
               <Button

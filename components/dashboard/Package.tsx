@@ -189,7 +189,7 @@ export default function PackageInfo() {
           }}
         >
           <div className="bg-white shadow-xl rounded-lg w-[95%] max-w-[1200px] h-[90%] overflow-hidden">
-            <div className="flex justify-between items-center bg-gray-200 p-4 border-b">
+            <div className="flex justify-between items-center bg-gray-200 p-4 border-b border-border">
               <h2 className="font-semibold text-xl">Schedule Classes</h2>
               <Button
                 onClick={() => setIsCalendarModalOpen(false)}

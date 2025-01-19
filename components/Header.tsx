@@ -24,7 +24,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
   const [hasAccess, setHasAccess] = useState<boolean>(false);
-  
+
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -72,12 +72,12 @@ const Header = () => {
     <motion.header
       className={cn(
         "fixed top-0 w-full z-50 border-b transition-colors duration-200",
-        isScrolled 
-          ? "bg-background/80 backdrop-blur-lg border-border" 
+        isScrolled
+          ? "bg-background/60 backdrop-blur-lg border-border"
           : "bg-transparent border-transparent"
       )}
     >
-      <nav className="flex justify-between items-center mx-auto w-full h-16 container">
+      <nav className="flex justify-between items-center mx-auto w-full h-14 container">
         {/* Logo */}
         <Link
           className="flex items-center gap-2 shrink-0"
@@ -96,25 +96,27 @@ const Header = () => {
           <span className="font-extrabold text-lg">{config.appName}</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="lg:flex lg:items-center lg:gap-8 hidden">
-          {links.map((link) => (
-            <Button
-              variant="ghost"
-              effect="hoverUnderline"
-              key={link.href}
-              asChild
-            >
-              <Link href={link.href}>{link.label}</Link>
-            </Button>
-          ))}
-        </div>
+        <div className="flex justify-end items-center gap-8">
+          {/* Desktop Navigation */}
+          <div className="lg:flex lg:items-center lg:gap-2 hidden">
+            {links.map((link) => (
+              <Button
+                variant="ghost"
+                effect="hoverUnderline"
+                key={link.href}
+                asChild
+              >
+                <Link href={link.href}>{link.label}</Link>
+              </Button>
+            ))}
+          </div>
 
-        {/* Desktop CTA */}
-        <div className="lg:flex lg:items-center lg:gap-2 hidden">
-          <ButtonSignin />
-          <ButtonSignup />
-          <ThemeToggle />
+          {/* Desktop CTA */}
+          <div className="lg:flex lg:items-center lg:gap-2 hidden">
+            <ButtonSignin />
+            <ButtonSignup />
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -142,32 +144,28 @@ const Header = () => {
                   />
                   <span className="font-bold">{config.appName}</span>
                 </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <X className="w-6 h-6" />
-                </Button>
               </div>
-              
-              <nav className="flex flex-col gap-4 mt-8">
-                {links.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="font-medium text-lg hover:text-primary transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
 
-              <div className="flex flex-col gap-2 mt-auto pb-8">
-                <ButtonSignin />
-                <ButtonSignup />
+              <div className="flex flex-col gap-4 mt-8">
                 <ThemeToggle />
+
+                <nav className="flex flex-col gap-4">
+                  {links.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="font-medium text-lg hover:text-primary transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="flex flex-col gap-2 mt-auto pb-8">
+                  <ButtonSignin />
+                  <ButtonSignup />
+                </div>
               </div>
             </div>
           </SheetContent>

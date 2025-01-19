@@ -1,5 +1,6 @@
 "use client";
 
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   GraduationCap,
   User as UserIcon
@@ -159,12 +160,12 @@ const StudentProfile = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-6 w-full max-w-screen-lg">
       <Breadcrumb />
       <div className="flex lg:flex-row flex-col gap-6 w-full">
         {/* Sidebar Tabs */}
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList>
+        <Tabs defaultValue="basic" className="flex flex-col gap-6 w-full">
+          <TabsList className="w-fit">
             <TabsTrigger value="basic">
               <div className="flex items-center gap-x-3">
                 <UserIcon className="w-5 h-5" />
@@ -181,71 +182,73 @@ const StudentProfile = () => {
 
           {/* Content Area */}
           <div className="w-full">
-            <div className="bg-white shadow-sm p-6 border rounded-md">
-              <TabsContent value="basic">
-                <BasicInfo
-                  profile={profile}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  editValue={editValue}
-                  setEditValue={setEditValue}
-                  handleUpdate={handleUpdate}
-                  genderOptions={genderOptions}
-                />
-              </TabsContent>
-              <TabsContent value="learning">
-                <LanguageLearning
-                  profile={profile}
-                  handleUpdate={handleUpdate}
-                  handleMultiSelect={handleMultiSelect}
-                  languageOptions={languageOptions}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  editValue={editValue}
-                  setEditValue={setEditValue}
-                />
-              </TabsContent>
-            </div>
+            <Card>
+              <CardContent>
+                <TabsContent value="basic">
+                  <BasicInfo
+                    profile={profile}
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                    editValue={editValue}
+                    setEditValue={setEditValue}
+                    handleUpdate={handleUpdate}
+                    genderOptions={genderOptions}
+                  />
+                </TabsContent>
+                <TabsContent value="learning">
+                  <LanguageLearning
+                    profile={profile}
+                    handleUpdate={handleUpdate}
+                    handleMultiSelect={handleMultiSelect}
+                    languageOptions={languageOptions}
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                    editValue={editValue}
+                    setEditValue={setEditValue}
+                  />
+                </TabsContent>
+              </CardContent>
 
-            {/* Save Changes Button */}
-            <div className="flex justify-end items-center gap-x-4 my-8">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsEditing(null);
-                  setEditValue("");
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                onClick={async () => {
-                  try {
-                    await Promise.all([
-                      handleMultiSelect('other_languages', profile.other_languages || [])
-                    ]);
+              <CardFooter className="flex justify-end items-center gap-x-4">
+                {/* Save Changes Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing(null);
+                    setEditValue("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={async () => {
+                    try {
+                      await Promise.all([
+                        handleMultiSelect('other_languages', profile.other_languages || [])
+                      ]);
 
-                    const { error } = await supabase
-                      .from('students')
-                      .update({
-                        ...profile,
-                        updated_at: new Date().toISOString()
-                      })
-                      .eq('id', user?.id);
+                      const { error } = await supabase
+                        .from('students')
+                        .update({
+                          ...profile,
+                          updated_at: new Date().toISOString()
+                        })
+                        .eq('id', user?.id);
 
-                    if (error) throw error;
-                    toast.success('All changes saved successfully');
-                  } catch (error) {
-                    console.error('Error updating profile:', error);
-                    toast.error('Failed to save changes');
-                  }
-                }}
-              >
-                <FloppyDisk className="w-5 h-5" />
-                Save all changes
-              </Button>
-            </div>
+                      if (error) throw error;
+                      toast.success('All changes saved successfully');
+                    } catch (error) {
+                      console.error('Error updating profile:', error);
+                      toast.error('Failed to save changes');
+                    }
+                  }}
+                >
+                  <FloppyDisk className="w-5 h-5" />
+                  Save all changes
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
         </Tabs>
       </div>

@@ -7,7 +7,9 @@ import { Suspense, useRef } from 'react'
 
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { AnimatedList } from "@/components/ui/animated-list";
+import CTA from "@/components/landing-page/CTA";
 import { Calendar } from "@/components/ui/calendar";
+import FAQ from "@/components/landing-page/FAQ";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Image from "next/image";
@@ -209,14 +211,14 @@ export default function Home() {
       <Suspense>
         <Header />
       </Suspense>
-      <main className="flex flex-col justify-center items-center gap-12 mx-auto mt-24 container">
+      <main className="flex flex-col justify-center items-center gap-12 mx-auto mt-24">
         <BentoGrid>
           {features.map((feature, idx) => (
             <BentoCard key={idx} {...feature} />
           ))}
         </BentoGrid>
 
-        <div className="relative flex flex-col justify-center items-center bg-background md:shadow-xl border rounded-lg w-full h-[500px] overflow-hidden">
+        <div className="relative flex flex-col justify-center items-center bg-background md:shadow-xl border border-border rounded-lg w-full h-[500px] overflow-hidden container">
           <Marquee pauseOnHover className="[--duration:20s]">
             {firstRow.map((review) => (
               <ReviewCard key={review.username} {...review} />
@@ -231,6 +233,8 @@ export default function Home() {
           <div className="right-0 absolute inset-y-0 bg-gradient-to-l from-white dark:from-background w-1/3 pointer-events-none"></div>
         </div>
         <Pricing />
+        <FAQ />
+        <CTA /> 
       </main>
       <Footer />
     </>

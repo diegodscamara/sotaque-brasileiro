@@ -20,15 +20,15 @@ interface BasicInfoProps {
 export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEditValue, handleUpdate, genderOptions }: BasicInfoProps) => {
   return (
     <div>
-      <h2 className="font-semibold text-base text-gray-900">Basic Information</h2>
+      <h2 className="mt-4 font-semibold text-base">Basic Information</h2>
       <p className="mt-1 text-gray-500 text-sm">
         This information will be displayed publicly so be careful what you share.
       </p>
 
-      <dl className="space-y-6 border-gray-200 mt-6 border-t divide-y divide-gray-100 text-sm">
+      <dl className="space-y-6 mt-6 divide-y divide-border text-sm">
         {/* Name */}
         <div className="sm:flex pt-6">
-          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Name</dt>
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">Name</dt>
           <dd className="flex sm:flex-auto justify-between items-center gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'name' ? (
               <div className="flex items-center gap-x-4 w-full">
@@ -56,7 +56,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
               </div>
             ) : (
               <>
-                <div className="text-gray-900">{profile.name}</div>
+                <div>{profile.name}</div>
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -74,15 +74,15 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
 
         {/* Email */}
         <div className="sm:flex pt-6">
-          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Email</dt>
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">Email</dt>
           <dd className="sm:flex-auto mt-1 sm:mt-0">
-            <div className="text-gray-900">{profile.email}</div>
+            <div>{profile.email}</div>
           </dd>
         </div>
 
         {/* Gender */}
         <div className="sm:flex pt-6">
-          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Gender</dt>
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">Gender</dt>
           <dd className="flex sm:flex-auto justify-between gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'gender' ? (
               <div className="flex items-center gap-x-4 w-full">
@@ -119,7 +119,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
               </div>
             ) : (
               <>
-                <div className="text-gray-900">
+                <div>
                   {genderOptions.find(g => g.id === profile.gender)?.name || 'Not specified'}
                 </div>
                 <Button
@@ -139,7 +139,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
 
         {/* Country */}
         <div className="sm:flex pt-6">
-          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium text-gray-900">Country</dt>
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">Country</dt>
           <dd className="flex sm:flex-auto justify-between gap-x-6 mt-1 sm:mt-0">
             {isEditing === 'country' ? (
               <div className="flex items-center gap-x-4 w-full">
@@ -169,7 +169,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
               </div>
             ) : (
               <>
-                <div className="text-gray-900">
+                <div>
                   {countries.find(c => c.code === profile.country)?.name || 'Not specified'}
                 </div>
                 <Button

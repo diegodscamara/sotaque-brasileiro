@@ -1,8 +1,7 @@
-import { ReactNode } from "react";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-
-import { cn } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
+import { cn } from "@/libs/utils";
 
 type BentoGridProps = {
   children: ReactNode;
@@ -23,7 +22,7 @@ const BentoGrid = ({ children, className }: BentoGridProps) => {
   return (
     <div
       className={cn(
-        "grid w-full auto-rows-[22rem] grid-cols-3 gap-4",
+        "grid w-full auto-rows-[22rem] grid-cols-3 gap-4 container",
         className,
       )}
     >
@@ -53,9 +52,9 @@ const BentoCard = ({
     )}
   >
     <div>{background}</div>
-    <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 transition-all duration-300 group-hover:-translate-y-10">
-      <Icon className="h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
-      <h3 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300">
+    <div className="z-10 flex flex-col gap-1 p-6 transform-gpu transition-all group-hover:-translate-y-10 duration-300 pointer-events-none">
+      <Icon className="group-hover:scale-75 w-12 h-12 text-neutral-700 transform-gpu origin-left transition-all duration-300 ease-in-out" />
+      <h3 className="font-semibold text-neutral-700 text-xl dark:text-neutral-300">
         {name}
       </h3>
       <p className="max-w-lg text-neutral-400">{description}</p>
@@ -69,11 +68,11 @@ const BentoCard = ({
       <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
         <a href={href}>
           {cta}
-          <ArrowRightIcon className="ml-2 h-4 w-4" />
+          <ArrowRightIcon className="ml-2 w-4 h-4" />
         </a>
       </Button>
     </div>
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
+    <div className="group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10 absolute inset-0 transform-gpu transition-all duration-300 pointer-events-none" />
   </div>
 );
 

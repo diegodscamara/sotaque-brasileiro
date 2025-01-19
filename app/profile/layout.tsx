@@ -31,7 +31,7 @@ export default async function LayoutPrivate({
       <Suspense>
         <Header />
       </Suspense>
-      <main className="flex flex-col justify-between items-center mx-auto p-8 container">
+      <main className="flex flex-col justify-between items-center mx-auto py-24 container">
         {children}
       </main>
       <Footer />

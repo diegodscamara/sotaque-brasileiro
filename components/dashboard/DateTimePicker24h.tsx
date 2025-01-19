@@ -77,7 +77,7 @@ export function DateTimePicker24h({ formData, setFormData }: DateTimePicker24hPr
                         onSelect={handleDateSelect}
                         initialFocus
                     />
-                    <div className="flex sm:flex-row flex-col sm:divide-x divide-y sm:divide-y-0 sm:h-[300px]">
+                    <div className="flex sm:flex-row flex-col sm:divide-x divide-y sm:divide-y-0 divide-border sm:h-[300px]">
                         <ScrollArea className="w-64 sm:w-auto">
                             <div className="flex sm:flex-col p-2">
                                 {hours.reverse().map((hour) => (

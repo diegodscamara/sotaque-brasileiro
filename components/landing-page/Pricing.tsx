@@ -20,10 +20,10 @@ const Pricing = () => {
   return (
     <section className="container" id="pricing">
       <div className="mx-auto py-24">
-        <div className="flex flex-col gap-4 mb-20 w-full text-center">
+        <div className="flex flex-col gap-4 mb-16 w-full text-center">
           <h2 className="font-bold text-3xl lg:text-5xl tracking-tight">Pricing</h2>
           <p className="mx-auto w-full max-w-lg font-large text-base-content/80">
-            We strive to provide the best service possible. This is why we offer a 30-day money back guarantee if you are not happy with our service
+            Choose the plan that&apos;s right for you
           </p>
           <Badge variant="outline" className="mx-auto w-fit">Save up to 17% with annual plans!</Badge>
         </div>
