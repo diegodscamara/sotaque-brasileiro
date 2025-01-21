@@ -43,8 +43,6 @@ apiClient.interceptors.response.use(
     // Automatically display errors to the user
     if (error.message) {
       toast.error(error.message);
-    } else {
-      toast.error("Something went wrong...");
     }
     return Promise.reject(error);
   }
