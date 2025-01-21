@@ -25,11 +25,16 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/auth/auth-code-error`);
     }
   } else {
+    console.error('No token or code provided.');
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
 
   // Fetch user metadata to check role and access
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    console.error('Error fetching user data:', userError);
+    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  }
 
   // Check if the user is a student
   const { data: studentData } = await supabase
@@ -44,7 +49,7 @@ export async function GET(request: Request) {
     .select('*')
     .eq('id', user.id)
     .single();
-    
+
   // Determine if the user is a student or teacher
   let existingUser;
   let isStudent = false;
@@ -55,8 +60,27 @@ export async function GET(request: Request) {
   } else if (teacherData) {
     existingUser = teacherData;
   } else {
-    console.error('User not found in either table.');
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+    // User does not exist in either table, create a new entry as a student
+    const newUser = {
+      id: user.id,
+      email: user.email,
+      first_name: user.user_metadata.first_name || '',
+      last_name: user.user_metadata.last_name || '',
+      avatar_url: user.user_metadata.avatar_url || '',
+      has_access: false, // Set default access as needed
+      role: 'student',
+    };
+
+    // Create the user as a student
+    const { error: createStudentError } = await supabase
+      .from('students')
+      .insert(newUser);
+    if (createStudentError) {
+      console.error('Error creating student:', createStudentError);
+      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+    }
+    existingUser = newUser;
+    isStudent = true; // Set isStudent to true since we created a student
   }
 
   // Compare and update user data
