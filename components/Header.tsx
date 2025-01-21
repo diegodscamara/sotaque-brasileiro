@@ -1,15 +1,14 @@
 "use client";
 
-import { List, X } from "@phosphor-icons/react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { motion, useScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import ButtonSignin from "@/components/ButtonSignin";
-import ButtonSignup from "./ButtonSignup";
 import Image from "next/image";
 import Link from "next/link";
+import { List } from "@phosphor-icons/react";
 import { ThemeToggle } from "./theme-toggle";
 import { User } from "@supabase/supabase-js";
 import { cn } from "@/libs/utils";
@@ -114,7 +113,9 @@ const Header = () => {
           {/* Desktop CTA */}
           <div className="lg:flex lg:items-center lg:gap-2 hidden">
             <ButtonSignin />
-            <ButtonSignup />
+            <Button variant="default" asChild>
+              <Link href="/#pricing">Get Started</Link>
+            </Button>
             <ThemeToggle />
           </div>
         </div>
@@ -164,7 +165,9 @@ const Header = () => {
 
                 <div className="flex flex-col gap-2 mt-auto pb-8">
                   <ButtonSignin />
-                  <ButtonSignup />
+                  <Button variant="default" asChild>
+                    <Link href="/#pricing">Get Started</Link>
+                  </Button>
                 </div>
               </div>
             </div>
