@@ -1,8 +1,10 @@
 import "./globals.css";
 
+import { Analytics } from "@vercel/analytics/react"
 import ClientLayout from "@/components/LayoutClient";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import SupabaseProvider from "./providers/SupabaseProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from 'react-hot-toast';
@@ -40,6 +42,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 					<SupabaseProvider>
 						{/* <ScrollProgress className="top-[65px]" /> */}
 						<ClientLayout>{children}</ClientLayout>
+						<Analytics />
+						<SpeedInsights />
 					</SupabaseProvider>
 				</ThemeProvider>
 			</body>
