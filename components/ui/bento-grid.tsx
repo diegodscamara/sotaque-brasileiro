@@ -8,11 +8,12 @@ type BentoGridProps = {
 };
 
 type BentoCardProps = {
-  name: string;
-  className: string;
-  background: ReactNode;
-  Icon: React.ElementType;
-  description: string;
+  name?: string;
+  className?: string;
+  background?: ReactNode;
+  Icon?: React.ElementType;
+  description?: string;
+  children?: ReactNode;
 };
 
 const BentoGrid = ({ children, className }: BentoGridProps) => {
@@ -28,13 +29,14 @@ const BentoGrid = ({ children, className }: BentoGridProps) => {
   );
 };
 
-const BentoCard = ({
+const BentoCard: React.FC<BentoCardProps> = ({
   name,
   className,
   background,
   Icon,
   description,
-}: BentoCardProps) => (
+  children,
+}) => (
   <div
     key={name}
     className={cn(
@@ -48,11 +50,12 @@ const BentoCard = ({
   >
     <div>{background}</div>
     <div className="z-10 flex flex-col gap-1 p-6 transform-gpu transition-all group-hover:-translate-y-10 duration-300 pointer-events-none">
-      <Icon className="group-hover:scale-75 w-12 h-12 text-neutral-700 transform-gpu origin-left transition-all duration-300 ease-in-out" />
+      {Icon && <Icon className="group-hover:scale-75 w-12 h-12 text-neutral-700 transform-gpu origin-left transition-all duration-300 ease-in-out" />}
       <h3 className="font-semibold text-neutral-700 text-xl dark:text-neutral-300">
         {name}
       </h3>
       <p className="max-w-lg text-neutral-400">{description}</p>
+      {children}
     </div>
     <div className="group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10 absolute inset-0 transform-gpu transition-all duration-300 pointer-events-none" />
   </div>
