@@ -1,5 +1,7 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { CheckCircleIcon, ClockIcon, Loader2, VideoIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -7,12 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
-import { Class } from "@/types/class";
-import { DateTimePicker24h } from "./DateTimePicker24h";
+import { DatePickerTimeExample } from "./date-picker";
 import React from "react";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-hot-toast";
@@ -22,97 +22,57 @@ import useTeacherApi from '@/hooks/useTeacherApi';
 interface ClassModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedDate: Date;
-  selectedClass?: Class;
-  onClassUpdated: () => void;
-  mode: 'view' | 'edit' | 'schedule'; // New prop to determine the mode
+  mode: 'view' | 'edit' | 'schedule';
+  existingStartTime?: Date  | undefined;
+  classId?: string | undefined;
 }
 
 export const ClassModal = ({
   isOpen,
   onClose,
-  selectedDate,
-  selectedClass,
-  onClassUpdated,
-  mode, // New prop
+  mode,
+  existingStartTime,
+  classId
 }: ClassModalProps) => {
-  const { scheduleClass, cancelClass } = useClassApi();
-  const { getTeacher, getTeachers } = useTeacherApi();
-  const [formData, setFormData] = useState({
-    title: "",
-    start_time: "",
-    notes: "",
-    teacher_id: "",
-  });
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [teachers, setTeachers] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { scheduleClass, editClass } = useClassApi();
+  const { getTeachers } = useTeacherApi();
+  const [teacher, setTeacher] = useState(null);
+  const [startTime, setStartTime] = useState<Date | null>(existingStartTime ? new Date(existingStartTime) : null);
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    const fetchTeacherName = async (teacherId: string) => {
-      const name = await getTeacher(teacherId);
-      return name;
-    };
+    const fetchTeacher = async () => {
+      const teacher = await getTeachers();
+      setTeacher(teacher);
+    }
 
-    const initializeFormData = async () => {
-      if (selectedClass) {
-        const teacherName = await fetchTeacherName(selectedClass.teacher_id);
-        setFormData({
-          title: `Private class with ${teacherName}`,
-          start_time: new Date(selectedClass.start_time).toISOString(),
-          notes: selectedClass.notes || "",
-          teacher_id: selectedClass.teacher_id,
-        });
-        setSelectedTeacher(selectedClass.teacher_id);
-      } else {
-        // Reset form data for scheduling a new class
-        setFormData({
-          title: "",
-          start_time: new Date(selectedDate).toISOString(),
-          notes: "",
-          teacher_id: selectedTeacher,
-        });
-      }
-    };
-
-    initializeFormData();
-  }, [selectedClass, selectedDate, selectedTeacher]);
-
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      const response = await getTeachers();
-      setTeachers(response);
-    };
-
-    fetchTeachers();
+    fetchTeacher();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isSubmitting) return; // Prevent multiple submissions
-    setIsSubmitting(true); // Set loading state
+    setIsLoading(true);
     try {
-      if (!selectedTeacher) {
-        toast.error("Please select a teacher before scheduling the class.");
-        return; // Prevent submission if no teacher is selected
-      }
-
-      // Prepare the data to be sent to the API
-      const startTime = new Date(formData.start_time);
-      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Calculate end time (1 hour later)
-
       const classData = {
-        ...formData,
-        start_time: startTime.toISOString(),
-        end_time: endTime.toISOString(),
-        teacher_id: selectedTeacher,
+        start_time: startTime ? startTime.toISOString() : "",
+        end_time: startTime ? new Date(startTime.getTime() + 60 * 60 * 1000).toISOString() : "",
+        teacher_id: teacher?.[0]?.id || "",
+        notes: notes || "",
+        title: "Private Class with " + teacher?.[0]?.first_name + " " + teacher?.[0]?.last_name || "",
       };
 
-      const response = await scheduleClass(classData);
+      let response;
+
+      if (mode === 'schedule') {
+        response = await scheduleClass(classData);
+      } else {
+        response = await editClass(classId, classData);
+      }
+
       if (response) {
         if (response.status === 200) {
           toast.success(response.message); // Show success message
-          onClassUpdated(); // Refresh the class list
           onClose(); // Close the modal
         } else {
           toast.error(response.message || "Failed to schedule class."); // Show error message
@@ -122,27 +82,7 @@ export const ClassModal = ({
       console.error("Error processing class:", error);
       toast.error("An error occurred while scheduling the class.");
     } finally {
-      setIsSubmitting(false); // Reset loading state
-    }
-  };
-
-  const handleCancel = async () => {
-    if (selectedClass) {
-      try {
-        const response = await cancelClass(selectedClass.id);
-        if (response) {
-          if (response.status === 200) {
-            toast.success(response.message); // Show success message
-            onClassUpdated(); // Refresh the class list
-            onClose(); // Close the modal
-          } else {
-            toast.error(response.message || "Failed to cancel class."); // Show error message
-          }
-        }
-      } catch (error) {
-        console.error("Error cancelling class:", error);
-        toast.error("An error occurred while cancelling the class.");
-      }
+      setIsLoading(false);
     }
   };
 
@@ -151,43 +91,45 @@ export const ClassModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{mode === 'view' ? "Class Details" : mode === 'edit' ? "Edit Class" : "Schedule Class"}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <p className="font-semibold text-lg">{formData.title}</p>
-          <Select onValueChange={(value) => {
-            const teacherId = value;
-            setSelectedTeacher(teacherId);
-            setFormData({ ...formData, teacher_id: teacherId });
-          }}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a teacher" />
-            </SelectTrigger>
-            <SelectContent>
-              {teachers.map((teacher) => (
-                <SelectItem key={teacher.id} value={teacher.id}>
-                  {teacher.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <DateTimePicker24h formData={formData} setFormData={setFormData} />
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <DialogHeader className="flex flex-row items-center gap-2">
+            <Avatar>
+              <AvatarImage src={teacher?.[0]?.avatar_url} />
+              <AvatarFallback>{teacher?.[0]?.first_name?.[0]} {teacher?.[0]?.last_name?.[0]}</AvatarFallback>
+            </Avatar>
+            <DialogTitle>{teacher?.[0]?.first_name} {teacher?.[0]?.last_name}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <CheckCircleIcon className="w-4 h-4 text-green-500" />
+              <p className="text-sm">Requires confirmation</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <ClockIcon className="w-4 h-4 text-green-500" />
+              <p className="text-sm">1 hr</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <VideoIcon className="w-4 h-4 text-green-500" />
+              <p className="text-sm">Google Meet</p>
+            </div>
+          </div>
+          <DatePickerTimeExample value={startTime} setValue={(date) => setStartTime(date ? new Date(date) : null)} />
           <Textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            placeholder="Notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Send suggestions for the class here"
           />
           <DialogFooter>
-            {mode === 'edit' && selectedClass && (
+            {/* {mode === 'edit' && (
               <Button variant="destructive" onClick={handleCancel}>Cancel Class</Button>
-            )}
-            <Button type="submit" disabled={isSubmitting}>
+            )} */}
+            <Button type="submit" disabled={isLoading}>
               {mode === 'schedule' ? "Schedule Class" : "Save Changes"}
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             </Button>
           </DialogFooter>
         </form>
-
       </DialogContent>
     </Dialog>
   );

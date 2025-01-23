@@ -76,8 +76,6 @@ export default function Page() {
       <ClassModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        selectedDate={selectedDate || new Date()}
-        onClassUpdated={() => { /* Logic to refresh classes */ }}
         mode="schedule"
       />
     </SidebarProvider>
