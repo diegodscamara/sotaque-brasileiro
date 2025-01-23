@@ -13,7 +13,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { addBusinessDays, setHours } from "date-fns"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button"
@@ -24,14 +23,9 @@ import Stats from "@/components/dashboard/Stats"
 import { useState } from "react"
 
 export default function Page() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleBookClass = () => {
-    const now = new Date()
-    const bookingDate = addBusinessDays(now, 1)
-    const bookingTime = setHours(bookingDate, 9)
-    setSelectedDate(bookingTime)
     setIsModalOpen(true)
   }
 
@@ -76,9 +70,8 @@ export default function Page() {
       <ClassModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        selectedDate={selectedDate || new Date()}
-        onClassUpdated={() => { /* Logic to refresh classes */ }}
         mode="schedule"
+        existingStartTime={new Date(Date.now() + 24 * 60 * 60 * 1000)}
       />
     </SidebarProvider>
   )

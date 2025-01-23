@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
 
@@ -8,29 +10,25 @@ const features = [
       "Use your Insighto's board to let users submit features they want.",
     styles: "bg-accent text-primary-content",
     demo: (
-      <div className="flex items-stretch h-full overflow-hidden">
-        <div className="bg-base-200 p-6 rounded-t-box w-full h-full translate-x-12">
-          <p className="mb-3 font-medium text-base-content/60 text-sm uppercase tracking-wide">
-            Suggest a feature
-          </p>
-          <div className="group-hover:bg-base-100 relative bg-base-200 mr-12 py-4 group-hover:border-border h-full text-base-content textarea">
-            <div className="top-4 left-4 absolute flex items-center group-hover:hidden">
-              <span>Notifica</span>
-              <span className="bg-accent w-[2px] h-6 animate-pulse"></span>
-            </div>
-            <div className="opacity-0 group-hover:opacity-100 duration-500">
-              Notifications should be visible only on certain pages.
-            </div>
-            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 duration-1000">
-              <span>Terms & privacy pages don&apos;t need them</span>
-              <span className="bg-accent w-[2px] h-6 animate-pulse"></span>
-            </div>
-            <button className="right-4 bottom-6 absolute opacity-0 group-hover:opacity-100 shadow-lg duration-1000 btn btn-primary">
-              Submit
-            </button>
+      <Card className="bg-accent text-primary-content">
+        <h6>Suggest a feature</h6>
+        <div className="group-hover:bg-base-100 relative bg-base-200 mr-12 py-4 group-hover:border-border h-full text-base-content textarea">
+          <div className="top-4 left-4 absolute flex items-center group-hover:hidden">
+            <span>Notifica</span>
+            <span className="bg-accent w-[2px] h-6 animate-pulse"></span>
           </div>
+          <div className="opacity-0 group-hover:opacity-100 duration-500">
+            Notifications should be visible only on certain pages.
+          </div>
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 duration-1000">
+            <span>Terms & privacy pages don&apos;t need them</span>
+            <span className="bg-accent w-[2px] h-6 animate-pulse"></span>
+          </div>
+          <Button className="right-4 bottom-6 absolute opacity-0 group-hover:opacity-100 shadow-lg duration-1000">
+            Submit
+          </Button>
         </div>
-      </div>
+      </Card>
     ),
   },
   {
@@ -57,19 +55,14 @@ const features = [
             votes: 1,
           },
         ].map((feature, i) => (
-          <div
-            className={`p-4 bg-base-100 text-base-content rounded-box flex justify-between mb-2 gap-4 ${feature?.transition}`}
-            key={i}
-          >
+          <Card key={i} className="flex justify-between gap-4 bg-base-100 mb-2 p-4 rounded-box text-base-content">
             <div>
-              <p className="mb-1 font-semibold">{feature.text}</p>
+              <p>{feature.text}</p>
               <p className="text-base-content-secondary">
                 {feature.secondaryText}
               </p>
             </div>
-            <button
-              className={`px-4 py-2 rounded-box group text-center text-lg duration-150 border border-transparent bg-accent text-primary-content`}
-            >
+            <Button className="bg-accent px-4 py-2 border border-transparent rounded-box text-center text-lg text-primary-content duration-150 group">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -85,8 +78,8 @@ const features = [
                 <path d="m18 15-6-6-6 6" />
               </svg>
               {feature.votes}
-            </button>
-          </div>
+            </Button>
+          </Card>
         ))}
       </div>
     ),
@@ -120,7 +113,7 @@ const features = [
               css: "rotate-[6deg] bg-base-200 text-base-content w-72 h-72 -ml-10 -z-10 rounded-xl p-4 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300",
             },
           ].map((theme, i) => (
-            <div className={theme.css} key={i}>
+            <Card key={i} className={theme.css}>
               <div className="mb-3 font-medium text-base-content/60 text-sm uppercase tracking-wide">
                 Trending feedback
               </div>
@@ -130,7 +123,7 @@ const features = [
                     <p className="mb-1 font-semibold">Clickable cards</p>
                     <p className="opacity-80">Make cards more accessible</p>
                   </div>
-                  <button
+                  <Button
                     className={`px-4 py-2 rounded-box group text-center text-lg duration-150 border border-transparent ${theme.buttonStyles}`}
                   >
                     <svg
@@ -148,14 +141,14 @@ const features = [
                       <path d="m18 15-6-6-6 6" />
                     </svg>
                     8
-                  </button>
+                  </Button>
                 </div>
                 <div className="flex justify-between bg-base-100 p-4 rounded-box">
                   <div>
                     <p className="mb-1 font-semibold">Bigger images</p>
                     <p className="opacity-80">Make cards more accessible</p>
                   </div>
-                  <button
+                  <Button
                     className={`px-4 py-2 rounded-box group text-center text-lg duration-150 border border-transparent ${theme.buttonStyles}`}
                   >
                     <svg
@@ -173,10 +166,10 @@ const features = [
                       <path d="m18 15-6-6-6 6" />
                     </svg>
                     5
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
@@ -208,7 +201,7 @@ const features = [
               "opacity-0 group-hover:opacity-100 duration-500 translate-x-1/4 group-hover:translate-x-0",
           },
         ]?.map((reply) => (
-          <div
+          <Card
             key={reply.id}
             className={`px-6 py-4 bg-neutral-content text-neutral rounded-box ${reply?.transition}`}
           >
@@ -231,12 +224,13 @@ const features = [
                 })}
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     ),
   },
 ];
+
 const FeaturesGrid = () => {
   return (
     <section className="flex justify-center items-center bg-base-200/50 py-20 lg:py-32 w-full text-base-content">
@@ -250,10 +244,7 @@ const FeaturesGrid = () => {
         <div className="flex flex-col gap-4 lg:gap-10 w-full max-w-[82rem] h-fit text-text-default">
           <div className="gap-4 lg:gap-10 grid grid-cols-1 md:grid-cols-3">
             {features.map((feature) => (
-              <div
-                key={feature.title}
-                className={`${feature.styles} rounded-3xl flex flex-col gap-6 w-full h-[22rem] lg:h-[25rem] pt-6 overflow-hidden group`}
-              >
+              <Card key={feature.title} className={`${feature.styles} rounded-3xl flex flex-col gap-6 w-full h-[22rem] lg:h-[25rem] pt-6 overflow-hidden group`}>
                 <div className="space-y-2 px-6">
                   <h3 className="font-bold text-xl lg:text-3xl tracking-tight">
                     {feature.title}
@@ -261,7 +252,7 @@ const FeaturesGrid = () => {
                   <p className="opacity-80">{feature.description}</p>
                 </div>
                 {feature.demo}
-              </div>
+              </Card>
             ))}
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
+import { ArrowUpDown, MoreHorizontal, MoreVertical } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     DropdownMenu,
@@ -26,33 +26,20 @@ import {
 import { useEffect, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Class } from "@/types/class"
+import { Class } from "@/types/class";
+import { formatDateTime } from '@/libs/utils/dateUtils'
 import useTeacherApi from '@/hooks/useTeacherApi'
-
-// Define a type for the class objects
-type ClassType = {
-    id: string;
-    start_time: string;
-    teacher?: string;
-    created_at: string;
-    status: string;
-    teacher_id: string;
-    title?: string;
-    end_time?: string;
-    time_zone?: string;
-    user_id?: string;
-}
 
 export function ClassListTable({ classes, handleCancel, handleEdit }: {
     classes: Class[],
     handleCancel: (class_: Class) => Promise<void>,
     handleEdit: (class_: Class) => void
 }) {
-    const [sortColumn, setSortColumn] = useState<keyof ClassType>("start_time")
+    const [sortColumn, setSortColumn] = useState<keyof Class>("start_time")
     const [sortDirection, setSortDirection] = useState("asc")
     const [currentPage, setCurrentPage] = useState(1)
-    const [statusFilter, setStatusFilter] = useState("scheduled")
-    const [teacher, setTeacher] = useState<{ name: string } | null>(null);
+    const [statusFilter, setStatusFilter] = useState("All")
+    const [teacher, setTeacher] = useState<{ first_name: string, last_name: string } | null>(null);
     const itemsPerPage = 6
     const { loading, getTeacher } = useTeacherApi();
 
@@ -60,7 +47,7 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
         const fetchTeacher = async () => {
             if (classes.length > 0) {
                 const teacherData = await getTeacher(classes[0].teacher_id);
-                if (teacherData && teacherData.name !== teacher?.name) {
+                if (teacherData && teacherData.first_name !== teacher?.first_name) {
                     setTeacher(teacherData);
                 }
             } else {
@@ -70,7 +57,7 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
         fetchTeacher();
     }, [classes, getTeacher]);
 
-    const handleSort = (column: keyof ClassType) => {
+    const handleSort = (column: keyof Class) => {
         if (column === sortColumn) {
             setSortDirection(sortDirection === "asc" ? "desc" : "asc")
         } else {
@@ -96,12 +83,13 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
     const endIndex = startIndex + itemsPerPage
     const currentClasses = filteredAndSortedClasses.slice(startIndex, endIndex)
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString('en-US', {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-        })
-    }
+    const handleCancelClass = (class_: Class) => {
+        handleCancel(class_);
+    };
+
+    const handleEditClass = (class_: Class) => {
+        handleEdit(class_);
+    };
 
     return (
         <Card className="w-full">
@@ -138,7 +126,7 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
                                     </Button>
                                 </TableHead>
                                 <TableHead>
-                                    <Button variant="ghost" onClick={() => handleSort("teacher")}>
+                                    <Button variant="ghost" onClick={() => handleSort("teacher_id")}>
                                         Teacher
                                         <ArrowUpDown className="ml-2 w-4 h-4" />
                                     </Button>
@@ -155,30 +143,42 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
                                         <ArrowUpDown className="ml-2 w-4 h-4" />
                                     </Button>
                                 </TableHead>
-                                <TableHead className="w-[100px]">Actions</TableHead>
+                                {classes.some(class_ => class_.status == 'pending' || class_.status == 'scheduled') && <TableHead className="w-[100px]">Actions</TableHead>}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {currentClasses.map((class_) => (
                                 <TableRow key={class_.id}>
-                                    <TableCell>{formatDate(class_.start_time)}</TableCell>
-                                    <TableCell>{teacher ? teacher.name : "Loading..."}</TableCell>
-                                    <TableCell className="hidden sm:table-cell">{formatDate(class_.created_at)}</TableCell>
-                                    <TableCell>{class_.status.charAt(0).toUpperCase() + class_.status.slice(1)}</TableCell>
+                                    <TableCell>{formatDateTime(class_.start_time)}</TableCell>
+                                    <TableCell>{teacher ? teacher.first_name + " " + teacher.last_name : "Loading..."}</TableCell>
+                                    <TableCell className="hidden sm:table-cell">{formatDateTime(class_.created_at)}</TableCell>
                                     <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="p-0 w-8 h-8">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="w-4 h-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={() => handleEdit(class_)}>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleCancel(class_)}>Cancel</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <span className={
+                                            class_.status === 'pending' ? 'text-yellow-500' :
+                                            class_.status === 'scheduled' ? 'text-blue-500' :
+                                            class_.status === 'completed' ? 'text-green-500' :
+                                            class_.status === 'cancelled' ? 'text-red-500' :
+                                            'text-gray-500'
+                                        }>
+                                            {class_.status.charAt(0).toUpperCase() + class_.status.slice(1)}
+                                        </span>
                                     </TableCell>
+                                    {(class_.status === 'pending' || class_.status === 'scheduled') && (
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="p-0 w-8 h-8">
+                                                        <span className="sr-only">Open menu</span>
+                                                        <MoreVertical className="w-4 h-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => handleEditClass(class_)}>Edit</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleCancelClass(class_)}>Cancel</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                         </TableBody>
