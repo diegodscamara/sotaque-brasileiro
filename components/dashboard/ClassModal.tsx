@@ -23,7 +23,7 @@ interface ClassModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode: 'view' | 'edit' | 'schedule';
-  existingStartTime?: Date  | undefined;
+  existingStartTime?: Date | undefined;
   classId?: string | undefined;
 }
 
@@ -35,10 +35,10 @@ export const ClassModal = ({
   classId
 }: ClassModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { scheduleClass, editClass } = useClassApi();
+  const { scheduleClass, editClass, cancelClass } = useClassApi();
   const { getTeachers } = useTeacherApi();
   const [teacher, setTeacher] = useState(null);
-  const [startTime, setStartTime] = useState<Date | null>(existingStartTime ? new Date(existingStartTime) : null);
+  const [startTime, setStartTime] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -86,11 +86,22 @@ export const ClassModal = ({
     }
   };
 
+  const handleCancel = async () => {
+    try {
+      await cancelClass(classId);
+      onClose();
+      toast.success("Class canceled successfully");
+    } catch (error) {
+      console.error("Error canceling class:", error);
+      toast.error("An error occurred while canceling the class.");
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent aria-description="class-modal">
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <DialogHeader className="flex flex-row items-center gap-2">
             <Avatar>
@@ -114,20 +125,24 @@ export const ClassModal = ({
               <p className="text-sm">Google Meet</p>
             </div>
           </div>
-          <DatePickerTimeExample value={startTime} setValue={(date) => setStartTime(date ? new Date(date) : null)} />
+          <DatePickerTimeExample value={startTime || existingStartTime} setValue={(date) => setStartTime(date ? new Date(date) : null)} />
           <Textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Send suggestions for the class here"
           />
           <DialogFooter>
-            {/* {mode === 'edit' && (
-              <Button variant="destructive" onClick={handleCancel}>Cancel Class</Button>
-            )} */}
+            {mode === 'edit' && (
+              <Button type="button" variant="destructive" onClick={handleCancel}>Cancel Class</Button>
+            )}
+            {mode === 'edit' && (
+              <Button type="button" variant="outline" onClick={onClose}>Abandon Changes</Button>
+            )}
             <Button type="submit" disabled={isLoading}>
               {mode === 'schedule' ? "Schedule Class" : "Save Changes"}
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             </Button>
+
           </DialogFooter>
         </form>
       </DialogContent>

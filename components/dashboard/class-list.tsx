@@ -13,7 +13,6 @@ const ClassList = () => {
   const { classes, loading, fetchClasses, cancelClass } = useClassApi();
   const [isClassModalOpen, setIsClassModalOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | undefined>(undefined);
-  console.log(selectedClass)
 
   useEffect(() => {
     fetchClasses({});
@@ -21,7 +20,13 @@ const ClassList = () => {
 
   const handleCancel = async (class_: Class) => {
     setSelectedClass(class_);
-    // Add any additional logic for canceling a class if needed
+    try {
+      await cancelClass(class_.id);
+      toast.success("Class canceled successfully");
+      fetchClasses({});
+    } catch (error) {
+      toast.error("An error occurred while canceling the class.");
+    }
   };
 
   const handleEdit = (class_: Class) => {
@@ -57,7 +62,7 @@ const ClassList = () => {
       <ClassModal
         isOpen={isClassModalOpen}
         onClose={handleCloseModal}
-        existingStartTime={selectedClass?.start_time}
+        existingStartTime={selectedClass ? new Date(selectedClass.start_time) : undefined}
         classId={selectedClass?.id}
         mode={'edit'}
       />
