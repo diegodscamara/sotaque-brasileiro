@@ -11,7 +11,7 @@ import Hero from "@/components/landing-page/Hero";
 import Image from "next/image";
 import Marquee from "@/components/ui/marquee";
 import Pricing from "@/components/landing-page/Pricing";
-import Problem from "@/components/landing-page/problem";
+import Problem from "@/components/landing-page/Problem";
 import { Solution } from "@/components/landing-page/solution";
 import { Suspense } from 'react'
 import Testimonials3 from "@/components/landing-page/Testimonials3";
