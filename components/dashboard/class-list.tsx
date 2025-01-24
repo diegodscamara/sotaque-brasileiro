@@ -8,6 +8,14 @@ import { ClassListTable } from "./class-list-table";
 import { ClassModal } from "./ClassModal";
 import { toast } from "react-hot-toast";
 import useClassApi from "@/hooks/useClassApi";
+import { z } from "zod";
+
+const classSchema = z.object({
+  id: z.string().nonempty(),
+  start_time: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "Invalid date format",
+  }),
+});
 
 const ClassList = () => {
   const { classes, loading, fetchClasses, cancelClass } = useClassApi();
@@ -21,11 +29,14 @@ const ClassList = () => {
   const handleCancel = async (class_: Class) => {
     setSelectedClass(class_);
     try {
+      // Validate class input
+      classSchema.parse(class_);
       await cancelClass(class_.id);
       toast.success("Class canceled successfully");
       fetchClasses({});
     } catch (error) {
       toast.error("An error occurred while canceling the class.");
+      console.error("Cancel class error:", error); // Log error for analysis
     }
   };
 

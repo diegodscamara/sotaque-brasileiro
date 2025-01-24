@@ -12,12 +12,14 @@ import {
 import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
+import DOMPurify from 'dompurify';
 import { DatePickerTimeExample } from "./date-picker";
 import React from "react";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-hot-toast";
 import useClassApi from '@/hooks/useClassApi';
 import useTeacherApi from '@/hooks/useTeacherApi';
+import { z } from 'zod';
 
 interface ClassModalProps {
   isOpen: boolean;
@@ -27,6 +29,21 @@ interface ClassModalProps {
   classId?: string | undefined;
 }
 
+/**
+ * Validation schema for class data
+ */
+const classDataSchema = z.object({
+  start_time: z.string().nonempty(),
+  end_time: z.string().nonempty(),
+  teacher_id: z.string().nonempty(),
+  notes: z.string().optional(),
+  title: z.string().nonempty(),
+});
+
+/**
+ * ClassModal component for scheduling and editing classes
+ * @param {ClassModalProps} props - Component props
+ */
 export const ClassModal = ({
   isOpen,
   onClose,
@@ -58,9 +75,12 @@ export const ClassModal = ({
         start_time: startTime ? startTime.toISOString() : "",
         end_time: startTime ? new Date(startTime.getTime() + 60 * 60 * 1000).toISOString() : "",
         teacher_id: teacher?.[0]?.id || "",
-        notes: notes || "",
-        title: "Private Class with " + teacher?.[0]?.first_name + " " + teacher?.[0]?.last_name || "",
+        notes: DOMPurify.sanitize(notes) || "",
+        title: `Private Class with ${teacher?.[0]?.first_name} ${teacher?.[0]?.last_name}` || "",
       };
+
+      // Validate class data
+      classDataSchema.parse(classData);
 
       let response;
 
@@ -72,10 +92,10 @@ export const ClassModal = ({
 
       if (response) {
         if (response.status === 200) {
-          toast.success(response.message); // Show success message
-          onClose(); // Close the modal
+          toast.success(response.message);
+          onClose();
         } else {
-          toast.error(response.message || "Failed to schedule class."); // Show error message
+          toast.error(response.message || "Failed to schedule class.");
         }
       }
     } catch (error) {
@@ -142,7 +162,6 @@ export const ClassModal = ({
               {mode === 'schedule' ? "Schedule Class" : "Save Changes"}
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             </Button>
-
           </DialogFooter>
         </form>
       </DialogContent>
