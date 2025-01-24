@@ -6,8 +6,8 @@ import { CalendarBlank } from "@phosphor-icons/react";
 import { Class } from "@/types/class";
 import { ClassListTable } from "./class-list-table";
 import { ClassModal } from "./ClassModal";
-import { toast } from "react-hot-toast";
 import useClassApi from "@/hooks/useClassApi";
+import { useToast } from "@/hooks/use-toast"
 import { z } from "zod";
 
 const classSchema = z.object({
@@ -19,6 +19,7 @@ const classSchema = z.object({
 
 const ClassList = () => {
   const { classes, loading, fetchClasses, cancelClass } = useClassApi();
+  const { toast } = useToast()
   const [isClassModalOpen, setIsClassModalOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<Class | undefined>(undefined);
 
@@ -32,10 +33,16 @@ const ClassList = () => {
       // Validate class input
       classSchema.parse(class_);
       await cancelClass(class_.id);
-      toast.success("Class canceled successfully");
+      toast({
+        title: "Class canceled successfully",
+        variant: "default",
+      });
       fetchClasses({});
     } catch (error) {
-      toast.error("An error occurred while canceling the class.");
+      toast({
+        title: "An error occurred while canceling the class.",
+        variant: "destructive",
+      });
       console.error("Cancel class error:", error); // Log error for analysis
     }
   };

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,15 +10,15 @@ import {
 import { DragEvent, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Markdown } from "@/components/markdown";
 import React from "react";
 import { SendIcon } from "lucide-react";
 import { StopIcon } from "@radix-ui/react-icons";
-import apiClient from "@/libs/api"; // Ensure you're importing the apiClient
-import { toast } from "react-hot-toast";
 import { useChat } from "ai/react";
+import { useToast } from "@/hooks/use-toast"
 
 const getTextFromDataUrl = (dataUrl: string) => {
   const base64 = dataUrl.split(",")[1];
@@ -46,31 +45,15 @@ function TextFilePreview({ file }: { file: File }) {
   );
 }
 
-async function handleCheckout() {
-  try {
-    const response = await apiClient.post('/stripe/create-checkout', {
-      // your request body
-    });
-    // Proceed to checkout with response.url
-  } catch (error) {
-    if (error.response?.status === 401) {
-      // Handle the redirect to login if the user is not authenticated
-      // This could be a redirect or a toast message
-      console.error("User not authenticated, redirecting to login...");
-      // Optionally, you can use a router to redirect
-      // router.push('/login'); // If using Next.js router
-    } else {
-      // Handle other errors
-      console.error("Error during checkout:", error.message);
-    }
-  }
-}
-
 export default function Page() {
+  const { toast } = useToast()
   const { messages, input, handleSubmit, handleInputChange, isLoading, stop } =
     useChat({
       onError: () =>
-        toast.error("You've been rate limited, please try again later!"),
+        toast({
+          title: "You've been rate limited, please try again later!",
+          variant: "destructive",
+        }),
     });
 
   const [files, setFiles] = useState<FileList | null>(null);
@@ -97,7 +80,10 @@ export default function Page() {
           validFiles.forEach((file) => dataTransfer.items.add(file));
           setFiles(dataTransfer.files);
         } else {
-          toast.error("Only image and text files are allowed");
+          toast({
+            title: "Only image and text files are allowed",
+            variant: "destructive",
+          });
         }
       }
     }
@@ -128,7 +114,10 @@ export default function Page() {
         validFiles.forEach((file) => dataTransfer.items.add(file));
         setFiles(dataTransfer.files);
       } else {
-        toast.error("Only image and text files are allowed!");
+        toast({
+          title: "Only image and text files are allowed!",
+          variant: "destructive",
+        });
       }
 
       setFiles(droppedFiles);
@@ -165,7 +154,10 @@ export default function Page() {
         validFiles.forEach((file) => dataTransfer.items.add(file));
         setFiles(dataTransfer.files);
       } else {
-        toast.error("Only image and text files are allowed");
+        toast({
+          title: "Only image and text files are allowed",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -199,9 +191,8 @@ export default function Page() {
             {messages.map((message, index) => (
               <motion.div
                 key={message.id}
-                className={`flex flex-row gap-2 px-4 w-full md:w-[500px] md:px-0 ${
-                  index === 0 ? "pt-20" : ""
-                }`}
+                className={`flex flex-row gap-2 px-4 w-full md:w-[500px] md:px-0 ${index === 0 ? "pt-20" : ""
+                  }`}
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
               >
@@ -216,7 +207,7 @@ export default function Page() {
                   <div className="flex flex-row gap-2">
                     {message.experimental_attachments?.map((attachment) =>
                       attachment.contentType?.startsWith("image") ? (
-                        <img
+                        <Image
                           className="mb-3 rounded-md w-40"
                           key={attachment.name}
                           src={attachment.url}
@@ -344,7 +335,7 @@ export default function Page() {
               onClick={handleUploadClick}
               aria-label="Upload Files"
             >
-                <AttachmentIcon aria-hidden="true" />
+              <AttachmentIcon aria-hidden="true" />
             </Button>
 
             {/* Message Input */}

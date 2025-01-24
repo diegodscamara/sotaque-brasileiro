@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   GraduationCap,
   User as UserIcon
@@ -11,17 +11,20 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { BasicInfo } from "./components/BasicInfo";
 import Breadcrumb from '@/components/Breadcrumb';
 import { Button } from "@/components/ui/button";
+import DOMPurify from "dompurify";
 import { FloppyDisk } from "@phosphor-icons/react";
 import { LanguageLearning } from "./components/LanguageLearning";
 import { StudentProfileData } from '@/types/profile';
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/libs/supabase/client";
-import toast from "react-hot-toast";
+import useStudentApi from "@/hooks/useStudentApi";
+import { useToast } from "@/hooks/use-toast"
+import { z } from "zod";
 
 const genderOptions = [
   { id: 'male', name: 'Male' },
@@ -42,28 +45,51 @@ const languageOptions = [
 
 const StudentProfile = () => {
   const supabase = createClient();
+  const { getStudent, editStudent } = useStudentApi();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
+  const { toast } = useToast()
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
-  const handleUpdate = async (field: string, value: string | number | string[]) => {
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, [supabase]);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      try {
+        const fetchedProfile = await getStudent(user.id);
+        setProfile(fetchedProfile);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [getStudent, user]);
+
+  const handleUpdate = useCallback(async (field: string, value: string | number | string[]) => {
     try {
-      const { error } = await supabase
-        .from('students')
-        .update({ [field]: value, updated_at: new Date().toISOString() })
-        .eq('id', user?.id);
-
-      if (error) throw error;
-
-      setProfile((prevProfile) => ({
-        ...prevProfile,
-        [field]: value,
-      }));
+      const sanitizedValue = DOMPurify.sanitize(value.toString());
+      const updatedProfile = await editStudent(user?.id, { [field]: sanitizedValue, updated_at: new Date().toISOString() });
+      setProfile(updatedProfile);
 
       const fieldNameMap: Record<string, string> = {
-        name: 'Name',
+        first_name: 'First Name',
+        last_name: 'Last Name',
         gender: 'Gender',
         country: 'Country',
         portuguese_level: 'Portuguese Level',
@@ -73,87 +99,28 @@ const StudentProfile = () => {
       };
 
       const fieldName = fieldNameMap[field] || field.replace(/_/g, ' ');
-      toast.success(`${fieldName} updated successfully`);
+      toast({
+        title: `${fieldName} updated successfully`,
+        variant: "default",
+      });
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
-      toast.error(`Failed to update ${field}`);
+      toast({
+        title: `Failed to update ${field}`,
+        variant: "destructive",
+      });
     }
-  };
+  }, [editStudent, profile, user]);
 
-  const handleMultiSelect = async (field: string, values: string[]) => {
+  const handleMultiSelect = useCallback(async (field: string, values: string[]) => {
     try {
-      const { error } = await supabase
-        .from('students')
-        .update({ [field]: values })
-        .eq('id', user?.id);
-
-      if (error) throw error;
-
-      setProfile(prev => prev ? { ...prev, [field]: values } : null);
+      const sanitizedValues = values.map(value => DOMPurify.sanitize(value));
+      const updatedProfile = await editStudent(user?.id, { [field]: sanitizedValues });
+      setProfile(updatedProfile);
     } catch (error) {
       console.error("Error updating profile:", error);
     }
-  };
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError) {
-          console.log("Error fetching user:", userError);
-          return;
-        }
-
-        setUser(user);
-
-        if (user) {
-          // Try to get existing profile
-          const { data: profile, error: profileError } = await supabase
-            .from("students")
-            .select("*")
-            .eq("id", user.id)
-            .single();
-
-          if (profileError) {
-            console.log("Error fetching profile:", profileError);
-          }
-
-          if (!profile) {
-            // Create new profile if it doesn't exist
-            const { data: newProfile, error: createError } = await supabase
-              .from("students")
-              .insert([
-                {
-                  id: user.id,
-                  email: user.email,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                },
-              ])
-              .select()
-              .single();
-
-            if (createError) {
-              console.log("Error creating profile:", createError);
-              return;
-            }
-
-            setProfile(newProfile);
-          } else {
-            setProfile(profile);
-          }
-        }
-      } catch (error) {
-        console.error("Error in fetchUser:", error);
-      }
-    };
-
-    fetchUser();
-  }, [supabase]);
+  }, [editStudent, user]);
 
   if (!user || !profile) {
     return <div>Loading...</div>;
@@ -224,23 +191,22 @@ const StudentProfile = () => {
                   variant="default"
                   onClick={async () => {
                     try {
-                      await Promise.all([
-                        handleMultiSelect('other_languages', profile.other_languages || [])
-                      ]);
-
-                      const { error } = await supabase
-                        .from('students')
-                        .update({
-                          ...profile,
-                          updated_at: new Date().toISOString()
-                        })
-                        .eq('id', user?.id);
-
-                      if (error) throw error;
-                      toast.success('All changes saved successfully');
+                      await handleMultiSelect('other_languages', profile.other_languages || []);
+                      const updatedProfile = await editStudent(user?.id, {
+                        ...profile,
+                        updated_at: new Date().toISOString()
+                      });
+                      setProfile(updatedProfile);
+                      toast({
+                        title: 'All changes saved successfully',
+                        variant: "default",
+                      });
                     } catch (error) {
                       console.error('Error updating profile:', error);
-                      toast.error('Failed to save changes');
+                      toast({
+                        title: 'Failed to save changes',
+                        variant: "destructive",
+                      });
                     }
                   }}
                 >

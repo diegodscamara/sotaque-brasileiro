@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 
 import { Input } from "./ui/input";
 import apiClient from "@/libs/api";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/hooks/use-toast"
 
 // This component is used to collect the emails from the landing page
 // You'd use this if your product isn't ready yet or you want to collect leads
@@ -15,7 +15,7 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
   const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-
+  const { toast } = useToast()
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
 
@@ -23,7 +23,10 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
     try {
       await apiClient.post("/lead", { email });
 
-      toast.success("Thanks for joining the waitlist!");
+      toast({
+        title: "Thanks for joining the waitlist!",
+        variant: "default",
+      });
 
       // just remove the focus on the input
       inputRef.current.blur();

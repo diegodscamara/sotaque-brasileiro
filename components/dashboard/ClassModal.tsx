@@ -16,9 +16,9 @@ import DOMPurify from 'dompurify';
 import { DatePickerTimeExample } from "./date-picker";
 import React from "react";
 import { Textarea } from "../ui/textarea";
-import { toast } from "react-hot-toast";
 import useClassApi from '@/hooks/useClassApi';
 import useTeacherApi from '@/hooks/useTeacherApi';
+import { useToast } from "@/hooks/use-toast"
 import { z } from 'zod';
 
 interface ClassModalProps {
@@ -51,6 +51,7 @@ export const ClassModal = ({
   existingStartTime,
   classId
 }: ClassModalProps) => {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false);
   const { scheduleClass, editClass, cancelClass } = useClassApi();
   const { getTeachers } = useTeacherApi();
@@ -92,15 +93,24 @@ export const ClassModal = ({
 
       if (response) {
         if (response.status === 200) {
-          toast.success(response.message);
+          toast({
+            title: response.message,
+            variant: "default",
+          });
           onClose();
         } else {
-          toast.error(response.message || "Failed to schedule class.");
+          toast({
+            title: response.message || "Failed to schedule class.",
+            variant: "destructive",
+          });
         }
       }
     } catch (error) {
       console.error("Error processing class:", error);
-      toast.error("An error occurred while scheduling the class.");
+      toast({
+        title: "An error occurred while scheduling the class.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -110,10 +120,16 @@ export const ClassModal = ({
     try {
       await cancelClass(classId);
       onClose();
-      toast.success("Class canceled successfully");
+      toast({
+        title: "Class canceled successfully",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error canceling class:", error);
-      toast.error("An error occurred while canceling the class.");
+      toast({
+        title: "An error occurred while canceling the class.",
+        variant: "destructive",
+      });
     }
   };
 
