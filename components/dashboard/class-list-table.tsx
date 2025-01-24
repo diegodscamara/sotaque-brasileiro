@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowUpDown, MoreHorizontal, MoreVertical } from 'lucide-react'
+import { ArrowUpDown, MoreVertical } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     DropdownMenu,
@@ -27,9 +27,29 @@ import { useEffect, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Class } from "@/types/class";
+import DOMPurify from 'dompurify';
 import { formatDateTime } from '@/libs/utils/dateUtils'
 import useTeacherApi from '@/hooks/useTeacherApi'
+import { z } from 'zod';
 
+/**
+ * Validation schema for class data
+ */
+const classSchema = z.object({
+    id: z.string(),
+    start_time: z.string(),
+    teacher_id: z.string(),
+    created_at: z.string(),
+    status: z.enum(['pending', 'scheduled', 'completed', 'cancelled']),
+});
+
+/**
+ * ClassListTable component to display a list of classes
+ * @param {Object} props - Component props
+ * @param {Class[]} props.classes - List of classes
+ * @param {Function} props.handleCancel - Function to handle class cancellation
+ * @param {Function} props.handleEdit - Function to handle class editing
+ */
 export function ClassListTable({ classes, handleCancel, handleEdit }: {
     classes: Class[],
     handleCancel: (class_: Class) => Promise<void>,
@@ -84,10 +104,12 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
     const currentClasses = filteredAndSortedClasses.slice(startIndex, endIndex)
 
     const handleCancelClass = (class_: Class) => {
+        classSchema.parse(class_);
         handleCancel(class_);
     };
 
     const handleEditClass = (class_: Class) => {
+        classSchema.parse(class_);
         handleEdit(class_);
     };
 
@@ -150,15 +172,15 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
                             {currentClasses.map((class_) => (
                                 <TableRow key={class_.id}>
                                     <TableCell>{formatDateTime(class_.start_time)}</TableCell>
-                                    <TableCell>{teacher ? teacher.first_name + " " + teacher.last_name : "Loading..."}</TableCell>
+                                    <TableCell>{teacher ? DOMPurify.sanitize(teacher.first_name + " " + teacher.last_name) : "Loading..."}</TableCell>
                                     <TableCell className="hidden sm:table-cell">{formatDateTime(class_.created_at)}</TableCell>
                                     <TableCell>
                                         <span className={
                                             class_.status === 'pending' ? 'text-yellow-500' :
-                                            class_.status === 'scheduled' ? 'text-blue-500' :
-                                            class_.status === 'completed' ? 'text-green-500' :
-                                            class_.status === 'cancelled' ? 'text-red-500' :
-                                            'text-gray-500'
+                                                class_.status === 'scheduled' ? 'text-blue-500' :
+                                                    class_.status === 'completed' ? 'text-green-500' :
+                                                        class_.status === 'cancelled' ? 'text-red-500' :
+                                                            'text-gray-500'
                                         }>
                                             {class_.status.charAt(0).toUpperCase() + class_.status.slice(1)}
                                         </span>

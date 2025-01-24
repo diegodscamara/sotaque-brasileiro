@@ -26,11 +26,11 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
       </p>
 
       <dl className="space-y-6 mt-6 divide-y divide-border text-sm">
-        {/* Name */}
+        {/* First Name */}
         <div className="sm:flex pt-6">
-          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">Name</dt>
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">First Name</dt>
           <dd className="flex sm:flex-auto justify-between items-center gap-x-6 mt-1 sm:mt-0">
-            {isEditing === 'name' ? (
+            {isEditing === 'first_name' ? (
               <div className="flex items-center gap-x-4 w-full">
                 <Input
                   type="text"
@@ -40,7 +40,7 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
                 />
                 <Button
                   variant="default"
-                  onClick={() => handleUpdate('name', editValue)}
+                  onClick={() => handleUpdate('first_name', editValue)}
                 >
                   Save
                 </Button>
@@ -56,12 +56,58 @@ export const BasicInfo = ({ profile, isEditing, setIsEditing, editValue, setEdit
               </div>
             ) : (
               <>
-                <div>{profile.name}</div>
+                <div>{profile.first_name}</div>
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setIsEditing('name');
-                    setEditValue(profile.name || '');
+                    setIsEditing('first_name');
+                    setEditValue(profile.first_name || '');
+                  }}
+                >
+                  <PencilLine className="w-5 h-5" />
+                  Update
+                </Button>
+              </>
+            )}
+          </dd>
+        </div>
+
+        {/* Last Name */}
+        <div className="sm:flex pt-6">
+          <dt className="sm:flex-none sm:pr-6 sm:w-64 font-medium">Last Name</dt>
+          <dd className="flex sm:flex-auto justify-between items-center gap-x-6 mt-1 sm:mt-0">
+            {isEditing === 'last_name' ? (
+              <div className="flex items-center gap-x-4 w-full">
+                <Input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="input-bordered w-full input input-primary input-sm"
+                />
+                <Button
+                  variant="default"
+                  onClick={() => handleUpdate('last_name', editValue)}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setIsEditing(null);
+                    setEditValue("");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div>{profile.last_name}</div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing('last_name');
+                    setEditValue(profile.last_name || '');
                   }}
                 >
                   <PencilLine className="w-5 h-5" />

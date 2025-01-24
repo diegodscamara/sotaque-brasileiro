@@ -9,13 +9,14 @@ import { Loader2 } from "lucide-react";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/libs/supabase/client";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast"
 
 export default function SignInForm() {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { toast } = useToast()
     const supabase = createClient();
 
     useEffect(() => {
@@ -38,11 +39,18 @@ export default function SignInForm() {
                     emailRedirectTo: window.location.origin + "/api/auth/callback",
                 },
             })
-            toast.success("Check your emails!");
+            toast({
+                title: "Check your emails!",
+                variant: "default",
+            });
 
             if (error) throw error;
         } catch (error) {
             console.error("Email sign-in error:", error);
+            toast({
+                title: "Failed to sign in",
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }

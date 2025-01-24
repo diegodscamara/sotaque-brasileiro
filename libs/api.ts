@@ -1,6 +1,5 @@
 import axios from "axios";
 import config from "@/config";
-import { toast } from "react-hot-toast";
 
 // use this to interact with our own API (/app/api folder) from the front-end side
 // See https://shipfa.st/docs/tutorials/api-call
@@ -24,7 +23,6 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401) {
       // User not authenticated, ask to re-login
-      toast.error("Please login");
       // Redirects the user to the login page
       handleRedirect(config.auth.loginUrl);
     } else if (error.response?.status === 403) {
@@ -42,7 +40,7 @@ apiClient.interceptors.response.use(
 
     // Automatically display errors to the user
     if (error.message) {
-      toast.error(error.message);
+      console.error(error.message);
     }
     return Promise.reject(error);
   }
