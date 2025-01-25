@@ -5,7 +5,7 @@ import TestimonialsAvatars from "./TestimonialsAvatars";
 
 const Hero = () => {
   return (
-    <section className="flex lg:flex-row flex-col justify-center items-center gap-16 lg:gap-20 mx-auto py-8 lg:py-20 container">
+    <section id="hero" className="relative flex lg:flex-row flex-col justify-center items-center gap-16 lg:gap-20 mx-auto px-4 py-16 max-w-7xl container">
       <div className="flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
         <h1 className="my-6 font-extrabold text-4xl lg:text-6xl tracking-tight">
           Transforme o futuro do seu filho em dias, não semanas

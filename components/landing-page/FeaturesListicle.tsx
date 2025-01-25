@@ -316,72 +316,60 @@ const FeaturesListicle = () => {
   }, [featureSelected, hasClicked]);
 
   return (
-    <section id="features">
-      <div className="relative flex flex-col justify-center items-center gap-16 mx-auto px-4 py-16 max-w-7xl container">
-        <div className="space-y-4 mx-auto pb-6 text-center">
-          <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
-            {/* 💡 COPY TIP: Remind visitors about the value of your product. Why do they need it? */}
-            Features
-          </h2>
-          <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">
-            {/* 💡 COPY TIP: Explain how your product delivers what you promise in the headline. */}
-            User Flows and Navigational Structures
-          </h3>
-        </div>
+    <section id="features" className="relative mx-auto px-4 py-16 max-w-7xl container">
+      <div className="space-y-4 mx-auto pb-6 text-center">
+        <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
+          {/* 💡 COPY TIP: Remind visitors about the value of your product. Why do they need it? */}
+          Features
+        </h2>
+        <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">
+          {/* 💡 COPY TIP: Explain how your product delivers what you promise in the headline. */}
+          User Flows and Navigational Structures
+        </h3>
       </div>
-
-      <div>
-        <div className="gap-x-10 grid md:grid-cols-4 mx-auto py-8 max-w-7xl container">
-          {features.map((feature) => (
+      <div className="gap-x-10 grid md:grid-cols-4 mx-auto py-8 max-w-7xl container">
+        {features.map((feature) => (
+          <span
+            key={feature.name}
+            onClick={() => {
+              if (!hasClicked) setHasClicked(true);
+              setFeatureSelected(feature.name);
+            }}
+            className="relative flex flex-col items-center cursor-pointer"
+          >
             <span
-              key={feature.name}
-              onClick={() => {
-                if (!hasClicked) setHasClicked(true);
-                setFeatureSelected(feature.name);
-              }}
-              className="relative flex flex-col items-center cursor-pointer"
+              className={`duration-100 text-primary item-box size-16 bg-primary/10 rounded-full sm:mx-6 mx-2 shrink-0 flex items-center justify-center ${featureSelected === feature.name
+                ? "bg-primary/20"
+                : "bg-primary/10"}`}
             >
-              <span
-                className={`duration-100 text-primary item-box size-16 bg-primary/10 rounded-full sm:mx-6 mx-2 shrink-0 flex items-center justify-center ${featureSelected === feature.name
-                  ? "bg-primary/20"
-                  : "bg-primary/10"
-                  }`}
-              >
-                {feature.svg}
-              </span>
-              <span
-                className={`font-bold text-xl my-3 ${featureSelected === feature.name
-                  ? "text-primary"
-                  : "text-base-content/50"
-                  }`}
-              >
-                {feature.name}
-              </span>
-              <span className="justify-center mb-4 text-center">
-                {feature.description}
-              </span>
+              {feature.svg}
             </span>
-          ))}
-        </div>
-        <div className="bg-base-200">
-          <div className="flex md:flex-row flex-col justify-center md:items-center gap-12 mx-auto">
-            <div
-              className="space-y-4 px-12 md:px-0 py-12 max-w-xl text-base-content/80 leading-relaxed animate-opacity"
-              key={featureSelected}
+            <span
+              className={`font-bold text-xl my-3 ${featureSelected === feature.name
+                ? "text-primary"
+                : "text-base-content/50"}`}
             >
-              <h3 className="font-semibold text-base-content text-lg">
-                {features.find((f) => f.name === featureSelected)["description"]}
-              </h3>
-
-              {features.find((f) => f.name === featureSelected)["content"]}
-            </div>
-          </div>
+              {feature.name}
+            </span>
+            <span className="justify-center mb-4 text-center">
+              {feature.description}
+            </span>
+          </span>
+        ))}
+      </div>
+      <div className="flex md:flex-row flex-col justify-center md:items-center gap-12 mx-auto">
+        <div
+          className="space-y-4 px-12 md:px-0 py-12 max-w-xl text-base-content/80 leading-relaxed animate-opacity"
+          key={featureSelected}
+        >
+          <h3 className="font-semibold text-base-content text-lg">
+            {features.find((f) => f.name === featureSelected)["description"]}
+          </h3>
+          {features.find((f) => f.name === featureSelected)["content"]}
         </div>
       </div>
-      {/* Just used to know it's the end of the autoscroll feature (optional, see useEffect) */}
-      <p className="opacity-0" ref={featuresEndRef}></p>
     </section>
   );
-};
+}
 
 export default FeaturesListicle;

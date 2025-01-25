@@ -29,24 +29,22 @@ const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; tex
 // - Features: "ShipFast has user auth, Stripe, emails all set up for you"
 const Problem = () => {
   return (
-    <section className="container">
-      <div className="relative mx-auto px-4 py-16 max-w-7xl container">
-        <div className="space-y-4 mx-auto pb-6 text-center">
-          <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
-            Problem
-          </h2>
-          <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">
-            Manually entering your data is a hassle.
-          </h3>
-        </div>
+    <section id="problem" className="relative mx-auto px-4 py-16 max-w-7xl container">
+      <div className="space-y-4 mx-auto pb-6 text-center">
+        <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
+          Problem
+        </h2>
+        <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">
+          Manually entering your data is a hassle.
+        </h3>
+      </div>
 
-        <div className="gap-8 grid grid-cols-1 md:grid-cols-3 mt-12">
-          <Step icon={<BrainIcon className="w-6 h-6 text-primary" />} title="Data Overload" text="Businesses struggle to make sense of vast amounts of complex data, missing out on valuable insights that could drive growth and innovation." />
+      <div className="gap-8 grid grid-cols-1 md:grid-cols-3 mt-12">
+        <Step icon={<BrainIcon className="w-6 h-6 text-primary" />} title="Data Overload" text="Businesses struggle to make sense of vast amounts of complex data, missing out on valuable insights that could drive growth and innovation." />
 
-          <Step icon={<LightbulbIcon className="w-6 h-6 text-primary" />} title="Slow Decision-Making" text="Traditional data processing methods are too slow, causing businesses to lag behind market changes and miss crucial opportunities." />
+        <Step icon={<LightbulbIcon className="w-6 h-6 text-primary" />} title="Slow Decision-Making" text="Traditional data processing methods are too slow, causing businesses to lag behind market changes and miss crucial opportunities." />
 
-          <Step icon={<ShieldIcon className="w-6 h-6 text-primary" />} title="Data Security Concerns" text="With increasing cyber threats, businesses worry about the safety of their sensitive information when adopting new technologies." />
-        </div>
+        <Step icon={<ShieldIcon className="w-6 h-6 text-primary" />} title="Data Security Concerns" text="With increasing cyber threats, businesses worry about the safety of their sensitive information when adopting new technologies." />
       </div>
     </section>
   );

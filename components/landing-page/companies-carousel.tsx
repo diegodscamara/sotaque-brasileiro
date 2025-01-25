@@ -43,26 +43,24 @@ const LOGOS = [
 
 export function CompaniesCarousel() {
     return (
-        <section className="bg-background py-14 w-full overflow-hidden">
-            <div className="mx-auto px-4 md:px-8 container">
-                <h2 className="font-semibold text-center text-gray-500 text-sm">HELPED PEOPLE FROM COMPANIES LIKE</h2>
-                <div className="relative mt-6 w-full overflow-hidden">
-                    <Marquee pauseOnHover>
-                        {LOGOS.map((logo, index) => (
-                            <div key={index} className="flex-shrink-0 opacity-90 hover:opacity-100 transition-opacity duration-300">
-                                <Image
-                                    src={logo.src || "/placeholder.svg"}
-                                    alt={logo.alt}
-                                    className={logo.className}
-                                    width={200}
-                                    height={80}
-                                />
-                            </div>
-                        ))}
-                    </Marquee>
-                    <div className="left-0 absolute inset-y-0 bg-gradient-to-r from-white dark:from-black w-1/3 h-full pointer-events-none"></div>
-                    <div className="right-0 absolute inset-y-0 bg-gradient-to-l from-white dark:from-black w-1/3 h-full pointer-events-none"></div>
-                </div>
+        <section id="companies" className="relative mx-auto px-4 py-16 max-w-7xl container">
+            <h2 className="font-semibold text-center text-gray-500 text-sm">HELPED PEOPLE FROM COMPANIES LIKE</h2>
+            <div className="relative mt-6 w-full overflow-hidden">
+                <Marquee pauseOnHover>
+                    {LOGOS.map((logo, index) => (
+                        <div key={index} className="flex-shrink-0 opacity-90 hover:opacity-100 transition-opacity duration-300">
+                            <Image
+                                src={logo.src || "/placeholder.svg"}
+                                alt={logo.alt}
+                                className={logo.className}
+                                width={200}
+                                height={80}
+                            />
+                        </div>
+                    ))}
+                </Marquee>
+                <div className="left-0 absolute inset-y-0 bg-gradient-to-r from-white dark:from-black w-1/3 h-full pointer-events-none"></div>
+                <div className="right-0 absolute inset-y-0 bg-gradient-to-l from-white dark:from-black w-1/3 h-full pointer-events-none"></div>
             </div>
         </section>
     )
