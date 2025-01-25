@@ -4,8 +4,8 @@ import config from "@/config";
 
 const CTA = () => {
   return (
-    <section className="bg-secondary py-8 w-full">
-      <div className="flex flex-col justify-center items-center gap-6 mx-auto py-24 max-w-3xl text-center container">
+    <section id="cta" className="relative flex flex-col items-center gap-4 bg-secondary mx-auto py-16 w-full">
+      <div className="flex flex-col justify-center items-center gap-6 px-4 max-w-7xl text-center container">
         <p className="inline-block mb-4 font-semibold text-primary">Ready to get started?</p>
         <h2 className="font-bold text-3xl text-center md:text-5xl">
           Boost your app, launch, earn

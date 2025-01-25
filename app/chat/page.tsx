@@ -17,7 +17,9 @@ import { Markdown } from "@/components/markdown";
 import React from "react";
 import { SendIcon } from "lucide-react";
 import { StopIcon } from "@radix-ui/react-icons";
+import { createClient } from "@/libs/supabase/client";
 import { useChat } from "ai/react";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast"
 
 const getTextFromDataUrl = (dataUrl: string) => {
@@ -47,6 +49,8 @@ function TextFilePreview({ file }: { file: File }) {
 
 export default function Page() {
   const { toast } = useToast()
+  const router = useRouter();
+  const supabase = createClient();
   const { messages, input, handleSubmit, handleInputChange, isLoading, stop } =
     useChat({
       onError: () =>
@@ -55,6 +59,20 @@ export default function Page() {
           variant: "destructive",
         }),
     });
+
+    useEffect(() => {
+      const checkUser = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push("/signin");
+          toast({
+            title: "You've been rate limited, please try again later!",
+            variant: "destructive",
+          });
+        }
+      };
+      checkUser();
+    }, [router, supabase.auth]);
 
   const [files, setFiles] = useState<FileList | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -318,7 +336,7 @@ export default function Page() {
           </AnimatePresence>
 
           {/* Hidden file input */}
-          <input
+          <Input
             type="file"
             multiple
             accept="image/*,text/*"
@@ -341,7 +359,7 @@ export default function Page() {
             {/* Message Input */}
             <Input
               ref={inputRef}
-              className="flex-grow bg-transparent text-zinc-800 dark:text-zinc-300 outline-none placeholder-zinc-400"
+              className="flex-grow bg-transparent shadow-none border-none focus:ring-0 text-zinc-800 dark:text-zinc-300 outline-none placeholder-zinc-400"
               placeholder="Send a message..."
               value={input}
               onChange={handleInputChange}
@@ -349,12 +367,12 @@ export default function Page() {
             />
 
             {isLoading ? (
-              <Button variant="ghost" onClick={stop}>
+              <Button variant="default" onClick={stop}>
                 <StopIcon />
               </Button>
             ) : (
-              <Button type="submit" variant="ghost">
-                <SendIcon />
+              <Button type="submit" variant="default" disabled={isLoading || input.length < 1}>
+                <SendIcon className="size-4" />
               </Button>
             )}
           </div>

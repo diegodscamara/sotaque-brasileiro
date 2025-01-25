@@ -56,32 +56,30 @@ const faqList: FAQItemProps[] = [
 
 const FAQ = () => {
   return (
-    <section className="container" id="faq">
-      <div className="flex flex-col gap-12 mx-auto py-24 max-w-3xl">
-        <div className="flex flex-col text-center basis-1/2">
-          <p className="inline-block mb-4 font-semibold text-primary">FAQ</p>
-          <p className="font-extrabold text-3xl text-base-content sm:text-4xl">
-            Frequently Asked Questions
-          </p>
-        </div>
+    <section className="relative flex flex-col items-center gap-4 mx-auto px-4 py-16 max-w-7xl container" id="faq">
+      <div className="flex flex-col text-center basis-1/2">
+        <p className="inline-block mb-4 font-semibold text-primary">FAQ</p>
+        <p className="font-extrabold text-3xl text-base-content sm:text-4xl">
+          Frequently Asked Questions
+        </p>
+      </div>
 
-        <Accordion type="single" collapsible>
-          {faqList.map((item, i) => (
-            <AccordionItem key={i} value={`item-${i}`}>
-              <AccordionTrigger >
-                {item.question}
-              </AccordionTrigger>
-              <AccordionContent >
-                {item.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+      <Accordion type="single" collapsible className="mx-auto w-full max-w-4xl">
+        {faqList.map((item, i) => (
+          <AccordionItem key={i} value={`item-${i}`}>
+            <AccordionTrigger >
+              {item.question}
+            </AccordionTrigger>
+            <AccordionContent >
+              {item.answer}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
 
-        <div className="flex flex-row justify-center items-center gap-1 basis-1/2">
-          <p className="text-base-content/80 text-sm">Still have questions? Email us at </p>
-          <Link className="text-base-content text-sm underline" href="mailto:hello@learnwithus.com">hello@learnwithus.com</Link>
-        </div>
+      <div className="flex flex-row justify-center items-center gap-1 basis-1/2">
+        <p className="text-base-content/80 text-sm">Still have questions? Email us at </p>
+        <Link className="text-base-content text-sm underline" href="mailto:hello@learnwithus.com">hello@learnwithus.com</Link>
       </div>
     </section>
   );

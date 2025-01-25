@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import type { JSX } from "react";
+import { useRef, useState } from "react";
+
 import Image from "next/image";
+import type { JSX } from "react";
 
 interface Feature {
   title: string;
@@ -130,7 +131,7 @@ const Item = ({
   return (
     <li>
       <button
-        className="relative flex gap-2 items-center w-full py-5 text-base font-medium text-left md:text-lg"
+        className="relative flex items-center gap-2 py-5 w-full font-medium text-base text-left md:text-lg"
         onClick={(e) => {
           e.preventDefault();
           setFeatureSelected();
@@ -141,9 +142,8 @@ const Item = ({
           {svg}
         </span>
         <span
-          className={`flex-1 text-base-content ${
-            isOpen ? "text-primary font-semibold" : ""
-          }`}
+          className={`flex-1 text-base-content ${isOpen ? "text-primary font-semibold" : ""
+            }`}
         >
           <h3 className="inline">{title}</h3>
         </span>
@@ -211,32 +211,30 @@ const FeaturesAccordion = () => {
 
   return (
     <section
-      className="py-24 md:py-32 space-y-24 md:space-y-32 max-w-7xl mx-auto bg-base-100 "
+      className="relative mx-auto px-4 py-16 max-w-7xl container"
       id="features"
     >
-      <div className="px-8">
-        <h2 className="font-extrabold text-4xl lg:text-6xl tracking-tight mb-12 md:mb-24">
-          All you need to ship your startup fast
-          <span className="bg-neutral text-neutral-content px-2 md:px-4 ml-1 md:ml-1.5 leading-relaxed whitespace-nowrap">
-            and get profitable
-          </span>
-        </h2>
-        <div className=" flex flex-col md:flex-row gap-12 md:gap-24">
-          <div className="grid grid-cols-1 items-stretch gap-8 sm:gap-12 lg:grid-cols-2 lg:gap-20">
-            <ul className="w-full">
-              {features.map((feature, i) => (
-                <Item
-                  key={feature.title}
-                  index={i}
-                  feature={feature}
-                  isOpen={featureSelected === i}
-                  setFeatureSelected={() => setFeatureSelected(i)}
-                />
-              ))}
-            </ul>
+      <h2 className="mb-12 md:mb-24 font-extrabold text-4xl lg:text-6xl tracking-tight">
+        All you need to ship your startup fast
+        <span className="bg-neutral ml-1 md:ml-1.5 px-2 md:px-4 text-neutral-content leading-relaxed whitespace-nowrap">
+          and get profitable
+        </span>
+      </h2>
+      <div className="flex md:flex-row flex-col gap-12 md:gap-24">
+        <div className="items-stretch gap-8 sm:gap-12 lg:gap-20 grid grid-cols-1 lg:grid-cols-2">
+          <ul className="w-full">
+            {features.map((feature, i) => (
+              <Item
+                key={feature.title}
+                index={i}
+                feature={feature}
+                isOpen={featureSelected === i}
+                setFeatureSelected={() => setFeatureSelected(i)}
+              />
+            ))}
+          </ul>
 
-            <Media feature={features[featureSelected]} key={featureSelected} />
-          </div>
+          <Media feature={features[featureSelected]} key={featureSelected} />
         </div>
       </div>
     </section>

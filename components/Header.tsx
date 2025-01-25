@@ -76,7 +76,7 @@ const Header = () => {
           : "bg-transparent border-transparent"
       )}
     >
-      <nav className="flex justify-between items-center mx-auto w-full h-14 container">
+      <nav className="flex justify-between items-center mx-auto px-4 max-w-7xl h-14 container">
         {/* Logo */}
         <Link
           className="flex items-center gap-2 shrink-0"

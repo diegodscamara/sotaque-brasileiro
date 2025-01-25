@@ -52,20 +52,18 @@ export const Solution = () => {
     ];
 
     return (
-        <section className="container">
-            <div>
-                <div className="relative flex flex-col justify-center items-center gap-16 mx-auto px-4 py-16 max-w-7xl container">
-                    <div className="space-y-4 mx-auto pb-6 text-center">
-                        <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">Solution</h2>
-                        <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">Empower Your Business with AI Workflows</h3>
-                        <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 leading-8">Generic AI tools won&apos;t suffice. Our platform is purpose-built to provide exceptional AI-driven solutions for your unique business needs.</p>
-                    </div>
-                    <BentoGrid>
-                        {features.map((feature, idx) => (
-                            <BentoCard key={idx} {...feature} />
-                        ))}
-                    </BentoGrid>
+        <section id="solution" className="relative mx-auto px-4 py-16 max-w-7xl container">
+            <div className="flex flex-col justify-center items-center gap-16">
+                <div className="space-y-4 mx-auto pb-6 text-center">
+                    <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">Solution</h2>
+                    <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">Empower Your Business with AI Workflows</h3>
+                    <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 leading-8">Generic AI tools won&apos;t suffice. Our platform is purpose-built to provide exceptional AI-driven solutions for your unique business needs.</p>
                 </div>
+                <BentoGrid>
+                    {features.map((feature, idx) => (
+                        <BentoCard key={idx} {...feature} />
+                    ))}
+                </BentoGrid>
             </div>
         </section>
     )
