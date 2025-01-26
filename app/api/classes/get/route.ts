@@ -1,46 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
+import { z } from 'zod';
+
+const querySchema = z.object({
+  teacherId: z.string().uuid().optional(),
+  status: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
 
 export async function GET(req: NextRequest) {
-    const supabase = createClient();
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-        console.error('Unauthorized access attempt:', userError);
-        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+  if (userError || !user) {
+    console.error('Unauthorized access attempt:', userError);
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
 
-    const { searchParams } = new URL(req.url);
-    const userId = user.id;
+  const { searchParams } = new URL(req.url);
+  const queryParams = {
+    teacherId: searchParams.get('teacherId'),
+    status: searchParams.get('status'),
+    startDate: searchParams.get('startDate'),
+    endDate: searchParams.get('endDate'),
+  };
 
-    const teacherId = searchParams.get('teacherId');
-    const status = searchParams.get('status');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+  const validation = querySchema.safeParse(queryParams);
+  if (!validation.success) {
+    console.error('Invalid query parameters:', validation.error);
+    return NextResponse.json({ message: "Invalid query parameters" }, { status: 400 });
+  }
 
-    let query = supabase.from('classes').select('*');
+  const { teacherId, status, startDate, endDate } = validation.data;
+  const userId = user.id;
 
-    // Apply filters
-    if (teacherId) {
-        query = query.eq('teacher_id', teacherId);
-    }
-    if (userId) {
-        query = query.eq('student_id', userId);
-    }
-    if (status) {
-        query = query.eq('status', status);
-    }
-    if (startDate && endDate) {
-        query = query.gte('start_time', startDate).lte('end_time', endDate);
-    }
+  let query = supabase.from('classes').select('*');
 
-    const { data, error } = await query;
+  if (teacherId) {
+    query = query.eq('teacher_id', teacherId);
+  }
+  if (userId) {
+    query = query.eq('student_id', userId);
+  }
+  if (status) {
+    query = query.eq('status', status);
+  }
+  if (startDate && endDate) {
+    query = query.gte('start_time', startDate).lte('end_time', endDate);
+  }
 
-    if (error) {
-        console.error('Error fetching classes:', error);
-        return NextResponse.json({ message: error.message || "Error fetching classes" }, { status: 500 });
-    }
+  const { data, error } = await query;
 
-    return NextResponse.json(data, { status: 200 });
+  if (error) {
+    console.error('Error fetching classes:', error);
+    return NextResponse.json({ message: error.message || "Error fetching classes" }, { status: 500 });
+  }
+
+  return NextResponse.json(data, { status: 200 });
 } 

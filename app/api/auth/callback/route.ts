@@ -1,13 +1,28 @@
 import { NextResponse } from 'next/server'
-// The client you created from the Server-Side Auth instructions
 import { createClient } from '@/libs/supabase/server'
+import { z } from 'zod'
+
+const validateQueryParams = z.object({
+  code: z.string().optional(),
+  token: z.string().nullable().optional(),
+  email: z.string().email().nullable().optional(),
+});
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const token = searchParams.get('token'); // Extract the token for magic link
-  const email = searchParams.get('email'); // Extract the email from the query parameters
+  const queryParams = {
+    code: searchParams.get('code'),
+    token: searchParams.get('token'),
+    email: searchParams.get('email'),
+  };
 
+  const validation = validateQueryParams.safeParse(queryParams);
+  if (!validation.success) {
+    console.error('Invalid query parameters:', validation.error);
+    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  }
+
+  const { code, token, email } = validation.data;
   const supabase = createClient();
 
   if (token && email) {
@@ -36,51 +51,15 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
 
-  // Check if the user is a student
-  const { data: studentData } = await supabase
-    .from('students')
+  const { data: existingUser, error: userFetchError } = await supabase
+    .from('users')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  // Check if the user is a teacher
-  const { data: teacherData } = await supabase
-    .from('teachers')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  // Determine if the user is a student or teacher
-  let existingUser;
-  let isStudent = false;
-
-  if (studentData) {
-    existingUser = studentData;
-    isStudent = true;
-  } else if (teacherData) {
-    existingUser = teacherData;
-  } else {
-    // User does not exist in either table, create a new entry as a student
-    const newUser = {
-      id: user.id,
-      email: user.email,
-      first_name: user.user_metadata.first_name || '',
-      last_name: user.user_metadata.last_name || '',
-      avatar_url: user.user_metadata.avatar_url || '',
-      has_access: false, // Set default access as needed
-      role: 'student',
-    };
-
-    // Create the user as a student
-    const { error: createStudentError } = await supabase
-      .from('students')
-      .insert(newUser);
-    if (createStudentError) {
-      console.error('Error creating student:', createStudentError);
-      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-    }
-    existingUser = newUser;
-    isStudent = true; // Set isStudent to true since we created a student
+  if (userFetchError) {
+    console.error('Error fetching user data:', userFetchError);
+    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
 
   // Compare and update user data
@@ -113,7 +92,7 @@ export async function GET(request: Request) {
   // Update the user in the database if needed
   if (needsUpdate) {
     const { error: updateError } = await supabase
-      .from(isStudent ? 'students' : 'teachers') // Update the correct table
+      .from('users')
       .update(updates)
       .eq('id', user.id);
 
@@ -126,32 +105,15 @@ export async function GET(request: Request) {
 
   // Redirect logic for student and teacher
   const isLocalEnv = process.env.NODE_ENV === 'development'
-  if (isLocalEnv) {
-    // Check for student access
-    if (isStudent) {
-      if (existingUser.has_access) {
-        return NextResponse.redirect(`${origin}/dashboard`);
-      } else {
-        return NextResponse.redirect(`${origin}/pricing`);
-      }
-    }
-    // If not a student, check if they are a teacher
-    else {
-      return NextResponse.redirect(`${origin}/dashboard`);
+  const redirectUrl = isLocalEnv ? origin : `https://${request.headers.get('x-forwarded-host')}`;
+
+  if (existingUser.role === 'student') {
+    if (existingUser.has_access) {
+      return NextResponse.redirect(`${redirectUrl}/dashboard`);
+    } else {
+      return NextResponse.redirect(`${redirectUrl}/pricing`);
     }
   } else {
-    const forwardedHost = request.headers.get('x-forwarded-host');
-    // Check for student access
-    if (isStudent) {
-      if (existingUser.has_access) {
-        return NextResponse.redirect(`https://${forwardedHost}/dashboard`);
-      } else {
-        return NextResponse.redirect(`https://${forwardedHost}/pricing`);
-      }
-    }
-    // If not a student, check if they are a teacher
-    else {
-      return NextResponse.redirect(`https://${forwardedHost}/dashboard`);
-    }
+    return NextResponse.redirect(`${redirectUrl}/dashboard`);
   }
 }

@@ -2,54 +2,67 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
 import { getUserTimeZone } from '@/libs/utils/timezone';
+import { z } from 'zod';
+
+const classDataSchema = z.object({
+  teacher_id: z.string().uuid(),
+  title: z.string().min(1),
+  start_time: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  }),
+  end_time: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  }),
+  notes: z.string().optional(),
+});
 
 export async function POST(req: NextRequest) {
-    const supabase = createClient();
-    const { userId, classData } = await req.json();
+  const supabase = createClient();
+  const { userId, classData } = await req.json();
 
-    // Check if the user exists in the students table
-    const { data: user, error: userError } = await supabase.from('students').select('*').eq('id', userId).single();
-    if (userError || !user) {
-        console.error('User not found or error fetching user:', userError);
-        return NextResponse.json({ message: userError.message || "User not found" }, { status: 400 });
-    }
+  const validation = classDataSchema.safeParse(classData);
+  if (!validation.success) {
+    console.error('Invalid class data:', validation.error);
+    return NextResponse.json({ message: "Invalid class data" }, { status: 400 });
+  }
 
-    // Check if the teacher exists
-    const { data: teacher, error: teacherError } = await supabase.from('teachers').select('*').eq('id', classData.teacher_id).single();
-    if (teacherError || !teacher) {
-        console.error('Teacher not found or error fetching teacher:', teacherError);
-        return NextResponse.json({ message: teacherError.message || "Teacher not found" }, { status: 400 });
-    }
+  const { data: user, error: userError } = await supabase.from('users').select('*').eq('id', userId).single();
+  if (userError || !user || user.role !== 'student') {
+    console.error('User not found or error fetching user:', userError);
+    return NextResponse.json({ message: userError?.message || "User not found" }, { status: 400 });
+  }
 
-    // Get the user's time zone
-    const timeZone = getUserTimeZone();
+  const { data: teacher, error: teacherError } = await supabase.from('users').select('*').eq('id', classData.teacher_id).single();
+  if (teacherError || !teacher || teacher.role !== 'teacher') {
+    console.error('Teacher not found or error fetching teacher:', teacherError);
+    return NextResponse.json({ message: teacherError?.message || "Teacher not found" }, { status: 400 });
+  }
 
-    // Insert the new class
-    const { error: insertError } = await supabase.from("classes").insert([{
-        student_id: userId,
-        teacher_id: classData.teacher_id,
-        title: classData.title,
-        start_time: classData.start_time,
-        end_time: classData.end_time,
-        notes: classData.notes,
-        time_zone: timeZone,
-    }]);
+  const timeZone = getUserTimeZone();
 
-    if (insertError) {
-        console.error('Error inserting class:', insertError);
-        return NextResponse.json({ message: insertError.message || "Error scheduling class" }, { status: 500 });
-    }
+  const { error: insertError } = await supabase.from("classes").insert([{
+    student_id: userId,
+    teacher_id: classData.teacher_id,
+    title: classData.title,
+    start_time: classData.start_time,
+    end_time: classData.end_time,
+    metadata: { notes: classData.notes, time_zone: timeZone },
+  }]);
 
-    // Update the student's credits
-    const { error: updateError } = await supabase
-        .from('students')
-        .update({ credits: user.credits - 1 }) // Deduct 1 credit
-        .eq('id', userId);
+  if (insertError) {
+    console.error('Error inserting class:', insertError);
+    return NextResponse.json({ message: insertError.message || "Error scheduling class" }, { status: 500 });
+  }
 
-    if (updateError) {
-        console.error('Error updating student credits:', updateError);
-        return NextResponse.json({ message: updateError.message || "Error updating credits" }, { status: 500 });
-    }
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ credits: user.credits - 1 })
+    .eq('id', userId);
 
-    return NextResponse.json({ message: 'Class scheduled successfully' }, { status: 200 });
+  if (updateError) {
+    console.error('Error updating student credits:', updateError);
+    return NextResponse.json({ message: updateError.message || "Error updating credits" }, { status: 500 });
+  }
+
+  return NextResponse.json({ message: 'Class scheduled successfully' }, { status: 200 });
 } 

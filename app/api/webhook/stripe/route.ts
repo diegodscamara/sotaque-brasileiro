@@ -5,6 +5,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import configFile from "@/config";
 import { findCheckoutSession } from "@/libs/stripe";
 import { headers } from "next/headers";
+import { z } from 'zod';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-08-16",
@@ -12,13 +13,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+const stripeEventSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  data: z.object({
+    object: z.any(),
+  }),
+});
+
 // This is where we receive Stripe webhook events
 // It used to update the user data, send emails, etc...
 // By default, it'll store the user in the database
 // See more: https://shipfa.st/docs/features/payments
 export async function POST(req: NextRequest) {
   const body = await req.text();
-
   const signature = (await headers()).get("stripe-signature");
 
   let eventType;
@@ -38,6 +46,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
+  const validation = stripeEventSchema.safeParse(event);
+  if (!validation.success) {
+    console.error('Invalid Stripe event:', validation.error);
+    return NextResponse.json({ message: "Invalid Stripe event" }, { status: 400 });
+  }
+
   eventType = event.type;
 
   try {
@@ -45,9 +59,7 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         // First payment is successful and a subscription is created (if mode was set to "subscription" in ButtonCheckout)
         // ✅ Grant access to the product
-        const stripeObject: Stripe.Checkout.Session = event.data
-          .object as Stripe.Checkout.Session;
-
+        const stripeObject: Stripe.Checkout.Session = event.data.object as Stripe.Checkout.Session;
         const session = await findCheckoutSession(stripeObject.id);
 
         const customerId = session?.customer;
@@ -67,7 +79,7 @@ export async function POST(req: NextRequest) {
         if (!userId) {
           // check if user already exists
           const { data: student } = await supabase
-            .from("students")
+            .from("users")
             .select("*")
             .eq("email", customer.email)
             .single();
@@ -84,7 +96,7 @@ export async function POST(req: NextRequest) {
         } else {
           // find user by ID
           const { data: student } = await supabase
-            .from("students")
+            .from("users")
             .select("*")
             .eq("id", userId)
             .single();
@@ -93,7 +105,7 @@ export async function POST(req: NextRequest) {
         }
 
         await supabase
-          .from("students")
+          .from("users")
           .update({
             customer_id: customerId,
             price_id: priceId,
@@ -130,14 +142,13 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.deleted": {
         // The customer subscription stopped
         // ❌ Revoke access to the product
-        const stripeObject: Stripe.Subscription = event.data
-          .object as Stripe.Subscription;
+        const stripeObject: Stripe.Subscription = event.data.object as Stripe.Subscription;
         const subscription = await stripe.subscriptions.retrieve(
           stripeObject.id
         );
 
         await supabase
-          .from("students")
+          .from("users")
           .update({ has_access: false })
           .eq("customer_id", subscription.customer);
         break;
@@ -146,14 +157,13 @@ export async function POST(req: NextRequest) {
       case "invoice.paid": {
         // Customer just paid an invoice (for instance, a recurring payment for a subscription)
         // ✅ Grant access to the product
-        const stripeObject: Stripe.Invoice = event.data
-          .object as Stripe.Invoice;
+        const stripeObject: Stripe.Invoice = event.data.object as Stripe.Invoice;
         const priceId = stripeObject.lines.data[0].price.id;
         const customerId = stripeObject.customer;
 
-        // Find student where customer_id equals the customerId (in table called 'students')
+        // Find student where customer_id equals the customerId (in table called 'users')
         const { data: student } = await supabase
-          .from("students")
+          .from("users")
           .select("*")
           .eq("customer_id", customerId)
           .single();
@@ -163,7 +173,7 @@ export async function POST(req: NextRequest) {
 
         // Grant the student access to your product. It's a boolean in the database, but could be a number of credits, etc...
         await supabase
-          .from("students")
+          .from("users")
           .update({ has_access: true })
           .eq("customer_id", customerId);
 

@@ -2,12 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createCheckout } from "@/libs/stripe";
 import { createClient } from "@/libs/supabase/server";
+import { z } from 'zod';
+
+const checkoutSchema = z.object({
+  priceId: z.string(),
+  mode: z.enum(['payment', 'subscription']),
+  successUrl: z.string().url(),
+  cancelUrl: z.string().url(),
+});
 
 // This function is used to create a Stripe Checkout Session (one-time payment or subscription)
 // It's called by the <ButtonCheckout /> component
 // Users must be authenticated. It will prefill the Checkout data with their email and/or credit card (if any)
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  const validation = checkoutSchema.safeParse(body);
+  if (!validation.success) {
+    console.error('Invalid checkout data:', validation.error);
+    return NextResponse.json({ message: "Invalid checkout data" }, { status: 400 });
+  }
 
   const supabase = createClient();
 
@@ -17,31 +31,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "User not authenticated" }, { status: 401 }); // Return 401 status
   }
 
-  if (!body.priceId) {
-    return NextResponse.json(
-      { error: "Price ID is required" },
-      { status: 400 }
-    );
-  } else if (!body.successUrl || !body.cancelUrl) {
-    return NextResponse.json(
-      { error: "Success and cancel URLs are required" },
-      { status: 400 }
-    );
-  } else if (!body.mode) {
-    return NextResponse.json(
-      {
-        error:
-          "Mode is required (either 'payment' for one-time payments or 'subscription' for recurring subscription)",
-      },
-      { status: 400 }
-    );
-  }
-
   try {
-    const { priceId, mode, successUrl, cancelUrl } = body;
+    const { priceId, mode, successUrl, cancelUrl } = validation.data;
 
     const { data } = await supabase
-      .from("students")
+      .from("users")
       .select("*")
       .eq("id", user?.id)
       .single();

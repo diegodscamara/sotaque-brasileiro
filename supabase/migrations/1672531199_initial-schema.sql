@@ -1,21 +1,25 @@
 -- ===========================
--- STUDENTS TABLE
+-- USERS TABLE
 -- ===========================
-create table public.students (
+create table public.users (
     id uuid not null default uuid_generate_v4() primary key,
     first_name text not null,
     last_name text not null,
     email text not null unique,
     avatar_url text,
-    credits integer not null default 0,
+    role text not null check (role in ('student', 'teacher', 'admin')),
+    -- Common fields for all users
+    country text,
+    gender text,
+    created_at timestamp with time zone default current_timestamp,
+    updated_at timestamp with time zone default current_timestamp,
+    -- Student-specific fields (nullable)
+    credits integer default 0,
     customer_id text,
     price_id text,
     has_access boolean default false,
     package_name text,
     package_expiration timestamp with time zone,
-    role text not null default 'student',
-    country text,
-    gender text,
     portuguese_level text check (portuguese_level in ('beginner', 'intermediate', 'advanced', 'native', 'unknown')),
     learning_goals text[],
     preferred_schedule text[] check (preferred_schedule <@ array['morning', 'afternoon', 'evening', 'night']),
@@ -25,32 +29,33 @@ create table public.students (
     professional_background text,
     motivation_for_learning text,
     has_completed_onboarding boolean default false,
-    created_at timestamp with time zone default current_timestamp,
-    updated_at timestamp with time zone default current_timestamp,
-    scheduled_lessons integer not null default 0
+    scheduled_lessons integer default 0,
+    -- Teacher-specific fields (nullable)
+    biography text,
+    specialties text[],
+    languages text[]
 );
 
--- Trigger to assign default role to students
-create or replace function assign_default_role_students()
+-- Trigger to assign default role
+create or replace function assign_default_role()
 returns trigger as $$
 begin
-    new.role := coalesce(new.role, 'student');
+    new.role := coalesce(new.role, 'student'); -- Default role
     return new;
 end;
 $$ language plpgsql;
 
-create trigger trg_assign_default_role_students
-before insert on public.students
-for each row execute function assign_default_role_students();
+create trigger trg_assign_default_role
+before insert on public.users
+for each row execute function assign_default_role();
 
 -- ===========================
 -- RECURRING GROUPS TABLE
 -- ===========================
 create table public.recurring_groups (
     id uuid not null default uuid_generate_v4() primary key,
-    student_id uuid not null references public.students (id) on delete cascade,
-    pattern text not null check (pattern in ('daily', 'weekly', 'monthly', 'custom')),
-    days_of_week integer[] check (days_of_week <@ array[1, 2, 3, 4, 5, 6, 7]),
+    user_id uuid not null references public.users (id) on delete cascade,
+    schedule jsonb not null, -- e.g., {"pattern": "weekly", "days_of_week": [1, 3, 5]}
     occurrences integer not null check (occurrences > 0),
     end_type text check (end_type in ('after', 'on')),
     end_date timestamp with time zone,
@@ -59,47 +64,15 @@ create table public.recurring_groups (
 );
 
 -- ===========================
--- TEACHERS TABLE
--- ===========================
-create table public.teachers (
-    id uuid not null default uuid_generate_v4() primary key,
-    first_name text not null,
-    last_name text not null,
-    email text not null unique,
-    avatar_url text,
-    biography text,
-    specialties text[],
-    languages text[],
-    role text not null default 'teacher',
-    country text,
-    gender text,
-    created_at timestamp with time zone default current_timestamp,
-    updated_at timestamp with time zone default current_timestamp
-);
-
--- Trigger to assign default role to teachers
-create or replace function assign_default_role_teachers()
-returns trigger as $$
-begin
-    new.role := coalesce(new.role, 'teacher');
-    return new;
-end;
-$$ language plpgsql;
-
-create trigger trg_assign_default_role_teachers
-before insert on public.teachers
-for each row execute function assign_default_role_teachers();
-
--- ===========================
--- TEACHER AVAILABILITY
+-- TEACHER AVAILABILITY TABLE
 -- ===========================
 create table public.teacher_availability (
     id serial primary key,
-    teacher_id uuid not null references public.teachers (id) on delete cascade,
-    date date not null,
-    start_time time not null,
-    end_time time not null check (end_time > start_time),
+    teacher_id uuid not null references public.users (id) on delete cascade,
+    start_time timestamp with time zone not null,
+    end_time timestamp with time zone not null check (end_time > start_time),
     is_available boolean default true,
+    recurring_rules jsonb, -- e.g., {"pattern": "weekly", "days_of_week": [1]}
     created_at timestamp with time zone default current_timestamp,
     updated_at timestamp with time zone default current_timestamp
 );
@@ -112,15 +85,13 @@ alter table public.teacher_availability replica identity full;
 -- ===========================
 create table public.classes (
     id uuid not null default uuid_generate_v4() primary key,
-    student_id uuid not null references public.students (id) on delete cascade,
-    teacher_id uuid not null references public.teachers (id) on delete cascade,
+    student_id uuid not null references public.users (id) on delete cascade,
+    teacher_id uuid not null references public.users (id) on delete cascade,
     title text not null,
     start_time timestamp with time zone not null,
     end_time timestamp with time zone not null check (end_time > start_time),
     status text not null default 'pending' check (status in ('pending', 'scheduled', 'cancelled', 'completed')),
-    notes text,
-    recurring_group_id uuid references public.recurring_groups (id),
-    time_zone text not null,
+    metadata jsonb, -- e.g., {"notes": "Student needs help with pronunciation", "recurring_group_id": "..."}
     created_at timestamp with time zone default current_timestamp,
     updated_at timestamp with time zone default current_timestamp
 );
@@ -137,9 +108,9 @@ create or replace function refund_credits_on_cancellation()
 returns trigger as $$
 begin
     if new.status = 'cancelled' and (old.start_time - current_timestamp >= interval '24 hours') then
-        update public.students
+        update public.users
         set credits = credits + 1
-        where id = new.student_id;
+        where id = new.student_id and role = 'student';
     end if;
     return new;
 end;
@@ -171,7 +142,7 @@ for each row execute function validate_class_duration();
 create or replace function prevent_insufficient_credits()
 returns trigger as $$
 begin
-    if (select credits from public.students where id = new.student_id) < 1 then
+    if (select credits from public.users where id = new.student_id and role = 'student') < 1 then
         raise exception 'Insufficient credits to schedule the class.';
     end if;
     return new;
@@ -209,7 +180,7 @@ for each row execute function prevent_class_overlap();
 -- ===========================
 create table public.notifications (
     id serial primary key,
-    user_id uuid not null,
+    user_id uuid not null references public.users (id) on delete cascade,
     type text not null,
     message text not null,
     metadata jsonb,
@@ -225,7 +196,7 @@ alter table public.notifications replica identity full;
 create table public.error_logs (
     id serial primary key,
     occurred_at timestamp with time zone default current_timestamp,
-    user_id uuid references public.students (id) on delete cascade,
+    user_id uuid references public.users (id) on delete cascade,
     table_name text not null,
     operation text not null,
     error_message text not null
@@ -236,19 +207,18 @@ alter table public.error_logs replica identity full;
 -- ===========================
 -- POLICIES
 -- ===========================
-alter table public.students enable row level security;
-alter table public.teachers enable row level security;
+alter table public.users enable row level security;
 alter table public.classes enable row level security;
 alter table public.notifications enable row level security;
 alter table public.error_logs enable row level security;
 
 -- Students can only access their own data
-create policy student_access_policy on public.students
-using (id = auth.uid());
+create policy student_access_policy on public.users
+using (id = auth.uid() and role = 'student');
 
--- Teachers can be viewed by all users
-create policy teacher_access_policy on public.teachers
-for select using (true);
+-- Teachers can only access their own data
+create policy teacher_access_policy on public.users
+using (id = auth.uid() and role = 'teacher');
 
 -- Classes can be accessed by the student or teacher involved
 create policy class_access_policy on public.classes
@@ -263,11 +233,7 @@ create policy error_log_access_policy on public.error_logs
 using (user_id = auth.uid());
 
 -- Admin access to all tables
-create policy admin_students_policy on public.students
-using (current_setting('jwt.claims.role') = 'admin')
-with check (true);
-
-create policy admin_teachers_policy on public.teachers
+create policy admin_users_policy on public.users
 using (current_setting('jwt.claims.role') = 'admin')
 with check (true);
 
@@ -286,7 +252,7 @@ with check (true);
 -- ===========================
 -- INDEXES
 -- ===========================
-create index idx_teacher_availability_teacher_date on public.teacher_availability (teacher_id, date);
+create index idx_teacher_availability_teacher_start_time on public.teacher_availability (teacher_id, start_time);
 create index idx_classes_teacher_date on public.classes (teacher_id, start_time);
 create index idx_classes_student_start_time on public.classes (student_id, start_time);
 create index idx_error_logs_occurred_at on public.error_logs (occurred_at);
@@ -297,30 +263,19 @@ create index idx_error_logs_occurred_at on public.error_logs (occurred_at);
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-    if new.raw_user_meta_data->>'role' = 'teacher' then
-        insert into public.teachers (id, email, first_name, last_name, avatar_url, role)
-        values (
-            new.id,
-            new.email,
-            coalesce(new.raw_user_meta_data->>'first_name', split_part(new.email, '@', 1)),
-            coalesce(new.raw_user_meta_data->>'last_name', ''),
-            coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
-            'teacher'
-        );
-    else
-        insert into public.students (id, email, first_name, last_name, avatar_url, role, has_access, credits, has_completed_onboarding)
-        values (
-            new.id,
-            new.email,
-            coalesce(new.raw_user_meta_data->>'first_name', split_part(new.email, '@', 1)),
-            coalesce(new.raw_user_meta_data->>'last_name', ''),
-            coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
-            'student',
-            false,
-            0,
-            false
-        );
-    end if;
+    insert into public.users (
+        id, email, first_name, last_name, avatar_url, role,
+        credits, has_access, has_completed_onboarding
+    )
+    values (
+        new.id,
+        new.email,
+        coalesce(new.raw_user_meta_data->>'first_name', split_part(new.email, '@', 1)),
+        coalesce(new.raw_user_meta_data->>'last_name', ''),
+        coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture', ''),
+        coalesce(new.raw_user_meta_data->>'role', 'student'),
+        0, false, false
+    );
     return new;
 end;
 $$ language plpgsql security definer;
@@ -330,8 +285,9 @@ after insert on auth.users
 for each row execute function public.handle_new_user();
 
 -- Enable realtime for relevant tables
-alter publication supabase_realtime add table public.students;
-alter publication supabase_realtime add table public.teachers;
+alter publication supabase_realtime add table public.users;
 alter publication supabase_realtime add table public.classes;
 alter publication supabase_realtime add table public.notifications;
 alter publication supabase_realtime add table public.error_logs;
+alter publication supabase_realtime add table public.teacher_availability;
+alter publication supabase_realtime add table public.recurring_groups;
