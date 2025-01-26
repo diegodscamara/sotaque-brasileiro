@@ -45,19 +45,42 @@ export async function GET(request: Request) {
   }
 
   // Fetch user metadata to check role and access
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    console.error('Error fetching user data:', userError);
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-  }
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: existingUser, error: userFetchError } = await supabase
+  let { data: existingUser, error: userFetchError } = await supabase
     .from('users')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  if (userFetchError) {
+  if (userFetchError && userFetchError.code === 'PGRST116') {
+    // User does not exist, create a new entry
+    const googleName = user.user_metadata.name;
+    const googleAvatar = user.user_metadata.avatar_url;
+    const [firstName, ...lastNameParts] = googleName.split(' ');
+    const lastName = lastNameParts.join(' ');
+
+    const { data: newUser, error: createUserError } = await supabase
+      .from('users')
+      .insert({
+        id: user.id,
+        email: user.email,
+        first_name: firstName,
+        last_name: lastName,
+        avatar_url: googleAvatar,
+        role: 'student', // Default role
+        has_access: false,
+      })
+      .select()
+      .single();
+
+    if (createUserError) {
+      console.error('Error creating user:', createUserError);
+      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+    }
+
+    existingUser = newUser;
+  } else if (userFetchError) {
     console.error('Error fetching user data:', userFetchError);
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
