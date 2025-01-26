@@ -40,7 +40,7 @@ const ButtonAccount = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
-          .from("students")
+          .from("users")
           .select("has_access")
           .eq("id", user.id)
           .single();

@@ -1,24 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
+import { z } from 'zod';
+
+const querySchema = z.object({
+  id: z.string().uuid().optional(),
+});
 
 export async function GET(req: NextRequest) {
-    const supabase = createClient();
-    const { searchParams } = new URL(req.url);
-    const studentId = searchParams.get('id');
+  const supabase = createClient();
+  const { searchParams } = new URL(req.url);
+  const queryParams = {
+    id: searchParams.get('id'),
+  };
 
-    let query = supabase.from('students').select('*');
+  const validation = querySchema.safeParse(queryParams);
+  if (!validation.success) {
+    console.error('Invalid query parameters:', validation.error);
+    return NextResponse.json({ message: "Invalid query parameters" }, { status: 400 });
+  }
 
-    if (studentId) {
-        query = query.eq('id', studentId);
-    }
+  const { id: studentId } = validation.data;
+  let query = supabase.from('users').select('*').eq('role', 'student');
 
-    const { data, error } = await query;
+  if (studentId) {
+    query = query.eq('id', studentId);
+  }
 
-    if (error) {
-        console.error('Error fetching students:', error);
-        return NextResponse.json({ message: error.message }, { status: 500 });
-    }
+  const { data, error } = await query;
 
-    return NextResponse.json(data, { status: 200 });
+  if (error) {
+    console.error('Error fetching students:', error);
+    return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data, { status: 200 });
 } 

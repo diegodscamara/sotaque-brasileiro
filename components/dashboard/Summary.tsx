@@ -41,7 +41,7 @@ const Summary = () => {
     if (!session) return;
     try {
       const { data: profile, error } = await supabase
-        .from("students")
+        .from("users")
         .select("*")
         .eq("id", session.id)
         .single();

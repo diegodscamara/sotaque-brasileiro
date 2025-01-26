@@ -96,7 +96,7 @@ export default function Stats() {
 
       // Fetch profile for credits
       const { data: profile } = await supabase
-        .from("students")
+        .from("users")
         .select("credits")
         .eq("id", user.id)
         .single();
