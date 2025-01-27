@@ -17,7 +17,7 @@ const config = {
   appName: "Sotaque Brasileiro",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "The NextJS boilerplate with all you need to build your SaaS, AI tool, or any other web app.",
+    "Sotaque Brasileiro is an online Portuguese school that offers personalized, culturally immersive classes with native Brazilian instructors, tailored to individual schedules and learning goals.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
   domainName: "sotaquebrasileiro.com",
   crisp: {
@@ -48,11 +48,11 @@ const config = {
             name: "8 hours of classes per month",
           },
           {
-            name: "Flexible scheduling to fit your lifestyle.",
+            name: "Native Brazilian instructors",
           },
-          { name: "Native Brazilian instructors with expertise." },
-          { name: "Cultural and conversational lessons." },
-          { name: "Cancel or reschedule easily." },
+          { name: "Personalized learning plan" },
+          { name: "Flexible scheduling" },
+          { name: "Email support" },
         ],
         units: 8,
       },
@@ -70,11 +70,11 @@ const config = {
             name: "8 hours of classes per month",
           },
           {
-            name: "Flexible scheduling to fit your lifestyle.",
+            name: "Native Brazilian instructors",
           },
-          { name: "Native Brazilian instructors with expertise." },
-          { name: "Cultural and conversational lessons." },
-          { name: "Cancel or reschedule easily." },
+          { name: "Personalized learning plan" },
+          { name: "Flexible scheduling" },
+          { name: "Email support" },
         ],
         units: 96,
       },
@@ -90,9 +90,12 @@ const config = {
         price: 380,
         features: [
           { name: "12 hours of classes per month" },
-          { name: "Everything in the Explorer plan" },
-          { name: "Priority access to experienced instructors." },
-          { name: "Automated reminders and progress tracking." },
+          {
+            name: "Native Brazilian instructors",
+          },
+          { name: "Personalized learning plan" },
+          { name: "Flexible scheduling" },
+          { name: "Priority email support" },
         ],
         units: 12,
       },
@@ -108,9 +111,12 @@ const config = {
         price: 4320,
         features: [
           { name: "12 hours of classes per month" },
-          { name: "Everything in the Explorer plan" },
-          { name: "Priority access to experienced instructors." },
-          { name: "Automated reminders and progress tracking." },
+          {
+            name: "Native Brazilian instructors",
+          },
+          { name: "Personalized learning plan" },
+          { name: "Flexible scheduling" },
+          { name: "Priority email support" },
         ],
         units: 144,
       },
@@ -126,9 +132,12 @@ const config = {
         price: 450,
         features: [
           { name: "16 hours of classes per month" },
-          { name: "Everything in the Enthusiast plan" },
-          { name: "Most cost-effective plan (up to 20% savings annually)." },
-          { name: "Premium support and priority scheduling." },
+          {
+            name: "Native Brazilian instructors",
+          },
+          { name: "Personalized learning plan" },
+          { name: "Flexible scheduling" },
+          { name: "Priority email and chat support" },
         ],
         units: 16,
       },
@@ -144,9 +153,12 @@ const config = {
         price: 4860,
         features: [
           { name: "16 hours of classes per month" },
-          { name: "Everything in the Enthusiast plan" },
-          { name: "Most cost-effective plan (up to 20% savings annually)." },
-          { name: "Premium support and priority scheduling." },
+          {
+            name: "Native Brazilian instructors",
+          },
+          { name: "Personalized learning plan" },
+          { name: "Flexible scheduling" },
+          { name: "Priority email and chat support" },
         ],
         units: 192,
       },
@@ -160,11 +172,11 @@ const config = {
   },
   resend: {
     // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `Sotaque Brasileiro <noreply@resend.sotaquebrasileiro.ca>`,
+    fromNoReply: `Sotaque Brasileiro <noreply@resend.sotaquebrasileiro.com>`,
     // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `Diego at Sotaque Brasileiro <contato@resend.sotaquebrasileiro.ca>`,
+    fromAdmin: `Diego at Sotaque Brasileiro <support@sotaquebrasileiro.com>`,
     // Email shown to customer if need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
-    supportEmail: "sotaquebrasileiro@gmail.com",
+    supportEmail: "support@sotaquebrasileiro.com",
   },
   auth: {
     // REQUIRED — the path to log in users. It's use to protect private routes (like /dashboard). It's used in apiClient (/libs/api.js) upon 401 errors from our API
