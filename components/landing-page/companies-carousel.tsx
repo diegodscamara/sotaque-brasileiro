@@ -10,11 +10,6 @@ const LOGOS = [
         className: "w-28 h-10",
     },
     {
-        src: "https://www.microsoft.com/en-us/p/microsoft-edge/9wzdncrfj3t8?activetab=pivot:overviewtab",
-        alt: "Microsoft",
-        className: "w-28 h-10",
-    },
-    {
         src: "https://www.apple.com/ac/structured-data/images/open_graph_logo.png",
         alt: "Apple",
         className: "w-28 h-10",
@@ -33,12 +28,7 @@ const LOGOS = [
         src: "https://www.netflix.com/favicon.ico",
         alt: "Netflix",
         className: "w-28 h-10",
-    },
-    {
-        src: "https://www.tesla.com/tesla_theme/assets/img/meta-logo.png",
-        alt: "Tesla",
-        className: "w-28 h-10",
-    },
+    }
 ]
 
 export function CompaniesCarousel() {

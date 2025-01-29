@@ -1,3 +1,7 @@
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -16,10 +20,8 @@ const nextConfig = {
       "logos-world.net",
       "via.placeholder.com",
       "avatar.vercel.sh",
-      "www.tesla.com",
       "www.apple.com",
       "www.amazon.com",
-      "www.microsoft.com",
       "www.facebook.com",
       "www.netflix.com",
       "www.google.com"
@@ -27,4 +29,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withNextIntl(nextConfig);

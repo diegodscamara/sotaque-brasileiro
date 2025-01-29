@@ -46,7 +46,7 @@ const Header = () => {
 
       if (user) {
         const { data: student } = await supabase
-          .from('students')
+          .from('users')
           .select('has_access')
           .eq('id', user.id)
           .single();

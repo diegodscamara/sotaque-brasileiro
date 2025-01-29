@@ -1,0 +1,27 @@
+{
+    "landing": {
+        "hero": {
+            "title": "Learn Portuguese with Native Teachers",
+            "subtitle": "Book 1-on-1 Portuguese lessons with expert teachers. Flexible scheduling, personalized learning.",
+            "imageAlt": "Sotaque Brasileiro",
+            "cta": {
+                "primary": "Get Started"
+            }
+        }
+    },
+    "dashboard": {},
+    "auth": {},
+    "shared": {
+        "buttons": {
+            "save": "Save",
+            "cancel": "Cancel",
+            "delete": "Delete"
+        },
+        "errors": {
+            "general": "Something went wrong"
+        }
+    },
+    "index": {
+        "title": "Hello world!"
+    }
+}

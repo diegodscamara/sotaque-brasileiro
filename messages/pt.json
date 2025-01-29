@@ -1,0 +1,27 @@
+{
+  "landing": {
+    "hero": {
+      "title": "Aprenda Português com Professores Nativos",
+      "subtitle": "Reserve aulas particulares de português com professores experientes. Horários flexíveis, aprendizado personalizado.",
+      "imageAlt": "Sotaque Brasileiro",
+      "cta": {
+        "primary": "Começar"
+      }
+    }
+  },
+  "dashboard": {},
+  "auth": {},
+  "shared": {
+    "buttons": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "delete": "Excluir"
+    },
+    "errors": {
+      "general": "Algo deu errado"
+    }
+  },
+  "index": {
+    "title": "Olá mundo!"
+  }
+}
