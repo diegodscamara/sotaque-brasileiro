@@ -1,0 +1,27 @@
+{
+    "landing": {
+        "hero": {
+            "title": "Apprenez le portugais avec des professeurs natifs",
+            "subtitle": "Réservez des cours particuliers de portugais avec des professeurs experts. Horaires flexibles, apprentissage personnalisé.",
+            "imageAlt": "Sotaque Brasileiro",
+            "cta": {
+                "primary": "Commencer"
+            }
+        }
+    },
+    "dashboard": {},
+    "auth": {},
+    "shared": {
+        "buttons": {
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "delete": "Supprimer"
+        },
+        "errors": {
+            "general": "Une erreur s'est produite"
+        }
+    },
+    "index": {
+        "title": "Bonjour le monde!"
+    }
+}
