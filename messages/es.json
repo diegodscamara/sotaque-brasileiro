@@ -64,6 +64,24 @@
                     "alt": "Instagram"
                 }
             ]
+        },
+        "problem": {
+            "title": "Esto Es Lo Que Te Está Frenando",
+            "subtitle": "¿Tienes dificultades para aprender portugués brasileño? No estás solo.",
+            "cards": [
+                {
+                    "title": "La vida es demasiado ocupada para horarios rígidos",
+                    "text": "Intentar encajar las clases de idiomas en tu agenda llena parece imposible. La mayoría de los cursos ofrecen horarios fijos que chocan con el trabajo, la familia u otros compromisos, dejándote frustrado e incapaz de progresar."
+                },
+                {
+                    "title": "Los cursos genéricos no satisfacen tus necesidades",
+                    "text": "La mayoría de los cursos de portugués se centran en el portugués europeo u ofrecen contenido genérico que no se alinea con tus objetivos. Ya sea para negocios, viajes o conexión cultural, necesitas un programa adaptado a tus necesidades específicas."
+                },
+                {
+                    "title": "Aprender sin contexto se siente vacío",
+                    "text": "El idioma es más que solo palabras: es cultura, expresiones y contexto de la vida real. Sin una inmersión auténtica en la cultura brasileña, tu aprendizaje se siente desconectado e incompleto."
+                }
+            ]
         }
     },
     "dashboard": {},
