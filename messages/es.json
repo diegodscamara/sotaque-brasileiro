@@ -2,36 +2,36 @@
     "landing": {
         "header": {
             "logoImage": "@/app/icon.png",
-            "logoAlt": "Logo Sotaque",
+            "logoAlt": "Logo de Sotaque",
             "nav": {
-                "features": "Recursos",
+                "features": "Características",
                 "featuresLink": "#features",
-                "howItWorks": "Como Funciona",
+                "howItWorks": "Cómo Funciona",
                 "howItWorksLink": "#how-it-works",
-                "pricing": "Preços",
+                "pricing": "Precios",
                 "pricingLink": "#pricing",
-                "faq": "Dúvidas",
+                "faq": "Preguntas Frecuentes",
                 "faqLink": "#faq",
-                "dashboard": "Painel",
+                "dashboard": "Panel de Control",
                 "dashboardLink": "/dashboard"
             },
             "cta": {
-                "primary": "Começar Agora",
+                "primary": "Comenzar",
                 "link": "#pricing"
             }
         },
         "hero": {
-            "title": "Aprenda Português Brasileiro para Negócios e Cultura",
-            "subtitle": "Seja para expandir seus negócios ou se conectar com a arte e tradições brasileiras, nossas aulas flexíveis e personalizadas com instrutores nativos são projetadas para se adequar à sua vida e objetivos.",
+            "title": "Aprende Portugués Brasileño para Negocios y Cultura",
+            "subtitle": "Ya sea que estés expandiendo tu negocio o conectando con el arte y las tradiciones brasileñas, nuestras clases flexibles y personalizadas con instructores nativos están diseñadas para adaptarse a tu vida y objetivos.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
-                "primary": "Começar Agora",
+                "primary": "Comenzar",
                 "link": "#pricing"
             }
         },
         "companies": {
-            "title": "ENSINAMOS ALUNOS DE EMPRESAS COMO",
+            "title": "HEMOS ENSEÑADO A ESTUDIANTES DE EMPRESAS COMO",
             "logos": [
                 {
                     "name": "Google",
@@ -66,20 +66,20 @@
             ]
         },
         "problem": {
-            "title": "O Que Está Te Impedindo",
-            "subtitle": "Dificuldade para Aprender Português Brasileiro? Você Não Está Sozinho.",
+            "title": "Esto Es Lo Que Te Está Frenando",
+            "subtitle": "¿Tienes dificultades para aprender portugués brasileño? No estás solo.",
             "cards": [
                 {
-                    "title": "Vida Muito Ocupada para Horários Fixos",
-                    "text": "Tentar encaixar aulas de idiomas em sua agenda lotada parece impossível. A maioria dos cursos oferece horários fixos que conflitam com trabalho, família ou outros compromissos, deixando você frustrado e sem conseguir progredir."
+                    "title": "La vida es demasiado ocupada para horarios rígidos",
+                    "text": "Intentar encajar las clases de idiomas en tu agenda llena parece imposible. La mayoría de los cursos ofrecen horarios fijos que chocan con el trabajo, la familia u otros compromisos, dejándote frustrado e incapaz de progresar."
                 },
                 {
-                    "title": "Cursos Genéricos Não Atendem Suas Necessidades",
-                    "text": "A maioria dos cursos de português foca no português europeu ou oferece conteúdo genérico que não se alinha aos seus objetivos. Seja para negócios, viagens ou conexão cultural, você precisa de um programa adaptado às suas necessidades específicas."
+                    "title": "Los cursos genéricos no satisfacen tus necesidades",
+                    "text": "La mayoría de los cursos de portugués se centran en el portugués europeo u ofrecen contenido genérico que no se alinea con tus objetivos. Ya sea para negocios, viajes o conexión cultural, necesitas un programa adaptado a tus necesidades específicas."
                 },
                 {
-                    "title": "Aprender Sem Contexto é Vazio",
-                    "text": "Idioma é mais do que apenas palavras—é cultura, expressões e contexto real. Sem uma imersão autêntica na cultura brasileira, seu aprendizado fica desconectado e incompleto."
+                    "title": "Aprender sin contexto se siente vacío",
+                    "text": "El idioma es más que solo palabras: es cultura, expresiones y contexto de la vida real. Sin una inmersión auténtica en la cultura brasileña, tu aprendizaje se siente desconectado e incompleto."
                 }
             ]
         }
@@ -88,15 +88,15 @@
     "auth": {},
     "shared": {
         "buttons": {
-            "save": "Salvar",
+            "save": "Guardar",
             "cancel": "Cancelar",
-            "delete": "Excluir"
+            "delete": "Eliminar"
         },
         "errors": {
-            "general": "Algo deu errado"
+            "general": "Algo salió mal"
         }
     },
     "index": {
-        "title": "Olá mundo!"
+        "title": "¡Hola mundo!"
     }
 }

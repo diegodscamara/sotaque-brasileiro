@@ -1,6 +1,7 @@
-import { BrainIcon, LightbulbIcon, ShieldIcon } from "lucide-react";
+import { AlarmClockIcon, CookieIcon, GlobeIcon } from "lucide-react";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 
 const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) => {
   return (
@@ -10,8 +11,8 @@ const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; tex
           <div className="flex justify-center items-center bg-primary/10 rounded-full w-12 h-12">
             {icon}
           </div>
-          <h3 className="font-semibold text-xl">{title}</h3>
-          <p className="text-muted-foreground">{text}</p>
+          <h3 className="font-semibold text-xl leading-8">{title}</h3>
+          <p className="text-base text-muted-foreground leading-5">{text}</p>
         </div>
       </div>
     </div>
@@ -28,23 +29,24 @@ const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; tex
 // - Problem Agitation: "Developers spend too much time adding features, get overwhelmed, and quit." (not about ShipFast at all)
 // - Features: "ShipFast has user auth, Stripe, emails all set up for you"
 const Problem = () => {
+  const t = useTranslations('landing.problem');
   return (
-    <section id="problem" className="relative mx-auto px-4 py-16 max-w-7xl container">
-      <div className="space-y-4 mx-auto pb-6 text-center">
+    <section id="problem" className="relative flex flex-col items-center gap-16 mx-auto px-4 py-16 max-w-7xl container">
+      <div className="flex flex-col items-center gap-4 mx-auto text-center">
         <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
-          Problem
+          {t('title')}
         </h2>
-        <h3 className="mx-auto mt-4 max-w-xs sm:max-w-none font-semibold text-3xl sm:text-4xl md:text-5xl">
-          Manually entering your data is a hassle.
+        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl sm:text-4xl md:text-5xl leading-none">
+          {t('subtitle')}
         </h3>
       </div>
 
-      <div className="gap-8 grid grid-cols-1 md:grid-cols-3 mt-12">
-        <Step icon={<BrainIcon className="w-6 h-6 text-primary" />} title="Data Overload" text="Businesses struggle to make sense of vast amounts of complex data, missing out on valuable insights that could drive growth and innovation." />
+      <div className="sm:gap-8 md:gap-10 lg:gap-12 grid grid-cols-1 md:grid-cols-3">
+        <Step icon={<AlarmClockIcon className="w-6 h-6 text-primary" />} title={t('cards.0.title')} text={t('cards.0.text')} />
 
-        <Step icon={<LightbulbIcon className="w-6 h-6 text-primary" />} title="Slow Decision-Making" text="Traditional data processing methods are too slow, causing businesses to lag behind market changes and miss crucial opportunities." />
+        <Step icon={<CookieIcon className="w-6 h-6 text-primary" />} title={t('cards.1.title')} text={t('cards.1.text')} />
 
-        <Step icon={<ShieldIcon className="w-6 h-6 text-primary" />} title="Data Security Concerns" text="With increasing cyber threats, businesses worry about the safety of their sensitive information when adopting new technologies." />
+        <Step icon={<GlobeIcon className="w-6 h-6 text-primary" />} title={t('cards.2.title')} text={t('cards.2.text')} />
       </div>
     </section>
   );

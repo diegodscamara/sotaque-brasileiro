@@ -22,13 +22,66 @@
         },
         "hero": {
             "title": "Learn Brazilian Portuguese for Business and Culture",
-            "subtitle": "Whether you’re expanding your business or connecting with Brazilian art and traditions, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
+            "subtitle": "Whether you're expanding your business or connecting with Brazilian art and traditions, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
                 "primary": "Get Started",
                 "link": "#pricing"
             }
+        },
+        "companies": {
+            "title": "TAUGHT STUDENTS FROM COMPANIES LIKE",
+            "logos": [
+                {
+                    "name": "Google",
+                    "src": "https://cdn.magicui.design/companies/Google.svg",
+                    "alt": "Google"
+                },
+                {
+                    "name": "Netflix",
+                    "src": "https://cdn.magicui.design/companies/Netflix.svg",
+                    "alt": "Netflix"
+                },
+                {
+                    "name": "Microsoft",
+                    "src": "https://cdn.magicui.design/companies/Microsoft.svg",
+                    "alt": "Microsoft"
+                },
+                {
+                    "name": "Uber",
+                    "src": "https://cdn.magicui.design/companies/Uber.svg",
+                    "alt": "Uber"
+                },
+                {
+                    "name": "Spotify",
+                    "src": "https://cdn.magicui.design/companies/Spotify.svg",
+                    "alt": "Spotify"
+                },
+                {
+                    "name": "Instagram",
+                    "src": "https://cdn.magicui.design/companies/Instagram.svg",
+                    "alt": "Instagram"
+                }
+            ]
+        },
+        "problem": {
+            "title": "Here’s What’s Holding You Back",
+            "subtitle": "Struggling to Learn Brazilian Portuguese? You’re Not Alone.",
+            "cards": [
+                {
+                    "title": "Life’s Too Busy for Rigid Class Times",
+                    "text": "Trying to fit language classes into your packed schedule feels impossible. Most courses offer fixed timings that clash with work, family, or other commitments, leaving you frustrated and unable to progress."
+                },
+                {
+                    "title": "Generic Courses Don’t Meet Your Needs",
+                    "text": "Most Portuguese courses focus on European Portuguese or offer generic content that doesn’t align with your goals. Whether it’s for business, travel, or cultural connection, you need a program tailored to your unique needs."
+                },
+                {
+                    "title": "Learning Without Context Feels Empty",
+                    "text": "Language is more than just words—it’s culture, expressions, and real-life context. Without authentic Brazilian cultural immersion, your learning feels disconnected and incomplete."
+                }
+            ]
         }
     },
     "dashboard": {},
