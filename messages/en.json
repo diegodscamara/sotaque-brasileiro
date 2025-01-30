@@ -22,13 +22,48 @@
         },
         "hero": {
             "title": "Learn Brazilian Portuguese for Business and Culture",
-            "subtitle": "Whether you’re expanding your business or connecting with Brazilian art and traditions, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
+            "subtitle": "Whether you're expanding your business or connecting with Brazilian art and traditions, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
                 "primary": "Get Started",
                 "link": "#pricing"
             }
+        },
+        "companies": {
+            "title": "TAUGHT STUDENTS FROM COMPANIES LIKE",
+            "logos": [
+                {
+                    "name": "Google",
+                    "src": "https://cdn.magicui.design/companies/Google.svg",
+                    "alt": "Google"
+                },
+                {
+                    "name": "Netflix",
+                    "src": "https://cdn.magicui.design/companies/Netflix.svg",
+                    "alt": "Netflix"
+                },
+                {
+                    "name": "Microsoft",
+                    "src": "https://cdn.magicui.design/companies/Microsoft.svg",
+                    "alt": "Microsoft"
+                },
+                {
+                    "name": "Uber",
+                    "src": "https://cdn.magicui.design/companies/Uber.svg",
+                    "alt": "Uber"
+                },
+                {
+                    "name": "Spotify",
+                    "src": "https://cdn.magicui.design/companies/Spotify.svg",
+                    "alt": "Spotify"
+                },
+                {
+                    "name": "Instagram",
+                    "src": "https://cdn.magicui.design/companies/Instagram.svg",
+                    "alt": "Instagram"
+                }
+            ]
         }
     },
     "dashboard": {},
