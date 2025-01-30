@@ -22,7 +22,7 @@
         },
         "hero": {
             "title": "Apprenez le portugais brésilien pour les affaires et la culture",
-            "subtitle": "Que vous souhaitiez développer votre entreprise ou vous connecter avec l'art et les traditions brésiliennes, nos cours flexibles et personnalisés avec des instructeurs natifs sont conçus pour s'adapter à votre vie et vos objectifs.",
+            "subtitle": "Que vous souhaitiez développer votre entreprise ou vous connecter à l'art et aux traditions brésiliennes, nos cours flexibles et personnalisés avec des instructeurs natifs sont conçus pour s'adapter à votre vie et vos objectifs.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
@@ -64,6 +64,24 @@
                     "alt": "Instagram"
                 }
             ]
+        },
+        "problem": {
+            "title": "Voici ce qui vous freine",
+            "subtitle": "Vous avez du mal à apprendre le portugais brésilien ? Vous n'êtes pas seul.",
+            "cards": [
+                {
+                    "title": "Une vie trop chargée pour des horaires de cours fixes",
+                    "text": "Essayer d'intégrer des cours de langue dans votre emploi du temps chargé semble impossible. La plupart des cours proposent des horaires fixes qui entrent en conflit avec le travail, la famille ou d'autres engagements, vous laissant frustré et incapable de progresser."
+                },
+                {
+                    "title": "Les cours génériques ne répondent pas à vos besoins",
+                    "text": "La plupart des cours de portugais se concentrent sur le portugais européen ou proposent un contenu générique qui ne correspond pas à vos objectifs. Que ce soit pour les affaires, les voyages ou la connexion culturelle, vous avez besoin d'un programme adapté à vos besoins spécifiques."
+                },
+                {
+                    "title": "Apprendre sans contexte sonne creux",
+                    "text": "La langue est plus que des mots - c'est la culture, les expressions et le contexte de la vie réelle. Sans une véritable immersion dans la culture brésilienne, votre apprentissage semble déconnecté et incomplet."
+                }
+            ]
         }
     },
     "dashboard": {},
@@ -79,6 +97,6 @@
         }
     },
     "index": {
-        "title": "Bonjour le monde!"
+        "title": "Bonjour le monde !"
     }
 }
