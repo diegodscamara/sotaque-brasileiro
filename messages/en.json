@@ -1,11 +1,33 @@
 {
     "landing": {
+        "header": {
+            "logoImage": "@/app/icon.png",
+            "logoAlt": "Sotaque Logo",
+            "nav": {
+                "features": "Features",
+                "featuresLink": "#features",
+                "howItWorks": "How It Works",
+                "howItWorksLink": "#how-it-works",
+                "pricing": "Pricing",
+                "pricingLink": "#pricing",
+                "faq": "FAQ",
+                "faqLink": "#faq",
+                "dashboard": "Dashboard",
+                "dashboardLink": "/dashboard"
+            },
+            "cta": {
+                "primary": "Get Started",
+                "link": "#pricing"
+            }
+        },
         "hero": {
-            "title": "Learn Portuguese with Native Teachers",
-            "subtitle": "Book 1-on-1 Portuguese lessons with expert teachers. Flexible scheduling, personalized learning.",
+            "title": "Learn Brazilian Portuguese for Business and Culture",
+            "subtitle": "Whether you’re expanding your business or connecting with Brazilian art and traditions, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
+            "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
-                "primary": "Get Started"
+                "primary": "Get Started",
+                "link": "#pricing"
             }
         }
     },
