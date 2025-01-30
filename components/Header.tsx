@@ -7,15 +7,16 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import ButtonSignin from "@/components/ButtonSignin";
 import Image from "next/image";
+import LanguageSwitcher from "./lang-switcher";
 import Link from "next/link";
 import { List } from "@phosphor-icons/react";
-import { ThemeToggle } from "./theme-toggle";
 import { User } from "@supabase/supabase-js";
 import { cn } from "@/libs/utils";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const Header = () => {
   const supabase = createClient();
@@ -23,6 +24,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
   const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const t = useTranslations('landing.header');
 
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,10 +63,11 @@ const Header = () => {
   }, [supabase]);
 
   const links = [
-    { href: "/#pricing", label: "Pricing" },
-    { href: "/#testimonials", label: "Reviews" },
-    { href: "/#faq", label: "FAQ" },
-    ...(user && hasAccess ? [{ href: "/dashboard", label: "Dashboard" }] : []),
+    { href: t("nav.featuresLink"), label: t("nav.features") },
+    { href: t("nav.howItWorksLink"), label: t("nav.howItWorks") },
+    { href: t("nav.pricingLink"), label: t("nav.pricing") },
+    { href: t("nav.faqLink"), label: t("nav.faq") },
+    ...(user && hasAccess ? [{ href: t("nav.dashboardLink"), label: t("nav.dashboard") }] : []),
   ];
 
   return (
@@ -114,9 +117,9 @@ const Header = () => {
           <div className="lg:flex lg:items-center lg:gap-2 hidden">
             <ButtonSignin />
             <Button variant="default" asChild>
-              <Link href="/#pricing">Get Started</Link>
+              <Link href={t("cta.link")}>{t("cta.primary")}</Link>
             </Button>
-            <ThemeToggle />
+            <LanguageSwitcher />
           </div>
         </div>
 
@@ -147,8 +150,8 @@ const Header = () => {
                 </Link>
               </div>
 
-              <div className="flex flex-col gap-4 mt-8">
-                <ThemeToggle />
+              <div className="flex flex-col items-start gap-4 mt-8">
+                <LanguageSwitcher />
 
                 <nav className="flex flex-col gap-4">
                   {links.map((link) => (
@@ -166,7 +169,7 @@ const Header = () => {
                 <div className="flex flex-col gap-2 mt-auto pb-8">
                   <ButtonSignin />
                   <Button variant="default" asChild>
-                    <Link href="/#pricing">Get Started</Link>
+                    <Link href={t("cta.link")}>{t("cta.primary")}</Link>
                   </Button>
                 </div>
               </div>

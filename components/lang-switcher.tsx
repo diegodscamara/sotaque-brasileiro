@@ -1,32 +1,39 @@
 'use client';
 
-import { JSX, useCallback } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useCallback, useState } from 'react';
 
-import { Globe } from '@phosphor-icons/react';
-import React from 'react';
+import { Button } from './ui/button';
+import { CaretDown } from '@phosphor-icons/react';
 import { usePathname } from 'next/navigation';
 
 interface Language {
   code: string;
   name: string;
   nativeName: string;
+  flag: string;
 }
 
 const SUPPORTED_LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'fr', name: 'French', nativeName: 'Français' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
 ];
 
 /**
  * Language switcher component that allows users to change the application language
  * @returns {JSX.Element} The language switcher component
  */
-export default function LanguageSwitcher(): JSX.Element {
+export default function LanguageSwitcher() {
+  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  
-  // Extract current locale from pathname
   const currentLocale = pathname.split('/')[1] || 'en';
+  const currentLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLocale);
 
   /**
    * Handles language change by redirecting to the new locale path
@@ -42,33 +49,33 @@ export default function LanguageSwitcher(): JSX.Element {
   }, [pathname, currentLocale]);
 
   return (
-    <nav
-      aria-label="Language switcher"
-      className="relative flex items-center gap-2"
-    >
-      <Globe 
-        className="w-4 h-4" 
-        aria-hidden="true"
-      />
-      <ul className="flex items-center gap-2">
-        {SUPPORTED_LANGUAGES.map(({ code, name, nativeName }) => (
-          <li key={code}>
-            <button
-              onClick={() => handleLanguageChange(code)}
-              className={`px-2 py-1 rounded-md text-sm transition-colors
-                ${currentLocale === code 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'hover:bg-muted'
-                }`}
-              aria-current={currentLocale === code ? 'true' : 'false'}
-              lang={code}
-              title={name}
-            >
-              {nativeName}
-            </button>
-          </li>
+    <DropdownMenu onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger aria-label="Select language"
+      >
+        <Button variant="outline">
+          <span className="mt-1 text-sm">{currentLanguage?.flag}</span>
+          <CaretDown
+            className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
+              }`}
+            aria-hidden="true"
+          />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end">
+        {SUPPORTED_LANGUAGES.map(({ code, name, nativeName, flag }) => (
+          <DropdownMenuItem
+            key={code}
+            onClick={() => handleLanguageChange(code)}
+            className={`flex items-center gap-2 cursor-pointer
+              ${currentLocale === code ? 'bg-muted' : ''}`}
+          >
+            <span className="text-base" aria-hidden="true">{flag}</span>
+            <span className="text-sm">{nativeName}</span>
+            <span className="text-muted-foreground text-xs">({name})</span>
+          </DropdownMenuItem>
         ))}
-      </ul>
-    </nav>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
