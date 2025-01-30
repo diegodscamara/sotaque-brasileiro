@@ -10,6 +10,7 @@ import { useCallback, useState } from 'react';
 
 import { Button } from './ui/button';
 import { CaretDown } from '@phosphor-icons/react';
+import { JSX } from 'react';
 import { usePathname } from 'next/navigation';
 
 interface Language {
@@ -23,13 +24,14 @@ const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
 ];
 
 /**
  * Language switcher component that allows users to change the application language
  * @returns {JSX.Element} The language switcher component
  */
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
