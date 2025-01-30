@@ -1,11 +1,33 @@
 {
     "landing": {
+        "header": {
+            "logoImage": "@/app/icon.png",
+            "logoAlt": "Sotaque Logo",
+            "nav": {
+                "features": "Fonctionnalités",
+                "featuresLink": "#features",
+                "howItWorks": "Comment ça marche",
+                "howItWorksLink": "#how-it-works",
+                "pricing": "Prix",
+                "pricingLink": "#pricing",
+                "faq": "FAQ",
+                "faqLink": "#faq",
+                "dashboard": "Tableau de bord",
+                "dashboardLink": "/dashboard"
+            },
+            "cta": {
+                "primary": "Commencer",
+                "link": "#pricing"
+            }
+        },
         "hero": {
             "title": "Apprenez le portugais avec des professeurs natifs",
             "subtitle": "Réservez des cours particuliers de portugais avec des professeurs experts. Horaires flexibles, apprentissage personnalisé.",
+            "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
-                "primary": "Commencer"
+                "primary": "Commencer",
+                "link": "#pricing"
             }
         }
     },
