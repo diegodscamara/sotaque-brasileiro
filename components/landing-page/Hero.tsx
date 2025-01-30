@@ -3,7 +3,6 @@ import React, { JSX } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import LanguageSwitcher from "../lang-switcher";
 import Link from "next/link";
 import { useTranslations } from 'next-intl';
 
@@ -28,12 +27,11 @@ const Hero = (): JSX.Element => {
         <h2 className="mb-8 max-w-xl text-muted-foreground lg:text-xl">
           {t("hero.subtitle")}
         </h2>
-        <LanguageSwitcher />
         {/* <TestimonialsAvatars priority={true} /> */}
 
         <div className="flex lg:flex-row flex-col justify-ce∏nter items-center gap-4">
           <Button variant="default" asChild>
-            <Link href={'#pricing'}>
+            <Link href={t("hero.cta.link")}>
               {t("hero.cta.primary")}
               <ArrowRight className="size-4" />
             </Link>
@@ -43,7 +41,7 @@ const Hero = (): JSX.Element => {
 
       <div className="w-full md:w-fit lg:w-full">
         <Image
-          src={'/images/hero.png'}
+          src={t("hero.image")}
           alt={t("hero.imageAlt")}
           className="rounded-md w-full max-h-[600px] lg:max-h-[800px] object-cover"
           priority={true}
