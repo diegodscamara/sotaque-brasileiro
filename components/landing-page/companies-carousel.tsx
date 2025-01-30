@@ -2,49 +2,29 @@
 
 import Image from "next/image"
 import Marquee from "@/components/ui/marquee"
+import { useTranslations } from "next-intl";
 
-const LOGOS = [
-    {
-        src: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-        alt: "Google",
-        className: "w-28 h-10",
-    },
-    {
-        src: "https://www.apple.com/ac/structured-data/images/open_graph_logo.png",
-        alt: "Apple",
-        className: "w-28 h-10",
-    },
-    {
-        src: "https://www.amazon.com/images/G/02/UK_CCMP/TM/OCC_Amazon1._CB423492668_.jpg",
-        alt: "Amazon",
-        className: "w-28 h-10",
-    },
-    {
-        src: "https://www.facebook.com/images/fb_icon_325x325.png",
-        alt: "Facebook",
-        className: "w-28 h-10",
-    },
-    {
-        src: "https://www.netflix.com/favicon.ico",
-        alt: "Netflix",
-        className: "w-28 h-10",
-    }
-]
+interface CompanyLogo {
+  name: string;
+  src: string;
+  alt: string;
+}
 
 export function CompaniesCarousel() {
+    const t = useTranslations('landing.companies');
     return (
-        <section id="companies" className="relative mx-auto px-4 py-16 max-w-7xl container">
-            <h2 className="font-semibold text-center text-gray-500 text-sm">HELPED PEOPLE FROM COMPANIES LIKE</h2>
-            <div className="relative mt-6 w-full overflow-hidden">
-                <Marquee pauseOnHover>
-                    {LOGOS.map((logo, index) => (
+        <section id="companies" className="relative flex flex-col items-center gap-8 mx-auto px-4 py-16 max-w-7xl container">
+            <h2 className="font-medium font-mono text-center text-primary text-sm uppercase tracking-wider">{t('title')}</h2>
+            <div className="relative w-full overflow-hidden">
+                <Marquee>
+                    {(t.raw('logos') as unknown as CompanyLogo[]).map((logo: CompanyLogo, index: number) => (
                         <div key={index} className="flex-shrink-0 opacity-90 hover:opacity-100 transition-opacity duration-300">
                             <Image
                                 src={logo.src || "/placeholder.svg"}
                                 alt={logo.alt}
-                                className={logo.className}
-                                width={200}
-                                height={80}
+                                className={'h-10 w-28 dark:brightness-0 dark:invert grayscale opacity-30 hover:opacity-100 transition-opacity duration-300'}
+                                width={112}
+                                height={40}
                             />
                         </div>
                     ))}
