@@ -6,32 +6,32 @@
             "nav": {
                 "features": "Recursos",
                 "featuresLink": "#features",
-                "howItWorks": "Como funciona",
+                "howItWorks": "Como Funciona",
                 "howItWorksLink": "#how-it-works",
                 "pricing": "Preços",
                 "pricingLink": "#pricing",
-                "faq": "FAQ",
+                "faq": "Dúvidas",
                 "faqLink": "#faq",
                 "dashboard": "Painel",
                 "dashboardLink": "/dashboard"
             },
             "cta": {
-                "primary": "Começar agora",
+                "primary": "Começar Agora",
                 "link": "#pricing"
             }
         },
         "hero": {
-            "title": "Aprenda português brasileiro para negócios e cultura",
-            "subtitle": "Seja para expandir seus negócios ou se conectar com a arte e as tradições brasileiras, nossos cursos flexíveis e personalizados com professores nativos são adaptados à sua vida e objetivos.",
+            "title": "Aprenda Português Brasileiro para Negócios e Cultura",
+            "subtitle": "Seja para expandir seus negócios ou se conectar com a arte e tradições brasileiras, nossas aulas flexíveis e personalizadas com instrutores nativos são projetadas para se adequar à sua vida e objetivos.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
-                "primary": "Começar agora",
+                "primary": "Começar Agora",
                 "link": "#pricing"
             }
         },
         "companies": {
-            "title": "NOSSOS ALUNOS VÊM DE EMPRESAS COMO",
+            "title": "ENSINAMOS ALUNOS DE EMPRESAS COMO",
             "logos": [
                 {
                     "name": "Google",
@@ -64,6 +64,24 @@
                     "alt": "Instagram"
                 }
             ]
+        },
+        "problem": {
+            "title": "O Que Está Te Impedindo",
+            "subtitle": "Dificuldade para Aprender Português Brasileiro? Você Não Está Sozinho.",
+            "cards": [
+                {
+                    "title": "Vida Muito Ocupada para Horários Fixos",
+                    "text": "Tentar encaixar aulas de idiomas em sua agenda lotada parece impossível. A maioria dos cursos oferece horários fixos que conflitam com trabalho, família ou outros compromissos, deixando você frustrado e sem conseguir progredir."
+                },
+                {
+                    "title": "Cursos Genéricos Não Atendem Suas Necessidades",
+                    "text": "A maioria dos cursos de português foca no português europeu ou oferece conteúdo genérico que não se alinha aos seus objetivos. Seja para negócios, viagens ou conexão cultural, você precisa de um programa adaptado às suas necessidades específicas."
+                },
+                {
+                    "title": "Aprender Sem Contexto é Vazio",
+                    "text": "Idioma é mais do que apenas palavras—é cultura, expressões e contexto real. Sem uma imersão autêntica na cultura brasileira, seu aprendizado fica desconectado e incompleto."
+                }
+            ]
         }
     },
     "dashboard": {},
@@ -75,7 +93,7 @@
             "delete": "Excluir"
         },
         "errors": {
-            "general": "Ocorreu um erro"
+            "general": "Algo deu errado"
         }
     },
     "index": {
