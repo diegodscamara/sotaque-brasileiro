@@ -1,0 +1,84 @@
+{
+    "landing": {
+        "header": {
+            "logoImage": "@/app/icon.png",
+            "logoAlt": "Logo de Sotaque",
+            "nav": {
+                "features": "Características",
+                "featuresLink": "#features",
+                "howItWorks": "Cómo Funciona",
+                "howItWorksLink": "#how-it-works",
+                "pricing": "Precios",
+                "pricingLink": "#pricing",
+                "faq": "Preguntas Frecuentes",
+                "faqLink": "#faq",
+                "dashboard": "Panel de Control",
+                "dashboardLink": "/dashboard"
+            },
+            "cta": {
+                "primary": "Comenzar",
+                "link": "#pricing"
+            }
+        },
+        "hero": {
+            "title": "Aprende Portugués Brasileño para Negocios y Cultura",
+            "subtitle": "Ya sea que estés expandiendo tu negocio o conectando con el arte y las tradiciones brasileñas, nuestras clases flexibles y personalizadas con instructores nativos están diseñadas para adaptarse a tu vida y objetivos.",
+            "image": "/images/hero.png",
+            "imageAlt": "Sotaque Brasileiro",
+            "cta": {
+                "primary": "Comenzar",
+                "link": "#pricing"
+            }
+        },
+        "companies": {
+            "title": "HEMOS ENSEÑADO A ESTUDIANTES DE EMPRESAS COMO",
+            "logos": [
+                {
+                    "name": "Google",
+                    "src": "https://cdn.magicui.design/companies/Google.svg",
+                    "alt": "Google"
+                },
+                {
+                    "name": "Netflix",
+                    "src": "https://cdn.magicui.design/companies/Netflix.svg",
+                    "alt": "Netflix"
+                },
+                {
+                    "name": "Microsoft",
+                    "src": "https://cdn.magicui.design/companies/Microsoft.svg",
+                    "alt": "Microsoft"
+                },
+                {
+                    "name": "Uber",
+                    "src": "https://cdn.magicui.design/companies/Uber.svg",
+                    "alt": "Uber"
+                },
+                {
+                    "name": "Spotify",
+                    "src": "https://cdn.magicui.design/companies/Spotify.svg",
+                    "alt": "Spotify"
+                },
+                {
+                    "name": "Instagram",
+                    "src": "https://cdn.magicui.design/companies/Instagram.svg",
+                    "alt": "Instagram"
+                }
+            ]
+        }
+    },
+    "dashboard": {},
+    "auth": {},
+    "shared": {
+        "buttons": {
+            "save": "Guardar",
+            "cancel": "Cancelar",
+            "delete": "Eliminar"
+        },
+        "errors": {
+            "general": "Algo salió mal"
+        }
+    },
+    "index": {
+        "title": "¡Hola mundo!"
+    }
+}
