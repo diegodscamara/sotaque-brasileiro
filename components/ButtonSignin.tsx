@@ -8,6 +8,7 @@ import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
+import { useTranslations } from "next-intl";
 
 // A simple button to sign in with our providers (Google & Magic Links).
 // It automatically redirects user to callbackUrl (config.auth.callbackUrl) after login, which is normally a private page for users to manage their accounts.
@@ -15,6 +16,7 @@ import { createClient } from "@/libs/supabase/client";
 const ButtonSignin = () => {
   const supabase = createClient();
   const [user, setUser] = useState<User>(null);
+  const t = useTranslations('shared.buttons');
 
   useEffect(() => {
     const getUser = async () => {
@@ -37,7 +39,7 @@ const ButtonSignin = () => {
       <Link
         href={config.auth.loginUrl}
       >
-        Sign in
+        {t('sign-in')}
       </Link>
     </Button>
   );

@@ -5,21 +5,12 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import configFile from "@/config";
 import { findCheckoutSession } from "@/libs/stripe";
 import { headers } from "next/headers";
-import { z } from 'zod';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-08-16",
   typescript: true,
 });
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-const stripeEventSchema = z.object({
-  id: z.string(),
-  type: z.string(),
-  data: z.object({
-    object: z.any(),
-  }),
-});
 
 // This is where we receive Stripe webhook events
 // It used to update the user data, send emails, etc...
@@ -44,12 +35,6 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error(`Webhook signature verification failed. ${err.message}`);
     return NextResponse.json({ error: err.message }, { status: 400 });
-  }
-
-  const validation = stripeEventSchema.safeParse(event);
-  if (!validation.success) {
-    console.error('Invalid Stripe event:', validation.error);
-    return NextResponse.json({ message: "Invalid Stripe event" }, { status: 400 });
   }
 
   eventType = event.type;

@@ -2,29 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
 import { getUserTimeZone } from '@/libs/utils/timezone';
-import { z } from 'zod';
-
-const classDataSchema = z.object({
-  teacher_id: z.string().uuid(),
-  title: z.string().min(1),
-  start_time: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid date format",
-  }),
-  end_time: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid date format",
-  }),
-  notes: z.string().optional(),
-});
 
 export async function POST(req: NextRequest) {
   const supabase = createClient();
   const { userId, classData } = await req.json();
-
-  const validation = classDataSchema.safeParse(classData);
-  if (!validation.success) {
-    console.error('Invalid class data:', validation.error);
-    return NextResponse.json({ message: "Invalid class data" }, { status: 400 });
-  }
 
   const { data: user, error: userError } = await supabase.from('users').select('*').eq('id', userId).single();
   if (userError || !user || user.role !== 'student') {

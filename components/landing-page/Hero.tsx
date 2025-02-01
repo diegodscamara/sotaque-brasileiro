@@ -39,11 +39,11 @@ const Hero = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="w-full md:w-fit lg:w-full">
+      <div className="w-full">
         <Image
           src={t("hero.image")}
           alt={t("hero.imageAlt")}
-          className="rounded-md w-full max-h-[600px] lg:max-h-[800px] object-cover"
+          className="rounded-md w-full object-cover"
           priority={true}
           width={500}
           height={500}

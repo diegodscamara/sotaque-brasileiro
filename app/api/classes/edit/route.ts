@@ -1,32 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
-import { z } from 'zod';
-
-const classDataSchema = z.object({
-  title: z.string().min(1).optional(),
-  start_time: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid start time format",
-  }).optional(),
-  end_time: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Invalid end time format",
-  }).optional(),
-  status: z.string().optional(),
-  metadata: z.object({
-    notes: z.string().optional(),
-    time_zone: z.string().optional(),
-  }).optional(),
-});
 
 export async function POST(req: NextRequest) {
   const supabase = createClient();
   const { classId, classData: newClassData } = await req.json();
-
-  const validation = classDataSchema.safeParse(newClassData);
-  if (!validation.success) {
-    console.error('Invalid class data:', validation.error);
-    return NextResponse.json({ message: "Invalid class data" }, { status: 400 });
-  }
 
   const { data: existingClassData, error: classError } = await supabase.from('classes').select('*').eq('id', classId).single();
   if (!existingClassData) {
@@ -41,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Class cannot be changed 24 hours before the class" }, { status: 400 });
   }
 
-  const { error } = await supabase.from("classes").update(validation.data).eq("id", classId);
+  const { error } = await supabase.from("classes").update(newClassData).eq("id", classId);
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

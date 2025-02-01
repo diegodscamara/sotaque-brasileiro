@@ -121,7 +121,16 @@
         "buttons": {
             "save": "Save",
             "cancel": "Cancel",
-            "delete": "Delete"
+            "delete": "Delete",
+            "sign-in": "Sign In",
+            "sign-up": "Sign Up"
+        },
+        "nav-user": {
+            "profile": "Profile",
+            "billing": "Billing",
+            "sign-out": "Sign Out",
+            "upgrade": "Upgrade",
+            "notifications": "Notifications"
         },
         "errors": {
             "general": "Something went wrong"

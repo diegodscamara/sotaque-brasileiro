@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
-import { z } from 'zod';
-
-const deleteSchema = z.object({
-  teacherId: z.string().uuid(),
-});
 
 export async function POST(req: NextRequest) {
   const supabase = createClient();
   const { teacherId } = await req.json();
-
-  const validation = deleteSchema.safeParse({ teacherId });
-  if (!validation.success) {
-    console.error('Invalid teacher ID:', validation.error);
-    return NextResponse.json({ message: "Invalid teacher ID" }, { status: 400 });
-  }
 
   const { data: existingTeacherData, error: teacherError } = await supabase.from('users').select('*').eq('id', teacherId).single();
   if (!existingTeacherData || existingTeacherData.role !== 'teacher') {

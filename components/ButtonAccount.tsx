@@ -3,63 +3,62 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CreditCard, SignOut, UserCircle } from "@phosphor-icons/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { User } from "@supabase/supabase-js";
 import apiClient from "@/libs/api";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
+import useStudentApi from "@/hooks/useStudentApi";
+import useTeacherApi from "@/hooks/useTeacherApi";
+import { useTranslations } from "next-intl";
 
-// A button to show user some account actions
-//  1. Billing: open a Stripe Customer Portal to manage their billing (cancel subscription, update payment method, etc.).
-//     You have to manually activate the Customer Portal in your Stripe Dashboard (https://dashboard.stripe.com/test/settings/billing/portal)
-//     This is only available if the customer has a customerId (they made a purchase previously)
-//  2. Logout: sign out and go back to homepage
-// See more at https://shipfa.st/docs/components/buttonAccount
+interface UserData {
+  id: string;
+  has_access?: boolean;
+}
+
+/**
+ * ButtonAccount component provides user account actions dropdown
+ * @component
+ * @returns {JSX.Element} Account dropdown with profile, billing, and sign-out options
+ */
 const ButtonAccount = () => {
   const supabase = createClient();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<User>(null);
-  const [userData, setUserData] = useState<any>(null);
   const router = useRouter();
+  const t = useTranslations('shared.nav-user');
+  const { getStudent } = useStudentApi();
+  const { getTeacher } = useTeacherApi();
 
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
-      setUser(user);
-    };
-
-    getUser();
+  const fetchUser = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
   }, [supabase]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("users")
-          .select("has_access")
-          .eq("id", user.id)
-          .single();
-        setUserData(profile);
-      }
-    };
+  const fetchUserData = useCallback(async () => {
+    if (!user?.id) return;
 
-    fetchUserData();
-  }, [supabase]);
+    const studentData = await getStudent(user.id);
+    if (studentData) {
+      setUserData(studentData);
+    } else {
+      const teacherData = await getTeacher(user.id);
+      setUserData(teacherData);
+    }
+  }, [user?.id, getStudent, getTeacher]);
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     router.push("/");
     window.location.reload();
-  };
+  }, [supabase, router]);
 
-  const handleBilling = async () => {
+  const handleBilling = useCallback(async () => {
     setIsLoading(true);
-
     try {
       const { url }: { url: string } = await apiClient.post(
         "/stripe/create-portal",
@@ -71,50 +70,68 @@ const ButtonAccount = () => {
       router.push(url);
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsLoading(false);
     }
+  }, [router]);
 
-    setIsLoading(false);
-  };
+  const avatarFallback = useMemo(() => user?.email?.charAt(0) || "", [user?.email]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserData();
+    }
+  }, [user?.id, fetchUserData]);
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full">
+      <DropdownMenuTrigger className="rounded-full" aria-label="Account menu">
         <Avatar>
-          <AvatarImage src={user?.user_metadata?.avatar_url} alt={"Profile picture"} />
-          <AvatarFallback>{user?.email?.charAt(0)}</AvatarFallback>
+          <AvatarImage
+            src={user?.user_metadata?.avatar_url}
+            alt="Profile picture"
+          />
+          <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>
-
-        {isLoading ?? (
-          <span className="loading loading-spinner loading-xs"></span>
+        {isLoading && (
+          <span className="loading loading-spinner loading-xs" aria-hidden="true" />
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer"
-            onClick={() => {
-              window.location.href = "/profile";
-            }}
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push("/profile")}
+            aria-label="Profile"
           >
             <UserCircle className="w-5 h-5" />
-            Profile
+            {t('profile')}
           </DropdownMenuItem>
-          {userData?.has_access &&
-            <DropdownMenuItem className="cursor-pointer"
+          {userData?.has_access && (
+            <DropdownMenuItem
+              className="cursor-pointer"
               onClick={handleBilling}
+              aria-label="Billing"
             >
               <CreditCard className="w-5 h-5" />
-              Billing
+              {t('billing')}
             </DropdownMenuItem>
-          }
-          <DropdownMenuItem className="cursor-pointer"
+          )}
+          <DropdownMenuItem
+            className="cursor-pointer"
             onClick={handleSignOut}
+            aria-label="Sign out"
           >
             <SignOut className="w-5 h-5" />
-            Logout
+            {t('sign-out')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
-    </DropdownMenu >
+    </DropdownMenu>
   );
 };
 

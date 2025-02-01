@@ -2,26 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createCheckout } from "@/libs/stripe";
 import { createClient } from "@/libs/supabase/server";
-import { z } from 'zod';
-
-const checkoutSchema = z.object({
-  priceId: z.string(),
-  mode: z.enum(['payment', 'subscription']),
-  successUrl: z.string().url(),
-  cancelUrl: z.string().url(),
-});
 
 // This function is used to create a Stripe Checkout Session (one-time payment or subscription)
 // It's called by the <ButtonCheckout /> component
 // Users must be authenticated. It will prefill the Checkout data with their email and/or credit card (if any)
 export async function POST(req: NextRequest) {
   const body = await req.json();
-
-  const validation = checkoutSchema.safeParse(body);
-  if (!validation.success) {
-    console.error('Invalid checkout data:', validation.error);
-    return NextResponse.json({ message: "Invalid checkout data" }, { status: 400 });
-  }
 
   const supabase = createClient();
 
@@ -32,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { priceId, mode, successUrl, cancelUrl } = validation.data;
+    const { priceId, mode, successUrl, cancelUrl } = body;
 
     const { data } = await supabase
       .from("users")

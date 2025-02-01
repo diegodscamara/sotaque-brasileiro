@@ -1,12 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/libs/supabase/server'
-import { z } from 'zod'
-
-const validateQueryParams = z.object({
-  code: z.string().optional(),
-  token: z.string().nullable().optional(),
-  email: z.string().email().nullable().optional(),
-});
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -16,13 +9,7 @@ export async function GET(request: Request) {
     email: searchParams.get('email'),
   };
 
-  const validation = validateQueryParams.safeParse(queryParams);
-  if (!validation.success) {
-    console.error('Invalid query parameters:', validation.error);
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-  }
-
-  const { code, token, email } = validation.data;
+  const { code, token, email } = queryParams;
   const supabase = createClient();
 
   if (token && email) {
