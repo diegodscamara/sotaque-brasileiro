@@ -82,6 +82,37 @@
                     "text": "Idioma é mais do que apenas palavras—é cultura, expressões e contexto real. Sem uma imersão autêntica na cultura brasileira, seu aprendizado fica desconectado e incompleto."
                 }
             ]
+        },
+        "features": {
+            "title": "Por Que Escolher Nós?",
+            "subtitle": "Aulas Flexíveis, Personalizadas e Inmersivas na Cultura Projetadas Justamente para Você",
+            "description": "Na Sotaque Brasileiro, reinventamos o aprendizado de idiomas para se adequar à sua vida. Com agendamento flexível, aulas personalizadas e imersão autêntica na cultura brasileira, você finalmente atingirá seus objetivos de português - em seus termos.",
+            "cards": [
+                {
+                    "title": "Aprenda em qualquer momento e em qualquer lugar",
+                    "text": "Diga adeus aos horários de aulas rígidos. Nossa plataforma oferece aulas que se adaptam ao seu horário, seja matutino, noturno ou fim de semana. Você é o mestre do seu caminho de aprendizado.",
+                    "image": "/images/landing-page/features/learn-anywhere.png",
+                    "imageAlt": "Aprenda em qualquer momento e em qualquer lugar"
+                },
+                {
+                    "title": "Aulas Personalizadas para Seus Objetivos",
+                    "text": "Seja para negócios, viagens ou conexão cultural, nossas aulas personalizadas são criadas para atender às suas necessidades únicas. Mais aulas de um único tamanho!",
+                    "image": "/images/landing-page/features/personalized-lessons.png",
+                    "imageAlt": "Aulas Personalizadas para Seus Objetivos"
+                },
+                {
+                    "title": "Aulas Inmersivas na Cultura",
+                    "text": "Idioma é mais do que palavras—é cultura. Nossas aulas incluem expressões autênticas brasileiras, música e tradições, para que você possa se conectar profundamente com a língua e suas pessoas.",
+                    "image": "/images/landing-page/features/culturally-immersive-lessons.png",
+                    "imageAlt": "Aulas Inmersivas na Cultura"
+                },
+                {
+                    "title": "Instrutores Nativos",
+                    "text": "Nossos instrutores são falantes nativos de português brasileiro com anos de experiência ensinando alunos de todo o mundo. Eles trazem um contexto real e insights culturais a cada aula.",
+                    "image": "/images/landing-page/features/native-instructors.png",
+                    "imageAlt": "Instrutores Nativos"
+                }
+            ]
         }
     },
     "dashboard": {},
