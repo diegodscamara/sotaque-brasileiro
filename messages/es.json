@@ -113,6 +113,30 @@
                     "imageAlt": "Instructores nativos"
                 }
             ]
+        },
+        "how-it-works": {
+            "title": "¿Cómo Funciona?",
+            "subtitle": "Aprende Portugués Brasileño en 3 Pasos Simples",
+            "steps": [
+                {
+                    "title": "1. Crea tu cuenta",
+                    "text": "Comienza registrándote y contándonos tus objetivos. Ya sea para negocios, viajes o conexión cultural, ajustaremos tu experiencia de aprendizaje para que se adapte a tus necesidades.",
+                    "image": "/images/landing-page/howItWorks/create-account.png",
+                    "imageAlt": "Crea tu cuenta"
+                },
+                {
+                    "title": "2. Elige tu horario",
+                    "text": "Elige los horarios que funcionan para ti. Con un horario flexible, puedes aprender a tu ritmo—mañanas, tardes o fines de semana.",
+                    "image": "/images/landing-page/howItWorks/choose-schedule.png",
+                    "imageAlt": "Elige tu horario"
+                },
+                {
+                    "title": "3. Aprende con instructores nativos",
+                    "text": "Únete a clases en vivo con instructores certificados de portugués brasileño. Sumérgete en un idioma auténtico y cultura, y observa cómo tus habilidades crecen.",
+                    "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
+                    "imageAlt": "Aprende con instructores nativos"
+                }
+            ]
         }
     },
     "dashboard": {},
