@@ -3,6 +3,7 @@
 import CTA from "@/components/landing-page/CTA";
 import { CompaniesCarousel } from "@/components/landing-page/companies-carousel";
 import FAQ from "@/components/landing-page/FAQ";
+import { Features } from "@/components/landing-page/solution";
 import FeaturesAccordion from "@/components/landing-page/FeaturesAccordion";
 import FeaturesListicle from "@/components/landing-page/FeaturesListicle";
 import Footer from "@/components/Footer";
@@ -10,7 +11,6 @@ import Header from "@/components/Header";
 import Hero from "@/components/landing-page/Hero";
 import Pricing from "@/components/landing-page/Pricing";
 import Problem from "@/components/landing-page/Problem";
-import { Solution } from "@/components/landing-page/solution";
 import { Suspense } from 'react'
 import Testimonials3 from "@/components/landing-page/Testimonials3";
 
@@ -26,8 +26,8 @@ export default function Home() {
         <CompaniesCarousel />
         {/* Problem*/}
         <Problem />
-        {/* Solution*/}
-        <Solution />
+        {/* Features*/}
+        <Features />
         {/* How it works*/}
         <FeaturesAccordion />
         {/* Testimonials*/}
