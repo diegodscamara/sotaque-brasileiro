@@ -121,7 +121,16 @@
         "buttons": {
             "save": "Enregistrer",
             "cancel": "Annuler",
-            "delete": "Supprimer"
+            "delete": "Supprimer",
+            "sign-in": "Se connecter",
+            "sign-up": "S'inscrire"
+        },
+        "nav-user": {
+            "profile": "Profil",
+            "billing": "Facturation",
+            "sign-out": "Se déconnecter",
+            "upgrade": "Mettre à niveau",
+            "notifications": "Notifications"
         },
         "errors": {
             "general": "Une erreur s'est produite"
