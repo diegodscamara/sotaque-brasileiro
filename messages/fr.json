@@ -82,6 +82,37 @@
                     "text": "La langue est plus que des mots - c'est la culture, les expressions et le contexte de la vie réelle. Sans une véritable immersion dans la culture brésilienne, votre apprentissage semble déconnecté et incomplet."
                 }
             ]
+        },
+        "features": {
+            "title": "Pourquoi nous choisir?",
+            "subtitle": "Cours flexibles, personnalisés et immersifs dans la culture conçus pour vous",
+            "description": "Chez Sotaque Brasileiro, nous avons imaginé l'apprentissage des langues pour correspondre à votre vie. Avec un calendrier flexible, des leçons personnalisées et une immersion authentique dans la culture brésilienne, vous atteindrez finalement vos objectifs portugais - sur vos termes.",
+            "cards": [
+                {
+                    "title": "Apprendre à n'importe quel moment et n'importe où",
+                    "text": "Dites adieu aux horaires de cours rigides. Notre plateforme propose des cours qui correspondent à votre emploi du temps, que ce soit des matinées matinales, des soirs tardifs ou des week-ends. Vous êtes le maître de votre parcours d'apprentissage.",
+                    "image": "/images/landing-page/features/learn-anywhere.png",
+                    "imageAlt": "Apprendre à n'importe quel moment et n'importe où"
+                },
+                {
+                    "title": "Leçons conçues pour vos objectifs",
+                    "text": "Que vous soyez à la recherche d'affaires, de voyages ou de connexion culturelle, nos leçons personnalisées sont conçues pour répondre à vos besoins uniques. Plus aucun cours de taille unique !",
+                    "image": "/images/landing-page/features/personalized-lessons.png",
+                    "imageAlt": "Leçons conçues pour vos objectifs"
+                },
+                {
+                    "title": "Leçons immersives dans la culture",
+                    "text": "La langue est plus que des mots - c'est la culture. Nos cours incluent des expressions brésiliennes authentiques, de la musique et des traditions, pour que vous puissiez vous connecter profondément avec la langue et ses personnes.",
+                    "image": "/images/landing-page/features/culturally-immersive-lessons.png",
+                    "imageAlt": "Leçons immersives dans la culture"
+                },
+                {
+                    "title": "Instructeurs natifs",
+                    "text": "Nos instructeurs sont des locuteurs natifs de portugais brésilien avec des années d'expérience enseignant des étudiants de partout dans le monde. Ils apportent un contexte de la vie réelle et des informations culturelles à chaque leçon.",
+                    "image": "/images/landing-page/features/native-instructors.png",
+                    "imageAlt": "Instructeurs natifs"
+                }
+            ]
         }
     },
     "dashboard": {},
