@@ -82,6 +82,37 @@
                     "text": "El idioma es más que solo palabras: es cultura, expresiones y contexto de la vida real. Sin una inmersión auténtica en la cultura brasileña, tu aprendizaje se siente desconectado e incompleto."
                 }
             ]
+        },
+        "features": {
+            "title": "¿Por Qué Elegirnos?",
+            "subtitle": "Clases Flexibles, Personalizadas y Culturalmente Inmersivas Diseñadas Justo para Ti",
+            "description": "En Sotaque Brasileiro, hemos reinventado el aprendizaje de idiomas para adaptarse a tu vida. Con horarios flexibles, lecciones personalizadas y una inmersión auténtica en la cultura brasileña, finalmente lograrás tus objetivos de portugués—en tus términos.",
+            "cards": [
+                {
+                    "title": "Aprende en cualquier momento y en cualquier lugar",
+                    "text": "Di adiós a los horarios rígidos. Nuestra plataforma ofrece clases que se ajustan a tu agenda, ya sea que sean mañanas tempranas, noches tardías o fines de semana. Eres el que controla tu viaje de aprendizaje.",
+                    "image": "/images/landing-page/features/learn-anywhere.png",
+                    "imageAlt": "Aprende en cualquier momento y en cualquier lugar"
+                },
+                {
+                    "title": "Lecciones diseñadas para tus objetivos",
+                    "text": "Ya sea que estés aprendiendo para negocios, viajes o conexión cultural, nuestras lecciones personalizadas están diseñadas para cumplir con tus necesidades únicas. No más cursos de un solo tamaño!",
+                    "image": "/images/landing-page/features/personalized-lessons.png",
+                    "imageAlt": "Lecciones diseñadas para tus objetivos"
+                },
+                {
+                    "title": "Lecciones culturalesmente inmersivas",
+                    "text": "El idioma es más que palabras: es cultura. Nuestras clases incluyen expresiones auténticas brasileñas, música y tradiciones, para que puedas conectarte profundamente con el idioma y sus personas.",
+                    "image": "/images/landing-page/features/culturally-immersive-lessons.png",
+                    "imageAlt": "Lecciones culturalesmente inmersivas"
+                },
+                {
+                    "title": "Instructores nativos",
+                    "text": "Nuestros instructores son hablantes nativos de portugués brasileño con años de experiencia en enseñar a estudiantes de todo el mundo. Llegan al contexto real de la vida y las ideas culturales a cada lección.",
+                    "image": "/images/landing-page/features/native-instructors.png",
+                    "imageAlt": "Instructores nativos"
+                }
+            ]
         }
     },
     "dashboard": {},

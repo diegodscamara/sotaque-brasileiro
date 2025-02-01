@@ -66,20 +66,51 @@
             ]
         },
         "problem": {
-            "title": "Here’s What’s Holding You Back",
-            "subtitle": "Struggling to Learn Brazilian Portuguese? You’re Not Alone.",
+            "title": "Here's What's Holding You Back",
+            "subtitle": "Struggling to Learn Brazilian Portuguese? You're Not Alone.",
             "cards": [
                 {
-                    "title": "Life’s Too Busy for Rigid Class Times",
+                    "title": "Life's Too Busy for Rigid Class Times",
                     "text": "Trying to fit language classes into your packed schedule feels impossible. Most courses offer fixed timings that clash with work, family, or other commitments, leaving you frustrated and unable to progress."
                 },
                 {
-                    "title": "Generic Courses Don’t Meet Your Needs",
-                    "text": "Most Portuguese courses focus on European Portuguese or offer generic content that doesn’t align with your goals. Whether it’s for business, travel, or cultural connection, you need a program tailored to your unique needs."
+                    "title": "Generic Courses Don't Meet Your Needs",
+                    "text": "Most Portuguese courses focus on European Portuguese or offer generic content that doesn't align with your goals. Whether it's for business, travel, or cultural connection, you need a program tailored to your unique needs."
                 },
                 {
                     "title": "Learning Without Context Feels Empty",
-                    "text": "Language is more than just words—it’s culture, expressions, and real-life context. Without authentic Brazilian cultural immersion, your learning feels disconnected and incomplete."
+                    "text": "Language is more than just words—it's culture, expressions, and real-life context. Without authentic Brazilian cultural immersion, your learning feels disconnected and incomplete."
+                }
+            ]
+        },
+        "features": {
+            "title": "Why Choose Us?",
+            "subtitle": "Flexible, Personalized, and Culturally Immersive Classes Designed Just for You",
+            "description": "At Sotaque Brasileiro, we've reimagined language learning to fit your life. With flexible scheduling, personalized lessons, and authentic cultural immersion, you'll finally achieve your Portuguese goals—on your terms.",
+            "cards": [
+                {
+                    "title": "Learn Anytime, Anywhere",
+                    "text": "Say goodbye to rigid class times. Our platform offers classes that fit your schedule, whether it's early mornings, late nights, or weekends. You're in control of your learning journey.",
+                    "image": "/images/landing-page/features/learn-anywhere.png",
+                    "imageAlt": "Learn Anytime, Anywhere"
+                },
+                {
+                    "title": "Lessons Designed for Your Goals",
+                    "text": "Whether you're learning for business, travel, or cultural connection, our personalized lessons are crafted to meet your unique needs. No more one-size-fits-all courses!",
+                    "image": "/images/landing-page/features/personalized-lessons.png",
+                    "imageAlt": "Lessons Designed for Your Goals"
+                },
+                {
+                    "title": "Culturally Immersive Lessons",
+                    "text": "Language is more than words—it's culture. Our classes include authentic Brazilian expressions, music, and traditions, so you can connect deeply with the language and its people.",
+                    "image": "/images/landing-page/features/culturally-immersive-lessons.png",
+                    "imageAlt": "Culturally Immersive Lessons"
+                },
+                {
+                    "title": "Native Instructors",
+                    "text": "Our instructors are native Brazilian Portuguese speakers with years of experience teaching students from around the world. They bring real-life context and cultural insights to every lesson.",
+                    "image": "/images/landing-page/features/native-instructors.png",
+                    "imageAlt": "Native Instructors"
                 }
             ]
         }

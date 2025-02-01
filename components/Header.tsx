@@ -16,10 +16,11 @@ import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { useSearchParams } from "next/navigation";
+import useStudentApi from "@/hooks/useStudentApi";
 import { useTranslations } from "next-intl";
 
 const Header = () => {
-  const supabase = createClient();
+  const { getStudent } = useStudentApi();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User>(null);
@@ -44,15 +45,10 @@ const Header = () => {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await createClient().auth.getUser();
 
       if (user) {
-        const { data: student } = await supabase
-          .from('users')
-          .select('has_access')
-          .eq('id', user.id)
-          .single();
-
+        const student = await getStudent(user.id);
         setHasAccess(student?.has_access || false);
       }
 
@@ -60,14 +56,13 @@ const Header = () => {
     };
 
     getUser();
-  }, [supabase]);
+  }, [getStudent]);
 
   const links = [
     { href: t("nav.featuresLink"), label: t("nav.features") },
     { href: t("nav.howItWorksLink"), label: t("nav.howItWorks") },
     { href: t("nav.pricingLink"), label: t("nav.pricing") },
-    { href: t("nav.faqLink"), label: t("nav.faq") },
-    ...(user && hasAccess ? [{ href: t("nav.dashboardLink"), label: t("nav.dashboard") }] : []),
+    { href: t("nav.faqLink"), label: t("nav.faq") }
   ];
 
   return (
@@ -115,10 +110,22 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="lg:flex lg:items-center lg:gap-2 hidden">
+            {user ? (
+              hasAccess ? (
+                <Button variant="default" asChild>
+                  <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+                </Button>
+              ) : (
+                <Button variant="default" asChild>
+                  <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+                </Button>
+              )
+            ) : (
+              <Button variant="default" asChild>
+                <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+              </Button>
+            )}
             <ButtonSignin />
-            <Button variant="default" asChild>
-              <Link href={t("cta.link")}>{t("cta.primary")}</Link>
-            </Button>
             <LanguageSwitcher />
           </div>
         </div>
@@ -167,10 +174,22 @@ const Header = () => {
                 </nav>
 
                 <div className="flex flex-col gap-2 mt-auto pb-8">
+                  {user ? (
+                    hasAccess ? (
+                      <Button variant="default" asChild>
+                        <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+                      </Button>
+                    ) : (
+                      <Button variant="default" asChild>
+                        <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+                      </Button>
+                    )
+                  ) : (
+                    <Button variant="default" asChild>
+                      <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+                    </Button>
+                  )}
                   <ButtonSignin />
-                  <Button variant="default" asChild>
-                    <Link href={t("cta.link")}>{t("cta.primary")}</Link>
-                  </Button>
                 </div>
               </div>
             </div>

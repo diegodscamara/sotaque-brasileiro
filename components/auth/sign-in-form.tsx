@@ -44,7 +44,13 @@ export default function SignInForm() {
                 variant: "default",
             });
 
-            if (error) throw error;
+            if (error) {
+                console.error("Email sign-in error:", error);
+                toast({
+                    title: "Failed to sign in",
+                    variant: "destructive",
+                });
+            }
         } catch (error) {
             console.error("Email sign-in error:", error);
             toast({
@@ -73,7 +79,17 @@ export default function SignInForm() {
 
             if (error) {
                 console.error("Google sign-in error:", error);
+                toast({
+                    title: "Failed to sign in",
+                    variant: "destructive",
+                });
             }
+        } catch (error) {
+            console.error("Google sign-in error:", error);
+            toast({
+                title: "Failed to sign in",
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }
