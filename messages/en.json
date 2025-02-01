@@ -113,6 +113,30 @@
                     "imageAlt": "Native Instructors"
                 }
             ]
+        },
+        "how-it-works": {
+            "title": "How It Works",
+            "subtitle": "Learn Brazilian Portuguese in 3 Simple Steps",
+            "steps": [
+                {
+                    "title": "1. Create Your Account",
+                    "text": "Start by signing up and telling us your goals. Whether it's for business, travel, or cultural connection, we'll tailor your learning experience to fit your needs.",
+                    "image": "/images/landing-page/howItWorks/create-account.png",
+                    "imageAlt": "Create Your Account"
+                },
+                {
+                    "title": "2. Choose Your Schedule",
+                    "text": "Pick class times that work for you. With flexible scheduling, you can learn at your own pace—mornings, evenings, or weekends.",
+                    "image": "/images/landing-page/howItWorks/choose-schedule.png",
+                    "imageAlt": "Choose Your Schedule"
+                },
+                {
+                    "title": "3. Learn with Native Instructors",
+                    "text": "Join live classes with certified native Brazilian Portuguese teachers. Immerse yourself in authentic language and culture, and watch your skills grow.",
+                    "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
+                    "imageAlt": "Learn with Native Instructors"
+                }
+            ]
         }
     },
     "dashboard": {},
