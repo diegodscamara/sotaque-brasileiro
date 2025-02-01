@@ -39,6 +39,7 @@ import { createClient } from "@/libs/supabase/client"
 import { useRouter } from "next/navigation";
 import useStudentApi from "@/hooks/useStudentApi";
 import useTeacherApi from "@/hooks/useTeacherApi";
+import { useTranslations } from "next-intl";
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -49,6 +50,7 @@ export function NavUser() {
   const router = useRouter();
   const { getStudent } = useStudentApi();
   const { getTeacher } = useTeacherApi();
+  const t = useTranslations('shared.nav-user');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -152,30 +154,30 @@ export function NavUser() {
               {profile && hasAccess && (
                 <DropdownMenuItem className="cursor-pointer" onClick={handleBilling}>
                   <CreditCard />
-                  Billing
+                  {t('billing')}
                 </DropdownMenuItem>
               )}
               {profile && profile.role === "student" && (
                 <DropdownMenuItem onClick={handleUpgrade} className="cursor-pointer">
                   <Sparkles />
-                  Upgrade to Master
+                  {t('upgrade')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem>
                 <BadgeCheck />
                 <Link href="/profile">
-                  Account
+                  {t('profile')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
-                Notifications
+                {t('notifications')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
               <LogOut />
-              Log out
+              {t('sign-out')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
