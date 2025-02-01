@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/libs/supabase/server';
-import { z } from 'zod';
-
-const querySchema = z.object({
-  teacherId: z.string().uuid().optional(),
-  status: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-});
 
 export async function GET(req: NextRequest) {
   const supabase = createClient();
@@ -27,13 +19,7 @@ export async function GET(req: NextRequest) {
     endDate: searchParams.get('endDate'),
   };
 
-  const validation = querySchema.safeParse(queryParams);
-  if (!validation.success) {
-    console.error('Invalid query parameters:', validation.error);
-    return NextResponse.json({ message: "Invalid query parameters" }, { status: 400 });
-  }
-
-  const { teacherId, status, startDate, endDate } = validation.data;
+  const { teacherId, status, startDate, endDate } = queryParams;
   const userId = user.id;
 
   let query = supabase.from('classes').select('*');
