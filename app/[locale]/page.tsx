@@ -4,11 +4,11 @@ import CTA from "@/components/landing-page/CTA";
 import { CompaniesCarousel } from "@/components/landing-page/companies-carousel";
 import FAQ from "@/components/landing-page/FAQ";
 import { Features } from "@/components/landing-page/solution";
-import FeaturesAccordion from "@/components/landing-page/FeaturesAccordion";
 import FeaturesListicle from "@/components/landing-page/FeaturesListicle";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/landing-page/Hero";
+import HowItWorks from "@/components/landing-page/how-it-works";
 import Pricing from "@/components/landing-page/Pricing";
 import Problem from "@/components/landing-page/Problem";
 import { Suspense } from 'react'
@@ -29,7 +29,7 @@ export default function Home() {
         {/* Features*/}
         <Features />
         {/* How it works*/}
-        <FeaturesAccordion />
+        <HowItWorks />
         {/* Testimonials*/}
         <Testimonials3 />
         {/* Features*/}

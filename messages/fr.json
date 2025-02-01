@@ -113,6 +113,30 @@
                     "imageAlt": "Instructeurs natifs"
                 }
             ]
+        },
+        "how-it-works": {
+            "title": "Comment ça marche?",
+            "subtitle": "Apprendre le portugais brésilien en 3 étapes simples",
+            "steps": [
+                {
+                    "title": "1. Créer votre compte",
+                    "text": "Commencez par vous inscrire et nous expliquer vos objectifs. Que ce soit pour les affaires, les voyages ou la connexion culturelle, nous adapterons votre expérience d'apprentissage à vos besoins.",
+                    "image": "/images/landing-page/howItWorks/create-account.png",
+                    "imageAlt": "Créer votre compte"
+                },
+                {
+                    "title": "2. Choisir votre horaire",
+                    "text": "Choisissez les horaires qui fonctionnent pour vous. Avec un calendrier flexible, vous pouvez apprendre à votre propre rythme—matinées, soirs ou week-ends.",
+                    "image": "/images/landing-page/howItWorks/choose-schedule.png",
+                    "imageAlt": "Choisir votre horaire"
+                },
+                {
+                    "title": "3. Apprendre avec des instructeurs natifs",
+                    "text": "Rejoignez des classes en direct avec des enseignants certifiés de portugais brésilien. Immergez-vous dans un langage authentique et une culture, et observez vos compétences grandir.",
+                    "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
+                    "imageAlt": "Apprendre avec des instructeurs natifs"
+                }
+            ]
         }
     },
     "dashboard": {},

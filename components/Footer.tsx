@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ThemeToggle } from "./theme-toggle";
 import config from "@/config";
 import logo from "@/app/icon.png";
 
@@ -28,6 +29,8 @@ const Footer = () => {
               {config.appName}
             </strong>
           </Link>
+
+          <ThemeToggle /> 
 
           <p className="mt-3 text-base-content/80 text-sm">
             {config.appDescription}
