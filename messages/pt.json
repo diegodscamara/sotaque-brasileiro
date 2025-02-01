@@ -113,6 +113,30 @@
                     "imageAlt": "Instrutores Nativos"
                 }
             ]
+        },
+        "how-it-works": {
+            "title": "Como Funciona?",
+            "subtitle": "Aprenda Português Brasileiro em 3 Passos Simples",
+            "steps": [
+                {
+                    "title": "1. Crie sua conta",
+                    "text": "Comece se inscrevendo e nos contando seus objetivos. Seja para negócios, viagens ou conexão cultural, ajustaremos sua experiência de aprendizado para atender às suas necessidades.",
+                    "image": "/images/landing-page/howItWorks/create-account.png",
+                    "imageAlt": "Crie sua conta"
+                },
+                {
+                    "title": "2. Escolha seu horário",
+                    "text": "Escolha os horários que funcionam para você. Com agendamento flexível, você pode aprender a seu próprio ritmo—matutino, noturno ou fim de semana.",
+                    "image": "/images/landing-page/howItWorks/choose-schedule.png",
+                    "imageAlt": "Escolha seu horário"
+                },
+                {
+                    "title": "3. Aprenda com Instrutores Nativos",
+                    "text": "Reúna-se em aulas ao vivo com instrutores certificados de português brasileiro. Immersa-se em um idioma autêntico e cultura, e observe seu progresso.",
+                    "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
+                    "imageAlt": "Aprenda com Instrutores Nativos"
+                }
+            ]
         }
     },
     "dashboard": {},
