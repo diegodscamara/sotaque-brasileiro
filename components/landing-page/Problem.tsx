@@ -1,21 +1,27 @@
 import { AlarmClockIcon, CookieIcon, GlobeIcon } from "lucide-react";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) => {
   return (
-    <div className="blur(0px); transform: translateY(-6px); 1; auto; filter: opacity: will-change:">
-      <div className="bg-background shadow-none border border-none rounded-lg text-card-foreground">
+    <motion.div
+      className="blur(0px); transform: translateY(-6px); 1; auto; filter: opacity: will-change:"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="shadow-none border border-none rounded-lg text-card-foreground">
         <div className="space-y-4 p-6">
-          <div className="flex justify-center items-center bg-primary/10 rounded-full w-12 h-12">
+          <div className="flex justify-center items-center bg-primary/10 dark:bg-primary/20 rounded-full w-12 h-12">
             {icon}
           </div>
-          <h3 className="font-semibold text-xl leading-8">{title}</h3>
-          <p className="text-base text-muted-foreground leading-5">{text}</p>
+          <h3 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{title}</h3>
+          <p className="text-base text-gray-500 dark:text-gray-400 leading-5">{text}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -36,16 +42,14 @@ const Problem = () => {
         <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
           {t('title')}
         </h2>
-        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl sm:text-4xl md:text-5xl leading-none">
+        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100 leading-none">
           {t('subtitle')}
         </h3>
       </div>
 
       <div className="sm:gap-8 md:gap-10 lg:gap-12 grid grid-cols-1 md:grid-cols-3">
         <Step icon={<AlarmClockIcon className="w-6 h-6 text-primary" />} title={t('cards.0.title')} text={t('cards.0.text')} />
-
         <Step icon={<CookieIcon className="w-6 h-6 text-primary" />} title={t('cards.1.title')} text={t('cards.1.text')} />
-
         <Step icon={<GlobeIcon className="w-6 h-6 text-primary" />} title={t('cards.2.title')} text={t('cards.2.text')} />
       </div>
     </section>

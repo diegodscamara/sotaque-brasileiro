@@ -137,6 +137,54 @@
                     "imageAlt": "Aprenda com Instrutores Nativos"
                 }
             ]
+        },
+        "testimonials": {
+            "title": "O Que Nossos Alunos Estão Dizendo",
+            "subtitle": "Ouvir Nossos Alunos Falarem Sobre Sua Experiência",
+            "cards": [
+                {
+                    "text": "Vim para o Brasil para trabalhar e precisei aprender português rapidamente. As aulas personalizadas me ajudaram a comunicar-me com confiança em apenas alguns meses!",
+                    "name": "Emily Johnson",
+                    "position": "Gerente de Marketing (USA)",
+                    "image": "/images/landing-page/testimonials/emily-johnson.png",
+                    "imageAlt": "Emily Johnson"
+                },
+                {
+                    "text": "Sempre quis aprender português para viajar, e esta escola fez isso tão fácil. Os professores são incríveis, e a imersão cultural é fantástica!",
+                    "name": "James Carter",
+                    "position": "Blogueiro de Viagem (UK)",
+                    "image": "/images/landing-page/testimonials/james-carter.png",
+                    "imageAlt": "James Carter"
+                },
+                {
+                    "text": "Como profissional de negócios, precisei aprender português para reuniões. As aulas personalizadas e o agendamento flexível foram perfeitos para minha vida ocupada.",
+                    "name": "Sarah Müller",
+                    "position": "Consultor de Negócios (Alemanha)",
+                    "image": "/images/landing-page/testimonials/sarah-muller.png",
+                    "imageAlt": "Sarah Müller"
+                },
+                {
+                    "text": "Comecei a aprender português para me conectar com meus amigos brasileiros. As aulas são tão envolventes, e estou surpreso com quanto melhorei!",
+                    "name": "Liam O’Connor",
+                    "position": "Desenvolvedor de Software (Irlanda)",
+                    "image": "/images/landing-page/testimonials/liam-oconnor.png",
+                    "imageAlt": "Liam O’Connor"
+                },
+                {
+                    "text": "Eu amo como os professores fazem cada aula tão divertida e interativa. Aprender português tornou-se minha parte favorita da semana!",
+                    "name": "Sofia Rossi",
+                    "position": "Artista (Itália)",
+                    "image": "/images/landing-page/testimonials/sofia-rossi.png",
+                    "imageAlt": "Sofia Rossi"
+                },
+                {
+                    "text": "A imersão cultural é incrível—eu me sinto como se estivesse experimentando o Brasil enquanto aprendo a língua. Altamente recomendado!",
+                    "name": "Emma Dubois",
+                    "position": "Estudante Universitário (França)",
+                    "image": "/images/landing-page/testimonials/emma-dubois.png",
+                    "imageAlt": "Emma Dubois"
+                }
+            ]
         }
     },
     "dashboard": {},

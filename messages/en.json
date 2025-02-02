@@ -137,6 +137,54 @@
                     "imageAlt": "Learn with Native Instructors"
                 }
             ]
+        },
+        "testimonials": {
+            "title": "What Our Students Are Saying",
+            "subtitle": "Hear From Our Students About Their Experience",
+            "cards": [
+                {
+                    "text": "I came to Brazil for work and needed to learn Portuguese quickly. The personalized lessons helped me communicate confidently in just a few months!",
+                    "name": "Emily Johnson",
+                    "position": "Marketing Manager (USA)",
+                    "image": "/images/landing-page/testimonials/emily-johnson.png",
+                    "imageAlt": "Emily Johnson"
+                },
+                {
+                    "text": "I’ve always wanted to learn Portuguese for travel, and this school made it so easy. The teachers are amazing, and the cultural immersion is fantastic!",
+                    "name": "James Carter",
+                    "position": "Travel Blogger (UK)",
+                    "image": "/images/landing-page/testimonials/james-carter.png",
+                    "imageAlt": "James Carter"
+                },
+                {
+                    "text": "As a business professional, I needed to learn Portuguese for meetings. The tailored lessons and flexible scheduling were perfect for my busy life.",
+                    "name": "Sarah Müller",
+                    "position": "Business Consultant (Germany)",
+                    "image": "/images/landing-page/testimonials/sarah-muller.png",
+                    "imageAlt": "Sarah Müller"
+                },
+                {
+                    "text": "I started learning Portuguese to connect with my Brazilian friends. The classes are so engaging, and I’m amazed at how much I’ve improved!",
+                    "name": "Liam O’Connor",
+                    "position": "Software Developer (Ireland)",
+                    "image": "/images/landing-page/testimonials/liam-oconnor.png",
+                    "imageAlt": "Liam O’Connor"
+                },
+                {
+                    "text": "I love how the teachers make every class fun and interactive. Learning Portuguese has become my favorite part of the week!",
+                    "name": "Sofia Rossi",
+                    "position": "Artist (Italy)",
+                    "image": "/images/landing-page/testimonials/sofia-rossi.png",
+                    "imageAlt": "Sofia Rossi"
+                },
+                {
+                    "text": "The cultural immersion is incredible—I feel like I’m experiencing Brazil while learning the language. Highly recommend this school!",
+                    "name": "Emma Dubois",
+                    "position": "University Student (France)",
+                    "image": "/images/landing-page/testimonials/emma-dubois.png",
+                    "imageAlt": "Emma Dubois"
+                }
+            ]
         }
     },
     "dashboard": {},

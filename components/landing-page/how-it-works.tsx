@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import Image from "next/image";
 import PropTypes from 'prop-types';
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 import { useTranslations } from "next-intl";
 
 interface Step {
@@ -46,20 +46,20 @@ const HowItWorks = () => {
         <h2 className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider" id="how-it-works-title">
           {t("title")}
         </h2>
-        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl sm:text-4xl md:text-5xl" id="how-it-works-subtitle">
+        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100" id="how-it-works-subtitle">
           {t("subtitle")}
         </h3>
       </div>
 
       <div className="gap-12 grid grid-cols-1 lg:grid-cols-2">
         <div className="space-y-8">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-4">
             {steps.map((step, index) => (
               <motion.button
                 key={step.title}
                 onClick={() => handleStepClick(index)}
                 className={cn(
-                  "flex gap-4 p-4 transition-colors text-left border-l-2",
+                  "flex gap-4 p-4 items-center transition-colors text-left border-l-2",
                   activeStep === index
                     ? "border-primary"
                     : "border-gray-200 dark:border-gray-600",
@@ -71,7 +71,7 @@ const HowItWorks = () => {
               >
                 <div className="flex-shrink-0">
                   <div className={cn(
-                    "flex justify-center items-center bg-primary/10 rounded-full w-12 h-12 text-primary",
+                    "flex justify-center items-center bg-primary/10 dark:bg-primary/20 rounded-full w-12 h-12 text-primary",
                     "dark:bg-primary/30"
                   )}>
                     {(() => {
@@ -81,9 +81,9 @@ const HowItWorks = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <h4 className="font-semibold text-xl leading-8">{step.title}</h4>
+                  <h4 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{step.title}</h4>
                   <p className={cn(
-                    "text-gray-600 text-base leading-5 font-normal",
+                    "text-gray-500 text-base leading-5 font-normal",
                     "dark:text-gray-400"
                   )}>{step.text}</p>
                 </div>
