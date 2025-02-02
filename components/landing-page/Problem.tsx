@@ -6,13 +6,13 @@ import { useTranslations } from "next-intl";
 const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) => {
   return (
     <div className="blur(0px); transform: translateY(-6px); 1; auto; filter: opacity: will-change:">
-      <div className="bg-background shadow-none border border-none rounded-lg text-card-foreground">
+      <div className="shadow-none border border-none rounded-lg text-card-foreground">
         <div className="space-y-4 p-6">
-          <div className="flex justify-center items-center bg-primary/10 rounded-full w-12 h-12">
+          <div className="flex justify-center items-center bg-primary/10 dark:bg-primary/20 rounded-full w-12 h-12">
             {icon}
           </div>
-          <h3 className="font-semibold text-xl leading-8">{title}</h3>
-          <p className="text-base text-muted-foreground leading-5">{text}</p>
+          <h3 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{title}</h3>
+          <p className="text-base text-gray-500 dark:text-gray-400 leading-5">{text}</p>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@ const Problem = () => {
         <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
           {t('title')}
         </h2>
-        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl sm:text-4xl md:text-5xl leading-none">
+        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100 leading-none">
           {t('subtitle')}
         </h3>
       </div>
