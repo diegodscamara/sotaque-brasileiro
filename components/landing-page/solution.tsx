@@ -23,10 +23,10 @@ const FeatureCard = ({
     className = ""
 }: FeatureCardTypes) => (
     <article
-        className={`flex flex-col items-start gap-4 bg-white dark:bg-gray-800  shadow-md hover:shadow-lg p-6 rounded-lg text-start ${className}`}
+        className={`flex flex-col items-start gap-4 bg-gray-50 dark:bg-gray-800  shadow-md hover:shadow-lg p-6 rounded-lg text-start ${className}`}
     >
-        <h4 className="font-semibold text-gray-900 text-xl dark:text-gray-100 leading-8">{title}</h4>
-        <p className="font-normal text-base text-slate-600 dark:text-slate-300 leading-5">{text}</p>
+        <h4 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{title}</h4>
+        <p className="font-normal text-base text-gray-500 dark:text-gray-400 leading-5">{text}</p>
         <Image
             src={image}
             alt={imageAlt}
@@ -48,7 +48,7 @@ export const Features = () => {
     return (
         <section
             id="features"
-            className="relative bg-gray-50 dark:bg-gray-700 w-full"
+            className="relative bg-gray-100 dark:bg-gray-700 w-full"
             aria-labelledby="features-title"
         >
             <div className="flex flex-col justify-center items-center gap-16 mx-auto px-4 py-16 max-w-7xl container">
@@ -59,10 +59,10 @@ export const Features = () => {
                     >
                         {t("title")}
                     </h2>
-                    <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-900 sm:text-4xl md:text-5xl dark:text-gray-100">
+                    <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100">
                         {t("subtitle")}
                     </h3>
-                    <p className="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300 leading-8">
+                    <p className="mx-auto max-w-2xl text-gray-500 text-lg dark:text-gray-300 leading-8">
                         {t("description")}
                     </p>
                 </header>
