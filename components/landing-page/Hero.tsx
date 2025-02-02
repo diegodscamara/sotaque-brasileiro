@@ -18,13 +18,13 @@ const Hero = (): JSX.Element => {
   return (
     <section
       id="hero"
-      className="relative flex lg:flex-row flex-col justify-center items-center gap-16 lg:gap-20 mx-auto px-4 py-16 max-w-7xl container"
+      className="relative flex lg:flex-row flex-col justify-center items-center gap-16 lg:gap-20 mx-auto px-4 py-40 max-w-7xl container"
     >
       <div className="flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
-        <h1 className="my-6 font-extrabold text-4xl lg:text-6xl tracking-tight">
+        <h1 className="my-6 font-extrabold text-4xl text-gray-800 lg:text-6xl dark:text-gray-100 tracking-tight">
           {t("hero.title")}
         </h1>
-        <h2 className="mb-8 max-w-xl text-muted-foreground lg:text-xl">
+        <h2 className="mb-8 max-w-xl text-gray-500 lg:text-xl dark:text-gray-300">
           {t("hero.subtitle")}
         </h2>
         {/* <TestimonialsAvatars priority={true} /> */}
