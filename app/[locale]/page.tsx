@@ -4,7 +4,6 @@ import CTA from "@/components/landing-page/CTA";
 import { CompaniesCarousel } from "@/components/landing-page/companies-carousel";
 import FAQ from "@/components/landing-page/FAQ";
 import { Features } from "@/components/landing-page/solution";
-import FeaturesListicle from "@/components/landing-page/FeaturesListicle";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/landing-page/Hero";
@@ -20,7 +19,7 @@ export default function Home() {
       <Suspense>
         <Header />
       </Suspense>
-      <main className="flex flex-col justify-center items-center gap-12 mx-auto mt-24">
+      <main className="flex flex-col justify-center items-center bg-gray-50 dark:bg-gray-800 mx-auto">
         <Hero />
         {/* Company logos */}
         <CompaniesCarousel />
@@ -32,8 +31,6 @@ export default function Home() {
         <HowItWorks />
         {/* Testimonials*/}
         <Testimonials3 />
-        {/* Features*/}
-        <FeaturesListicle />
         {/* Pricing*/}
         <Pricing />
         {/* FAQ*/}
