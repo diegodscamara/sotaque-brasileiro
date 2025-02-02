@@ -11,7 +11,7 @@ import HowItWorks from "@/components/landing-page/how-it-works";
 import Pricing from "@/components/landing-page/Pricing";
 import Problem from "@/components/landing-page/Problem";
 import { Suspense } from 'react'
-import Testimonials3 from "@/components/landing-page/Testimonials3";
+import Testimonials from "@/components/landing-page/testimonials";
 
 export default function Home() {
   return (
@@ -30,7 +30,7 @@ export default function Home() {
         {/* How it works*/}
         <HowItWorks />
         {/* Testimonials*/}
-        <Testimonials3 />
+        <Testimonials />
         {/* Pricing*/}
         <Pricing />
         {/* FAQ*/}
