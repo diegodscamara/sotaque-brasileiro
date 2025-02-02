@@ -137,6 +137,54 @@
                     "imageAlt": "Aprende con instructores nativos"
                 }
             ]
+        },
+        "testimonials": {
+            "title": "Lo Que Nuestros Estudiantes Dicen",
+            "subtitle": "Escucha lo que dicen nuestros estudiantes sobre su experiencia",
+            "cards": [
+                {
+                    "text": "Llegué a Brasil para trabajar y necesitaba aprender portugués rápidamente. Las lecciones personalizadas me ayudaron a comunicarme con confianza en solo unos meses!",
+                    "name": "Emily Johnson",
+                    "position": "Gerente de Marketing (USA)",
+                    "image": "/images/landing-page/testimonials/emily-johnson.png",
+                    "imageAlt": "Emily Johnson"
+                },
+                {
+                    "text": "Siempre he querido aprender portugués para viajar, y esta escuela lo hizo tan fácil. Los profesores son increíbles, y la inmersión cultural es fantástica!",
+                    "name": "James Carter",
+                    "position": "Bloguero de Viajes (Reino Unido)",
+                    "image": "/images/landing-page/testimonials/james-carter.png",
+                    "imageAlt": "James Carter"
+                },
+                {
+                    "text": "Como profesional de negocios, necesitaba aprender portugués para reuniones. Las lecciones personalizadas y el horario flexible fueron perfectos para mi vida ocupada.",
+                    "name": "Sarah Müller",
+                    "position": "Consultora de Negocios (Alemania)",
+                    "image": "/images/landing-page/testimonials/sarah-muller.png",
+                    "imageAlt": "Sarah Müller"
+                },
+                {
+                    "text": "Comencé a aprender portugués para conectar con mis amigos brasileños. Las clases son tan entretenidas, y estoy sorprendido de cuánto he mejorado!",
+                    "name": "Liam O’Connor",
+                    "position": "Desarrollador de Software (Irlanda)",
+                    "image": "/images/landing-page/testimonials/liam-oconnor.png",
+                    "imageAlt": "Liam O’Connor"
+                },
+                {
+                    "text": "Me encanta cómo los profesores hacen cada clase tan entretenida y interactiva. Aprender portugués se ha convertido en mi parte favorita de la semana!",
+                    "name": "Sofia Rossi",
+                    "position": "Artista (Italia)",
+                    "image": "/images/landing-page/testimonials/sofia-rossi.png",
+                    "imageAlt": "Sofia Rossi"
+                },
+                {
+                    "text": "La inmersión cultural es increíble—me siento como si estuviera experimentando Brasil mientras aprendo el idioma. ¡Altamente recomendado!",
+                    "name": "Emma Dubois",
+                    "position": "Estudiante Universitario (Francia)",
+                    "image": "/images/landing-page/testimonials/emma-dubois.png",
+                    "imageAlt": "Emma Dubois"
+                }
+            ]
         }
     },
     "dashboard": {},
