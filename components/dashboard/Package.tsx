@@ -181,7 +181,7 @@ export default function PackageInfo() {
       {/* Calendar Modal */}
       {isCalendarModalOpen && (
         <div
-          className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 m-0 h-[100vh]"
+          className="z-50 fixed inset-0 flex justify-center items-center bg-gray-800/50 m-0 h-[100vh]"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setIsCalendarModalOpen(false);

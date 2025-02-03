@@ -11,6 +11,7 @@ import { useCallback, useState } from 'react';
 import { Button } from './ui/button';
 import { CaretDown } from '@phosphor-icons/react';
 import { JSX } from 'react';
+import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 
 interface Language {
@@ -64,18 +65,25 @@ export default function LanguageSwitcher(): JSX.Element {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
         {SUPPORTED_LANGUAGES.map(({ code, name, nativeName, flag }) => (
-          <DropdownMenuItem
+          <motion.div
             key={code}
-            onClick={() => handleLanguageChange(code)}
-            className={`flex items-center gap-2 cursor-pointer
-              ${currentLocale === code ? 'bg-muted' : ''}`}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
           >
-            <span className="text-base" aria-hidden="true">{flag}</span>
-            <span className="text-sm">{nativeName}</span>
-            <span className="text-muted-foreground text-xs">({name})</span>
-          </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleLanguageChange(code)}
+              className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600
+                ${currentLocale === code ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
+            >
+              <span className="text-base" aria-hidden="true">{flag}</span>
+              <span className="text-sm">{nativeName}</span>
+              <span className="text-muted-foreground text-xs">({name})</span>
+            </DropdownMenuItem>
+          </motion.div>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

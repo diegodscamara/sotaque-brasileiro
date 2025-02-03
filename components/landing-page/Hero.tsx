@@ -49,7 +49,7 @@ const Hero = (): JSX.Element => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <Button variant="default" asChild>
+          <Button variant="default" asChild effect="shineHover">
             <Link href={t("hero.cta.link")}>
               {t("hero.cta.primary")}
               <ArrowRight className="size-4" />

@@ -24,7 +24,7 @@ const FeatureCard = ({
     className = ""
 }: FeatureCardTypes) => (
     <motion.article
-        className={`flex flex-col items-start gap-4 bg-gray-50 dark:bg-gray-800 shadow-md p-6 rounded-lg text-start ${className}`}
+        className={`flex flex-col items-start gap-4 bg-gray-50/70 dark:bg-gray-800/30  shadow-md p-6 rounded-lg text-start ${className}`}
     >
         <h4 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{title}</h4>
         <p className="font-normal text-base text-gray-500 dark:text-gray-400 leading-5">{text}</p>

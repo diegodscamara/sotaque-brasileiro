@@ -62,7 +62,7 @@ const features = [
                 {feature.secondaryText}
               </p>
             </div>
-            <Button className="bg-accent px-4 py-2 border border-transparent rounded-box text-center text-lg text-primary-content duration-150 group">
+            <Button className="group bg-accent px-4 py-2 border border-transparent rounded-box text-center text-lg text-primary-content duration-150">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -235,7 +235,7 @@ const FeaturesGrid = () => {
   return (
     <section className="flex justify-center items-center bg-base-200/50 py-20 lg:py-32 w-full text-base-content">
       <div className="flex flex-col gap-16 md:gap-20 px-4 max-w-[82rem]">
-        <h2 className="max-w-3xl font-black text-4xl md:text-6xl tracking-[-0.01em]">
+        <h2 className="max-w-3xl font-gray-800 text-4xl md:text-6xl tracking-[-0.01em]">
           Ship features <br /> users{" "}
           <span className="underline underline-offset-8 decoration-base-300 decoration-dashed">
             really want

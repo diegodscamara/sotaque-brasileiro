@@ -30,9 +30,9 @@ export default function Page() {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="bg-gray-100 dark:bg-gray-700">
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="bg-gray-50 dark:bg-gray-800">
         <header className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 flex items-center gap-2 h-16 transition-[width,height] ease-linear shrink-0">
           <div className="flex items-center gap-2 px-4 w-full">
             <SidebarTrigger className="-ml-1" />
