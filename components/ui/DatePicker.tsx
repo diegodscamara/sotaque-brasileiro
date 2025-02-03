@@ -137,7 +137,7 @@ const TimeInput = React.forwardRef<HTMLDivElement, TimeInputProps>(
             <div
                 {...fieldProps}
                 ref={innerRef}
-                className="inline-flex gap-x-2 w-full group/time-input"
+                className="group/time-input inline-flex gap-x-2 w-full"
             >
                 {state.segments.map((segment, i) => (
                     <TimeSegment key={i} segment={segment} state={state} />
@@ -235,7 +235,7 @@ const CalendarPopover = React.forwardRef<
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 className={cx(
                     // base
-                    "relative z-50 w-fit rounded-md border text-sm shadow-xl shadow-black/[2.5%]",
+                    "relative z-50 w-fit rounded-md border text-sm shadow-xl shadow-gray-800/[2.5%]",
                     // widths
                     "min-w-[calc(var(--radix-select-trigger-width)-2px)] max-w-[95vw]",
                     // border color
