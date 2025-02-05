@@ -22,19 +22,19 @@ export async function GET(req: NextRequest) {
   const { teacherId, status, startDate, endDate } = queryParams;
   const userId = user.id;
 
-  let query = supabase.from('classes').select('*');
+  let query = supabase.from('Class').select('*');
 
   if (teacherId) {
-    query = query.eq('teacher_id', teacherId);
+    query = query.eq('teacherId', teacherId);
   }
   if (userId) {
-    query = query.eq('student_id', userId);
+    query = query.eq('studentId', userId);
   }
   if (status) {
     query = query.eq('status', status);
   }
   if (startDate && endDate) {
-    query = query.gte('start_time', startDate).lte('end_time', endDate);
+    query = query.gte('startDateTime', startDate).lte('endDateTime', endDate);
   }
 
   const { data, error } = await query;

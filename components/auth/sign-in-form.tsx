@@ -1,10 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { GoogleLogo } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast"
 
 export default function SignInForm() {
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const { toast } = useToast()
@@ -32,17 +34,10 @@ export default function SignInForm() {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.signInWithOtp({
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
-                options: {
-                    shouldCreateUser: true,
-                    emailRedirectTo: window.location.origin + "/api/auth/callback",
-                },
+                password
             })
-            toast({
-                title: "Check your emails!",
-                variant: "default",
-            });
 
             if (error) {
                 console.error("Email sign-in error:", error);
@@ -117,11 +112,22 @@ export default function SignInForm() {
                                 required
                             />
                         </div>
+                        <div className="gap-2 grid">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="********"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? (
                                 <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                             ) : null}
-                            Sign in with email
+                            Sign In
                         </Button>
                     </div>
                 </form>
@@ -138,6 +144,13 @@ export default function SignInForm() {
                     Sign in with Google
                 </Button>
             </CardContent>
+
+            <CardFooter className="flex flex-row justify-center items-center gap-1 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="underline underline-offset-4">
+                    Sign up
+                </Link>
+            </CardFooter>
         </Card>
     )
 }

@@ -11,21 +11,15 @@ import { Loader2 } from "lucide-react";
 import React from "react";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
-import useTeacherApi from "@/hooks/useTeacherApi";
 
 export default function SignUpForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [first_name, setFirst_name] = useState("");
-    const [last_name, setLast_name] = useState("");
-    const [role, setRole] = useState<"student" | "teacher">("student");
+    const [role, setRole] = useState<"STUDENT" | "TEACHER">("STUDENT");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const supabase = createClient();
-    const { getStudent } = useStudentApi();
-    const { getTeacher } = useTeacherApi();
 
     useEffect(() => {
         const checkUser = async () => {
@@ -41,35 +35,62 @@ export default function SignUpForm() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
                         role: role,
-                        first_name,
-                        last_name,
                     },
                 },
             });
 
-            if (error) throw error;
+            if (error || !data.user) {
+                throw new Error((error?.message || "No user data returned"));
+            }
 
-            // Redirect based on role
-            if (role === "student") {
-                // Check if the student has access
-                const { data: { user } } = await supabase.auth.getUser();
-                const studentData = await getStudent(user.id);
+            const { data: userData, error: userError } = await supabase.from("User").insert({
+                id: data.user.id,
+                email: data.user.email,
+                firstName: "John",
+                lastName: "Doe",
+                role: role,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
 
-                if (studentData && studentData.has_access) {
+            if (userError) throw userError;
+
+            if (userData && role === "STUDENT") {
+                const { data: studentData, error: studentError } = await supabase.from("Student").insert({
+                    id: data.user.id,
+                    userId: data.user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+
+                if (studentError) throw studentError;
+
+                if (studentData) {
                     router.push("/dashboard");
                 } else {
                     router.push("/pricing");
                 }
             } else {
-                // If it's a teacher, redirect to dashboard
-                router.push("/dashboard");
+                const { data: teacherData, error: teacherError } = await supabase.from("Teacher").insert({
+                    id: data.user.id,
+                    userId: data.user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+
+                if (teacherData) {
+                    router.push("/dashboard");
+                }
+
+                if (teacherError) throw teacherError;
             }
+
         } catch (error) {
             console.error("Sign up error:", error);
             setError(error.message);
@@ -80,13 +101,13 @@ export default function SignUpForm() {
 
     return (
         <div className="flex flex-col items-center gap-4">
-            <Tabs value={role} onValueChange={(value: "student" | "teacher") => setRole(value)} className="w-full">
+            <Tabs value={role} onValueChange={(value: "STUDENT" | "TEACHER") => setRole(value)} className="w-full">
                 <TabsList className="grid grid-cols-2 w-full">
-                    <TabsTrigger value="student" className="flex items-center gap-2">
+                    <TabsTrigger value="STUDENT" className="flex items-center gap-2">
                         <Student className="w-4 h-4" />
                         Student
                     </TabsTrigger>
-                    <TabsTrigger value="teacher" className="flex items-center gap-2">
+                    <TabsTrigger value="TEACHER" className="flex items-center gap-2">
                         <Pen className="w-4 h-4" />
                         Teacher
                     </TabsTrigger>
@@ -103,30 +124,6 @@ export default function SignUpForm() {
                 <CardContent>
                     <form onSubmit={handleSignUp} >
                         <div className="flex flex-col gap-6">
-                            <div className="flex flex-column items-center gap-6">
-                                <div className="gap-2 grid">
-                                    <Label htmlFor="first_name">First name</Label>
-                                    <Input
-                                        id="first_name"
-                                        type="text"
-                                        placeholder="John"
-                                        value={first_name}
-                                        onChange={(e) => setFirst_name(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="gap-2 grid">
-                                    <Label htmlFor="last_name">Last name</Label>
-                                    <Input
-                                        id="last_name"
-                                        type="text"
-                                        placeholder="Doe"
-                                        value={last_name}
-                                        onChange={(e) => setLast_name(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
                             <div className="gap-2 grid">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
