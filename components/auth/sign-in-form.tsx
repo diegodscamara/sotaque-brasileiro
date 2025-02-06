@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,14 +12,14 @@ import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast"
 
 export default function SignInForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
-    const { toast } = useToast()
     const supabase = createClient();
 
     useEffect(() => {
@@ -32,26 +33,26 @@ export default function SignInForm() {
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            })
+            const response = await fetch('/api/auth/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password, signIn: true }),
+            });
 
-            if (error) {
-                console.error("Email sign-in error:", error);
-                toast({
-                    title: "Failed to sign in",
-                    variant: "destructive",
-                });
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(data.error || "An unknown error occurred");
+            } else {
+                router.push(data.redirectUrl);
             }
         } catch (error) {
-            console.error("Email sign-in error:", error);
-            toast({
-                title: "Failed to sign in",
-                variant: "destructive",
-            });
+            setError(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }
@@ -64,27 +65,15 @@ export default function SignInForm() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
                 options: {
-                    redirectTo: window.location.origin + "/api/auth/callback",
-                    queryParams: {
-                        access_type: "offline",
-                        prompt: "consent",
-                    },
+                    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
                 },
             });
 
             if (error) {
-                console.error("Google sign-in error:", error);
-                toast({
-                    title: "Failed to sign in",
-                    variant: "destructive",
-                });
+                setError(error.message || "An unknown error occurred");
             }
         } catch (error) {
-            console.error("Google sign-in error:", error);
-            toast({
-                title: "Failed to sign in",
-                variant: "destructive",
-            });
+            setError(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }
@@ -114,14 +103,24 @@ export default function SignInForm() {
                         </div>
                         <div className="gap-2 grid">
                             <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                placeholder="********"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="********"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                                <button type="button" className="top-1/2 right-2 absolute transform -translate-y-1/2" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                            {error && (
+                                <div className="text-red-500 text-sm">
+                                    {error}
+                                </div>
+                            )}
                         </div>
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? (
@@ -137,7 +136,6 @@ export default function SignInForm() {
                     <p className="font-medium text-base-content/50 text-xs">OR</p>
                     <Separator className="w-1/3" />
                 </div>
-
 
                 <Button onClick={handleGoogleSignIn} variant="outline" className="w-full" disabled={loading}>
                     <GoogleLogo className="mr-2 w-4 h-4" />
