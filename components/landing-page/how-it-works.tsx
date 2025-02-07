@@ -1,8 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { Calendar, GraduationCap, UserCheck } from "@phosphor-icons/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import Image from "next/image";
 import PropTypes from 'prop-types';
@@ -24,6 +24,8 @@ const HowItWorks = () => {
   const t = useTranslations('landing.how-it-works');
   const steps: Step[] = useMemo(() => t.raw("steps"), [t]);
   const [activeStep, setActiveStep] = useState<number>(0);
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   // Dynamic STEP_ICONS based on current language
   const STEP_ICONS = useMemo(() => ({
@@ -41,7 +43,12 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <section id="how-it-works" className="relative flex flex-col gap-16 mx-auto px-4 py-16 max-w-7xl container" aria-labelledby="how-it-works-title">
+    <section 
+      ref={sectionRef}
+      id="how-it-works" 
+      className="relative flex flex-col gap-16 mx-auto px-4 py-16 max-w-7xl container" 
+      aria-labelledby="how-it-works-title"
+    >
       <div className="flex flex-col gap-4 text-center">
         <h2 className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider" id="how-it-works-title">
           {t("title")}
@@ -66,7 +73,7 @@ const HowItWorks = () => {
                 )}
                 aria-label={`Step ${index + 1}: ${step.title}`}
                 initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
               >
                 <div className="flex-shrink-0">
@@ -97,7 +104,7 @@ const HowItWorks = () => {
             <motion.div
               key={activeStep}
               initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.5 }}
               className="w-full h-64 lg:h-full"
