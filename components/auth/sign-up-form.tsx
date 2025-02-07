@@ -1,31 +1,31 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pen, Student } from "@phosphor-icons/react";
+import { Eye, EyeSlash, Pen, Student } from "@phosphor-icons/react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { GoogleLogo } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import React from "react";
+import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
-import useTeacherApi from "@/hooks/useTeacherApi";
 
 export default function SignUpForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [first_name, setFirst_name] = useState("");
-    const [last_name, setLast_name] = useState("");
-    const [role, setRole] = useState<"student" | "teacher">("student");
+    const [repeatPassword, setRepeatPassword] = useState("");
+    const [role, setRole] = useState<"STUDENT" | "TEACHER">("STUDENT");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+    const [isTypingPassword, setIsTypingPassword] = useState(false);
     const router = useRouter();
     const supabase = createClient();
-    const { getStudent } = useStudentApi();
-    const { getTeacher } = useTeacherApi();
 
     useEffect(() => {
         const checkUser = async () => {
@@ -40,53 +40,82 @@ export default function SignUpForm() {
         setLoading(true);
         setError(null);
 
+        if (password !== repeatPassword) {
+            setError("Passwords do not match.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        role: role,
-                        first_name,
-                        last_name,
-                    },
+            const response = await fetch('/api/auth/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    signIn: false,
+                    role,
+                }),
             });
 
-            if (error) throw error;
+            const data = await response.json();
 
-            // Redirect based on role
-            if (role === "student") {
-                // Check if the student has access
-                const { data: { user } } = await supabase.auth.getUser();
-                const studentData = await getStudent(user.id);
-
-                if (studentData && studentData.has_access) {
-                    router.push("/dashboard");
-                } else {
-                    router.push("/pricing");
-                }
+            if (!response.ok) {
+                setError(data.error || "An unknown error occurred");
             } else {
-                // If it's a teacher, redirect to dashboard
-                router.push("/dashboard");
+                router.push(data.redirectUrl);
             }
         } catch (error) {
-            console.error("Sign up error:", error);
-            setError(error.message);
+            setError(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }
     };
 
+    const handleGoogleSignUp = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/api/auth/callback`,
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                },
+            });
+
+            if (error) throw error;
+        } catch (error) {
+            setError(error instanceof Error ? error.message : "An unknown error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getPasswordStrength = (password: string) => {
+        if (password.length < 6) return { strength: "Too short", color: "text-red-500" };
+        if (password.length < 8) return { strength: "Weak", color: "text-orange-500" };
+        if (password.match(/[A-Z]/) && password.match(/[0-9]/)) return { strength: "Strong", color: "text-green-500" };
+        return { strength: "Medium", color: "text-yellow-500" };
+    };
+
+    const { strength: passwordStrength, color: strengthColor } = getPasswordStrength(password);
+    const isPasswordStrong = passwordStrength !== "Too short" && passwordStrength !== "Weak";
+    const passwordsMatch = password === repeatPassword;
+
     return (
         <div className="flex flex-col items-center gap-4">
-            <Tabs value={role} onValueChange={(value: "student" | "teacher") => setRole(value)} className="w-full">
+            <Tabs value={role} onValueChange={(value: "STUDENT" | "TEACHER") => setRole(value)} className="w-full">
                 <TabsList className="grid grid-cols-2 w-full">
-                    <TabsTrigger value="student" className="flex items-center gap-2">
+                    <TabsTrigger value="STUDENT" className="flex items-center gap-2">
                         <Student className="w-4 h-4" />
                         Student
                     </TabsTrigger>
-                    <TabsTrigger value="teacher" className="flex items-center gap-2">
+                    <TabsTrigger value="TEACHER" className="flex items-center gap-2">
                         <Pen className="w-4 h-4" />
                         Teacher
                     </TabsTrigger>
@@ -100,33 +129,9 @@ export default function SignUpForm() {
                         Enter your information to create an account
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSignUp} >
+                <CardContent className="flex flex-col gap-4">
+                    <form onSubmit={handleSignUp}>
                         <div className="flex flex-col gap-6">
-                            <div className="flex flex-column items-center gap-6">
-                                <div className="gap-2 grid">
-                                    <Label htmlFor="first_name">First name</Label>
-                                    <Input
-                                        id="first_name"
-                                        type="text"
-                                        placeholder="John"
-                                        value={first_name}
-                                        onChange={(e) => setFirst_name(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="gap-2 grid">
-                                    <Label htmlFor="last_name">Last name</Label>
-                                    <Input
-                                        id="last_name"
-                                        type="text"
-                                        placeholder="Doe"
-                                        value={last_name}
-                                        onChange={(e) => setLast_name(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
                             <div className="gap-2 grid">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
@@ -140,23 +145,57 @@ export default function SignUpForm() {
                             </div>
                             <div className="gap-2 grid">
                                 <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="********"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="********"
+                                        value={password}
+                                        onChange={(e) => {
+                                            setPassword(e.target.value);
+                                            setIsTypingPassword(true);
+                                        }}
+                                        required
+                                    />
+                                    <button type="button" className="top-1/2 right-2 absolute transform -translate-y-1/2" onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
+                                {isTypingPassword && (
+                                    <div className={`text-sm ${strengthColor}`}>
+                                        Password Strength: {passwordStrength}
+                                    </div>
+                                )}
                             </div>
-
+                            {isPasswordStrong && (
+                                <div className="gap-2 grid">
+                                    <Label htmlFor="repeat-password">Repeat Password</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="repeat-password"
+                                            type={showRepeatPassword ? "text" : "password"}
+                                            placeholder="********"
+                                            value={repeatPassword}
+                                            onChange={(e) => setRepeatPassword(e.target.value)}
+                                            required
+                                        />
+                                        <button type="button" className="top-1/2 right-2 absolute transform -translate-y-1/2" onClick={() => setShowRepeatPassword(!showRepeatPassword)}>
+                                            {showRepeatPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
+                                    {!passwordsMatch && (
+                                        <div className="text-red-500 text-sm">
+                                            Passwords do not match.
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                             {error && (
                                 <div className="text-red-500 text-sm">
                                     {error}
                                 </div>
                             )}
-
-                            <Button type="submit" className="w-full" disabled={loading}>
+                            <Button type="submit" className="w-full" disabled={loading || !isPasswordStrong || !passwordsMatch}>
                                 {loading ? (
                                     <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                                 ) : null}
@@ -164,6 +203,17 @@ export default function SignUpForm() {
                             </Button>
                         </div>
                     </form>
+
+                    <div className="flex justify-center items-center gap-2 w-full">
+                        <Separator className="w-1/3" />
+                        <p className="font-medium text-base-content/50 text-xs">OR</p>
+                        <Separator className="w-1/3" />
+                    </div>
+
+                    <Button onClick={handleGoogleSignUp} variant="outline" className="w-full" disabled={loading}>
+                        <GoogleLogo className="mr-2 w-4 h-4" />
+                        Sign up with Google
+                    </Button>
                 </CardContent>
 
                 <CardFooter className="flex flex-row justify-center items-center gap-1 text-center text-sm">

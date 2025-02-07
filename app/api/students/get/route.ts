@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   };
 
   const { id: studentId } = queryParams;
-  let query = supabase.from('users').select('*').eq('role', 'student');
+  let query = supabase.from('Student').select('*');
 
   if (studentId) {
     query = query.eq('id', studentId);
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     console.error('Error fetching students:', error);
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json({ message: error.message || "Error fetching students" }, { status: 500 });
   }
 
   return NextResponse.json(data, { status: 200 });

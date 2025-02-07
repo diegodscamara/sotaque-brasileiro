@@ -1,15 +1,18 @@
 import { AlarmClockIcon, CookieIcon, GlobeIcon } from "lucide-react";
+import React, { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
-import React from "react";
-import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
   return (
     <motion.div
-      className="blur(0px); transform: translateY(-6px); 1; auto; filter: opacity: will-change:"
+      ref={ref}
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5 }}
     >
       <div className="shadow-none border border-none rounded-lg text-card-foreground">
@@ -36,18 +39,30 @@ const Step = ({ icon, title, text }: { icon: React.ReactNode; title: string; tex
 // - Features: "ShipFast has user auth, Stripe, emails all set up for you"
 const Problem = () => {
   const t = useTranslations('landing.problem');
+  const sectionRef = useRef(null);
+  const isSectionInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
   return (
-    <section id="problem" className="relative flex flex-col items-center gap-16 mx-auto px-4 py-16 max-w-7xl container">
-      <div className="flex flex-col items-center gap-4 mx-auto text-center">
+    <section 
+      id="problem" 
+      ref={sectionRef}
+      className="relative flex flex-col items-center gap-16 mx-auto px-4 py-16 max-w-7xl container"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isSectionInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col items-center gap-4 mx-auto text-center"
+      >
         <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
           {t('title')}
         </h2>
         <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100 leading-none">
           {t('subtitle')}
         </h3>
-      </div>
+      </motion.div>
 
-      <div className="sm:gap-8 md:gap-10 lg:gap-12 grid grid-cols-1 md:grid-cols-3">
+      <div className="sm:gap-8 md:gap-10 lg:gap-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <Step icon={<AlarmClockIcon className="w-6 h-6 text-primary" />} title={t('cards.0.title')} text={t('cards.0.text')} />
         <Step icon={<CookieIcon className="w-6 h-6 text-primary" />} title={t('cards.1.title')} text={t('cards.1.text')} />
         <Step icon={<GlobeIcon className="w-6 h-6 text-primary" />} title={t('cards.2.title')} text={t('cards.2.text')} />

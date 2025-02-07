@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum ClassStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+  role      Role     @default(STUDENT)
+  country   String?
+  gender    String?
+
+  students      Student[]      @relation("UserStudents")
+  teachers      Teacher[]      @relation("UserTeachers")
+  notifications Notification[]
+  errorLogs     ErrorLog[]
+
+  @@index([email])
+}
+
+model Student {
+  id                     String    @id @default(uuid())
+  userId                 String
+  user                   User      @relation("UserStudents", fields: [userId], references: [id])
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  credits                Int       @default(0)
+  customerId             String?
+  priceId                String?
+  hasAccess              Boolean   @default(false)
+  packageName            String?
+  packageExpiration      DateTime?
+  portugueseLevel        String?
+  learningGoals          String[]
+  preferredSchedule      String[]
+  nativeLanguage         String?
+  otherLanguages         String[]
+  timeZone               String?
+  professionalBackground String?
+  motivationForLearning  String?
+  hasCompletedOnboarding Boolean   @default(false)
+  classes                Class[]
+
+  @@index([userId])
+}
+
+model Teacher {
+  id           String                @id @default(uuid())
+  userId       String
+  user         User                  @relation("UserTeachers", fields: [userId], references: [id])
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  biography    String?
+  specialties  String[]
+  languages    String[]
+  classes      Class[]
+  availability TeacherAvailability[]
+
+  @@index([userId])
+}
+
+model TeacherAvailability {
+  id             String   @id @default(uuid())
+  teacherId      String
+  teacher        Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  startDateTime  DateTime
+  endDateTime    DateTime
+  isAvailable    Boolean  @default(true)
+  recurringRules Json?
+  notes          String?
+
+  @@index([teacherId])
+}
+
+model Class {
+  id               String          @id @default(uuid())
+  teacherId        String
+  teacher          Teacher         @relation(fields: [teacherId], references: [id])
+  studentId        String
+  student          Student         @relation(fields: [studentId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  status           ClassStatus     @default(PENDING)
+  startDateTime    DateTime
+  endDateTime      DateTime
+  duration         Int
+  notes            String?
+  feedback         String?
+  rating           Int?
+  recurringGroupId String?
+  recurringGroup   RecurringGroup? @relation(fields: [recurringGroupId], references: [id])
+
+  @@index([teacherId, studentId])
+}
+
+model RecurringGroup {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  schedule    Json // e.g., {"pattern": "weekly", "days_of_week": [1, 3, 5]}
+  occurrences Int
+  endType     String
+  endDate     DateTime?
+  classes     Class[]
+
+  @@index([endDate])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type      String
+  message   String
+  metadata  Json?
+  isRead    Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@index([userId])
+}
+
+model ErrorLog {
+  id           String   @id @default(uuid())
+  occurredAt   DateTime @default(now())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  errorMessage String
+  errorStack   String?
+  table        String
+  operation    String
+
+  @@index([userId])
+}

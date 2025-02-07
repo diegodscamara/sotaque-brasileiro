@@ -1,129 +1,245 @@
 import { NextResponse } from 'next/server'
+import { Role } from '@prisma/client'
 import { createClient } from '@/libs/supabase/server'
+import { getUserTimeZone } from '@/libs/utils/timezone'
 
-export async function GET(request: Request) {
+/**
+ * Handles user authentication and account creation
+ * @param {Request} request - The incoming request
+ * @returns {Promise<NextResponse>} - Response with redirect URL or error
+ */
+export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams, origin } = new URL(request.url)
-  const queryParams = {
-    code: searchParams.get('code'),
-    token: searchParams.get('token'),
-    email: searchParams.get('email'),
-  };
+  const code = searchParams.get('code')
+  const error = searchParams.get('error')
+  const supabase = createClient()
 
-  const { code, token, email } = queryParams;
-  const supabase = createClient();
+  // Remove language prefix from origin
+  const baseUrl = origin.replace(/\/(en|fr|pt)(\/|$)/, '/')
 
-  if (token && email) {
-    // If a token is present, verify it
-    const { error } = await supabase.auth.verifyOtp({ type: 'magiclink', token, email });
-    if (error) {
-      console.error('Error verifying magic link:', error);
-      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-    }
-  } else if (code) {
-    // If a code is present, exchange it for a session
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) {
-      console.error('Error exchanging code for session:', error);
-      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-    }
-  } else {
-    console.error('No token or code provided.');
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  if (error) {
+    return NextResponse.redirect(`${baseUrl}auth/auth-code-error?error=${error}`)
   }
 
-  // Fetch user metadata to check role and access
-  const { data: { user } } = await supabase.auth.getUser();
+  if (!code) {
+    return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+  }
 
-  let { data: existingUser, error: userFetchError } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  try {
+    const { data: { session }, error: authError } = await supabase.auth.exchangeCodeForSession(code)
 
-  if (userFetchError && userFetchError.code === 'PGRST116') {
-    // User does not exist, create a new entry
-    const googleName = user.user_metadata.name;
-    const googleAvatar = user.user_metadata.avatar_url;
-    const [firstName, ...lastNameParts] = googleName.split(' ');
-    const lastName = lastNameParts.join(' ');
+    if (authError) {
+      console.error('Error exchanging code for session:', authError)
+      return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+    }
 
-    const { data: newUser, error: createUserError } = await supabase
-      .from('users')
+    // Check if user exists
+    const { data: existingUser, error: userFetchError } = await supabase
+      .from('User')
+      .select('*')
+      .eq('id', session.user.id)
+      .single()
+
+    if (userFetchError && userFetchError.code === 'PGRST116') {
+      // User doesn't exist, create new user
+      await createNewUser(supabase, session, Role.STUDENT)
+    } else if (!userFetchError && existingUser) {
+      // User exists, update with Google info if available
+      await updateUserWithGoogleInfo(supabase, session, existingUser)
+    } else if (userFetchError) {
+      return NextResponse.json({ error: userFetchError.message }, { status: 400 })
+    }
+
+    // Get updated user info for redirect
+    const { data: updatedUser } = await supabase
+      .from('User')
+      .select('*')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!updatedUser) {
+      return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+    }
+
+    // Handle role-based redirect
+    const redirectUrl = await handleRoleBasedRedirect(supabase, updatedUser)
+    return NextResponse.redirect(`${baseUrl}${redirectUrl.replace(/^\//, '')}`)
+
+  } catch (error) {
+    console.error('Error in auth callback:', error)
+    return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+  }
+}
+
+/**
+ * Updates existing user with Google info if available
+ * @param {ReturnType<typeof createClient>} supabase - Supabase client
+ * @param {any} session - Auth session
+ * @param {any} existingUser - Existing user data
+ * @returns {Promise<void>}
+ */
+async function updateUserWithGoogleInfo(supabase: ReturnType<typeof createClient>, session: any, existingUser: any): Promise<void> {
+  if (session.user.user_metadata?.full_name) {
+    const googleName = session.user.user_metadata.full_name
+    const googleAvatar = session.user.user_metadata.avatar_url || null
+    const [firstName, ...lastNameParts] = googleName.split(' ')
+    const lastName = lastNameParts.join(' ')
+
+    const updateData: any = {}
+
+    // Only update fields that are empty, null or different from existing values
+    if (!existingUser.firstName || existingUser.firstName !== firstName) updateData.firstName = firstName
+    if (!existingUser.lastName || existingUser.lastName !== lastName) updateData.lastName = lastName
+    if (!existingUser.avatarUrl || existingUser.avatarUrl !== googleAvatar) updateData.avatarUrl = googleAvatar
+
+    if (Object.keys(updateData).length > 0) {
+      updateData.updatedAt = new Date().toLocaleString('en-US', { timeZone: getUserTimeZone() })
+      const { error } = await supabase
+        .from('User')
+        .update(updateData)
+        .eq('id', session.user.id)
+
+      if (error) throw new Error(`User update failed: ${error.message}`)
+    }
+  }
+}
+
+/**
+ * Creates a new user in the database
+ * @param {ReturnType<typeof createClient>} supabase - Supabase client
+ * @param {any} session - Auth session
+ * @param {Role} role - User role
+ * @returns {Promise<void>}
+ */
+async function createNewUser(supabase: ReturnType<typeof createClient>, session: any, role: Role): Promise<void> {
+  const userTimeZone = getUserTimeZone()
+  const currentDate = new Date().toLocaleString('en-US', { timeZone: userTimeZone })
+
+  // Only extract name for Google sign-ups
+  const userData: any = {
+    id: session.user.id,
+    email: session.user.email,
+    role,
+    updatedAt: currentDate,
+    createdAt: currentDate,
+  }
+
+  // Add name and avatar only if it's a Google sign-up
+  if (session.user.user_metadata?.full_name) {
+    const googleName = session.user.user_metadata.full_name
+    const googleAvatar = session.user.user_metadata.avatar_url || null
+    const [firstName, ...lastNameParts] = googleName.split(' ')
+    const lastName = lastNameParts.join(' ')
+
+    userData.firstName = firstName
+    userData.lastName = lastName
+    userData.avatarUrl = googleAvatar
+  }
+
+  const { error: userError } = await supabase
+    .from('User')
+    .insert(userData)
+
+  if (userError) throw new Error(`User creation failed: ${userError.message}`)
+
+  if (role === Role.STUDENT) {
+    const { error: studentError } = await supabase
+      .from('Student')
       .insert({
-        id: user.id,
-        email: user.email,
-        first_name: firstName,
-        last_name: lastName,
-        avatar_url: googleAvatar,
-        role: 'student', // Default role
-        has_access: false,
+        id: session.user.id,
+        userId: session.user.id,
+        createdAt: currentDate,
+        updatedAt: currentDate,
       })
-      .select()
-      .single();
 
-    if (createUserError) {
-      console.error('Error creating user:', createUserError);
-      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-    }
+    if (studentError) throw new Error(`Student creation failed: ${studentError.message}`)
+  } else if (role === Role.TEACHER) {
+    const { error: teacherError } = await supabase
+      .from('Teacher')
+      .insert({
+        id: session.user.id,
+        userId: session.user.id,
+        createdAt: currentDate,
+        updatedAt: currentDate,
+      })
 
-    existingUser = newUser;
-  } else if (userFetchError) {
-    console.error('Error fetching user data:', userFetchError);
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+    if (teacherError) throw new Error(`Teacher creation failed: ${teacherError.message}`)
   }
+}
 
-  // Compare and update user data
-  const googleName = user.user_metadata.name; // Full name from Google
-  const googleAvatar = user.user_metadata.avatar_url; // Avatar URL from Google
+/**
+ * Handles email/password authentication
+ * @param {Request} request - The incoming request
+ * @returns {Promise<NextResponse>} - Response with redirect URL or error
+ */
+export async function POST(request: Request): Promise<NextResponse> {
+  const supabase = createClient()
+  const { email, password, signIn, role } = await request.json()
 
-  // Split the full name into first and last names
-  const [firstName, ...lastNameParts] = googleName.split(' ');
-  const lastName = lastNameParts.join(' ');
+  try {
+    if (signIn) {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
 
-  // Check if the name or avatar URL needs to be updated
-  let needsUpdate = false;
-  const updates: any = {};
+      const user = data?.user
+      if (!user) throw new Error('User sign-in failed.')
 
-  if (existingUser.first_name !== firstName) {
-    updates.first_name = firstName;
-    needsUpdate = true;
-  }
+      const { data: existingUser, error: userFetchError } = await supabase
+        .from('User')
+        .select('*')
+        .eq('id', user.id)
+        .single()
 
-  if (existingUser.last_name !== lastName) {
-    updates.last_name = lastName;
-    needsUpdate = true;
-  }
+      if (userFetchError) throw userFetchError
+      if (!existingUser) throw new Error('User not found.')
 
-  if (existingUser.avatar_url !== googleAvatar) {
-    updates.avatar_url = googleAvatar;
-    needsUpdate = true;
-  }
-
-  // Update the user in the database if needed
-  if (needsUpdate) {
-    const { error: updateError } = await supabase
-      .from('users')
-      .update(updates)
-      .eq('id', user.id);
-
-    if (updateError) {
-      console.error('Error updating user data:', updateError);
+      const redirectUrl = await handleRoleBasedRedirect(supabase, existingUser)
+      return NextResponse.json({ success: true, redirectUrl }, { status: 200 })
     } else {
-      console.log('User data updated successfully:', updates);
-    }
-  }
+      const { data, error } = await supabase.auth.signUp({ email, password })
+      if (error) throw error
 
-  // Redirect logic for student and teacher
-  const isLocalEnv = process.env.NODE_ENV === 'development'
-  const redirectUrl = isLocalEnv ? origin : `https://${request.headers.get('x-forwarded-host')}`;
+      const user = data?.user
+      if (!user) throw new Error('User creation failed.')
 
-  if (existingUser.role === 'student') {
-    if (existingUser.has_access) {
-      return NextResponse.redirect(`${redirectUrl}/dashboard`);
-    } else {
-      return NextResponse.redirect(`${redirectUrl}/pricing`);
+      await createNewUser(supabase, { user }, role as Role)
+
+      const redirectUrl = role === Role.STUDENT ? '/#pricing' : '/dashboard'
+      return NextResponse.json({ success: true, redirectUrl }, { status: 201 })
     }
-  } else {
-    return NextResponse.redirect(`${redirectUrl}/dashboard`);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'An unknown error occurred' },
+      { status: 400 }
+    )
   }
+}
+
+/**
+ * Handles role-based redirect logic
+ * @param {ReturnType<typeof createClient>} supabase - Supabase client
+ * @param {any} user - User data
+ * @returns {Promise<string>} - Redirect URL
+ */
+async function handleRoleBasedRedirect(supabase: ReturnType<typeof createClient>, user: any): Promise<string> {
+  if (user.role === Role.STUDENT) {
+    const { data: studentRecord, error } = await supabase
+      .from('Student')
+      .select('hasAccess')
+      .eq('userId', user.id)
+      .single()
+
+    if (error) throw error
+    return studentRecord?.hasAccess ? '/dashboard' : '/#pricing'
+  } else if (user.role === Role.TEACHER) {
+    const { error } = await supabase
+      .from('Teacher')
+      .select('id')
+      .eq('userId', user.id)
+      .single()
+
+    if (error) throw error
+    return '/dashboard'
+  }
+  throw new Error('Invalid role.')
 }

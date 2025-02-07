@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { updateSession } from "@/libs/supabase/middleware";
 import createMiddleware from 'next-intl/middleware';
 import {routing} from './i18n/routing';
+import { NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -12,8 +13,12 @@ export async function middleware(request: NextRequest) {
     return sessionResponse;
   }
 
-  // Then handle internationalization
-  return intlMiddleware(request);
+  // Then handle internationalization, but skip for auth callback
+  if (!request.nextUrl.pathname.startsWith('/api/auth/callback')) {
+    return intlMiddleware(request);
+  }
+
+  return NextResponse.next(); // Proceed without localization for this path
 }
 
 export const config = {

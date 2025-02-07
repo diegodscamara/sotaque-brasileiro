@@ -7,14 +7,14 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const queryParams = {
     teacherId: searchParams.get('teacherId'),
-    date: searchParams.get('date'),
+    startDateTime: searchParams.get('startDateTime'),
   };
 
-  const { teacherId, date } = queryParams;
-  let query = supabase.from('teacher_availability').select('*').eq('teacher_id', teacherId);
+  const { teacherId, startDateTime } = queryParams;
+  let query = supabase.from('TeacherAvailability').select('*').eq('teacherId', teacherId);
 
-  if (date) {
-    query = query.eq('date', date);
+  if (startDateTime) {
+    query = query.eq('startDateTime', startDateTime);
   }
 
   const { data, error } = await query;

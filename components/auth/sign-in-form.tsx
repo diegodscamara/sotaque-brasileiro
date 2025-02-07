@@ -1,22 +1,25 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { GoogleLogo } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast"
 
 export default function SignInForm() {
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
-    const { toast } = useToast()
     const supabase = createClient();
 
     useEffect(() => {
@@ -30,33 +33,26 @@ export default function SignInForm() {
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithOtp({
-                email,
-                options: {
-                    shouldCreateUser: true,
-                    emailRedirectTo: window.location.origin + "/api/auth/callback",
+            const response = await fetch('/api/auth/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            })
-            toast({
-                title: "Check your emails!",
-                variant: "default",
+                body: JSON.stringify({ email, password, signIn: true }),
             });
 
-            if (error) {
-                console.error("Email sign-in error:", error);
-                toast({
-                    title: "Failed to sign in",
-                    variant: "destructive",
-                });
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(data.error || "An unknown error occurred");
+            } else {
+                router.push(data.redirectUrl);
             }
         } catch (error) {
-            console.error("Email sign-in error:", error);
-            toast({
-                title: "Failed to sign in",
-                variant: "destructive",
-            });
+            setError(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }
@@ -64,32 +60,21 @@ export default function SignInForm() {
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
-
         try {
             const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
+                provider: 'google',
                 options: {
-                    redirectTo: window.location.origin + "/api/auth/callback",
+                    redirectTo: `${window.location.origin}/api/auth/callback`,
                     queryParams: {
-                        access_type: "offline",
-                        prompt: "consent",
+                        access_type: 'offline',
+                        prompt: 'consent',
                     },
                 },
             });
 
-            if (error) {
-                console.error("Google sign-in error:", error);
-                toast({
-                    title: "Failed to sign in",
-                    variant: "destructive",
-                });
-            }
+            if (error) throw error;
         } catch (error) {
-            console.error("Google sign-in error:", error);
-            toast({
-                title: "Failed to sign in",
-                variant: "destructive",
-            });
+            setError(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }
@@ -117,11 +102,32 @@ export default function SignInForm() {
                                 required
                             />
                         </div>
+                        <div className="gap-2 grid">
+                            <Label htmlFor="password">Password</Label>
+                            <div className="relative">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="********"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                                <button type="button" className="top-1/2 right-2 absolute transform -translate-y-1/2" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                            {error && (
+                                <div className="text-red-500 text-sm">
+                                    {error}
+                                </div>
+                            )}
+                        </div>
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? (
                                 <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                             ) : null}
-                            Sign in with email
+                            Sign In
                         </Button>
                     </div>
                 </form>
@@ -132,12 +138,18 @@ export default function SignInForm() {
                     <Separator className="w-1/3" />
                 </div>
 
-
                 <Button onClick={handleGoogleSignIn} variant="outline" className="w-full" disabled={loading}>
                     <GoogleLogo className="mr-2 w-4 h-4" />
                     Sign in with Google
                 </Button>
             </CardContent>
+
+            <CardFooter className="flex flex-row justify-center items-center gap-1 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="underline underline-offset-4">
+                    Sign up
+                </Link>
+            </CardFooter>
         </Card>
     )
 }
