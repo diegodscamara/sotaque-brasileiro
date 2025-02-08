@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import React, { JSX, useMemo } from "react";
 import { motion, useAnimation } from "framer-motion";
 
 import { ArrowRight } from "@phosphor-icons/react";
@@ -29,20 +29,24 @@ const Hero = (): JSX.Element => {
     }
   }, [controls, inView]);
 
-  const variants = {
+  const variants = useMemo(() => ({
     visible: { opacity: 1, y: 0 },
     hidden: { opacity: 0, y: 20 },
-  };
+  }), []);
 
-  const textVariants = {
+  const textVariants = useMemo(() => ({
     visible: { opacity: 1, x: 0 },
     hidden: { opacity: 0, x: -20 },
-  };
+  }), []);
 
-  const imageVariants = {
+  const imageVariants = useMemo(() => ({
     visible: { opacity: 1, scale: 1 },
     hidden: { opacity: 0, scale: 0.9 },
-  };
+  }), []);
+
+  const animationTransition = useMemo(() => ({
+    duration: 0.6
+  }), []);
 
   return (
     <motion.section
@@ -52,20 +56,24 @@ const Hero = (): JSX.Element => {
       initial="hidden"
       animate={controls}
       variants={variants}
-      transition={{ duration: 0.5 }}
+      transition={animationTransition}
+      aria-labelledby="hero-title"
+      role="region"
     >
       <div className="flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
         <motion.h1
+          id="hero-title"
           className="my-6 font-extrabold text-4xl text-gray-800 lg:text-6xl dark:text-gray-100 tracking-tight"
           variants={textVariants}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ ...animationTransition, delay: 0.2 }}
         >
           {t("hero.title")}
         </motion.h1>
         <motion.h2
           className="mb-8 max-w-xl text-gray-500 lg:text-xl dark:text-gray-300"
           variants={textVariants}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ ...animationTransition, delay: 0.4 }}
+          aria-describedby="hero-title"
         >
           {t("hero.subtitle")}
         </motion.h2>
@@ -74,12 +82,12 @@ const Hero = (): JSX.Element => {
         <motion.div
           className="flex lg:flex-row flex-col justify-center items-center gap-4"
           variants={variants}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ ...animationTransition, delay: 0.6 }}
         >
           <Button variant="default" asChild effect="shineHover">
-            <Link href={t("hero.cta.link")}>
+            <Link href={t("hero.cta.link")} aria-label={t("hero.cta.ariaLabel")}>
               {t("hero.cta.primary")}
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </Button>
         </motion.div>
@@ -88,7 +96,9 @@ const Hero = (): JSX.Element => {
       <motion.div
         className="w-full"
         variants={imageVariants}
-        transition={{ duration: 0.5, delay: 0.8 }}
+        transition={{ ...animationTransition, delay: 0.8 }}
+        role="img"
+        aria-label={t("hero.imageAlt")}
       >
         <Image
           src={t("hero.image")}
