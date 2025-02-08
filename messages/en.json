@@ -27,7 +27,8 @@
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
                 "primary": "Get Started",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Get started with our service"
             }
         },
         "companies": {
@@ -191,11 +192,7 @@
             "subtitle": "Start Your Journey Today",
             "intervals": {
                 "monthly": "Monthly",
-                "yearly": "Yearly",
-                "toggle": {
-                    "monthly": "Monthly",
-                    "yearly": "Yearly"
-                }
+                "yearly": "Yearly"
             },
             "billing": {
                 "monthly": "Billed monthly",
