@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 import config from "@/config";
 import logo from "@/app/icon.png";
 

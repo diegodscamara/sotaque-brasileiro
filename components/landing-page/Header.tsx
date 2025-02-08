@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import ButtonSignin from "@/components/ButtonSignin";
 import Image from "next/image";
-import LanguageSwitcher from "./lang-switcher";
+import LanguageSwitcher from "@/components/lang-switcher";
 import Link from "next/link";
 import { List } from "@phosphor-icons/react";
 import { User } from "@supabase/supabase-js";

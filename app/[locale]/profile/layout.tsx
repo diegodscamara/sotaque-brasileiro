@@ -1,7 +1,4 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import { ReactNode } from "react";
-import { Suspense } from "react";
 import config from "@/config";
 import { createClient } from "@/libs/supabase/server";
 import { redirect } from "next/navigation";
@@ -26,15 +23,5 @@ export default async function LayoutPrivate({
     redirect(config.auth.loginUrl);
   }
 
-  return (
-    <>
-      <Suspense>
-        <Header />
-      </Suspense>
-      <main className="flex flex-col justify-between items-center mx-auto py-24 container">
-        {children}
-      </main>
-      <Footer />
-    </>
-  );
+  return children
 }

@@ -1,11 +1,17 @@
+import { JSX, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
 import Image from "next/image";
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
 
 /**
  * Represents a feature card's content structure and component props
+ * @interface
+ * @property {string} title - The title of the feature
+ * @property {string} text - The description of the feature
+ * @property {string} image - The image URL for the feature
+ * @property {string} imageAlt - The alt text for the feature image
+ * @property {string} [className] - Additional CSS classes
  */
 interface FeatureCardTypes {
     title: string;
@@ -17,6 +23,9 @@ interface FeatureCardTypes {
 
 /**
  * Individual feature card component with consistent styling and accessibility
+ * @component
+ * @param {FeatureCardTypes} props - The feature card properties
+ * @returns {JSX.Element} The rendered feature card
  */
 const FeatureCard = ({
     title,
@@ -24,30 +33,43 @@ const FeatureCard = ({
     image,
     imageAlt,
     className = ""
-}: FeatureCardTypes) => (
+}: FeatureCardTypes): JSX.Element => (
     <motion.article
         className={`flex flex-col items-start gap-4 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg text-start h-full w-full ${className}`}
+        aria-labelledby={`feature-${title.toLowerCase().replace(/\s+/g, '-')}-title`}
     >
-        <h4 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{title}</h4>
-        <p className="font-normal text-base text-gray-500 dark:text-gray-400 leading-5">{text}</p>
-        <Image
-            src={image}
-            alt={imageAlt}
-            width={100}
-            height={100}
-            className="rounded-lg w-full h-full object-cover"
-            loading="lazy"
-        />
+        <h4
+            id={`feature-${title.toLowerCase().replace(/\s+/g, '-')}-title`}
+            className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8"
+        >
+            {title}
+        </h4>
+        <p className="font-normal text-base text-gray-500 dark:text-gray-400 leading-5">
+            {text}
+        </p>
+        <div className="relative w-full">
+            <Image
+                src={image}
+                alt={imageAlt}
+                width={100}
+                height={100}
+                className="rounded-lg w-full h-full object-cover"
+                loading="lazy"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+        </div>
     </motion.article>
 );
 
 /**
  * Features section component displaying feature cards in a grid layout
+ * @component
+ * @returns {JSX.Element} The rendered features section
  */
-export const Features = () => {
+export const Features = (): JSX.Element => {
     const t = useTranslations('landing.features');
     const cards = t.raw('cards') as FeatureCardTypes[];
-    const ref = useRef(null);
+    const ref = useRef<HTMLDivElement>(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
 
     return (
@@ -58,7 +80,7 @@ export const Features = () => {
             aria-labelledby="features-title"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
         >
             <div className="flex flex-col justify-center items-center gap-16 mx-auto px-4 py-16 max-w-7xl container">
                 <header className="space-y-4 mx-auto text-center">
@@ -117,7 +139,7 @@ export const Features = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ delay: 0.5 }}
+                        transition={{ delay: 0.6 }}
                         className="col-span-2 lg:col-span-1"
                     >
                         <FeatureCard
@@ -127,6 +149,6 @@ export const Features = () => {
                     </motion.div>
                 </div>
             </div>
-        </motion.section >
+        </motion.section>
     );
 };
