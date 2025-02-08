@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/tabs";
 import { useCallback, useEffect, useState } from "react";
 
-import { BasicInfo } from "./components/BasicInfo";
+import { BasicInfo } from "../../../components/profile/user-info";
 import Breadcrumb from '@/components/Breadcrumb';
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import { FloppyDisk } from "@phosphor-icons/react";
-import { LanguageLearning } from "./components/LanguageLearning";
+import { LanguageLearning } from "../../../components/profile/language-info";
 import { StudentProfileData } from '@/types/profile';
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/libs/supabase/client";
