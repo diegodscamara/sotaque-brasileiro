@@ -17,7 +17,8 @@
             },
             "cta": {
                 "primary": "Get Started",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Get started with our service"
             }
         },
         "hero": {
