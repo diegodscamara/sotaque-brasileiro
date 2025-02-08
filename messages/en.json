@@ -150,7 +150,7 @@
                     "imageAlt": "Emily Johnson"
                 },
                 {
-                    "text": "I’ve always wanted to learn Portuguese for travel, and this school made it so easy. The teachers are amazing, and the cultural immersion is fantastic!",
+                    "text": "I've always wanted to learn Portuguese for travel, and this school made it so easy. The teachers are amazing, and the cultural immersion is fantastic!",
                     "name": "James Carter",
                     "position": "Travel Blogger (UK)",
                     "image": "/images/landing-page/testimonials/james-carter.png",
@@ -164,11 +164,11 @@
                     "imageAlt": "Sarah Müller"
                 },
                 {
-                    "text": "I started learning Portuguese to connect with my Brazilian friends. The classes are so engaging, and I’m amazed at how much I’ve improved!",
-                    "name": "Liam O’Connor",
+                    "text": "I started learning Portuguese to connect with my Brazilian friends. The classes are so engaging, and I'm amazed at how much I've improved!",
+                    "name": "Liam O'Connor",
                     "position": "Software Developer (Ireland)",
                     "image": "/images/landing-page/testimonials/liam-oconnor.png",
-                    "imageAlt": "Liam O’Connor"
+                    "imageAlt": "Liam O'Connor"
                 },
                 {
                     "text": "I love how the teachers make every class fun and interactive. Learning Portuguese has become my favorite part of the week!",
@@ -178,11 +178,127 @@
                     "imageAlt": "Sofia Rossi"
                 },
                 {
-                    "text": "The cultural immersion is incredible—I feel like I’m experiencing Brazil while learning the language. Highly recommend this school!",
+                    "text": "The cultural immersion is incredible—I feel like I'm experiencing Brazil while learning the language. Highly recommend this school!",
                     "name": "Emma Dubois",
                     "position": "University Student (France)",
                     "image": "/images/landing-page/testimonials/emma-dubois.png",
                     "imageAlt": "Emma Dubois"
+                }
+            ]
+        },
+        "pricing": {
+            "title": "Affordable Plans for Every Learner",
+            "subtitle": "Start Your Journey Today",
+            "intervals": {
+                "monthly": "Monthly",
+                "yearly": "Yearly",
+                "toggle": {
+                    "monthly": "Monthly",
+                    "yearly": "Yearly"
+                }
+            },
+            "billing": {
+                "monthly": "Billed monthly",
+                "yearly": "Billed yearly"
+            },
+            "CTA": "Get Started",
+            "featured": "Popular",
+            "disclaimer": "Prices in USD, VAT may apply. Secure payment via Stripe",
+            "plans": [
+                {
+                    "tier": "Explorer",
+                    "description": "Perfect for beginners testing the waters or casual learners who want flexibility.",
+                    "features": [
+                        "8 hours of classes per month",
+                        "Native Brazilian instructors",
+                        "Personalized learning plan",
+                        "Flexible scheduling",
+                        "Email support"
+                    ],
+                    "variants": [
+                        {
+                            "priceId": {
+                                "development": "price_1QfVt5G0hzDtxXr3D7YiNwRq",
+                                "production": "price_1QfVt5G0hzDtxXr3D7YiNwRq"
+                            },
+                            "interval": "monthly",
+                            "price": 260,
+                            "units": 8
+                        },
+                        {
+                            "priceId": {
+                                "development": "price_1QfVxyG0hzDtxXr3GGFsKXQV",
+                                "production": "price_1QfVxyG0hzDtxXr3GGFsKXQV"
+                            },
+                            "interval": "yearly",
+                            "price": 2880,
+                            "units": 96
+                        }
+                    ]
+                },
+                {
+                    "tier": "Enthusiast",
+                    "isFeatured": true,
+                    "description": "Ideal for consistent learners aiming for steady progress with more regular practice.",
+                    "features": [
+                        "12 hours of classes per month",
+                        "Native Brazilian instructors",
+                        "Personalized learning plan",
+                        "Flexible scheduling",
+                        "Priority email support"
+                    ],
+                    "variants": [
+                        {
+                            "priceId": {
+                                "development": "price_1QfW3jG0hzDtxXr3Om5klqsl",
+                                "production": "price_1QfW3jG0hzDtxXr3Om5klqsl"
+                            },
+                            "interval": "monthly",
+                            "price": 380,
+                            "units": 12
+                        },
+                        {
+                            "priceId": {
+                                "development": "price_1QfW6PG0hzDtxXr3DxLeHB8c",
+                                "production": "price_1QfW6PG0hzDtxXr3DxLeHB8c"
+                            },
+                            "interval": "yearly",
+                            "price": 4320,
+                            "units": 144
+                        }
+                    ]
+                },
+                {
+                    "tier": "Master",
+                    "isFeatured": false,
+                    "description": "Designed for dedicated learners or professionals with ambitious goals.",
+                    "features": [
+                        "16 hours of classes per month",
+                        "Native Brazilian instructors",
+                        "Personalized learning plan",
+                        "Flexible scheduling",
+                        "Priority email and chat support"
+                    ],
+                    "variants": [
+                        {
+                            "priceId": {
+                                "development": "price_1QfWBBG0hzDtxXr3FlRtiwr0",
+                                "production": "price_1QfWBBG0hzDtxXr3FlRtiwr0"
+                            },
+                            "interval": "monthly",
+                            "price": 450,
+                            "units": 16
+                        },
+                        {
+                            "priceId": {
+                                "development": "price_1QfWEfG0hzDtxXr3TetQvd8v",
+                                "production": "price_1QfWEfG0hzDtxXr3TetQvd8v"
+                            },
+                            "interval": "yearly",
+                            "price": 4860,
+                            "units": 192
+                        }
+                    ]
                 }
             ]
         }
