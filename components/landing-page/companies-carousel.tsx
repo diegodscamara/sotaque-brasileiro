@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Image from "next/image"
 import Marquee from "@/components/ui/marquee"
@@ -14,20 +14,42 @@ interface CompanyLogo {
 
 export function CompaniesCarousel() {
     const t = useTranslations('landing.companies');
-    const [animationClass, setAnimationClass] = useState("");
+    const [isVisible, setIsVisible] = useState(false);
+    const sectionRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setAnimationClass("animate-slide");
-        }, 1000); // Delay animation start by 1 second
+        const currentRef = sectionRef.current;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
 
-        return () => clearTimeout(timer);
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
+
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
     }, []);
 
     return (
-        <section id="companies" className="relative flex flex-col items-center gap-8 mx-auto px-4 py-16 max-w-7xl container">
-            <h2 className="font-medium font-mono text-center text-primary text-sm uppercase tracking-wider">{t('title')}</h2>
-            <div className={`relative w-full overflow-hidden ${animationClass}`}>
+        <section 
+            id="companies" 
+            ref={sectionRef}
+            className="relative flex flex-col items-center gap-8 mx-auto px-4 py-16 max-w-7xl container"
+        >
+            <h2 className="font-medium font-mono text-center text-primary text-sm uppercase tracking-wider">
+                {t('title')}
+            </h2>
+            <div className={`relative w-full overflow-hidden ${isVisible ? "animate-slide" : ""}`}>
                 <Marquee>
                     {(t.raw('logos') as unknown as CompanyLogo[]).map((logo: CompanyLogo, index: number) => (
                         <div key={index} className="flex-shrink-0 opacity-90 hover:opacity-100 dark:opacity-95 transition-opacity duration-300">
