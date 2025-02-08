@@ -17,7 +17,8 @@
             },
             "cta": {
                 "primary": "Comenzar",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Comenzar con nuestro servicio"
             }
         },
         "hero": {
@@ -27,7 +28,8 @@
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
                 "primary": "Comenzar",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Comenzar con nuestro servicio"
             }
         },
         "companies": {
