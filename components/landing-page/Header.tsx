@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useScroll } from "framer-motion";
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ const Header = () => {
   const { getStudent } = useStudentApi();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean>(false);
   const t = useTranslations('landing.header');
 
@@ -45,14 +45,19 @@ const Header = () => {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await createClient().auth.getUser();
+      try {
+        const { data: { user } } = await createClient().auth.getUser();
 
-      if (user) {
-        const student = await getStudent(user.id);
-        setHasAccess(student?.has_access || false);
+        if (user) {
+          const student = await getStudent(user.id);
+          setHasAccess(student?.hasAccess || false);
+        }
+
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        setUser(null);
       }
-
-      setUser(user);
     };
 
     getUser();
@@ -98,42 +103,39 @@ const Header = () => {
             <span className="font-extrabold text-lg">{config.appName}</span>
           </Link>
 
-          <div className="flex justify-end items-center gap-8">
-            {/* Desktop Navigation */}
-            <div className="lg:flex lg:items-center lg:gap-2 hidden">
-              {links.map((link) => (
-                <Button
-                  variant="link"
-                  effect="hoverUnderline"
-                  className="text-gray-800 dark:text-gray-50"
-                  key={link.href}
-                  asChild
-                >
-                  <Link href={link.href}>{link.label}</Link>
-                </Button>
-              ))}
-            </div>
+          {/* Desktop Navigation */}
+          <div className="lg:flex lg:items-center lg:gap-2 hidden">
+            {links.map((link) => (
+              <Button
+                variant="link"
+                effect="hoverUnderline"
+                className="text-gray-800 dark:text-gray-50"
+                key={link.href}
+                asChild
+              >
+                <Link href={link.href}>{link.label}</Link>
+              </Button>
+            ))}
+          </div>
 
-            {/* Desktop CTA */}
-            <div className="lg:flex lg:items-center lg:gap-2 hidden">
-              {user ? (
-                hasAccess ? (
-                  <Button variant="default" asChild>
-                    <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
-                  </Button>
-                ) : (
-                  <Button variant="default" asChild effect="shineHover">
-                    <Link href={t("cta.link")}>{t("cta.primary")}</Link>
-                  </Button>
-                )
-              ) : (
+          {/* Desktop CTA */}
+          <div className="lg:flex lg:items-center gap-4 hidden">
+            <LanguageSwitcher />
+            {user && hasAccess ? (
+              <>
+                <Button variant="default" asChild>
+                  <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+                </Button>
+                <ButtonSignin />
+              </>
+            ) : (
+              <>
+                <ButtonSignin />
                 <Button variant="default" asChild effect="shineHover">
                   <Link href={t("cta.link")}>{t("cta.primary")}</Link>
                 </Button>
-              )}
-              <ButtonSignin />
-              <LanguageSwitcher />
-            </div>
+              </>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -166,8 +168,6 @@ const Header = () => {
                 </SheetHeader>
 
                 <div className="flex flex-col items-start gap-4 mt-8">
-                  <LanguageSwitcher />
-
                   <nav className="flex flex-col items-start gap-4">
                     {links.map((link) => (
                       <Button variant="link" effect="hoverUnderline" className="px-0 text-gray-800 dark:text-gray-50" key={link.href} asChild>
@@ -181,24 +181,24 @@ const Header = () => {
                     ))}
                   </nav>
 
-                  <SheetFooter className="flex flex-col gap-2 mt-auto pb-8">
-                    {user ? (
-                      hasAccess ? (
+                  <div className="flex flex-col sm:flex-col items-start gap-6">
+                    <LanguageSwitcher />
+                    {user && hasAccess ? (
+                      <div className="flex flex-col items-start gap-6 sm:m-0">
                         <Button variant="default" asChild effect="shineHover">
                           <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
                         </Button>
-                      ) : (
+                        <ButtonSignin />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-start gap-6 sm:m-0">
+                        <ButtonSignin />
                         <Button variant="default" asChild effect="shineHover">
                           <Link href={t("cta.link")}>{t("cta.primary")}</Link>
                         </Button>
-                      )
-                    ) : (
-                      <Button variant="default" asChild effect="shineHover">
-                        <Link href={t("cta.link")}>{t("cta.primary")}</Link>
-                      </Button>
+                      </div>
                     )}
-                    <ButtonSignin />
-                  </SheetFooter>
+                  </div>
                 </div>
               </div>
             </SheetContent>
