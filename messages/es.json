@@ -299,6 +299,34 @@
                     ]
                 }
             ]
+        },
+        "faq": {
+            "title": "Preguntas Frecuentes",
+            "subtitle": "Todo lo que necesitas saber para comenzar",
+            "questions": {
+                "1": {
+                    "question": "¿Qué tan flexibles son los horarios de las clases?",
+                    "answer": "Nuestras clases están diseñadas para adaptarse a tu vida ocupada. Puedes elegir entre horarios de mañana, tarde o fin de semana, y reprogramar fácilmente si es necesario. ¡Perfecto para profesionales y entusiastas por igual!"
+                },
+                "2": {
+                    "question": "¿Las clases están adaptadas a mis objetivos?",
+                    "answer": "Sí, personalizamos cada clase según tus necesidades específicas. Ya sea que estés aprendiendo para negocios, viajes o conexión cultural, nuestros instructores crean lecciones que se alinean con tus objetivos."
+                },
+                "3": {
+                    "question": "¿Ofrecen cursos de portugués para negocios?",
+                    "answer": "Sí, ofrecemos cursos de portugués para negocios. Contamos con un equipo de instructores experimentados que son expertos en portugués comercial. Te ayudarán a mejorar tus habilidades de portugués para negocios y te prepararán para tus reuniones empresariales."
+                },
+                "4": {
+                    "question": "¿Cómo incorporan la cultura brasileña en las clases?",
+                    "answer": "Incorporamos la cultura brasileña en las clases a través de expresiones auténticas, música y tradiciones. Esto te ayuda a conectarte con el idioma y su gente en un nivel más profundo."
+                },
+                "5": {
+                    "question": "¿Qué pasa si necesito cancelar o reprogramar una clase?",
+                    "answer": "Puedes cancelar o reprogramar una clase hasta 24 horas antes de la clase programada. Si necesitas cancelar o reprogramar una clase con menos de 24 horas de anticipación, puedes hacerlo contactándonos."
+                }
+            },
+            "disclaimer": "¿Aún tienes preguntas? Escríbenos a",
+            "email": "contacto@sotaquebrasileiro.com"
         }
     },
     "dashboard": {},
