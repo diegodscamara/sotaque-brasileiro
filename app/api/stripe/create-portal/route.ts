@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
     }
 
     const { data } = await supabase
-      .from("users")
+      .from("Student")
       .select("*")
-      .eq("id", user?.id)
+      .eq("userId", user?.id)
       .single();
 
-    if (!data?.customer_id) {
+    if (!data?.customerId) {
       return NextResponse.json(
         {
           error: "You don't have a billing account yet. Make a purchase first.",
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     const stripePortalUrl = await createCustomerPortal({
-      customerId: data.customer_id,
+      customerId: data.customerId,
       returnUrl: body.returnUrl,
     });
 

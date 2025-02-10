@@ -2,49 +2,74 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createCheckout } from "@/libs/stripe";
 import { createClient } from "@/libs/supabase/server";
+import { z } from "zod";
 
-// This function is used to create a Stripe Checkout Session (one-time payment or subscription)
-// It's called by the <ButtonCheckout /> component
-// Users must be authenticated. It will prefill the Checkout data with their email and/or credit card (if any)
+/**
+ * Schema for validating the request body
+ */
+const CreateCheckoutSchema = z.object({
+  priceId: z.string().min(1, "Price ID is required"),
+  mode: z.enum(["payment", "subscription"]),
+  successUrl: z.string().url("Invalid success URL"),
+  cancelUrl: z.string().url("Invalid cancel URL"),
+});
+
+/**
+ * Creates a Stripe Checkout Session for authenticated users
+ * @param req - Next.js request object
+ * @returns NextResponse with checkout session URL or error
+ */
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-
   const supabase = createClient();
 
-  // Check if a user is logged in
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) {
-    return NextResponse.json({ error: "User not authenticated" }, { status: 401 }); // Return 401 status
+  // Validate authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: "User not authenticated" },
+      { status: 401 }
+    );
   }
 
   try {
-    const { priceId, mode, successUrl, cancelUrl } = body;
+    // Validate and parse request body
+    const body = await req.json();
+    const { priceId, mode, successUrl, cancelUrl } = CreateCheckoutSchema.parse(body);
 
-    const { data } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", user?.id)
-      .single();
+    // Fetch user data in parallel
+    const [userData, studentData] = await Promise.all([
+      supabase.from("User").select("*").eq("id", user.id).single(),
+      supabase.from("Student").select("*").eq("userId", user.id).single(),
+    ]);
 
+    // Create Stripe checkout session
     const stripeSessionURL = await createCheckout({
       priceId,
       mode,
       successUrl,
       cancelUrl,
-      // If user is logged in, it will pass the user ID to the Stripe Session so it can be retrieved in the webhook later
-      clientReferenceId: user?.id,
+      clientReferenceId: user.id,
       user: {
-        email: data?.email,
-        // If the user has already purchased, it will automatically prefill it's credit card
-        customerId: data?.customer_id,
+        email: userData.data?.email,
+        customerId: studentData.data?.customerId,
       },
-      // If you send coupons from the frontend, you can pass it here
-      // couponId: body.couponId,
     });
 
     return NextResponse.json({ url: stripeSessionURL });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: e?.message }, { status: 500 });
+  } catch (error) {
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: error.errors.map(e => e.message).join(", ") },
+        { status: 400 }
+      );
+    }
+
+    // Log and return generic error
+    console.error("Stripe Checkout Error:", error);
+    return NextResponse.json(
+      { error: "An error occurred while creating the checkout session" },
+      { status: 500 }
+    );
   }
 }

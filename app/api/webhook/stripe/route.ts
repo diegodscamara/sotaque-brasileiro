@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import Stripe from "stripe";
 import { SupabaseClient } from "@supabase/supabase-js";
-import configFile from "@/config";
 import { findCheckoutSession } from "@/libs/stripe";
 import { headers } from "next/headers";
+import messages from "@/messages/en.json";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-08-16",
@@ -42,71 +42,122 @@ export async function POST(req: NextRequest) {
   try {
     switch (eventType) {
       case "checkout.session.completed": {
-        // First payment is successful and a subscription is created (if mode was set to "subscription" in ButtonCheckout)
-        // ✅ Grant access to the product
         const stripeObject: Stripe.Checkout.Session = event.data.object as Stripe.Checkout.Session;
         const session = await findCheckoutSession(stripeObject.id);
 
-        const customerId = session?.customer;
-        const priceId = session?.line_items?.data[0]?.price.id;
+        const customerId = session?.customer as string;
+        const priceId = session?.line_items?.data[0]?.price?.id;
         const userId = stripeObject.client_reference_id;
-        const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
-        const units = session?.metadata?.hours_per_month || configFile.stripe.plans.find((p) => p.priceId === priceId)?.units || 0; // Retrieve units from metadata
-        const planName = plan?.name || configFile.stripe.plans.find((p) => p.priceId === priceId)?.name;
+        const plan = messages.landing.pricing.plans.find(p => 
+          p.variants.some(v => v.priceId.production === priceId)
+        );
+        const newPlanUnits = plan?.variants.find(v => v.priceId.production === priceId)?.units || 0;
+        const planName = plan?.tier;
 
-        const customer = (await stripe.customers.retrieve(
-          customerId as string
-        )) as Stripe.Customer;
+        if (!customerId || !priceId || !plan) {
+          throw new Error("Missing required Stripe data");
+        }
 
-        if (!plan) break;
-
+        const customer = (await stripe.customers.retrieve(customerId)) as Stripe.Customer;
         let user;
+        let units = newPlanUnits;
+
         if (!userId) {
-          // check if user already exists
-          const { data: student } = await supabase
-            .from("users")
+          // Check if user exists in User table
+          const { data: existingUser } = await supabase
+            .from("User")
             .select("*")
             .eq("email", customer.email)
             .single();
-          if (student) {
-            user = student;
+
+          if (existingUser) {
+            // Check if student record exists
+            const { data: student } = await supabase
+              .from("Student")
+              .select("*")
+              .eq("userId", existingUser.id)
+              .single();
+
+            user = student || existingUser;
           } else {
-            // create a new user using supabase auth admin
-            const { data } = await supabase.auth.admin.createUser({
+            // Create new user and student record
+            const { data: newUser } = await supabase.auth.admin.createUser({
               email: customer.email,
             });
 
-            user = data?.user;
+            if (newUser?.user) {
+              const { data: newStudent } = await supabase
+                .from("Student")
+                .insert({
+                  userId: newUser.user.id,
+                  email: customer.email,
+                  credits: newPlanUnits,
+                  customerId,
+                  priceId,
+                  hasAccess: true,
+                  packageName: planName
+                })
+                .select()
+                .single();
+
+              user = newStudent;
+            }
           }
         } else {
-          // find user by ID
+          // Handle plan upgrade/downgrade
+          const existingSubscriptions = await stripe.subscriptions.list({
+            customer: customerId,
+            status: 'active',
+            limit: 1
+          });
+
+          if (existingSubscriptions.data.length > 0) {
+            const currentSubscription = existingSubscriptions.data[0];
+            
+            await stripe.subscriptions.update(currentSubscription.id, {
+              cancel_at_period_end: true,
+              proration_behavior: 'always_invoice'
+            });
+
+            // Get current user credits from database
+            const { data: student } = await supabase
+              .from("Student")
+              .select("credits")
+              .eq("userId", userId)
+              .single();
+
+            if (student) {
+              // Calculate total credits: current credits + new plan's units
+              units = student.credits + newPlanUnits;
+            }
+          }
+
+          // Update existing student record
           const { data: student } = await supabase
-            .from("users")
+            .from("Student")
             .select("*")
-            .eq("id", userId)
+            .eq("userId", userId)
             .single();
+
+          if (!student) {
+            throw new Error("Student record not found");
+          }
 
           user = student;
         }
 
-        await supabase
-          .from("users")
-          .update({
-            customer_id: customerId,
-            price_id: priceId,
-            has_access: true,
-            role: "student",
-            credits: (user?.credits || 0) + units,
-            package_name: planName,
-          })
-          .eq("id", user?.id);
-
-        // Extra: send email with user link, product page, etc...
-        // try {
-        //   await sendEmail(...);
-        // } catch (e) {
-        //   console.error("Email issue:" + e?.message);
-        // }
+        if (user) {
+          await supabase
+            .from("Student")
+            .update({
+              customerId,
+              priceId,
+              hasAccess: true,
+              credits: units,
+              packageName: planName,
+            })
+            .eq("userId", user.userId || user.id);
+        }
 
         break;
       }
@@ -133,34 +184,46 @@ export async function POST(req: NextRequest) {
         );
 
         await supabase
-          .from("users")
-          .update({ has_access: false })
-          .eq("customer_id", subscription.customer);
+          .from("Student")
+          .update({ hasAccess: false })
+          .eq("customerId", subscription.customer);
         break;
       }
 
       case "invoice.paid": {
-        // Customer just paid an invoice (for instance, a recurring payment for a subscription)
-        // ✅ Grant access to the product
         const stripeObject: Stripe.Invoice = event.data.object as Stripe.Invoice;
-        const priceId = stripeObject.lines.data[0].price.id;
+        const priceId = stripeObject.lines.data[0]?.price?.id;
         const customerId = stripeObject.customer;
 
-        // Find student where customer_id equals the customerId (in table called 'users')
+        if (!customerId || !priceId) {
+          throw new Error("Missing required invoice data");
+        }
+
         const { data: student } = await supabase
-          .from("users")
+          .from("Student")
           .select("*")
-          .eq("customer_id", customerId)
+          .eq("customerId", customerId)
           .single();
 
-        // Make sure the invoice is for the same plan (priceId) the user subscribed to
-        if (student.price_id !== priceId) break;
+        if (!student) {
+          throw new Error("Student not found");
+        }
 
-        // Grant the student access to your product. It's a boolean in the database, but could be a number of credits, etc...
+        // Update the student's priceId and credits
+        const plan = messages.landing.pricing.plans.find(p => 
+          p.variants.some(v => v.priceId.production === priceId)
+        );
+        const newPlanUnits = plan?.variants.find(v => v.priceId.production === priceId)?.units || 0;
+
         await supabase
-          .from("users")
-          .update({ has_access: true })
-          .eq("customer_id", customerId);
+          .from("Student")
+          .update({ 
+            hasAccess: true,
+            priceId,
+            credits: (student.credits || 0) + newPlanUnits,
+            packageName: plan?.tier
+          })
+          .eq("customerId", customerId);
 
         break;
       }
@@ -178,8 +241,9 @@ export async function POST(req: NextRequest) {
       // Unhandled event type
     }
   } catch (e) {
-    console.error("stripe error: ", e.message);
+    console.error("Stripe webhook error:", e);
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 
-  return NextResponse.json({});
+  return NextResponse.json({ received: true });
 }

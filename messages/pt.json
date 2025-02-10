@@ -17,7 +17,8 @@
             },
             "cta": {
                 "primary": "Começar Agora",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Começar com nosso serviço"
             }
         },
         "hero": {
@@ -27,7 +28,8 @@
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
                 "primary": "Começar Agora",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Começar com nosso serviço"
             }
         },
         "companies": {
@@ -297,6 +299,34 @@
                     ]
                 }
             ]
+        },
+        "faq": {
+            "title": "Perguntas Frequentes",
+            "subtitle": "Tudo o que você precisa saber para começar",
+            "questions": {
+                "1": {
+                    "question": "Quão flexíveis são os horários das aulas?",
+                    "answer": "Nossas aulas são projetadas para se adequar à sua vida ocupada. Você pode escolher entre horários matutinos, vespertinos ou de fim de semana, e remarcar facilmente, se necessário. Perfeito para profissionais e entusiastas!"
+                },
+                "2": {
+                    "question": "As aulas são personalizadas para os meus objetivos?",
+                    "answer": "Sim, personalizamos cada aula de acordo com suas necessidades específicas. Seja para negócios, viagens ou conexão cultural, nossos instrutores criam lições que se alinham aos seus objetivos."
+                },
+                "3": {
+                    "question": "Vocês oferecem cursos de português para negócios?",
+                    "answer": "Sim, oferecemos cursos de português para negócios. Temos uma equipe de instrutores experientes, especialistas em português empresarial. Eles ajudarão você a melhorar suas habilidades em português para negócios e a se preparar para suas reuniões profissionais."
+                },
+                "4": {
+                    "question": "Como vocês incorporam a cultura brasileira nas aulas?",
+                    "answer": "Incorporamos a cultura brasileira nas aulas por meio de expressões autênticas, música e tradições. Isso ajuda você a se conectar com a língua e seu povo em um nível mais profundo."
+                },
+                "5": {
+                    "question": "E se eu precisar cancelar ou remarcar uma aula?",
+                    "answer": "Você pode cancelar ou remarcar uma aula até 24 horas antes do horário agendado. Se precisar cancelar ou remarcar uma aula com menos de 24 horas de antecedência, você pode fazer isso entrando em contato conosco."
+                }
+            },
+            "disclaimer": "Ainda tem dúvidas? Envie um e-mail para",
+            "email": "contato@sotaquebrasileiro.com"
         }
     },
     "dashboard": {},

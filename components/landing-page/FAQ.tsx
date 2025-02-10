@@ -4,6 +4,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 import type { JSX } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useTranslations } from "next-intl";
 
 // <FAQ> component is a list of <Item> component
 // Just import the FAQ & add your FAQ content to the const faqList array below.
@@ -13,75 +16,70 @@ interface FAQItemProps {
   answer: JSX.Element;
 }
 
-const faqList: FAQItemProps[] = [
-  {
-    question: "What do I get exactly?",
-    answer: <div className="space-y-2 leading-relaxed">You will receive access to all our courses, materials, and support from our instructors.</div>,
-  },
-  {
-    question: "Can I get a refund?",
-    answer: (
-      <p>
-        Yes! You can request a refund within 7 days of your purchase. Reach out by email for assistance.
-      </p>
-    ),
-  },
-  {
-    question: "What are the rules of the school?",
-    answer: (
-      <div className="space-y-2 leading-relaxed">
-        <p>1. Respect your instructors and fellow students.</p>
-        <p>2. Attend classes regularly and be punctual.</p>
-        <p>3. Complete assignments on time.</p>
-        <p>4. Maintain a positive and constructive attitude.</p>
-      </div>
-    ),
-  },
-  {
-    question: "What plans do you offer?",
-    answer: (
-      <div className="space-y-2 leading-relaxed">
-        <p>We offer various plans including monthly and annual subscriptions, with discounts for long-term commitments.</p>
-        <p>Check our pricing page for more details.</p>
-      </div>
-    ),
-  },
-  {
-    question: "I have another question",
-    answer: (
-      <div className="space-y-2 leading-relaxed">Cool, contact us by email for any inquiries.</div>
-    ),
-  },
-];
+/**
+ * FAQ component displays frequently asked questions in an accessible accordion format.
+ * @returns {JSX.Element} - Rendered FAQ section with interactive accordion
+ */
+const FAQ = (): JSX.Element => {
+  const t = useTranslations('landing.faq'); // Initialize translation hook
 
-const FAQ = () => {
+  // Fetch FAQ questions from JSON using t.raw
+  const faqList: FAQItemProps[] = Object.values(t.raw('questions')).map((value) => ({
+    question: (value as { question: string }).question,
+    answer: <div className="space-y-2 leading-relaxed">{(value as { answer: string }).answer}</div>,
+  }));
+
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
   return (
-    <section className="relative flex flex-col items-center gap-4 mx-auto px-4 py-16 max-w-7xl container" id="faq">
-      <div className="flex flex-col text-center basis-1/2">
-        <p className="inline-block mb-4 font-semibold text-primary">FAQ</p>
-        <p className="font-extrabold text-3xl text-base-content sm:text-4xl">
-          Frequently Asked Questions
-        </p>
-      </div>
+    <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="relative flex flex-col gap-16 mx-auto px-4 py-16 max-w-7xl container"
+      id="faq"
+      aria-labelledby="faq-title"
+    >
+      <header className="flex flex-col gap-4 text-center">
+        <h2 id="faq-title" className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider">
+          {t('title')}
+        </h2>
+        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100">
+          {t('subtitle')}
+        </h3>
+      </header>
 
+      {/* Render the FAQ list using Shadcn Accordion component */}
       <Accordion type="single" collapsible className="mx-auto w-full max-w-4xl">
         {faqList.map((item, i) => (
           <AccordionItem key={i} value={`item-${i}`}>
-            <AccordionTrigger >
+            <AccordionTrigger className="font-semibold text-base text-gray-800 hover:text-primary dark:text-gray-100 leading-6">
               {item.question}
             </AccordionTrigger>
-            <AccordionContent >
+            <AccordionContent className="text-gray-700 text-sm dark:text-gray-200 leading-5">
               {item.answer}
             </AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
 
-      <div className="flex flex-row justify-center items-center gap-1 basis-1/2">
-        <p className="text-base-content/80 text-sm">Still have questions? Email us at </p>
-        <Link className="text-base-content text-sm underline" href="mailto:hello@learnwithus.com">hello@learnwithus.com</Link>
+      <div className="flex flex-row flex-wrap justify-center items-center gap-1">
+        <p className="font-normal text-gray-600 text-sm dark:text-gray-200 leading-5">
+          {t('disclaimer')}
+        </p>
+        <Link
+          className="font-normal text-gray-600 text-sm hover:text-primary dark:text-gray-200 underline leading-5"
+          href={`mailto:${t('email')}`}
+          aria-label="Contact us via email"
+        >
+          {t('email')}
+        </Link>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

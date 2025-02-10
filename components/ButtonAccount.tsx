@@ -5,7 +5,7 @@ import { CreditCard, SignOut, UserCircle } from "@phosphor-icons/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { User } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import apiClient from "@/libs/api";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
@@ -13,9 +13,14 @@ import useStudentApi from "@/hooks/useStudentApi";
 import useTeacherApi from "@/hooks/useTeacherApi";
 import { useTranslations } from "next-intl";
 
+// Extend the Supabase User type
+interface User extends SupabaseUser {
+  avatarUrl?: string; // Add avatarUrl property
+}
+
 interface UserData {
   id: string;
-  has_access?: boolean;
+  hasAccess?: boolean;
 }
 
 /**
@@ -92,10 +97,10 @@ const ButtonAccount = () => {
       <DropdownMenuTrigger className="rounded-full" aria-label="Account menu">
         <Avatar>
           <AvatarImage
-            src={user?.user_metadata?.avatar_url}
+            src={user?.avatarUrl}
             alt="Profile picture"
           />
-          <AvatarFallback>{avatarFallback}</AvatarFallback>
+          <AvatarFallback className="bg-gray-200 dark:bg-gray-600">{avatarFallback}</AvatarFallback>
         </Avatar>
         {isLoading && (
           <span className="loading loading-spinner loading-xs" aria-hidden="true" />
@@ -111,7 +116,7 @@ const ButtonAccount = () => {
             <UserCircle className="w-5 h-5" />
             {t('profile')}
           </DropdownMenuItem>
-          {userData?.has_access && (
+          {userData?.hasAccess && (
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={handleBilling}

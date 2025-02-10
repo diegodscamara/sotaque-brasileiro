@@ -17,7 +17,8 @@
             },
             "cta": {
                 "primary": "Get Started",
-                "link": "#pricing"
+                "link": "#pricing",
+                "ariaLabel": "Get started with our service"
             }
         },
         "hero": {
@@ -298,6 +299,34 @@
                     ]
                 }
             ]
+        },
+        "faq": {
+            "title": "Frequently Asked Questions",
+            "subtitle": "Everything You Need to Know to Get Started",
+            "questions": {
+                "1": {
+                    "question": "How flexible are the class schedules?",
+                    "answer": "Our classes are designed to fit your busy life. You can choose from morning, evening, or weekend slots, and reschedule easily if needed. Perfect for professionals and enthusiasts alike!"
+                },
+                "2": {
+                    "question": "Are the classes tailored to my goals?",
+                    "answer": "Yes, we customize each class to your specific needs. Whether you're learning for business, travel, or cultural connection, our instructors create lessons that align with your objectives."
+                },
+                "3": {
+                    "question": "Do you offer business Portuguese courses?",
+                    "answer": "Yes, we offer business Portuguese courses. We have a team of experienced instructors who are experts in business Portuguese. They will help you improve your business Portuguese skills and prepare you for your business meetings."
+                },
+                "4": {
+                    "question": "How do you incorporate Brazilian culture into the classes?",
+                    "answer": "We incorporate Brazilian culture into the classes through authentic expressions, music, and traditions. This helps you connect with the language and its people on a deeper level."
+                },
+                "5": {
+                    "question": "What if I need to cancel or reschedule a class?",
+                    "answer": "You can cancel or reschedule a class up to 24 hours before the scheduled class. If you need to cancel or reschedule a class less than 24 hours before the scheduled class, you can do so by contacting us."
+                }
+            },
+            "disclaimer": "Still have questions? Email us at",
+            "email": "contact@sotaquebrasileiro.com"
         }
     },
     "dashboard": {},
