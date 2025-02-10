@@ -299,6 +299,34 @@
                     ]
                 }
             ]
+        },
+        "faq": {
+            "title": "Foire Aux Questions",
+            "subtitle": "Tout ce que vous devez savoir pour commencer",
+            "questions": {
+                "1": {
+                    "question": "À quel point les horaires des cours sont-ils flexibles ?",
+                    "answer": "Nos cours sont conçus pour s'adapter à votre vie bien remplie. Vous pouvez choisir parmi des créneaux le matin, le soir ou le week-end, et les reprogrammer facilement si nécessaire. Parfait pour les professionnels et les passionnés !"
+                },
+                "2": {
+                    "question": "Les cours sont-ils adaptés à mes objectifs ?",
+                    "answer": "Oui, nous personnalisons chaque cours en fonction de vos besoins spécifiques. Que vous appreniez pour les affaires, les voyages ou la connexion culturelle, nos instructeurs créent des leçons qui s'alignent sur vos objectifs."
+                },
+                "3": {
+                    "question": "Proposez-vous des cours de portugais des affaires ?",
+                    "answer": "Oui, nous proposons des cours de portugais des affaires. Nous avons une équipe d'instructeurs expérimentés, experts en portugais des affaires. Ils vous aideront à améliorer vos compétences en portugais des affaires et à vous préparer pour vos réunions professionnelles."
+                },
+                "4": {
+                    "question": "Comment intégrez-vous la culture brésilienne dans les cours ?",
+                    "answer": "Nous intégrons la culture brésilienne dans les cours à travers des expressions authentiques, de la musique et des traditions. Cela vous aide à vous connecter avec la langue et ses habitants à un niveau plus profond."
+                },
+                "5": {
+                    "question": "Que se passe-t-il si je dois annuler ou reprogrammer un cours ?",
+                    "answer": "Vous pouvez annuler ou reprogrammer un cours jusqu'à 24 heures avant l'heure prévue. Si vous devez annuler ou reprogrammer un cours moins de 24 heures à l'avance, vous pouvez le faire en nous contactant."
+                }
+            },
+            "disclaimer": "Vous avez encore des questions ? Écrivez-nous à",
+            "email": "contact@sotaquebrasileiro.com"
         }
     },
     "dashboard": {},
