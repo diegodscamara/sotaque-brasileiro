@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Clock, CreditCard, Trophy } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
@@ -96,23 +96,23 @@ export default function Stats() {
 
       // Fetch profile for credits
       const { data: profile } = await supabase
-        .from("users")
+        .from("Student")
         .select("credits")
-        .eq("id", user.id)
+        .eq("userId", user.id)
         .single();
 
       // Count scheduled classes
       const { count: scheduledCount } = await supabase
-        .from("classes")
+        .from("Class")
         .select("*", { count: "exact", head: true })
-        .eq("student_id", user.id)
+        .eq("studentId", user.id)
         .eq("status", "scheduled");
 
       // Count completed classes
       const { count: completedCount } = await supabase
-        .from("classes")
+        .from("Class")
         .select("*", { count: "exact", head: true })
-        .eq("student_id", user.id)
+        .eq("studentId", user.id)
         .eq("status", "completed");
 
       setDashboardStats({
