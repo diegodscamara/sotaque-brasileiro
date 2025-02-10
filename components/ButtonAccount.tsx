@@ -15,7 +15,7 @@ import { useTranslations } from "next-intl";
 
 interface UserData {
   id: string;
-  has_access?: boolean;
+  hasAccess?: boolean;
 }
 
 /**
@@ -111,7 +111,7 @@ const ButtonAccount = () => {
             <UserCircle className="w-5 h-5" />
             {t('profile')}
           </DropdownMenuItem>
-          {userData?.has_access && (
+          {userData?.hasAccess && (
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={handleBilling}
