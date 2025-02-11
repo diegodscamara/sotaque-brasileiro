@@ -195,6 +195,10 @@
                 "monthly": "Mensuel",
                 "yearly": "Annuel"
             },
+            "period": {
+                "monthly": "mois",
+                "yearly": "an"
+            },
             "billing": {
                 "monthly": "Facturé mensuellement",
                 "yearly": "Facturé annuellement"
@@ -327,6 +331,13 @@
             },
             "disclaimer": "Vous avez encore des questions ? Écrivez-nous à",
             "email": "contact@sotaquebrasileiro.com"
+        },
+        "cta": {
+            "title": "Prêt à commencer votre voyage en portugais brésilien ?",
+            "subtitle": "Transformez vos compétences linguistiques aujourd'hui",
+            "description": "Rejoignez des centaines d'apprenants qui ont atteint leurs objectifs avec nos cours flexibles et personnalisés. Que vous souhaitiez développer votre entreprise ou vous connecter à la culture brésilienne, nous sommes là pour vous aider à réussir. Réservez votre première leçon aujourd'hui et expérimentez la différence !",
+            "button": "Commencer à apprendre aujourd'hui",
+            "link": "#pricing"
         }
     },
     "dashboard": {},
