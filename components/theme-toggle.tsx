@@ -2,40 +2,40 @@
 
 import * as React from "react"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Moon, Sun } from "lucide-react"
+import { Monitor, Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 
 export function ThemeToggle() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="w-[1.2rem] h-[1.2rem] transition-all dark:-rotate-90 dark:scale-0 rotate-0 scale-100" />
-          <Moon className="absolute w-[1.2rem] h-[1.2rem] transition-all dark:rotate-0 dark:scale-100 rotate-90 scale-0" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex gap-1 p-1 border border-gray-300 dark:border-gray-700 rounded-lg">
+      <Button
+        variant={theme === "system" ? "secondary" : "ghost"}
+        size="icon"
+        className="w-8 h-8"
+        onClick={() => setTheme("system")}
+      >
+        <Monitor className="w-[1rem] h-[1rem] text-gray-800 dark:text-gray-200" />
+      </Button>
+      <Button
+        variant={theme === "light" ? "secondary" : "ghost"}
+        size="icon"
+        className="w-8 h-8"
+        onClick={() => setTheme("light")}
+      >
+        <Sun className="w-[1rem] h-[1rem] text-gray-800 dark:text-gray-200" />
+      </Button>
+      <Button
+        variant={theme === "dark" ? "secondary" : "ghost"}
+        size="icon"
+        className="w-8 h-8"
+        onClick={() => setTheme("dark")}
+      >
+        <Moon className="w-[1rem] h-[1rem] text-gray-800 dark:text-gray-200" />
+      </Button>
+    </div>
   )
 }
