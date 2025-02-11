@@ -69,13 +69,13 @@ const Pricing = (): JSX.Element => {
     >
       <header className="flex flex-col gap-4 text-center">
         <h2
-          className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider"
+          className="font-mono font-medium text-primary text-sm uppercase leading-5 tracking-wider"
           id="pricing-title"
         >
           {t("title")}
         </h2>
         <h3
-          className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100"
+          className="mx-auto sm:max-w-none max-w-xs font-extrabold text-gray-800 dark:text-gray-100 text-3xl sm:text-4xl md:text-5xl"
           id="pricing-subtitle"
         >
           {t("subtitle")}
@@ -88,7 +88,7 @@ const Pricing = (): JSX.Element => {
           role="radiogroup"
           aria-label="Select billing interval"
         >
-          <span className="font-medium text-base text-gray-800 dark:text-gray-200 leading-7">
+          <span className="font-medium text-gray-800 dark:text-gray-200 text-base leading-7">
             {t(`intervals.monthly`)}
           </span>
           <Switch
@@ -96,7 +96,7 @@ const Pricing = (): JSX.Element => {
             onCheckedChange={handleIntervalChange}
             aria-label="Toggle between monthly and yearly billing"
           />
-          <span className="font-medium text-base text-gray-800 dark:text-gray-200 leading-7">
+          <span className="font-medium text-gray-800 dark:text-gray-200 text-base leading-7">
             {t(`intervals.yearly`)}
           </span>
         </div>
@@ -121,7 +121,7 @@ const Pricing = (): JSX.Element => {
                     </div>
                   )}
 
-                  <div className="relative z-10 flex flex-col gap-6 bg-base-100 p-6 rounded-lg h-full">
+                  <div className="z-10 relative flex flex-col gap-6 bg-base-100 p-6 rounded-lg h-full">
                     <div className="flex flex-col gap-4">
                       <div className="flex flex-col justify-between items-start gap-4">
                         <h4
@@ -131,7 +131,7 @@ const Pricing = (): JSX.Element => {
                           {plan.tier}
                         </h4>
                         {plan.description && (
-                          <p className="font-normal text-base text-gray-600 dark:text-gray-400 leading-5">
+                          <p className="font-normal text-gray-600 dark:text-gray-400 text-base leading-5">
                             {plan.description}
                           </p>
                         )}
@@ -139,16 +139,16 @@ const Pricing = (): JSX.Element => {
 
                       <div className="flex flex-col justify-end gap-2">
                         <div className="flex gap-2">
-                          <p className="font-extrabold text-5xl text-gray-800 dark:text-gray-200 leading-none">
+                          <p className="font-extrabold text-gray-800 dark:text-gray-200 text-5xl leading-none">
                             ${getMonthlyPrice(variant).toFixed()}
                           </p>
                           <div className="flex flex-col justify-end mb-[4px]">
-                            <p className="font-normal text-gray-600 text-xs dark:text-gray-400 leading-5">
-                              /month
+                            <p className="font-normal text-gray-600 dark:text-gray-400 text-xs leading-5">
+                              /{t(`period.${variant.interval}`)}
                             </p>
                           </div>
                         </div>
-                        <p className="font-normal text-gray-600 text-xs dark:text-gray-400 leading-5">
+                        <p className="font-normal text-gray-600 dark:text-gray-400 text-xs leading-5">
                           {t(`billing.${variant.interval}`)}
                         </p>
                       </div>
@@ -173,7 +173,7 @@ const Pricing = (): JSX.Element => {
                             >
                               <Check className="w-2 h-2 text-primary dark:text-primary" />
                             </div>
-                            <span className="font-normal text-base text-gray-800 dark:text-gray-200 leading-5">
+                            <span className="font-normal text-gray-800 dark:text-gray-200 text-base leading-5">
                               {feature}
                             </span>
                           </li>
@@ -187,7 +187,7 @@ const Pricing = (): JSX.Element => {
         </div>
       </div>
 
-      <p className="font-normal text-center text-gray-600 text-sm dark:text-gray-400 leading-5">
+      <p className="font-normal text-gray-600 dark:text-gray-400 text-sm text-center leading-5">
         {t("disclaimer")}
       </p>
     </motion.section>
