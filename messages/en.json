@@ -338,11 +338,92 @@
             "description": "Join hundreds of learners who’ve achieved their goals with our flexible, personalized classes. Whether you’re expanding your business or connecting with Brazilian culture, we’re here to help you succeed. Book your first class today and experience the difference!",
             "button": "Start Learning Today",
             "link": "#pricing"
+        },
+        "footer": {
+            "description": "Transform your Portuguese with Sotaque Brasileiro: personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "services": {
+                "title": "Services",
+                "links": [
+                    {
+                        "features": {
+                            "name": "Features",
+                            "link": "#features"
+                        },
+                        "howItWorks": {
+                            "name": "How It Works",
+                            "link": "#how-it-works"
+                        },
+                        "pricing": {
+                            "name": "Pricing",
+                            "link": "#pricing"
+                        },
+                        "faq": {
+                            "name": "FAQ",
+                            "link": "#faq"
+                        }
+                    }
+                ]
+            },
+            "resources": {
+                "title": "Resources",
+                "links": [
+                    {
+                        "contact": {
+                            "name": "Contact",
+                            "link": "/contact"
+                        },
+                        "support": {
+                            "name": "Support",
+                            "link": "/support"
+                        },
+                        "teacher": {
+                            "name": "Become a Teacher",
+                            "link": "/become-a-teacher"
+                        }
+                    }
+                ]
+            },
+            "legal": {
+                "title": "Legal",
+                "links": [
+                    {
+                        "privacy": {
+                            "name": "Privacy Policy",
+                            "link": "/privacy-policy"
+                        },
+                        "terms": {
+                            "name": "Terms of Service",
+                            "link": "/terms-of-service"
+                        }
+                    }
+                ]
+            },
+            "social": {
+                "title": "Social",
+                "links": [
+                    {
+                        "instagram": {
+                            "name": "Instagram",
+                            "link": "https://www.instagram.com/sotaquebrasileiro/"
+                        },
+                        "facebook": {
+                            "name": "Facebook",
+                            "link": "https://www.facebook.com/sotaquebrasileiro/"
+                        },
+                        "linkedin": {
+                            "name": "LinkedIn",
+                            "link": "https://www.linkedin.com/company/sotaquebrasileiro/"
+                        }
+                    }
+                ]
+            },
+            "copyright": "Copyright © 2024 Sotaque Brasileiro. All rights reserved."
         }
     },
     "dashboard": {},
     "auth": {},
     "shared": {
+        "appName": "Sotaque Brasileiro",
         "buttons": {
             "save": "Save",
             "cancel": "Cancel",

@@ -338,11 +338,92 @@
             "description": "Junte-se a centenas de aprendizes que atingiram seus objetivos com nossas aulas flexíveis e personalizadas. Seja para expandir seu negócio ou conectar com a cultura brasileira, estamos aqui para ajudá-lo a ter sucesso. Reserve sua primeira aula hoje e experimente a diferença!",
             "button": "Começar a aprender hoje",
             "link": "#pricing"
+        },
+        "footer": {
+            "description": "Transforme seu português com Sotaque Brasileiro: aulas personalizadas, imersivas na cultura, adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+            "services": {
+                "title": "Serviços",
+                "links": [
+                    {
+                        "features": {
+                            "name": "Recursos",
+                            "link": "#features"
+                        },
+                        "howItWorks": {
+                            "name": "Como Funciona?",
+                            "link": "#how-it-works"
+                        },
+                        "pricing": {
+                            "name": "Preços",
+                            "link": "#pricing"
+                        },
+                        "faq": {
+                            "name": "Dúvidas Frequentes",
+                            "link": "#faq"
+                        }
+                    }
+                ]
+            },
+            "resources": {
+                "title": "Recursos",
+                "links": [
+                    {
+                        "contact": {
+                            "name": "Contato",
+                            "link": "/contact"
+                        },
+                        "support": {
+                            "name": "Suporte",
+                            "link": "/support"
+                        },
+                        "teacher": {
+                            "name": "Seja um Instrutor",
+                            "link": "/become-a-teacher"
+                        }
+                    }
+                ]
+            },
+            "legal": {
+                "title": "Legal",
+                "links": [
+                    {
+                        "privacy": {
+                            "name": "Política de Privacidade",
+                            "link": "/privacy-policy"
+                        },
+                        "terms": {
+                            "name": "Termos de Serviço",
+                            "link": "/terms-of-service"
+                        }
+                    }
+                ]
+            },
+            "social": {
+                "title": "Redes Sociais",
+                "links": [
+                    {
+                        "instagram": {
+                            "name": "Instagram",
+                            "link": "https://www.instagram.com/sotaquebrasileiro/"
+                        },
+                        "facebook": {
+                            "name": "Facebook",
+                            "link": "https://www.facebook.com/sotaquebrasileiro/"
+                        },
+                        "linkedin": {
+                            "name": "LinkedIn",
+                            "link": "https://www.linkedin.com/company/sotaquebrasileiro/"
+                        }
+                    }
+                ]
+            },
+            "copyright": "Copyright © 2025 Sotaque Brasileiro. Todos os direitos reservados."
         }
     },
     "dashboard": {},
     "auth": {},
     "shared": {
+        "appName": "Sotaque Brasileiro",
         "buttons": {
             "save": "Salvar",
             "cancel": "Cancelar",

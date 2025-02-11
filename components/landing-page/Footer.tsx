@@ -1,88 +1,102 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
-import config from "@/config";
 import logo from "@/app/icon.png";
+import { useTranslations } from "next-intl";
 
 // Add the Footer to the bottom of your landing page and more.
 // The support link is connected to the config.js file. If there's no config.resend.supportEmail, the link won't be displayed.
 
 const Footer = () => {
+  const t = useTranslations("landing.footer");
+  const tShared = useTranslations("shared");
+  const [isVisible, setIsVisible] = useState(false);
+  const footerRef = useRef<HTMLDivElement>(null);
+
+  // Check if the footer is in the viewport
+  const handleScroll = () => {
+    if (footerRef.current) {
+      const rect = footerRef.current.getBoundingClientRect();
+      if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+        setIsVisible(true);
+        window.removeEventListener("scroll", handleScroll); // Remove listener after visibility is detected
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Define the sections to be displayed in the footer
+  const sections = ["services", "resources", "legal", "social"];
+
   return (
-    <footer id="footer" className="relative mx-auto px-4 py-16 max-w-7xl container">
-      <div className="flex md:flex-row flex-col flex-wrap md:flex-nowrap lg:items-start">
-        <div className="flex-shrink-0 mx-auto md:mx-0 w-64 text-center md:text-left">
-          <Link
-            href="/#"
-            aria-current="page"
-            className="flex justify-center md:justify-start items-center gap-2"
-          >
-            <Image
-              src={logo}
-              alt={`${config.appName} logo`}
-              priority={true}
-              className="w-6 h-6"
-              width={24}
-              height={24}
-            />
-            <strong className="font-extrabold text-base md:text-lg tracking-tight">
-              {config.appName}
-            </strong>
-          </Link>
-
-          <ThemeToggle /> 
-
-          <p className="mt-3 text-base-content/80 text-sm">
-            {config.appDescription}
-          </p>
-          <p className="mt-3 text-base-content/60 text-sm">
-            Copyright © {new Date().getFullYear()} - All rights reserved
-          </p>
-        </div>
-        <div className="flex flex-wrap flex-grow justify-center mt-10 md:mt-0 -mb-10 text-center">
-          <div className="px-4 w-full md:w-1/2 lg:w-1/3">
-            <div className="mb-3 font-semibold text-base-content text-sm md:text-left tracking-widest footer-title">
-              LINKS
-            </div>
-
-            <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
-              {config.resend.supportEmail && (
-                <a
-                  href={`mailto:${config.resend.supportEmail}`}
-                  target="_blank"
-                  className="link link-hover"
-                  aria-label="Contact Support"
-                >
-                  Support
-                </a>
-              )}
-              <Link href="/#pricing" className="link link-hover">
-                Pricing
-              </Link>
-              <Link href="/blog" className="link link-hover">
-                Blog
-              </Link>
-              <a href="/#" target="_blank" className="link link-hover">
-                Affiliates
-              </a>
-            </div>
+    <footer
+      id="footer"
+      ref={footerRef}
+      className={`relative mx-auto px-4 py-16 max-w-7xl container transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <div className="flex flex-col items-start gap-12">
+        <div className="flex md:flex-row flex-col md:justify-between items-start gap-8 md:gap-16 lg:gap-32 w-full">
+          {/* Row 1: Logo and Description */}
+          <div className="flex flex-col items-start gap-4 w-full md:max-w-xs">
+            <Link href="/#" aria-current="page" className="flex items-center gap-2">
+              <Image
+                src={logo}
+                alt={`${tShared("appName")} logo`}
+                priority={true}
+                className="w-6 h-6"
+                width={24}
+                height={24}
+              />
+              <strong className="font-bold text-gray-800 dark:text-gray-200 text-lg leading-7">
+                {tShared("appName")}
+              </strong>
+            </Link>
+            <p className="font-normal text-gray-600 dark:text-gray-400 text-sm leading-5">
+              {t("description")}
+            </p>
+            <ThemeToggle />
           </div>
 
-          <div className="px-4 w-full md:w-1/2 lg:w-1/3">
-            <div className="mb-3 font-semibold text-base-content text-sm md:text-left tracking-widest footer-title">
-              LEGAL
-            </div>
-
-            <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
-              <Link href="/tos" className="link link-hover">
-                Terms of services
-              </Link>
-              <Link href="/privacy-policy" className="link link-hover">
-                Privacy policy
-              </Link>
-            </div>
+          {/* Row 2: Dynamic Columns */}
+          <div className="justify-end gap-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full">
+            {sections.map((section) => (
+              <div key={section} className="flex flex-col gap-4 w-full">
+                <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-base leading-6">
+                  {t(`${section}.title`)}
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {Object.values(t.raw(`${section}.links.0`)).map((link: any) => (
+                    <Link
+                      key={link.name}
+                      href={link.link}
+                      className="font-normal text-gray-600 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-400 text-sm leading-5 link link-hover"
+                      aria-label={link.name}
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+
+        <hr className="border-gray-200 dark:border-gray-800 border-t w-full" />
+
+        {/* Row 3: Copyright */}
+        <span className="text-gray-600 dark:text-gray-400 text-sm leading-5">
+          {t("copyright")}
+        </span>
       </div>
     </footer>
   );
