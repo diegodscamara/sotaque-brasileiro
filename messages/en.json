@@ -195,6 +195,10 @@
                 "monthly": "Monthly",
                 "yearly": "Yearly"
             },
+            "period": {
+                "monthly": "month",
+                "yearly": "year"
+            },
             "billing": {
                 "monthly": "Billed monthly",
                 "yearly": "Billed yearly"
@@ -327,6 +331,13 @@
             },
             "disclaimer": "Still have questions? Email us at",
             "email": "contact@sotaquebrasileiro.com"
+        },
+        "cta": {
+            "title": "Ready to Start Your Brazilian Portuguese Journey?",
+            "subtitle": "Transform Your Language Skills Today",
+            "description": "Join hundreds of learners who’ve achieved their goals with our flexible, personalized classes. Whether you’re expanding your business or connecting with Brazilian culture, we’re here to help you succeed. Book your first class today and experience the difference!",
+            "button": "Start Learning Today",
+            "link": "#pricing"
         }
     },
     "dashboard": {},
