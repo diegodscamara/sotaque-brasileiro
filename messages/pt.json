@@ -195,6 +195,10 @@
                 "monthly": "Mensal",
                 "yearly": "Anual"
             },
+            "period": {
+                "monthly": "mês",
+                "yearly": "ano"
+            },
             "billing": {
                 "monthly": "Cobrado mensalmente",
                 "yearly": "Cobrado anualmente"
@@ -327,6 +331,13 @@
             },
             "disclaimer": "Ainda tem dúvidas? Envie um e-mail para",
             "email": "contato@sotaquebrasileiro.com"
+        },
+        "cta": {
+            "title": "Pronto para começar sua jornada de português brasileiro?",
+            "subtitle": "Transforme suas habilidades linguísticas hoje",
+            "description": "Junte-se a centenas de aprendizes que atingiram seus objetivos com nossas aulas flexíveis e personalizadas. Seja para expandir seu negócio ou conectar com a cultura brasileira, estamos aqui para ajudá-lo a ter sucesso. Reserve sua primeira aula hoje e experimente a diferença!",
+            "button": "Começar a aprender hoje",
+            "link": "#pricing"
         }
     },
     "dashboard": {},

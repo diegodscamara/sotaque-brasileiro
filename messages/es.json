@@ -195,6 +195,10 @@
                 "monthly": "Mensual",
                 "yearly": "Anual"
             },
+            "period": {
+                "monthly": "mes",
+                "yearly": "año"
+            },
             "billing": {
                 "monthly": "Facturado mensualmente",
                 "yearly": "Facturado anualmente"
@@ -327,6 +331,13 @@
             },
             "disclaimer": "¿Aún tienes preguntas? Escríbenos a",
             "email": "contacto@sotaquebrasileiro.com"
+        },
+        "cta": {
+            "title": "¿Listo para comenzar tu viaje de portugués brasileño?",
+            "subtitle": "Transforma tus habilidades de idioma hoy",
+            "description": "Únete a cientos de aprendices que han logrado sus objetivos con nuestras clases flexibles y personalizadas. Ya sea que estés expandiendo tu negocio o conectando con la cultura brasileña, estamos aquí para ayudarte a tener éxito. Reserva tu primera clase hoy y experimenta la diferencia!",
+            "button": "Comenzar a aprender hoy",
+            "link": "#pricing"
         }
     },
     "dashboard": {},
