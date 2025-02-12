@@ -148,42 +148,42 @@
                     "text": "Je suis venu au Brésil pour le travail et j'avais besoin d'apprendre le portugais rapidement. Les leçons personnalisées axées sur les affaires m'ont aidé à communiquer avec confiance en quelques mois seulement !",
                     "name": "Emily Johnson",
                     "position": "Responsable Marketing (USA)",
-                    "image": "/images/landing-page/testimonials/emily-johnson.png",
+                    "image": "https://i.pravatar.cc/150?img=1",
                     "imageAlt": "Emily Johnson"
                 },
                 {
                     "text": "J'ai toujours voulu apprendre le portugais pour voyager, et cette école a rendu cela si facile. Les enseignants sont incroyables et l'immersion culturelle est fantastique !",
                     "name": "James Carter",
                     "position": "Blogueur Voyageur (UK)",
-                    "image": "/images/landing-page/testimonials/james-carter.png",
+                    "image": "https://i.pravatar.cc/150?img=2",
                     "imageAlt": "James Carter"
                 },
                 {
                     "text": "En tant que professionnel, j'avais besoin d'apprendre le portugais pour des réunions. Les leçons personnalisées et la flexibilité des horaires étaient parfaites pour ma vie trépidante.",
                     "name": "Sarah Müller",
                     "position": "Consultante en Affaires (Allemagne)",
-                    "image": "/images/landing-page/testimonials/sarah-muller.png",
+                    "image": "https://i.pravatar.cc/150?img=3",
                     "imageAlt": "Sarah Müller"
                 },
                 {
                     "text": "J'ai commencé à apprendre le portugais pour me connecter avec mes amis brésiliens. Les cours sont engageants et culturellement riches ; je ne me suis jamais senti aussi connecté !",
                     "name": "Liam O'Connor",
                     "position": "Développeur de Logiciels (Irlande)",
-                    "image": "/images/landing-page/testimonials/liam-oconnor.png",
+                    "image": "https://i.pravatar.cc/150?img=4",
                     "imageAlt": "Liam O'Connor"
                 },
                 {
                     "text": "J'adore la façon dont les enseignants intègrent chaque cours avec la culture brésilienne authentique. Apprendre le portugais est devenu le point culminant de ma semaine !",
                     "name": "Sofia Rossi",
                     "position": "Artiste (Italie)",
-                    "image": "/images/landing-page/testimonials/sofia-rossi.png",
+                    "image": "https://i.pravatar.cc/150?img=5",
                     "imageAlt": "Sofia Rossi"
                 },
                 {
                     "text": "L'immersion culturelle est incroyable ; j'ai l'impression de vivre vraiment le Brésil tout en apprenant la langue. Je recommande vivement cette école !",
                     "name": "Emma Dubois",
                     "position": "Étudiante Universitaire (France)",
-                    "image": "/images/landing-page/testimonials/emma-dubois.png",
+                    "image": "https://i.pravatar.cc/150?img=6",
                     "imageAlt": "Emma Dubois"
                 }
             ]
