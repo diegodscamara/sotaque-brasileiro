@@ -436,7 +436,15 @@
             "billing": "Facturación",
             "sign-out": "Cerrar Sesión",
             "upgrade": "Actualizar",
-            "notifications": "Notificaciones"
+            "notifications": "Notificaciones",
+            "loading": "Cargando",
+            "accountMenu": "Menú de cuenta"
+        },
+        "langSwitcher": {
+            "english": "Inglés",
+            "french": "Francés",
+            "portuguese": "Portugués",
+            "spanish": "Español"
         },
         "errors": {
             "general": "Algo salió mal"
