@@ -148,42 +148,42 @@
                     "text": "Vim ao Brasil para trabalhar e precisava aprender português rapidamente. As aulas personalizadas e focadas em negócios me ajudaram a me comunicar com confiança em apenas alguns meses!",
                     "name": "Emily Johnson",
                     "position": "Gerente de Marketing (EUA)",
-                    "image": "/images/landing-page/testimonials/emily-johnson.png",
+                    "image": "https://i.pravatar.cc/150?img=1",
                     "imageAlt": "Emily Johnson"
                 },
                 {
                     "text": "Sempre quis aprender português para viajar, e esta escola facilitou muito. Os professores são incríveis e a imersão cultural é fantástica!",
                     "name": "James Carter",
                     "position": "Blogueiro de Viagens (Reino Unido)",
-                    "image": "/images/landing-page/testimonials/james-carter.png",
+                    "image": "https://i.pravatar.cc/150?img=2",
                     "imageAlt": "James Carter"
                 },
                 {
                     "text": "Como profissional de negócios, precisava aprender português para reuniões. As aulas personalizadas e a programação flexível foram perfeitas para minha vida agitada.",
                     "name": "Sarah Müller",
                     "position": "Consultora de Negócios (Alemanha)",
-                    "image": "/images/landing-page/testimonials/sarah-muller.png",
+                    "image": "https://i.pravatar.cc/150?img=3",
                     "imageAlt": "Sarah Müller"
                 },
                 {
                     "text": "Comecei a aprender português para me conectar com meus amigos brasileiros. As aulas são envolventes e culturalmente ricas — nunca me senti tão conectado!",
                     "name": "Liam O'Connor",
                     "position": "Desenvolvedor de Software (Irlanda)",
-                    "image": "/images/landing-page/testimonials/liam-oconnor.png",
+                    "image": "https://i.pravatar.cc/150?img=4",
                     "imageAlt": "Liam O'Connor"
                 },
                 {
                     "text": "Adoro como os professores infundem cada aula com cultura brasileira autêntica. Aprender português se tornou o destaque da minha semana!",
                     "name": "Sofia Rossi",
                     "position": "Artista (Itália)",
-                    "image": "/images/landing-page/testimonials/sofia-rossi.png",
+                    "image": "https://i.pravatar.cc/150?img=5",
                     "imageAlt": "Sofia Rossi"
                 },
                 {
                     "text": "A imersão cultural é incrível — sinto que estou realmente vivenciando o Brasil enquanto aprendo a língua. Recomendo muito esta escola!",
                     "name": "Emma Dubois",
                     "position": "Estudante Universitária (França)",
-                    "image": "/images/landing-page/testimonials/emma-dubois.png",
+                    "image": "https://i.pravatar.cc/150?img=6",
                     "imageAlt": "Emma Dubois"
                 }
             ]
