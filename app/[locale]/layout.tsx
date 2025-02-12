@@ -77,6 +77,7 @@ export default async function LocaleLayout({
 			<head />
 			<body
 				suppressHydrationWarning
+				className="bg-gray-50 dark:bg-gray-800"
 			>
 				<NextIntlClientProvider locale={locale} messages={messages}>
 					<ThemeProvider

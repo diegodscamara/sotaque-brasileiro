@@ -91,7 +91,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <hr className="border-gray-200 dark:border-gray-800 border-t w-full" />
+        <hr className="border-gray-200 dark:border-gray-700 border-t w-full" />
 
         {/* Row 3: Copyright */}
         <span className="text-gray-600 dark:text-gray-400 text-sm leading-5">
