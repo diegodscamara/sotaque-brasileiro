@@ -8,11 +8,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCallback, useState } from 'react';
 
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { CaretDown } from '@phosphor-icons/react';
 import { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface Language {
   code: string;
@@ -21,21 +22,23 @@ interface Language {
   flag: string;
 }
 
-const SUPPORTED_LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
-  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
-];
-
 /**
  * Language switcher component that allows users to change the application language
  * @returns {JSX.Element} The language switcher component
  */
 export default function LanguageSwitcher(): JSX.Element {
+  const t = useTranslations('shared.langSwitcher');
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
+
+  const SUPPORTED_LANGUAGES: Language[] = [
+    { code: 'en', name: t('english'), nativeName: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: t('french'), nativeName: 'Français', flag: '🇫🇷' },
+    { code: 'pt', name: t('portuguese'), nativeName: 'Português', flag: '🇧🇷' },
+    { code: 'es', name: t('spanish'), nativeName: 'Español', flag: '🇪🇸' },
+  ];
+
   const currentLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLocale);
 
   /**
@@ -65,7 +68,7 @@ export default function LanguageSwitcher(): JSX.Element {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+      <DropdownMenuContent align="end" className="bg-white dark:bg-gray-700">
         {SUPPORTED_LANGUAGES.map(({ code, name, nativeName, flag }) => (
           <motion.div
             key={code}
