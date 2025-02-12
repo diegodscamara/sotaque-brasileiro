@@ -19,7 +19,7 @@ export default function Home() {
       <Suspense>
         <Header />
       </Suspense>
-      <main className="flex flex-col justify-center items-center bg-gray-50 dark:bg-gray-800 mx-auto">
+      <main className="flex flex-col justify-center items-center mx-auto">
         <Hero />
         {/* Company logos */}
         <CompaniesCarousel />
