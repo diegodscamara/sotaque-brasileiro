@@ -436,7 +436,15 @@
             "billing": "Faturamento",
             "sign-out": "Sair",
             "upgrade": "Atualizar",
-            "notifications": "Notificações"
+            "notifications": "Notificações",
+            "loading": "Carregando",
+            "accountMenu": "Menu de conta"
+        },
+        "langSwitcher": {
+            "english": "Inglês",
+            "french": "Francês",
+            "portuguese": "Português",
+            "spanish": "Espanhol"
         },
         "errors": {
             "general": "Algo deu errado"
