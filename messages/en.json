@@ -436,7 +436,15 @@
             "billing": "Billing",
             "sign-out": "Sign Out",
             "upgrade": "Upgrade",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "loading": "Loading",
+            "accountMenu": "Account Menu"
+        },
+        "langSwitcher": {
+            "english": "English",
+            "french": "French",
+            "portuguese": "Portuguese",
+            "spanish": "Spanish"
         },
         "errors": {
             "general": "Something went wrong"
