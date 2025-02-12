@@ -88,7 +88,7 @@
         "features": {
             "title": "Why Choose Sotaque Brasileiro?",
             "subtitle": "Flexible, Tailored, and Immersive – Classes Designed with Your Goals in Mind",
-            "description": "We believe language learning should fit your life. Whether you're sharpening your business skills or diving into Brazil’s vibrant culture, our platform offers flexible scheduling, personalized lessons, and authentic cultural immersion led by native instructors.",
+            "description": "We believe language learning should fit your life. Whether you're sharpening your business skills or diving into Brazil's vibrant culture, our platform offers flexible scheduling, personalized lessons, and authentic cultural immersion led by native instructors.",
             "cards": [
                 {
                     "title": "Learn Anytime, Anywhere",
@@ -104,7 +104,7 @@
                 },
                 {
                     "title": "Immersive Cultural Experience",
-                    "text": "Experience Brazil like never before. Our classes integrate music, art, and real-life context to create an engaging journey into Brazil’s vibrant culture.",
+                    "text": "Experience Brazil like never before. Our classes integrate music, art, and real-life context to create an engaging journey into Brazil's vibrant culture.",
                     "image": "/images/landing-page/features/culturally-immersive-lessons.png",
                     "imageAlt": "Immersive Cultural Experience"
                 },
@@ -122,13 +122,13 @@
             "steps": [
                 {
                     "title": "1. Create Your Profile",
-                    "text": "Sign up and share your goals—whether you're aiming for business excellence or cultural immersion. We’ll tailor your learning plan right from the start.",
+                    "text": "Sign up and share your goals—whether you're aiming for business excellence or cultural immersion. We'll tailor your learning plan right from the start.",
                     "image": "/images/landing-page/howItWorks/create-account.png",
                     "imageAlt": "Create Your Profile"
                 },
                 {
                     "title": "2. Select Your Ideal Schedule",
-                    "text": "Pick class times that seamlessly fit around your busy life. Our flexible options mean you can learn when it’s most convenient—morning, evening, or weekends.",
+                    "text": "Pick class times that seamlessly fit around your busy life. Our flexible options mean you can learn when it's most convenient—morning, evening, or weekends.",
                     "image": "/images/landing-page/howItWorks/choose-schedule.png",
                     "imageAlt": "Select Your Ideal Schedule"
                 },
@@ -148,42 +148,42 @@
                     "text": "I came to Brazil for work and needed to learn Portuguese quickly. The personalized, business-focused lessons helped me communicate confidently in just a few months!",
                     "name": "Emily Johnson",
                     "position": "Marketing Manager (USA)",
-                    "image": "/images/landing-page/testimonials/emily-johnson.png",
+                    "image": "https://i.pravatar.cc/150?img=1",
                     "imageAlt": "Emily Johnson"
                 },
                 {
                     "text": "I've always wanted to learn Portuguese for travel, and this school made it so easy. The teachers are amazing, and the cultural immersion is fantastic!",
                     "name": "James Carter",
                     "position": "Travel Blogger (UK)",
-                    "image": "/images/landing-page/testimonials/james-carter.png",
+                    "image": "https://i.pravatar.cc/150?img=2",
                     "imageAlt": "James Carter"
                 },
                 {
                     "text": "As a business professional, I needed to learn Portuguese for meetings. The tailored lessons and flexible scheduling were perfect for my hectic life.",
                     "name": "Sarah Müller",
                     "position": "Business Consultant (Germany)",
-                    "image": "/images/landing-page/testimonials/sarah-muller.png",
+                    "image": "https://i.pravatar.cc/150?img=3",
                     "imageAlt": "Sarah Müller"
                 },
                 {
                     "text": "I started learning Portuguese to connect with my Brazilian friends. The classes are engaging and culturally rich—I've never felt more connected!",
                     "name": "Liam O'Connor",
                     "position": "Software Developer (Ireland)",
-                    "image": "/images/landing-page/testimonials/liam-oconnor.png",
+                    "image": "https://i.pravatar.cc/150?img=4",
                     "imageAlt": "Liam O'Connor"
                 },
                 {
                     "text": "I love how the teachers infuse every class with authentic Brazilian culture. Learning Portuguese has become the highlight of my week!",
                     "name": "Sofia Rossi",
                     "position": "Artist (Italy)",
-                    "image": "/images/landing-page/testimonials/sofia-rossi.png",
+                    "image": "https://i.pravatar.cc/150?img=5",
                     "imageAlt": "Sofia Rossi"
                 },
                 {
                     "text": "The cultural immersion is incredible—I feel like I'm truly experiencing Brazil while I learn the language. Highly recommend this school!",
                     "name": "Emma Dubois",
                     "position": "University Student (France)",
-                    "image": "/images/landing-page/testimonials/emma-dubois.png",
+                    "image": "https://i.pravatar.cc/150?img=6",
                     "imageAlt": "Emma Dubois"
                 }
             ]
