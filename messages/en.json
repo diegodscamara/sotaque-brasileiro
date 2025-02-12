@@ -22,8 +22,8 @@
             }
         },
         "hero": {
-            "title": "Learn Brazilian Portuguese for Business and Culture",
-            "subtitle": "Whether you're expanding your business or connecting with Brazilian art and traditions, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
+            "title": "Empower Your Future with Brazilian Portuguese",
+            "subtitle": "Whether you're a busy professional needing business-ready vocabulary or a cultural enthusiast eager for an authentic Brazilian experience, our flexible, personalized classes with native instructors are designed to fit your life and goals.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
@@ -68,84 +68,84 @@
             ]
         },
         "problem": {
-            "title": "Here's What's Holding You Back",
+            "title": "What's Holding You Back?",
             "subtitle": "Struggling to Learn Brazilian Portuguese? You're Not Alone.",
             "cards": [
                 {
-                    "title": "Life's Too Busy for Rigid Class Times",
-                    "text": "Trying to fit language classes into your packed schedule feels impossible. Most courses offer fixed timings that clash with work, family, or other commitments, leaving you frustrated and unable to progress."
+                    "title": "Rigid Schedules That Don't Fit Your Life",
+                    "text": "For professionals with demanding careers, fixed class times can clash with your work, family, or personal commitments. You deserve a learning solution that adapts to your busy schedule."
                 },
                 {
-                    "title": "Generic Courses Don't Meet Your Needs",
-                    "text": "Most Portuguese courses focus on European Portuguese or offer generic content that doesn't align with your goals. Whether it's for business, travel, or cultural connection, you need a program tailored to your unique needs."
+                    "title": "Courses That Miss the Mark",
+                    "text": "Generic language courses often overlook your unique objectives. Business professionals need industry-specific terminology, while cultural enthusiasts crave a genuine Brazilian experience—not a watered-down version of European Portuguese."
                 },
                 {
-                    "title": "Learning Without Context Feels Empty",
-                    "text": "Language is more than just words—it's culture, expressions, and real-life context. Without authentic Brazilian cultural immersion, your learning feels disconnected and incomplete."
+                    "title": "Missing the Real Brazilian Vibe",
+                    "text": "Without true cultural context, learning Portuguese feels incomplete. You deserve an immersive experience that infuses Brazilian art, music, and traditions into every lesson."
                 }
             ]
         },
         "features": {
-            "title": "Why Choose Us?",
-            "subtitle": "Flexible, Personalized, and Culturally Immersive Classes Designed Just for You",
-            "description": "At Sotaque Brasileiro, we've reimagined language learning to fit your life. With flexible scheduling, personalized lessons, and authentic cultural immersion, you'll finally achieve your Portuguese goals—on your terms.",
+            "title": "Why Choose Sotaque Brasileiro?",
+            "subtitle": "Flexible, Tailored, and Immersive – Classes Designed with Your Goals in Mind",
+            "description": "We believe language learning should fit your life. Whether you're sharpening your business skills or diving into Brazil’s vibrant culture, our platform offers flexible scheduling, personalized lessons, and authentic cultural immersion led by native instructors.",
             "cards": [
                 {
                     "title": "Learn Anytime, Anywhere",
-                    "text": "Say goodbye to rigid class times. Our platform offers classes that fit your schedule, whether it's early mornings, late nights, or weekends. You're in control of your learning journey.",
+                    "text": "No more rigid timetables. Choose the class times that work for you—be it early mornings, late nights, or weekends—so you can progress without compromise.",
                     "image": "/images/landing-page/features/learn-anywhere.png",
                     "imageAlt": "Learn Anytime, Anywhere"
                 },
                 {
-                    "title": "Lessons Designed for Your Goals",
-                    "text": "Whether you're learning for business, travel, or cultural connection, our personalized lessons are crafted to meet your unique needs. No more one-size-fits-all courses!",
+                    "title": "Lessons Tailored to Your Ambitions",
+                    "text": "Our curriculum is crafted to meet your specific needs. For business professionals, we emphasize practical, industry-focused language skills; for cultural enthusiasts, we bring authentic Brazilian expressions and creative insights into every session.",
                     "image": "/images/landing-page/features/personalized-lessons.png",
-                    "imageAlt": "Lessons Designed for Your Goals"
+                    "imageAlt": "Lessons Tailored to Your Ambitions"
                 },
                 {
-                    "title": "Culturally Immersive Lessons",
-                    "text": "Language is more than words—it's culture. Our classes include authentic Brazilian expressions, music, and traditions, so you can connect deeply with the language and its people.",
+                    "title": "Immersive Cultural Experience",
+                    "text": "Experience Brazil like never before. Our classes integrate music, art, and real-life context to create an engaging journey into Brazil’s vibrant culture.",
                     "image": "/images/landing-page/features/culturally-immersive-lessons.png",
-                    "imageAlt": "Culturally Immersive Lessons"
+                    "imageAlt": "Immersive Cultural Experience"
                 },
                 {
-                    "title": "Native Instructors",
-                    "text": "Our instructors are native Brazilian Portuguese speakers with years of experience teaching students from around the world. They bring real-life context and cultural insights to every lesson.",
+                    "title": "Native Instructors with Real Insight",
+                    "text": "Learn from certified native Brazilian instructors who bring firsthand cultural knowledge and practical expertise to every lesson, ensuring your learning is both authentic and effective.",
                     "image": "/images/landing-page/features/native-instructors.png",
-                    "imageAlt": "Native Instructors"
+                    "imageAlt": "Native Instructors with Real Insight"
                 }
             ]
         },
         "how-it-works": {
             "title": "How It Works",
-            "subtitle": "Learn Brazilian Portuguese in 3 Simple Steps",
+            "subtitle": "3 Simple Steps to Start Your Brazilian Portuguese Journey",
             "steps": [
                 {
-                    "title": "1. Create Your Account",
-                    "text": "Start by signing up and telling us your goals. Whether it's for business, travel, or cultural connection, we'll tailor your learning experience to fit your needs.",
+                    "title": "1. Create Your Profile",
+                    "text": "Sign up and share your goals—whether you're aiming for business excellence or cultural immersion. We’ll tailor your learning plan right from the start.",
                     "image": "/images/landing-page/howItWorks/create-account.png",
-                    "imageAlt": "Create Your Account"
+                    "imageAlt": "Create Your Profile"
                 },
                 {
-                    "title": "2. Choose Your Schedule",
-                    "text": "Pick class times that work for you. With flexible scheduling, you can learn at your own pace—mornings, evenings, or weekends.",
+                    "title": "2. Select Your Ideal Schedule",
+                    "text": "Pick class times that seamlessly fit around your busy life. Our flexible options mean you can learn when it’s most convenient—morning, evening, or weekends.",
                     "image": "/images/landing-page/howItWorks/choose-schedule.png",
-                    "imageAlt": "Choose Your Schedule"
+                    "imageAlt": "Select Your Ideal Schedule"
                 },
                 {
-                    "title": "3. Learn with Native Instructors",
-                    "text": "Join live classes with certified native Brazilian Portuguese teachers. Immerse yourself in authentic language and culture, and watch your skills grow.",
+                    "title": "3. Engage with Native Experts",
+                    "text": "Join live sessions with our native instructors. Immerse yourself in authentic language and culture, and start making real progress from day one.",
                     "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
-                    "imageAlt": "Learn with Native Instructors"
+                    "imageAlt": "Engage with Native Experts"
                 }
             ]
         },
         "testimonials": {
             "title": "What Our Students Are Saying",
-            "subtitle": "Hear From Our Students About Their Experience",
+            "subtitle": "Hear From Our Learners About Their Experience",
             "cards": [
                 {
-                    "text": "I came to Brazil for work and needed to learn Portuguese quickly. The personalized lessons helped me communicate confidently in just a few months!",
+                    "text": "I came to Brazil for work and needed to learn Portuguese quickly. The personalized, business-focused lessons helped me communicate confidently in just a few months!",
                     "name": "Emily Johnson",
                     "position": "Marketing Manager (USA)",
                     "image": "/images/landing-page/testimonials/emily-johnson.png",
@@ -159,28 +159,28 @@
                     "imageAlt": "James Carter"
                 },
                 {
-                    "text": "As a business professional, I needed to learn Portuguese for meetings. The tailored lessons and flexible scheduling were perfect for my busy life.",
+                    "text": "As a business professional, I needed to learn Portuguese for meetings. The tailored lessons and flexible scheduling were perfect for my hectic life.",
                     "name": "Sarah Müller",
                     "position": "Business Consultant (Germany)",
                     "image": "/images/landing-page/testimonials/sarah-muller.png",
                     "imageAlt": "Sarah Müller"
                 },
                 {
-                    "text": "I started learning Portuguese to connect with my Brazilian friends. The classes are so engaging, and I'm amazed at how much I've improved!",
+                    "text": "I started learning Portuguese to connect with my Brazilian friends. The classes are engaging and culturally rich—I've never felt more connected!",
                     "name": "Liam O'Connor",
                     "position": "Software Developer (Ireland)",
                     "image": "/images/landing-page/testimonials/liam-oconnor.png",
                     "imageAlt": "Liam O'Connor"
                 },
                 {
-                    "text": "I love how the teachers make every class fun and interactive. Learning Portuguese has become my favorite part of the week!",
+                    "text": "I love how the teachers infuse every class with authentic Brazilian culture. Learning Portuguese has become the highlight of my week!",
                     "name": "Sofia Rossi",
                     "position": "Artist (Italy)",
                     "image": "/images/landing-page/testimonials/sofia-rossi.png",
                     "imageAlt": "Sofia Rossi"
                 },
                 {
-                    "text": "The cultural immersion is incredible—I feel like I'm experiencing Brazil while learning the language. Highly recommend this school!",
+                    "text": "The cultural immersion is incredible—I feel like I'm truly experiencing Brazil while I learn the language. Highly recommend this school!",
                     "name": "Emma Dubois",
                     "position": "University Student (France)",
                     "image": "/images/landing-page/testimonials/emma-dubois.png",
@@ -209,7 +209,7 @@
             "plans": [
                 {
                     "tier": "Explorer",
-                    "description": "Perfect for beginners testing the waters or casual learners who want flexibility.",
+                    "description": "Perfect for beginners or casual learners who value flexibility.",
                     "features": [
                         "8 hours of classes per month",
                         "Native Brazilian instructors",
@@ -241,7 +241,7 @@
                 {
                     "tier": "Enthusiast",
                     "isFeatured": true,
-                    "description": "Ideal for consistent learners aiming for steady progress with more regular practice.",
+                    "description": "Ideal for consistent learners seeking steady progress with extra practice.",
                     "features": [
                         "12 hours of classes per month",
                         "Native Brazilian instructors",
@@ -273,7 +273,7 @@
                 {
                     "tier": "Master",
                     "isFeatured": false,
-                    "description": "Designed for dedicated learners or professionals with ambitious goals.",
+                    "description": "For dedicated learners or professionals with ambitious goals.",
                     "features": [
                         "16 hours of classes per month",
                         "Native Brazilian instructors",
@@ -310,33 +310,33 @@
             "questions": {
                 "1": {
                     "question": "How flexible are the class schedules?",
-                    "answer": "Our classes are designed to fit your busy life. You can choose from morning, evening, or weekend slots, and reschedule easily if needed. Perfect for professionals and enthusiasts alike!"
+                    "answer": "Our classes are designed to fit your busy life. You can choose from morning, evening, or weekend slots and reschedule easily if needed—perfect for professionals and enthusiasts alike!"
                 },
                 "2": {
                     "question": "Are the classes tailored to my goals?",
-                    "answer": "Yes, we customize each class to your specific needs. Whether you're learning for business, travel, or cultural connection, our instructors create lessons that align with your objectives."
+                    "answer": "Absolutely. We customize each class to your specific needs. Whether you're learning for business success or cultural immersion, our instructors craft lessons that align with your objectives."
                 },
                 "3": {
                     "question": "Do you offer business Portuguese courses?",
-                    "answer": "Yes, we offer business Portuguese courses. We have a team of experienced instructors who are experts in business Portuguese. They will help you improve your business Portuguese skills and prepare you for your business meetings."
+                    "answer": "Yes, we offer courses specifically designed for business professionals. Our experienced instructors help you master industry-specific vocabulary and communication skills for your meetings and presentations."
                 },
                 "4": {
                     "question": "How do you incorporate Brazilian culture into the classes?",
-                    "answer": "We incorporate Brazilian culture into the classes through authentic expressions, music, and traditions. This helps you connect with the language and its people on a deeper level."
+                    "answer": "We weave authentic Brazilian culture into every lesson—from local expressions and music to art and traditions—ensuring you experience the real Brazil as you learn the language."
                 },
                 "5": {
                     "question": "What if I need to cancel or reschedule a class?",
-                    "answer": "You can cancel or reschedule a class up to 24 hours before the scheduled class. If you need to cancel or reschedule a class less than 24 hours before the scheduled class, you can do so by contacting us."
+                    "answer": "You can cancel or reschedule a class up to 24 hours before the session. For changes made within 24 hours of the scheduled class, please contact us directly."
                 }
             },
             "disclaimer": "Still have questions? Email us at",
             "email": "contact@sotaquebrasileiro.com"
         },
         "cta": {
-            "title": "Ready to Start Your Brazilian Portuguese Journey?",
-            "subtitle": "Transform Your Language Skills Today",
-            "description": "Join hundreds of learners who’ve achieved their goals with our flexible, personalized classes. Whether you’re expanding your business or connecting with Brazilian culture, we’re here to help you succeed. Book your first class today and experience the difference!",
-            "button": "Start Learning Today",
+            "title": "Ready to Elevate Your Brazilian Portuguese?",
+            "subtitle": "Transform Your Business and Cultural Connections",
+            "description": "Join hundreds of learners who have redefined their futures with our flexible, personalized classes. Whether you're preparing for global business meetings or eager to dive into Brazil's vibrant culture, we're here to help you succeed on your schedule.",
+            "button": "Start Your Journey Today",
             "link": "#pricing"
         },
         "footer": {
@@ -445,6 +445,11 @@
             "french": "French",
             "portuguese": "Portuguese",
             "spanish": "Spanish"
+        },
+        "themeToggle": {
+            "system": "System Theme",
+            "light": "Light Theme",
+            "dark": "Dark Theme"
         },
         "errors": {
             "general": "Something went wrong"
