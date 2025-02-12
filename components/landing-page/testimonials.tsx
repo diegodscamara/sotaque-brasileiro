@@ -39,21 +39,24 @@ export default function Testimonials(): JSX.Element {
     const renderTestimonialCard = (card: TestimonialCard, index: number): JSX.Element => (
         <motion.article
             key={`${card.name}-${index}`}
-            className="flex flex-col gap-4 border-gray-300 dark:border-gray-600 p-4 border rounded-lg"
+            className="flex flex-col gap-4 p-4 border border-gray-300 dark:border-gray-600 rounded-lg"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: index * 0.2 }}
-            aria-labelledby={`testimonial-${index}-title`}
+            aria-labelledby={`testimonial-${index}-title testimonial-${index}-position`}
         >
-            <blockquote className="font-normal text-gray-700 text-sm dark:text-gray-300 leading-5">
-                {card.text}
+            <blockquote 
+                className="font-normal text-gray-700 dark:text-gray-300 text-sm leading-5"
+                aria-describedby={`testimonial-${index}-quote`}
+            >
+                <span id={`testimonial-${index}-quote`}>{card.text}</span>
             </blockquote>
-            <div className="flex gap-1" aria-hidden="true">
+            <div className="flex gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                         key={i}
                         weight="fill"
-                        className="w-4 h-4 text-yellow-500 fill-current"
+                        className="fill-current w-4 h-4 text-yellow-500"
                         aria-hidden="true"
                     />
                 ))}
@@ -74,11 +77,14 @@ export default function Testimonials(): JSX.Element {
                 <div className="flex flex-col">
                     <h4
                         id={`testimonial-${index}-title`}
-                        className="font-semibold text-base text-gray-800 dark:text-gray-100 leading-7"
+                        className="font-semibold text-gray-800 dark:text-gray-100 text-base leading-7"
                     >
                         {card.name}
                     </h4>
-                    <p className="font-normal text-gray-600 text-xs dark:text-gray-400 leading-5">
+                    <p 
+                        id={`testimonial-${index}-position`}
+                        className="font-normal text-gray-600 dark:text-gray-400 text-xs leading-5"
+                    >
                         {card.position}
                     </p>
                 </div>
@@ -91,28 +97,24 @@ export default function Testimonials(): JSX.Element {
             id="testimonials"
             ref={sectionRef}
             className="relative flex flex-col gap-16 mx-auto px-4 py-16 max-w-7xl container"
-            aria-labelledby="testimonials-title"
+            aria-labelledby="testimonials-title testimonials-subtitle"
         >
             <header className="flex flex-col gap-4 text-center">
                 <h2
-                    className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider"
+                    className="font-mono font-medium text-primary text-sm uppercase leading-5 tracking-wider"
                     id="testimonials-title"
                 >
                     {t("title")}
                 </h2>
                 <h3
-                    className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100"
+                    className="mx-auto sm:max-w-none max-w-xs font-extrabold text-gray-800 dark:text-gray-100 text-3xl sm:text-4xl md:text-5xl"
                     id="testimonials-subtitle"
                 >
                     {t("subtitle")}
                 </h3>
             </header>
 
-            <div
-                className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                role="list"
-                aria-label="Customer testimonials"
-            >
+            <div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {cards.map(renderTestimonialCard)}
             </div>
         </section>
