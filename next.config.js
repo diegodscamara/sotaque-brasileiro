@@ -24,7 +24,8 @@ const nextConfig = {
       "www.amazon.com",
       "www.facebook.com",
       "www.netflix.com",
-      "www.google.com"
+      "www.google.com",
+      "i.pravatar.cc"
     ],
   },
 };
