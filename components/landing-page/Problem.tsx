@@ -39,11 +39,11 @@ const Step = ({ icon, title, text }: StepProps) => {
           </div>
           <h3
             id={`step-title-${title}`}
-            className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8"
+            className="font-semibold text-gray-800 dark:text-gray-100 text-xl leading-8"
           >
             {title}
           </h3>
-          <p className="text-base text-gray-500 dark:text-gray-400 leading-5">
+          <p className="text-gray-500 dark:text-gray-400 text-base leading-5">
             {text}
           </p>
         </div>
@@ -79,12 +79,12 @@ const Problem = () => {
         transition={{ duration: 0.6 }}
         className="flex flex-col items-center gap-4 mx-auto text-center"
       >
-        <h2 className="font-medium font-mono text-primary text-sm uppercase tracking-wider">
+        <h2 className="font-mono font-medium text-primary text-sm uppercase tracking-wider">
           {t('title')}
         </h2>
         <h3
           id="problem-heading"
-          className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100"
+          className="mx-auto sm:max-w-none max-w-xs font-extrabold text-gray-800 dark:text-gray-100 text-3xl sm:text-4xl md:text-5xl"
         >
           {t('subtitle')}
         </h3>
@@ -93,22 +93,29 @@ const Problem = () => {
       <div
         className="gap-8 md:gap-10 lg:gap-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         role="list"
+        aria-label="Problem solution steps"
       >
-        <Step
-          icon={<AlarmClockIcon className="w-6 h-6 text-primary" aria-hidden="true" />}
-          title={t('cards.0.title')}
-          text={t('cards.0.text')}
-        />
-        <Step
-          icon={<CookieIcon className="w-6 h-6 text-primary" aria-hidden="true" />}
-          title={t('cards.1.title')}
-          text={t('cards.1.text')}
-        />
-        <Step
-          icon={<GlobeIcon className="w-6 h-6 text-primary" aria-hidden="true" />}
-          title={t('cards.2.title')}
-          text={t('cards.2.text')}
-        />
+        <div role="listitem">
+          <Step
+            icon={<AlarmClockIcon className="w-6 h-6 text-primary" aria-hidden="true" />}
+            title={t('cards.0.title')}
+            text={t('cards.0.text')}
+          />
+        </div>
+        <div role="listitem">
+          <Step
+            icon={<CookieIcon className="w-6 h-6 text-primary" aria-hidden="true" />}
+            title={t('cards.1.title')}
+            text={t('cards.1.text')}
+          />
+        </div>
+        <div role="listitem">
+          <Step
+            icon={<GlobeIcon className="w-6 h-6 text-primary" aria-hidden="true" />}
+            title={t('cards.2.title')}
+            text={t('cards.2.text')}
+          />
+        </div>
       </div>
     </section>
   );
