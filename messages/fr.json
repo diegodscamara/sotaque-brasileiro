@@ -436,7 +436,15 @@
             "billing": "Facturation",
             "sign-out": "Se déconnecter",
             "upgrade": "Mettre à niveau",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "loading": "Chargement",
+            "accountMenu": "Menu de compte"
+        },
+        "langSwitcher": {
+            "english": "Anglais",
+            "french": "Français",
+            "portuguese": "Portugais",
+            "spanish": "Espagnol"
         },
         "errors": {
             "general": "Une erreur s'est produite"
