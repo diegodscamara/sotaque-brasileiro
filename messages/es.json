@@ -12,28 +12,28 @@
                 "pricingLink": "#pricing",
                 "faq": "Preguntas Frecuentes",
                 "faqLink": "#faq",
-                "dashboard": "Panel de Control",
+                "dashboard": "Tablero",
                 "dashboardLink": "/dashboard"
             },
             "cta": {
                 "primary": "Comenzar",
                 "link": "#pricing",
-                "ariaLabel": "Comenzar con nuestro servicio"
+                "ariaLabel": "Comienza con nuestro servicio"
             }
         },
         "hero": {
-            "title": "Aprende Portugués Brasileño para Negocios y Cultura",
-            "subtitle": "Ya sea que estés expandiendo tu negocio o conectando con el arte y las tradiciones brasileñas, nuestras clases flexibles y personalizadas con instructores nativos están diseñadas para adaptarse a tu vida y objetivos.",
+            "title": "Empodera Tu Futuro con Portugués Brasileño",
+            "subtitle": "Ya seas un profesional ocupado que necesita vocabulario listo para negocios o un entusiasta cultural ansioso por una experiencia brasileña auténtica, nuestras clases flexibles y personalizadas con instructores nativos están diseñadas para adaptarse a tu vida y objetivos.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
                 "primary": "Comenzar",
                 "link": "#pricing",
-                "ariaLabel": "Comenzar con nuestro servicio"
+                "ariaLabel": "Comienza con nuestro servicio"
             }
         },
         "companies": {
-            "title": "HEMOS ENSEÑADO A ESTUDIANTES DE EMPRESAS COMO",
+            "title": "ESTUDIANTES ENSEÑADOS DE COMPAÑÍAS COMO",
             "logos": [
                 {
                     "name": "Google",
@@ -68,121 +68,121 @@
             ]
         },
         "problem": {
-            "title": "Esto Es Lo Que Te Está Frenando",
-            "subtitle": "¿Tienes dificultades para aprender portugués brasileño? No estás solo.",
+            "title": "¿Qué Te Está Deteniendo?",
+            "subtitle": "¿Tienes Dificultades para Aprender Portugués Brasileño? No Estás Solo.",
             "cards": [
                 {
-                    "title": "La vida es demasiado ocupada para horarios rígidos",
-                    "text": "Intentar encajar las clases de idiomas en tu agenda llena parece imposible. La mayoría de los cursos ofrecen horarios fijos que chocan con el trabajo, la familia u otros compromisos, dejándote frustrado e incapaz de progresar."
+                    "title": "Horarios Rígidos que No Se Adaptan a Tu Vida",
+                    "text": "Para profesionales con carreras exigentes, los horarios de clase fijos pueden chocar con tus compromisos laborales, familiares o personales. Mereces una solución de aprendizaje que se adapte a tu apretada agenda."
                 },
                 {
-                    "title": "Los cursos genéricos no satisfacen tus necesidades",
-                    "text": "La mayoría de los cursos de portugués se centran en el portugués europeo u ofrecen contenido genérico que no se alinea con tus objetivos. Ya sea para negocios, viajes o conexión cultural, necesitas un programa adaptado a tus necesidades específicas."
+                    "title": "Cursos que No Cumplen con las Expectativas",
+                    "text": "Los cursos de idiomas genéricos a menudo pasan por alto tus objetivos únicos. Los profesionales de negocios necesitan terminología específica de la industria, mientras que los entusiastas culturales anhelan una experiencia brasileña genuina, no una versión diluida del portugués europeo."
                 },
                 {
-                    "title": "Aprender sin contexto se siente vacío",
-                    "text": "El idioma es más que solo palabras: es cultura, expresiones y contexto de la vida real. Sin una inmersión auténtica en la cultura brasileña, tu aprendizaje se siente desconectado e incompleto."
+                    "title": "Falta de la Verdadera Vibración Brasileña",
+                    "text": "Sin un verdadero contexto cultural, aprender portugués se siente incompleto. Mereces una experiencia inmersiva que infunda arte, música y tradiciones brasileñas en cada lección."
                 }
             ]
         },
         "features": {
-            "title": "¿Por Qué Elegirnos?",
-            "subtitle": "Clases Flexibles, Personalizadas y Culturalmente Inmersivas Diseñadas Justo para Ti",
-            "description": "En Sotaque Brasileiro, hemos reinventado el aprendizaje de idiomas para adaptarse a tu vida. Con horarios flexibles, lecciones personalizadas y una inmersión auténtica en la cultura brasileña, finalmente lograrás tus objetivos de portugués—en tus términos.",
+            "title": "¿Por Qué Elegir Sotaque Brasileiro?",
+            "subtitle": "Flexible, Personalizado e Inmersivo – Clases Diseñadas con Tus Objetivos en Mente",
+            "description": "Creemos que el aprendizaje de idiomas debe adaptarse a tu vida. Ya sea que estés perfeccionando tus habilidades comerciales o sumergiéndote en la vibrante cultura de Brasil, nuestra plataforma ofrece horarios flexibles, lecciones personalizadas e inmersión cultural auténtica liderada por instructores nativos.",
             "cards": [
                 {
-                    "title": "Aprende en cualquier momento y en cualquier lugar",
-                    "text": "Di adiós a los horarios rígidos. Nuestra plataforma ofrece clases que se ajustan a tu agenda, ya sea que sean mañanas tempranas, noches tardías o fines de semana. Eres el que controla tu viaje de aprendizaje.",
+                    "title": "Aprende en Cualquier Momento y Lugar",
+                    "text": "No más horarios rígidos. Elige los horarios de clase que funcionen para ti, ya sean temprano en la mañana, tarde en la noche o fines de semana, para que puedas avanzar sin compromisos.",
                     "image": "/images/landing-page/features/learn-anywhere.png",
-                    "imageAlt": "Aprende en cualquier momento y en cualquier lugar"
+                    "imageAlt": "Aprende en Cualquier Momento y Lugar"
                 },
                 {
-                    "title": "Lecciones diseñadas para tus objetivos",
-                    "text": "Ya sea que estés aprendiendo para negocios, viajes o conexión cultural, nuestras lecciones personalizadas están diseñadas para cumplir con tus necesidades únicas. No más cursos de un solo tamaño!",
+                    "title": "Lecciones Adaptadas a Tus Ambiciones",
+                    "text": "Nuestro currículo está diseñado para satisfacer tus necesidades específicas. Para los profesionales de negocios, enfatizamos habilidades lingüísticas prácticas y enfocadas en la industria; para los entusiastas culturales, traemos expresiones brasileñas auténticas y perspectivas creativas en cada sesión.",
                     "image": "/images/landing-page/features/personalized-lessons.png",
-                    "imageAlt": "Lecciones diseñadas para tus objetivos"
+                    "imageAlt": "Lecciones Adaptadas a Tus Ambiciones"
                 },
                 {
-                    "title": "Lecciones culturalesmente inmersivas",
-                    "text": "El idioma es más que palabras: es cultura. Nuestras clases incluyen expresiones auténticas brasileñas, música y tradiciones, para que puedas conectarte profundamente con el idioma y sus personas.",
+                    "title": "Experiencia Cultural Inmersiva",
+                    "text": "Experimenta Brasil como nunca antes. Nuestras clases integran música, arte y contexto de la vida real para crear un viaje atractivo a la vibrante cultura de Brasil.",
                     "image": "/images/landing-page/features/culturally-immersive-lessons.png",
-                    "imageAlt": "Lecciones culturalesmente inmersivas"
+                    "imageAlt": "Experiencia Cultural Inmersiva"
                 },
                 {
-                    "title": "Instructores nativos",
-                    "text": "Nuestros instructores son hablantes nativos de portugués brasileño con años de experiencia en enseñar a estudiantes de todo el mundo. Llegan al contexto real de la vida y las ideas culturales a cada lección.",
+                    "title": "Instructores Nativos con Verdadera Perspectiva",
+                    "text": "Aprende de instructores brasileños nativos certificados que aportan conocimiento cultural de primera mano y experiencia práctica a cada lección, asegurando que tu aprendizaje sea auténtico y efectivo.",
                     "image": "/images/landing-page/features/native-instructors.png",
-                    "imageAlt": "Instructores nativos"
+                    "imageAlt": "Instructores Nativos con Verdadera Perspectiva"
                 }
             ]
         },
         "how-it-works": {
-            "title": "¿Cómo Funciona?",
-            "subtitle": "Aprende Portugués Brasileño en 3 Pasos Simples",
+            "title": "Cómo Funciona",
+            "subtitle": "3 Pasos Simples para Comenzar Tu Viaje en Portugués Brasileño",
             "steps": [
                 {
-                    "title": "1. Crea tu cuenta",
-                    "text": "Comienza registrándote y contándonos tus objetivos. Ya sea para negocios, viajes o conexión cultural, ajustaremos tu experiencia de aprendizaje para que se adapte a tus necesidades.",
+                    "title": "1. Crea Tu Perfil",
+                    "text": "Regístrate y comparte tus objetivos, ya sea que busques la excelencia empresarial o la inmersión cultural. Personalizaremos tu plan de aprendizaje desde el principio.",
                     "image": "/images/landing-page/howItWorks/create-account.png",
-                    "imageAlt": "Crea tu cuenta"
+                    "imageAlt": "Crea Tu Perfil"
                 },
                 {
-                    "title": "2. Elige tu horario",
-                    "text": "Elige los horarios que funcionan para ti. Con un horario flexible, puedes aprender a tu ritmo—mañanas, tardes o fines de semana.",
+                    "title": "2. Selecciona Tu Horario Ideal",
+                    "text": "Elige horarios de clase que se adapten perfectamente a tu vida ocupada. Nuestras opciones flexibles significan que puedes aprender cuando sea más conveniente: mañana, tarde o fines de semana.",
                     "image": "/images/landing-page/howItWorks/choose-schedule.png",
-                    "imageAlt": "Elige tu horario"
+                    "imageAlt": "Selecciona Tu Horario Ideal"
                 },
                 {
-                    "title": "3. Aprende con instructores nativos",
-                    "text": "Únete a clases en vivo con instructores certificados de portugués brasileño. Sumérgete en un idioma auténtico y cultura, y observa cómo tus habilidades crecen.",
+                    "title": "3. Interactúa con Expertos Nativos",
+                    "text": "Únete a sesiones en vivo con nuestros instructores nativos. Sumérgete en el idioma y la cultura auténticos, y comienza a hacer un progreso real desde el primer día.",
                     "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
-                    "imageAlt": "Aprende con instructores nativos"
+                    "imageAlt": "Interactúa con Expertos Nativos"
                 }
             ]
         },
         "testimonials": {
-            "title": "Lo Que Nuestros Estudiantes Dicen",
-            "subtitle": "Escucha lo que dicen nuestros estudiantes sobre su experiencia",
+            "title": "Lo Que Dicen Nuestros Estudiantes",
+            "subtitle": "Escucha a Nuestros Aprendices Sobre Su Experiencia",
             "cards": [
                 {
-                    "text": "Llegué a Brasil para trabajar y necesitaba aprender portugués rápidamente. Las lecciones personalizadas me ayudaron a comunicarme con confianza en solo unos meses!",
+                    "text": "Vine a Brasil por trabajo y necesitaba aprender portugués rápidamente. Las lecciones personalizadas y enfocadas en negocios me ayudaron a comunicarme con confianza en solo unos meses.",
                     "name": "Emily Johnson",
-                    "position": "Gerente de Marketing (USA)",
+                    "position": "Gerente de Marketing (EE. UU.)",
                     "image": "/images/landing-page/testimonials/emily-johnson.png",
                     "imageAlt": "Emily Johnson"
                 },
                 {
-                    "text": "Siempre he querido aprender portugués para viajar, y esta escuela lo hizo tan fácil. Los profesores son increíbles, y la inmersión cultural es fantástica!",
+                    "text": "Siempre quise aprender portugués para viajar, y esta escuela lo hizo tan fácil. ¡Los profesores son increíbles y la inmersión cultural es fantástica!",
                     "name": "James Carter",
                     "position": "Bloguero de Viajes (Reino Unido)",
                     "image": "/images/landing-page/testimonials/james-carter.png",
                     "imageAlt": "James Carter"
                 },
                 {
-                    "text": "Como profesional de negocios, necesitaba aprender portugués para reuniones. Las lecciones personalizadas y el horario flexible fueron perfectos para mi vida ocupada.",
+                    "text": "Como profesional de negocios, necesitaba aprender portugués para reuniones. Las lecciones personalizadas y la programación flexible fueron perfectas para mi vida agitada.",
                     "name": "Sarah Müller",
                     "position": "Consultora de Negocios (Alemania)",
                     "image": "/images/landing-page/testimonials/sarah-muller.png",
                     "imageAlt": "Sarah Müller"
                 },
                 {
-                    "text": "Comencé a aprender portugués para conectar con mis amigos brasileños. Las clases son tan entretenidas, y estoy sorprendido de cuánto he mejorado!",
+                    "text": "Comencé a aprender portugués para conectar con mis amigos brasileños. Las clases son atractivas y culturalmente ricas; ¡nunca me he sentido más conectado!",
                     "name": "Liam O'Connor",
                     "position": "Desarrollador de Software (Irlanda)",
                     "image": "/images/landing-page/testimonials/liam-oconnor.png",
                     "imageAlt": "Liam O'Connor"
                 },
                 {
-                    "text": "Me encanta cómo los profesores hacen cada clase tan entretenida y interactiva. Aprender portugués se ha convertido en mi parte favorita de la semana!",
+                    "text": "¡Me encanta cómo los profesores infunden cada clase con cultura brasileña auténtica! Aprender portugués se ha convertido en el punto culminante de mi semana.",
                     "name": "Sofia Rossi",
                     "position": "Artista (Italia)",
                     "image": "/images/landing-page/testimonials/sofia-rossi.png",
                     "imageAlt": "Sofia Rossi"
                 },
                 {
-                    "text": "La inmersión cultural es increíble—me siento como si estuviera experimentando Brasil mientras aprendo el idioma. ¡Altamente recomendado!",
+                    "text": "La inmersión cultural es increíble; siento que realmente estoy experimentando Brasil mientras aprendo el idioma. ¡Recomiendo encarecidamente esta escuela!",
                     "name": "Emma Dubois",
-                    "position": "Estudiante Universitario (Francia)",
+                    "position": "Estudiante Universitaria (Francia)",
                     "image": "/images/landing-page/testimonials/emma-dubois.png",
                     "imageAlt": "Emma Dubois"
                 }
@@ -209,12 +209,12 @@
             "plans": [
                 {
                     "tier": "Explorador",
-                    "description": "Perfecto para principiantes que están probando el terreno o estudiantes casuales que buscan flexibilidad.",
+                    "description": "Perfecto para principiantes o estudiantes ocasionales que valoran la flexibilidad.",
                     "features": [
-                        "8 horas de clases al mes",
+                        "8 horas de clases por mes",
                         "Instructores brasileños nativos",
                         "Plan de aprendizaje personalizado",
-                        "Horario flexible",
+                        "Programación flexible",
                         "Soporte por correo electrónico"
                     ],
                     "variants": [
@@ -241,13 +241,13 @@
                 {
                     "tier": "Entusiasta",
                     "isFeatured": true,
-                    "description": "Ideal para estudiantes consistentes que buscan un progreso constante con práctica más regular.",
+                    "description": "Ideal para estudiantes constantes que buscan un progreso constante con práctica adicional.",
                     "features": [
-                        "12 horas de clases al mes",
+                        "12 horas de clases por mes",
                         "Instructores brasileños nativos",
                         "Plan de aprendizaje personalizado",
-                        "Horario flexible",
-                        "Soporte prioritario por correo electrónico"
+                        "Programación flexible",
+                        "Soporte por correo electrónico prioritario"
                     ],
                     "variants": [
                         {
@@ -273,12 +273,12 @@
                 {
                     "tier": "Maestro",
                     "isFeatured": false,
-                    "description": "Diseñado para estudiantes dedicados o profesionales con objetivos ambiciosos.",
+                    "description": "Para estudiantes dedicados o profesionales con objetivos ambiciosos.",
                     "features": [
-                        "16 horas de clases al mes",
+                        "16 horas de clases por mes",
                         "Instructores brasileños nativos",
                         "Plan de aprendizaje personalizado",
-                        "Horario flexible",
+                        "Programación flexible",
                         "Soporte prioritario por correo electrónico y chat"
                     ],
                     "variants": [
@@ -306,41 +306,41 @@
         },
         "faq": {
             "title": "Preguntas Frecuentes",
-            "subtitle": "Todo lo que necesitas saber para comenzar",
+            "subtitle": "Todo lo que Necesitas Saber para Comenzar",
             "questions": {
                 "1": {
                     "question": "¿Qué tan flexibles son los horarios de las clases?",
-                    "answer": "Nuestras clases están diseñadas para adaptarse a tu vida ocupada. Puedes elegir entre horarios de mañana, tarde o fin de semana, y reprogramar fácilmente si es necesario. ¡Perfecto para profesionales y entusiastas por igual!"
+                    "answer": "Nuestras clases están diseñadas para adaptarse a tu vida ocupada. Puedes elegir entre horarios de mañana, tarde o fines de semana y reprogramar fácilmente si es necesario, ¡perfecto para profesionales y entusiastas por igual!"
                 },
                 "2": {
                     "question": "¿Las clases están adaptadas a mis objetivos?",
-                    "answer": "Sí, personalizamos cada clase según tus necesidades específicas. Ya sea que estés aprendiendo para negocios, viajes o conexión cultural, nuestros instructores crean lecciones que se alinean con tus objetivos."
+                    "answer": "Absolutamente. Personalizamos cada clase a tus necesidades específicas. Ya sea que estés aprendiendo para el éxito empresarial o la inmersión cultural, nuestros instructores crean lecciones que se alinean con tus objetivos."
                 },
                 "3": {
                     "question": "¿Ofrecen cursos de portugués para negocios?",
-                    "answer": "Sí, ofrecemos cursos de portugués para negocios. Contamos con un equipo de instructores experimentados que son expertos en portugués comercial. Te ayudarán a mejorar tus habilidades de portugués para negocios y te prepararán para tus reuniones empresariales."
+                    "answer": "Sí, ofrecemos cursos diseñados específicamente para profesionales de negocios. Nuestros instructores experimentados te ayudan a dominar el vocabulario y las habilidades de comunicación específicas de la industria para tus reuniones y presentaciones."
                 },
                 "4": {
                     "question": "¿Cómo incorporan la cultura brasileña en las clases?",
-                    "answer": "Incorporamos la cultura brasileña en las clases a través de expresiones auténticas, música y tradiciones. Esto te ayuda a conectarte con el idioma y su gente en un nivel más profundo."
+                    "answer": "Integramos la cultura brasileña auténtica en cada lección, desde expresiones locales y música hasta arte y tradiciones, asegurando que experimentes el verdadero Brasil mientras aprendes el idioma."
                 },
                 "5": {
                     "question": "¿Qué pasa si necesito cancelar o reprogramar una clase?",
-                    "answer": "Puedes cancelar o reprogramar una clase hasta 24 horas antes de la clase programada. Si necesitas cancelar o reprogramar una clase con menos de 24 horas de anticipación, puedes hacerlo contactándonos."
+                    "answer": "Puedes cancelar o reprogramar una clase hasta 24 horas antes de la sesión. Para cambios realizados dentro de las 24 horas previas a la clase programada, contáctanos directamente."
                 }
             },
-            "disclaimer": "¿Aún tienes preguntas? Escríbenos a",
-            "email": "contacto@sotaquebrasileiro.com"
+            "disclaimer": "¿Aún tienes preguntas? Envíanos un correo a",
+            "email": "contact@sotaquebrasileiro.com"
         },
         "cta": {
-            "title": "¿Listo para comenzar tu viaje de portugués brasileño?",
-            "subtitle": "Transforma tus habilidades de idioma hoy",
-            "description": "Únete a cientos de aprendices que han logrado sus objetivos con nuestras clases flexibles y personalizadas. Ya sea que estés expandiendo tu negocio o conectando con la cultura brasileña, estamos aquí para ayudarte a tener éxito. Reserva tu primera clase hoy y experimenta la diferencia!",
-            "button": "Comenzar a aprender hoy",
+            "title": "¿Listo para Elevar Tu Portugués Brasileño?",
+            "subtitle": "Transforma Tus Conexiones Empresariales y Culturales",
+            "description": "Únete a cientos de estudiantes que han redefinido su futuro con nuestras clases flexibles y personalizadas. Ya sea que te estés preparando para reuniones empresariales globales o ansíes sumergirte en la vibrante cultura de Brasil, estamos aquí para ayudarte a tener éxito en tu horario.",
+            "button": "Comienza Tu Viaje Hoy",
             "link": "#pricing"
         },
         "footer": {
-            "description": "Transforma tu portugués con Sotaque Brasileiro: clases personalizadas, inmersivas culturalmente, adaptadas a tu horario y objetivos, enseñadas por instructores brasileños nativos.",
+            "description": "Transforma tu portugués con Sotaque Brasileiro: clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
             "services": {
                 "title": "Servicios",
                 "links": [
@@ -350,7 +350,7 @@
                             "link": "#features"
                         },
                         "howItWorks": {
-                            "name": "¿Cómo Funciona?",
+                            "name": "Cómo Funciona",
                             "link": "#how-it-works"
                         },
                         "pricing": {
@@ -377,7 +377,7 @@
                             "link": "/support"
                         },
                         "teacher": {
-                            "name": "Ser Instructor",
+                            "name": "Conviértete en Profesor",
                             "link": "/become-a-teacher"
                         }
                     }
@@ -399,7 +399,7 @@
                 ]
             },
             "social": {
-                "title": "Redes Sociales",
+                "title": "Social",
                 "links": [
                     {
                         "instagram": {
@@ -417,7 +417,7 @@
                     }
                 ]
             },
-            "copyright": "Derechos reservados © 2025 Sotaque Brasileiro."
+            "copyright": "Copyright © 2024 Sotaque Brasileiro. Todos los derechos reservados."
         }
     },
     "dashboard": {},
@@ -445,6 +445,11 @@
             "french": "Francés",
             "portuguese": "Portugués",
             "spanish": "Español"
+        },
+        "themeToggle": {
+            "system": "Tema del Sistema",
+            "light": "Tema Claro",
+            "dark": "Tema Oscuro"
         },
         "errors": {
             "general": "Algo salió mal"
