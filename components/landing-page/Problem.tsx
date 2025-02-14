@@ -79,7 +79,7 @@ const Problem = () => {
         transition={{ duration: 0.6 }}
         className="flex flex-col items-center gap-4 mx-auto text-center"
       >
-        <h2 className="font-mono font-medium text-primary text-sm uppercase tracking-wider">
+        <h2 className="font-mono font-medium text-green-700 dark:text-green-500 text-sm uppercase tracking-wider">
           {t('title')}
         </h2>
         <h3
