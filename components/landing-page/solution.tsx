@@ -102,7 +102,7 @@ export const Features = (): JSX.Element => {
                         {t("subtitle")}
                     </motion.h3>
                     <motion.p
-                        className="mx-auto max-w-2xl text-gray-500 dark:text-gray-300 text-lg leading-8"
+                        className="mx-auto max-w-2xl text-gray-600 dark:text-gray-200 text-lg leading-8"
                         initial={{ opacity: 0 }}
                         animate={isInView ? { opacity: 1 } : {}}
                         transition={{ delay: 0.6 }}
