@@ -5,6 +5,7 @@ module.exports = {
     "app/**/*.{ts,tsx,jsx,mdx,js}",
     "components/**/*.{ts,tsx,jsx,js,mdx}",
     "libs/**/*.{js,ts,jsx,tsx,mdx}",
+    "public/**/*.{png,svg,jpg,jpeg,gif,ico,webp,avif,tiff}",
   ],
   theme: {
     extend: {

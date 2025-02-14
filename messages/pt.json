@@ -421,7 +421,43 @@
         }
     },
     "dashboard": {},
-    "auth": {},
+    "auth": {
+        "sign-in": {
+            "title": "Bem-vindo de volta",
+            "subtitle": "Digite seu email abaixo para entrar na sua conta",
+            "email": "Email",
+            "emailPlaceholder": "you@example.com",
+            "password": "Senha",
+            "passwordPlaceholder": "********",
+            "forgotPassword": "Esqueceu sua senha?",
+            "signIn": "Entrar",
+            "continue": "Ou continue com",
+            "signInWithGoogle": "Entrar com Google",
+            "noAccount": "Não tem uma conta?",
+            "signUp": "Registrar",
+            "disclaimer": "Ao entrar, você concorda com nossos",
+            "and": "e",
+            "termsOfService": "Termos de serviço",
+            "privacyPolicy": "Política de privacidade"
+        },
+        "sign-up": {
+            "title": "Crie uma conta",
+            "subtitle": "Digite seu email abaixo para criar uma conta",
+            "email": "Email",
+            "emailPlaceholder": "you@example.com",
+            "password": "Senha",
+            "passwordPlaceholder": "********",
+            "confirmPassword": "Confirmar senha",
+            "confirmPasswordPlaceholder": "********",
+            "signUp": "Registrar",
+            "alreadyHaveAccount": "Já tem uma conta?",
+            "signIn": "Entrar",
+            "disclaimer": "Ao registrar, você concorda com nossos",
+            "and": "e",
+            "termsOfService": "Termos de serviço",
+            "privacyPolicy": "Política de privacidade"
+        }
+    },
     "shared": {
         "appName": "Sotaque Brasileiro",
         "buttons": {
