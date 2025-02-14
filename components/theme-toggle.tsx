@@ -13,9 +13,9 @@ export function ThemeToggle() {
   const t = useTranslations("shared")
 
   return (
-    <div 
-      className="flex gap-1 p-1 border border-gray-300 dark:border-gray-700 rounded-lg" 
-      role="radiogroup" 
+    <div
+      className="flex justify-center items-center gap-1 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 p-1 border border-gray-300 dark:border-gray-500 rounded-lg h-10 text-gray-800 dark:text-gray-200 hover:text-accent-foreground"
+      role="radiogroup"
       aria-label="Theme Toggle"
     >
       <Button
