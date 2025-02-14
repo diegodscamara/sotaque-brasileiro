@@ -421,7 +421,43 @@
         }
     },
     "dashboard": {},
-    "auth": {},
+    "auth": {
+        "sign-in": {
+            "title": "Bienvenue de nouveau",
+            "subtitle": "Entrez votre email ci-dessous pour vous connecter à votre compte",
+            "email": "Email",
+            "emailPlaceholder": "you@example.com",
+            "password": "Mot de passe",
+            "passwordPlaceholder": "********",
+            "forgotPassword": "Mot de passe oublié?",
+            "signIn": "Se connecter",
+            "continue": "Ou continuez avec",
+            "signInWithGoogle": "Se connecter avec Google",
+            "noAccount": "Pas de compte?",
+            "signUp": "S'inscrire",
+            "disclaimer": "En vous connectant, vous acceptez nos",
+            "and": "et",
+            "termsOfService": "Conditions de service",
+            "privacyPolicy": "Politique de confidentialité"
+        },
+        "sign-up": {
+            "title": "Créer un compte",
+            "subtitle": "Entrez votre email ci-dessous pour créer un compte",
+            "email": "Email",
+            "emailPlaceholder": "you@example.com",
+            "password": "Mot de passe",
+            "passwordPlaceholder": "********",
+            "confirmPassword": "Confirmer le mot de passe",
+            "confirmPasswordPlaceholder": "********",
+            "signUp": "S'inscrire",
+            "alreadyHaveAccount": "Vous avez déjà un compte?",
+            "signIn": "Se connecter",
+            "disclaimer": "En vous inscrivant, vous acceptez nos",
+            "and": "et",
+            "termsOfService": "Conditions de service",
+            "privacyPolicy": "Politique de confidentialité"
+        }
+    },
     "shared": {
         "appName": "Sotaque Brasileiro",
         "buttons": {
