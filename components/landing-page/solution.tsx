@@ -40,11 +40,11 @@ const FeatureCard = ({
     >
         <h4
             id={`feature-${title.toLowerCase().replace(/\s+/g, '-')}-title`}
-            className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8"
+            className="font-semibold text-gray-800 dark:text-gray-100 text-xl leading-8"
         >
             {title}
         </h4>
-        <p className="font-normal text-base text-gray-500 dark:text-gray-400 leading-5">
+        <p className="font-normal text-gray-500 dark:text-gray-400 text-base leading-5">
             {text}
         </p>
         <div className="relative w-full">
@@ -86,7 +86,7 @@ export const Features = (): JSX.Element => {
                 <header className="space-y-4 mx-auto text-center">
                     <motion.h2
                         id="features-title"
-                        className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider"
+                        className="font-mono font-medium text-green-700 dark:text-green-500 text-sm uppercase leading-5 tracking-wider"
                         initial={{ opacity: 0 }}
                         animate={isInView ? { opacity: 1 } : {}}
                         transition={{ delay: 0.2 }}
@@ -94,7 +94,7 @@ export const Features = (): JSX.Element => {
                         {t("title")}
                     </motion.h2>
                     <motion.h3
-                        className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100"
+                        className="mx-auto sm:max-w-none max-w-xs font-extrabold text-gray-800 dark:text-gray-100 text-3xl sm:text-4xl md:text-5xl"
                         initial={{ opacity: 0 }}
                         animate={isInView ? { opacity: 1 } : {}}
                         transition={{ delay: 0.4 }}
@@ -102,7 +102,7 @@ export const Features = (): JSX.Element => {
                         {t("subtitle")}
                     </motion.h3>
                     <motion.p
-                        className="mx-auto max-w-2xl text-gray-500 text-lg dark:text-gray-300 leading-8"
+                        className="mx-auto max-w-2xl text-gray-500 dark:text-gray-300 text-lg leading-8"
                         initial={{ opacity: 0 }}
                         animate={isInView ? { opacity: 1 } : {}}
                         transition={{ delay: 0.6 }}
