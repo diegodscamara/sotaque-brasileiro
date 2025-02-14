@@ -69,7 +69,7 @@ const Pricing = (): JSX.Element => {
     >
       <header className="flex flex-col gap-4 text-center">
         <h2
-          className="font-mono font-medium text-primary text-sm uppercase leading-5 tracking-wider"
+          className="font-mono font-medium text-green-700 dark:text-green-500 text-sm uppercase leading-5 tracking-wider"
           id="pricing-title"
         >
           {t("title")}
@@ -111,7 +111,7 @@ const Pricing = (): JSX.Element => {
               return (
                 <Card
                   key={`${plan.tier}-${variant.interval}`}
-                  className={`relative bg-transparent shadow-none w-full ${plan.isFeatured ? "border-primary h-full lg:h-[calc(100%+1rem)]" : "border-gray-300 dark:border-gray-500"
+                  className={`relative bg-transparent shadow-none w-full ${plan.isFeatured ? "border-green-700 dark:border-green-500 h-full lg:h-[calc(100%+1rem)]" : "border-gray-300 dark:border-gray-500"
                     }`}
                   aria-labelledby={`${plan.tier}-title`}
                 >
@@ -168,10 +168,10 @@ const Pricing = (): JSX.Element => {
                         {plan.features.map((feature, i) => (
                           <li key={i} className="flex items-center gap-4">
                             <div
-                              className="flex justify-center items-center bg-primary/10 dark:bg-primary/20 rounded-full w-4 h-4"
+                              className="flex justify-center items-center bg-green-700/10 dark:bg-green-500/20 rounded-full w-4 h-4"
                               aria-hidden="true"
                             >
-                              <Check className="w-2 h-2 text-primary dark:text-primary" />
+                              <Check className="w-2 h-2 text-green-700 dark:text-green-500" />
                             </div>
                             <span className="font-normal text-gray-800 dark:text-gray-200 text-base leading-5">
                               {feature}
