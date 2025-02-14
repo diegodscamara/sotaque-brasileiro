@@ -45,8 +45,8 @@ export default function Testimonials(): JSX.Element {
             transition={{ duration: 0.6, delay: index * 0.2 }}
             aria-labelledby={`testimonial-${index}-title testimonial-${index}-position`}
         >
-            <blockquote 
-                className="font-normal text-gray-700 dark:text-gray-300 text-sm leading-5"
+            <blockquote
+                className="font-normal text-gray-700 dark:text-gray-200 text-sm leading-5"
                 aria-describedby={`testimonial-${index}-quote`}
             >
                 <span id={`testimonial-${index}-quote`}>{card.text}</span>
@@ -70,20 +70,20 @@ export default function Testimonials(): JSX.Element {
                         height={48}
                         loading="lazy"
                     />
-                    <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100">
+                    <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-50">
                         {card.name.charAt(0)}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                     <h4
                         id={`testimonial-${index}-title`}
-                        className="font-semibold text-gray-800 dark:text-gray-100 text-base leading-7"
+                        className="font-semibold text-gray-800 dark:text-gray-50 text-base leading-7"
                     >
                         {card.name}
                     </h4>
-                    <p 
+                    <p
                         id={`testimonial-${index}-position`}
-                        className="font-normal text-gray-600 dark:text-gray-400 text-xs leading-5"
+                        className="font-normal text-gray-600 dark:text-gray-300 text-xs leading-5"
                     >
                         {card.position}
                     </p>
@@ -101,7 +101,7 @@ export default function Testimonials(): JSX.Element {
         >
             <header className="flex flex-col gap-4 text-center">
                 <h2
-                    className="font-mono font-medium text-primary text-sm uppercase leading-5 tracking-wider"
+                    className="font-mono font-medium text-green-700 dark:text-green-500 text-sm uppercase leading-5 tracking-wider"
                     id="testimonials-title"
                 >
                     {t("title")}
