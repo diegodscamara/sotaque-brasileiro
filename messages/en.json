@@ -461,6 +461,8 @@
             "repeatPasswordPlaceholder": "********",
             "passwordsDoNotMatch": "Passwords do not match",
             "passwordStrength": "Password strength",
+            "showPassword": "Show password",
+            "hidePassword": "Hide password",
             "signUp": "Sign up",
             "alreadyHaveAccount": "Already have an account?",
             "signIn": "Sign in",
