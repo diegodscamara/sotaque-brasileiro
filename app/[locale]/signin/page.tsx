@@ -5,14 +5,12 @@ import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { GoogleLogo } from "@phosphor-icons/react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import React from "react";
-import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { motion } from "framer-motion";
@@ -62,28 +60,6 @@ export default function SignIn() {
       } else {
         router.push(data.redirectUrl);
       }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-
-      if (error) throw error;
     } catch (error) {
       setError(error instanceof Error ? error.message : "An unknown error occurred");
     } finally {
@@ -193,19 +169,6 @@ export default function SignIn() {
                 </Button>
               </div>
             </form>
-
-            <div className="flex justify-center items-center gap-2 w-full">
-              <Separator className="bg-gray-300 dark:bg-gray-500 w-1/4" />
-              <p className="font-normal text-gray-600 dark:text-gray-300 text-sm leading-5">
-                {t("continue")}
-              </p>
-              <Separator className="bg-gray-300 dark:bg-gray-500 w-1/4" />
-            </div>
-
-            <Button onClick={handleGoogleSignIn} variant="outline" className="bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800/50 dark:bg-transparent border-gray-300 dark:border-gray-600 w-full" disabled={loading}>
-              <GoogleLogo className="mr-2 w-4 h-4" />
-              {t("signInWithGoogle")}
-            </Button>
           </CardContent>
 
           <CardFooter className="flex flex-row flex-wrap justify-center items-center gap-1 text-gray-600 dark:text-gray-300 text-sm text-center leading-none">
