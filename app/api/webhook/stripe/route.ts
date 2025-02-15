@@ -15,7 +15,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 // This is where we receive Stripe webhook events
 // It used to update the user data, send emails, etc...
 // By default, it'll store the user in the database
-// See more: https://shipfa.st/docs/features/payments
+// See more: https://sotaquebrasileiro.com/docs/features/payments
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const signature = (await headers()).get("stripe-signature");
