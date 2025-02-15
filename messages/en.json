@@ -340,7 +340,7 @@
             "link": "#pricing"
         },
         "footer": {
-            "description": "Transform your Portuguese with Sotaque Brasileiro: personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "description": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
             "services": {
                 "title": "Services",
                 "links": [
@@ -418,6 +418,10 @@
                 ]
             },
             "copyright": "Copyright © 2024 Sotaque Brasileiro. All rights reserved."
+        },
+        "seo": {
+            "seoDescription": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule"
         }
     },
     "dashboard": {},
@@ -438,28 +442,48 @@
             "disclaimer": "By signing in, you agree to our",
             "and": "and",
             "termsOfService": "Terms of Service",
-            "privacyPolicy": "Privacy Policy"
+            "privacyPolicy": "Privacy Policy",
+            "seoDescription": "Sign in to Sotaque Brasileiro to access your personalized Portuguese learning journey with native Brazilian instructors.",
+            "ogImageAlt": "Sign in to Sotaque Brasileiro - Learn Portuguese with native instructors",
+            "keywords": "sign in, login, portuguese lessons, brazilian portuguese, language learning, online portuguese classes, native instructors"
         },
         "sign-up": {
             "title": "Create an account",
             "subtitle": "Enter your email below to create an account",
+            "selectRole": "Select your role",
+            "studentTab": "Sign up as a student",
+            "teacherTab": "Sign up as a teacher",
             "email": "Email",
             "emailPlaceholder": "you@example.com",
             "password": "Password",
             "passwordPlaceholder": "********",
-            "confirmPassword": "Confirm password",
-            "confirmPasswordPlaceholder": "********",
+            "repeatPassword": "Repeat password",
+            "repeatPasswordPlaceholder": "********",
+            "passwordsDoNotMatch": "Passwords do not match",
+            "passwordStrength": "Password strength",
             "signUp": "Sign up",
             "alreadyHaveAccount": "Already have an account?",
             "signIn": "Sign in",
             "disclaimer": "By signing up, you agree to our",
             "and": "and",
             "termsOfService": "Terms of Service",
-            "privacyPolicy": "Privacy Policy"
+            "privacyPolicy": "Privacy Policy",
+            "becomeTeacher": "Become a Teacher",
+            "teacherSubtitle": "Create your teacher account and start sharing knowledge",
+            "seoDescription": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "ogImageAlt": "Sign up for Sotaque Brasileiro - Learn Portuguese with native instructors",
+            "keywords": "portuguese lessons, brazilian portuguese, language learning, online portuguese classes, native instructors, cultural immersion, business portuguese, flexible schedule, personalized learning, brazilian culture"
+        },
+        "become-teacher": {
+            "title": "Become a Teacher",
+            "seoDescription": "Join Sotaque Brasileiro as a teacher and share your expertise in Brazilian Portuguese. Help students achieve their language goals through personalized, culturally immersive lessons.",
+            "ogImageAlt": "Become a Portuguese teacher at Sotaque Brasileiro",
+            "keywords": "teach portuguese, brazilian portuguese teacher, language teaching, online teaching, native instructors, cultural education, teaching opportunities, language education"
         }
     },
     "shared": {
         "appName": "Sotaque Brasileiro",
+        "appUrl": "https://sotaquebrasileiro.com",
         "buttons": {
             "save": "Save",
             "cancel": "Cancel",

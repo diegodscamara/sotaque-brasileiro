@@ -13,6 +13,7 @@ import { Viewport } from "next";
 import { getSEOTags } from "@/libs/seo";
 import { notFound } from 'next/navigation';
 import { routing, type Locale } from '@/i18n/routing';
+import { getTranslations } from 'next-intl/server';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +22,63 @@ export const viewport: Viewport = {
 	initialScale: 1,
 };
 
-// This adds default SEO tags to all pages in our app.
-// You can override them in each page passing params to getSOTags() function.
-export const metadata = getSEOTags();
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+	const t = await getTranslations({ locale, namespace: 'landing' });
+	const tShared = await getTranslations({ locale, namespace: 'shared' });
+
+	return getSEOTags({
+		title: tShared('appName'),
+		description: t('seo.seoDescription'),
+		openGraph: {
+			title: tShared('appName'),
+			description: t('seo.seoDescription'),
+			images: [
+				{
+					url: "/images/og-image.png",
+					width: 1200,
+					height: 630,
+					alt: t('hero.imageAlt')
+				},
+			],
+			locale,
+			type: "website",
+			siteName: tShared('appName'),
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: tShared('appName'),
+			description: t('seo.seoDescription'),
+			images: [
+				{
+					url: "/images/og-image.png",
+					width: 1200,
+					height: 630,
+					alt: t('hero.imageAlt')
+				},
+			],
+			creator: "@sotaquebrasileiro",
+			site: "@sotaquebrasileiro",
+		},
+		alternates: {
+			canonical: "/",
+			languages: {
+				'en': '/en',
+				'es': '/es',
+				'fr': '/fr',
+				'pt': '/pt',
+			},
+		},
+		robots: {
+			index: true,
+			follow: true,
+			noimageindex: false,
+			'max-video-preview': -1,
+			'max-image-preview': 'large',
+			'max-snippet': -1,
+		},
+		keywords: t('seo.keywords'),
+	});
+}
 
 type LayoutProps = {
 	children: ReactNode;

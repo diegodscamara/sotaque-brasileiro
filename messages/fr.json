@@ -418,6 +418,10 @@
                 ]
             },
             "copyright": "Copyright © 2024 Sotaque Brasileiro. Tous droits réservés."
+        },
+        "seo": {
+            "seoDescription": "Transformez votre portugais avec des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
+            "keywords": "leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs brésiliens natifs, culture brésilienne, emploi du temps flexible, apprentissage personnalisé, culture brésilienne"
         }
     },
     "dashboard": {},
@@ -425,8 +429,8 @@
         "sign-in": {
             "title": "Bienvenue de nouveau",
             "subtitle": "Entrez votre email ci-dessous pour vous connecter à votre compte",
-            "email": "Email",
-            "emailPlaceholder": "you@example.com",
+            "email": "Courriel",
+            "emailPlaceholder": "votre@courriel.com",
             "password": "Mot de passe",
             "passwordPlaceholder": "********",
             "forgotPassword": "Mot de passe oublié?",
@@ -438,28 +442,48 @@
             "disclaimer": "En vous connectant, vous acceptez nos",
             "and": "et",
             "termsOfService": "Conditions de service",
-            "privacyPolicy": "Politique de confidentialité"
+            "privacyPolicy": "Politique de confidentialité",
+            "seoDescription": "Connectez-vous à Sotaque Brasileiro pour accéder à votre voyage d'apprentissage portugais personnalisé avec des instructeurs brésiliens natifs.",
+            "ogImageAlt": "Connectez-vous à Sotaque Brasileiro - Apprenez le portugais avec des instructeurs brésiliens natifs",
+            "keywords": "connexion, connexion, leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs brésiliens natifs"
         },
         "sign-up": {
             "title": "Créer un compte",
             "subtitle": "Entrez votre email ci-dessous pour créer un compte",
-            "email": "Email",
-            "emailPlaceholder": "you@example.com",
+            "selectRole": "Sélectionnez votre rôle",
+            "studentTab": "S'inscrire comme étudiant",
+            "teacherTab": "S'inscrire comme enseignant",
+            "email": "Courriel",
+            "emailPlaceholder": "votre@courriel.com",
             "password": "Mot de passe",
             "passwordPlaceholder": "********",
-            "confirmPassword": "Confirmer le mot de passe",
-            "confirmPasswordPlaceholder": "********",
+            "repeatPassword": "Répéter le mot de passe",
+            "repeatPasswordPlaceholder": "********",
+            "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+            "passwordStrength": "Force du mot de passe",
             "signUp": "S'inscrire",
             "alreadyHaveAccount": "Vous avez déjà un compte?",
             "signIn": "Se connecter",
             "disclaimer": "En vous inscrivant, vous acceptez nos",
             "and": "et",
             "termsOfService": "Conditions de service",
-            "privacyPolicy": "Politique de confidentialité"
+            "privacyPolicy": "Politique de confidentialité",
+            "becomeTeacher": "Devenir Enseignant",
+            "teacherSubtitle": "Créez votre compte enseignant et commencez à partager vos connaissances",
+            "seoDescription": "Transformez votre portugais avec des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
+            "ogImageAlt": "S'inscrire à Sotaque Brasileiro - Apprenez le portugais avec des instructeurs brésiliens natifs",
+            "keywords": "inscription, inscription, leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs brésiliens natifs"
+        },
+        "become-teacher": {
+            "title": "Devenir Enseignant",
+            "seoDescription": "Rejoignez Sotaque Brasileiro en tant qu'enseignant et partagez vos compétences en portugais brésilien. Aidez les apprenants à atteindre leurs objectifs de langue grâce à des cours personnalisés et culturellement immersifs.",
+            "ogImageAlt": "Devenir enseignant de portugais brésilien à Sotaque Brasileiro",
+            "keywords": "enseigner le portugais, enseignant de portugais brésilien, enseignement des langues, enseignement en ligne, instructeurs brésiliens natifs, éducation culturelle, opportunités d'enseignement, éducation des langues"
         }
     },
     "shared": {
         "appName": "Sotaque Brasileiro",
+        "appUrl": "https://sotaquebrasileiro.com",
         "buttons": {
             "save": "Enregistrer",
             "cancel": "Annuler",

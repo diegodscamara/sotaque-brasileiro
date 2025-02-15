@@ -18,7 +18,7 @@ import { useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-export default function SignUp() {
+export default function BecomeATeacher() {
     const t = useTranslations("auth.sign-up");
     const tShared = useTranslations("shared");
     const [email, setEmail] = useState("");
@@ -63,7 +63,7 @@ export default function SignUp() {
                     email,
                     password,
                     signIn: false,
-                    role: "STUDENT",
+                    role: "TEACHER",
                 }),
             });
 
@@ -136,7 +136,7 @@ export default function SignUp() {
                             {t("title")}
                         </CardTitle>
                         <CardDescription className="text-gray-600 dark:text-gray-300 text-sm text-center leading-none">
-                            {t("subtitle")}
+                            {t("teacherSubtitle")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">

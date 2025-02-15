@@ -5,12 +5,11 @@ import { getSEOTags } from "@/libs/seo";
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
-  const t = await getTranslations({ locale, namespace: 'auth.sign-in' });
+  const t = await getTranslations({ locale, namespace: 'auth.become-teacher' });
   const tShared = await getTranslations({ locale, namespace: 'shared' });
-
   return getSEOTags({
     title: `${tShared('appName')} - ${t('title')}`,
-    canonicalUrlRelative: "/auth/signin",
+    canonicalUrlRelative: "/auth/become-a-teacher",
     description: t('seoDescription'),
     openGraph: {
       title: `${tShared('appName')} - ${t('title')}`,
@@ -43,12 +42,12 @@ export async function generateMetadata({ params: { locale } }: { params: { local
       site: "@sotaquebrasileiro",
     },
     alternates: {
-      canonical: "/auth/signin",
+      canonical: "/auth/become-a-teacher",
       languages: {
-        'en': '/en/auth/signin',
-        'es': '/es/auth/signin',
-        'fr': '/fr/auth/signin',
-        'pt': '/pt/auth/signin',
+        'en': '/en/auth/become-a-teacher',
+        'es': '/es/auth/become-a-teacher',
+        'fr': '/fr/auth/become-a-teacher',
+        'pt': '/pt/auth/become-a-teacher',
       },
     },
     robots: {
@@ -64,14 +63,12 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <Suspense>
-        <Header />
-      </Suspense>
-      <main className="flex flex-col justify-center items-center mx-auto h-full">
-        {children}
-      </main>
-    </>
-  );
+  return <>
+    <Suspense>
+      <Header />
+    </Suspense>
+    <main className="flex flex-col justify-center items-center mx-auto h-full">
+      {children}
+    </main>
+  </>
 }

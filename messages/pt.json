@@ -418,6 +418,10 @@
                 ]
             },
             "copyright": "Copyright © 2024 Sotaque Brasileiro. Todos os direitos reservados."
+        },
+        "seo": {
+            "seoDescription": "Transforme seu português com o Sotaque Brasileiro: aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+            "keywords": "aulas de português, português brasileiro, aprendizado de idiomas, aulas de português online, instrutores brasileiros nativos, cultura brasileira, horário flexível, aprendizado personalizado, cultura brasileira"
         }
     },
     "dashboard": {},
@@ -426,7 +430,7 @@
             "title": "Bem-vindo de volta",
             "subtitle": "Digite seu email abaixo para entrar na sua conta",
             "email": "Email",
-            "emailPlaceholder": "you@example.com",
+            "emailPlaceholder": "seu@email.com",
             "password": "Senha",
             "passwordPlaceholder": "********",
             "forgotPassword": "Esqueceu sua senha?",
@@ -438,28 +442,48 @@
             "disclaimer": "Ao entrar, você concorda com nossos",
             "and": "e",
             "termsOfService": "Termos de serviço",
-            "privacyPolicy": "Política de privacidade"
+            "privacyPolicy": "Política de privacidade",
+            "seoDescription": "Entre na sua conta do Sotaque Brasileiro para acessar seu aprendizado português personalizado com instrutores brasileiros nativos.",
+            "ogImageAlt": "Entre na sua conta do Sotaque Brasileiro - Aprenda português com instrutores brasileiros nativos",
+            "keywords": "login, entrar, aulas de português, português brasileiro, aprendizado de idiomas, aulas de português online, instrutores brasileiros nativos"
         },
         "sign-up": {
             "title": "Crie uma conta",
             "subtitle": "Digite seu email abaixo para criar uma conta",
+            "selectRole": "Selecione seu papel",
+            "studentTab": "Registrar como aluno",
+            "teacherTab": "Registrar como professor",
             "email": "Email",
-            "emailPlaceholder": "you@example.com",
+            "emailPlaceholder": "seu@email.com",
             "password": "Senha",
             "passwordPlaceholder": "********",
-            "confirmPassword": "Confirmar senha",
-            "confirmPasswordPlaceholder": "********",
+            "repeatPassword": "Repetir senha",
+            "repeatPasswordPlaceholder": "********",
+            "passwordsDoNotMatch": "As senhas não coincidem",
+            "passwordStrength": "Fortaleza da senha",
             "signUp": "Registrar",
             "alreadyHaveAccount": "Já tem uma conta?",
             "signIn": "Entrar",
             "disclaimer": "Ao registrar, você concorda com nossos",
             "and": "e",
             "termsOfService": "Termos de serviço",
-            "privacyPolicy": "Política de privacidade"
+            "privacyPolicy": "Política de privacidade",
+            "becomeTeacher": "Torne-se um Professor",
+            "teacherSubtitle": "Crie sua conta de professor e comece a compartilhar seus conhecimentos",
+            "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+            "ogImageAlt": "Torne-se um professor de português brasileiro no Sotaque Brasileiro",
+            "keywords": "professor, professor de português, ensino de idiomas, ensino online, instrutores brasileiros nativos, educação cultural, oportunidades de ensino, educação em idiomas"
+        },
+        "become-teacher": {
+            "title": "Torne-se um Professor",
+            "seoDescription": "Junte-se ao Sotaque Brasileiro como professor e compartilhe seus conhecimentos em português brasileiro. Ajude os alunos a atingir seus objetivos de aprendizado através de aulas personalizadas e culturalmente imersivas.",
+            "ogImageAlt": "Torne-se um professor de português brasileiro no Sotaque Brasileiro",
+            "keywords": "professor, professor de português, ensino de idiomas, ensino online, instrutores brasileiros nativos, educação cultural, oportunidades de ensino, educação em idiomas"
         }
     },
     "shared": {
         "appName": "Sotaque Brasileiro",
+        "appUrl": "https://sotaquebrasileiro.com",
         "buttons": {
             "save": "Salvar",
             "cancel": "Cancelar",
