@@ -8,11 +8,10 @@ CREATE TYPE "ClassStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELL
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
     "avatarUrl" TEXT,
     "role" "Role" NOT NULL DEFAULT 'STUDENT',
     "country" TEXT,
