@@ -55,7 +55,7 @@ export function CompaniesCarousel(): JSX.Element {
             <Image
                 src={logo.src || "/placeholder.svg"}
                 alt={logo.alt}
-                className="dark:brightness-0 opacity-30 hover:opacity-100 w-28 h-10 dark:invert transition-opacity duration-300 grayscale"
+                className="opacity-30 hover:opacity-100 dark:brightness-0 grayscale dark:invert w-28 h-10 transition-opacity duration-300"
                 width={112}
                 height={40}
                 priority={index < 5} // Prioritize first 5 logos for better LCP
@@ -72,7 +72,7 @@ export function CompaniesCarousel(): JSX.Element {
         >
             <h2
                 id="companies-title"
-                className="font-medium font-mono text-center text-primary text-sm uppercase tracking-wider"
+                className="font-mono font-medium text-green-700 dark:text-green-500 text-sm text-center uppercase tracking-wider"
             >
                 {t('title')}
             </h2>

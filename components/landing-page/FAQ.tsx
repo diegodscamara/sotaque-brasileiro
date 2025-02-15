@@ -45,7 +45,7 @@ const FAQ = (): JSX.Element => {
       aria-labelledby="faq-title"
     >
       <header className="flex flex-col gap-4 text-center">
-        <h2 id="faq-title" className="font-mono font-medium text-primary text-sm uppercase leading-5 tracking-wider">
+        <h2 id="faq-title" className="font-mono font-medium text-green-700 dark:text-green-500 text-sm uppercase leading-5 tracking-wider">
           {t('title')}
         </h2>
         <h3 className="mx-auto sm:max-w-none max-w-xs font-extrabold text-gray-800 dark:text-gray-100 text-3xl sm:text-4xl md:text-5xl">
@@ -57,7 +57,7 @@ const FAQ = (): JSX.Element => {
       <Accordion type="single" collapsible className="mx-auto w-full max-w-4xl">
         {faqList.map((item, i) => (
           <AccordionItem key={i} value={`item-${i}`}>
-            <AccordionTrigger className="font-semibold text-gray-800 hover:text-primary dark:hover:text-primary dark:text-gray-100 text-base leading-6 duration-300 ease-in-out">
+            <AccordionTrigger className="font-semibold text-gray-800 hover:text-green-700 dark:hover:text-green-500 dark:text-gray-100 text-base leading-6 duration-300 ease-in-out">
               {item.question}
             </AccordionTrigger>
             <AccordionContent className="text-gray-700 dark:text-gray-200 text-sm leading-5 duration-300 ease-in-out">
@@ -72,7 +72,7 @@ const FAQ = (): JSX.Element => {
           {t('disclaimer')}
         </p>
         <Link
-          className="font-normal text-gray-600 hover:text-primary dark:hover:text-primary dark:text-gray-200 text-sm underline leading-5 duration-300 ease-in-out"
+          className="font-normal text-gray-600 hover:text-green-700 dark:hover:text-green-500 dark:text-gray-200 text-sm underline leading-5 duration-300 ease-in-out"
           href={`mailto:${t('email')}`}
           aria-label="Contact us via email"
         >

@@ -54,10 +54,10 @@ const HowItWorks = (): JSX.Element => {
       aria-labelledby="how-it-works-title"
     >
       <header className="flex flex-col gap-4 text-center">
-        <h2 className="font-medium font-mono text-primary text-sm uppercase leading-5 tracking-wider" id="how-it-works-title">
+        <h2 className="font-mono font-medium text-green-700 dark:text-green-500 text-sm uppercase leading-5 tracking-wider" id="how-it-works-title">
           {t("title")}
         </h2>
-        <h3 className="mx-auto max-w-xs sm:max-w-none font-extrabold text-3xl text-gray-800 sm:text-4xl md:text-5xl dark:text-gray-100" id="how-it-works-subtitle">
+        <h3 className="mx-auto sm:max-w-none max-w-xs font-extrabold text-gray-800 dark:text-gray-100 text-3xl sm:text-4xl md:text-5xl" id="how-it-works-subtitle">
           {t("subtitle")}
         </h3>
       </header>
@@ -74,7 +74,7 @@ const HowItWorks = (): JSX.Element => {
                   className={cn(
                     "flex gap-4 p-4 items-center transition-colors text-left border-l-2",
                     activeStep === index
-                      ? "border-primary"
+                      ? "border-green-700 dark:border-green-500"
                       : "border-gray-200 dark:border-gray-600",
                   )}
                   aria-label={`Step ${index + 1}: ${step.title}`}
@@ -84,8 +84,8 @@ const HowItWorks = (): JSX.Element => {
                 >
                   <div className="flex-shrink-0">
                     <div className={cn(
-                      "flex justify-center items-center bg-primary/10 dark:bg-primary/20 rounded-full w-12 h-12 text-primary",
-                      "dark:bg-primary/30"
+                      "flex justify-center items-center bg-green-700/10 dark:bg-green-500/20 rounded-full w-12 h-12 text-green-700 dark:text-green-500",
+                      "dark:bg-green-500/30"
                     )}>
                       {(() => {
                         const Icon = getStepIcon(step.title);
@@ -94,7 +94,7 @@ const HowItWorks = (): JSX.Element => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <h4 className="font-semibold text-gray-800 text-xl dark:text-gray-100 leading-8">{step.title}</h4>
+                    <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-xl leading-8">{step.title}</h4>
                     <p className={cn(
                       "text-gray-500 text-base leading-5 font-normal",
                       "dark:text-gray-400"

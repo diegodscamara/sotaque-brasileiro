@@ -112,7 +112,7 @@ export default function SignIn() {
       <Card className="bg-gray-100 dark:bg-gray-700 rounded-lg w-full max-w-md">
         <CardHeader className="items-center">
           <CardTitle className="font-semibold text-lg text-center leading-8">{t("title")}</CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-400 text-sm text-center leading-none">
+          <CardDescription className="text-gray-600 dark:text-gray-300 text-sm text-center leading-none">
             {t("subtitle")}
           </CardDescription>
         </CardHeader>
@@ -124,6 +124,8 @@ export default function SignIn() {
                 <Input
                   className="bg-transparent dark:bg-transparent border-gray-300 dark:border-gray-600 placeholder:font-normal text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 placeholder:text-sm placeholder:leading-none"
                   id="email"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   placeholder={t("emailPlaceholder")}
                   value={email}
@@ -134,7 +136,7 @@ export default function SignIn() {
               <div className="gap-2 grid">
                 <div className="flex flex-row flex-wrap justify-between items-center gap-2">
                   <Label className="text-gray-800 dark:text-gray-200 text-sm leading-none" htmlFor="password">{t("password")}</Label>
-                  <Link href="/forgot-password" className="text-gray-600 dark:text-gray-400 text-sm leading-none">
+                  <Link href="/forgot-password" className="text-gray-600 dark:text-gray-300 text-sm leading-none">
                     {t("forgotPassword")}
                   </Link>
                 </div>
@@ -142,6 +144,8 @@ export default function SignIn() {
                   <Input
                     className="bg-transparent dark:bg-transparent border-gray-300 dark:border-gray-600 placeholder:font-normal text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 placeholder:text-sm placeholder:leading-none"
                     id="password"
+                    name="password"
+                    autoComplete="current-password"
                     type={showPassword ? "text" : "password"}
                     placeholder={t("passwordPlaceholder")}
                     value={password}
@@ -160,7 +164,7 @@ export default function SignIn() {
                   </div>
                 )}
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button variant="default" type="submit" className="w-full" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                 ) : null}
@@ -171,7 +175,7 @@ export default function SignIn() {
 
           <div className="flex justify-center items-center gap-2 w-full">
             <Separator className="bg-gray-300 dark:bg-gray-500 w-1/4" />
-            <p className="font-normal text-gray-600 dark:text-gray-400 text-sm leading-5">
+            <p className="font-normal text-gray-600 dark:text-gray-300 text-sm leading-5">
               {t("continue")}
             </p>
             <Separator className="bg-gray-300 dark:bg-gray-500 w-1/4" />
@@ -183,7 +187,7 @@ export default function SignIn() {
           </Button>
         </CardContent>
 
-        <CardFooter className="flex flex-row flex-wrap justify-center items-center gap-1 text-gray-600 dark:text-gray-400 text-sm text-center leading-none">
+        <CardFooter className="flex flex-row flex-wrap justify-center items-center gap-1 text-gray-600 dark:text-gray-300 text-sm text-center leading-none">
           <p>
             {t("noAccount")}
           </p>
