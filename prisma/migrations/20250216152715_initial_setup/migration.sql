@@ -6,7 +6,7 @@ CREATE TYPE "ClassStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELL
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "email" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -22,8 +22,8 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Student" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "credits" INTEGER NOT NULL DEFAULT 0,
@@ -47,8 +47,8 @@ CREATE TABLE "Student" (
 
 -- CreateTable
 CREATE TABLE "Teacher" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "biography" TEXT,
@@ -60,8 +60,8 @@ CREATE TABLE "Teacher" (
 
 -- CreateTable
 CREATE TABLE "TeacherAvailability" (
-    "id" TEXT NOT NULL,
-    "teacherId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "teacherId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "startDateTime" TIMESTAMP(3) NOT NULL,
@@ -75,9 +75,9 @@ CREATE TABLE "TeacherAvailability" (
 
 -- CreateTable
 CREATE TABLE "Class" (
-    "id" TEXT NOT NULL,
-    "teacherId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "teacherId" UUID NOT NULL,
+    "studentId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "status" "ClassStatus" NOT NULL DEFAULT 'PENDING',
@@ -87,14 +87,14 @@ CREATE TABLE "Class" (
     "notes" TEXT,
     "feedback" TEXT,
     "rating" INTEGER,
-    "recurringGroupId" TEXT,
+    "recurringGroupId" UUID,
 
     CONSTRAINT "Class_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "RecurringGroup" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "schedule" JSONB NOT NULL,
@@ -107,23 +107,23 @@ CREATE TABLE "RecurringGroup" (
 
 -- CreateTable
 CREATE TABLE "Notification" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "type" TEXT NOT NULL,
     "message" TEXT NOT NULL,
     "metadata" JSONB,
     "isRead" BOOLEAN NOT NULL DEFAULT false,
-    "userId" TEXT NOT NULL,
+    "userId" UUID NOT NULL,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ErrorLog" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "occurredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "userId" TEXT,
+    "userId" UUID,
     "errorMessage" TEXT NOT NULL,
     "errorStack" TEXT,
     "table" TEXT NOT NULL,
