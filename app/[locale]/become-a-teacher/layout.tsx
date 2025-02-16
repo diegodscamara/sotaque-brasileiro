@@ -4,7 +4,10 @@ import Header from "@/components/auth/Header";
 import { getSEOTags } from "@/libs/seo";
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+  const awaitedParams = await params;
+  const { locale } = awaitedParams;
+
   const t = await getTranslations({ locale, namespace: 'auth.become-teacher' });
   const tShared = await getTranslations({ locale, namespace: 'shared' });
   return getSEOTags({
