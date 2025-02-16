@@ -178,36 +178,85 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   try {
     if (signIn) {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw error
+      const { data: { session }, error: authError } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      })
 
-      const user = data?.user
-      if (!user) throw new Error('User sign-in failed.')
+      if (authError) throw authError
 
       const { data: existingUser, error: userFetchError } = await supabase
         .from('User')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', session.user.id)
         .single()
 
-      if (userFetchError) throw userFetchError
-      if (!existingUser) throw new Error('User not found.')
+      if (userFetchError && userFetchError.code !== 'PGRST116') {
+        throw userFetchError
+      }
+
+      if (!existingUser) {
+        throw new Error('User not found.')
+      }
 
       const redirectUrl = await handleRoleBasedRedirect(supabase, existingUser)
       return NextResponse.json({ success: true, redirectUrl }, { status: 200 })
     } else {
-      const { data, error } = await supabase.auth.signUp({ email, password })
-      if (error) throw error
+      // Sign up flow
+      const { data: { user, session }, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            role: role || 'STUDENT'
+          }
+        }
+      })
 
-      const user = data?.user
-      if (!user) throw new Error('User creation failed.')
+      if (signUpError) throw signUpError
+      if (!user || !session) throw new Error('Signup failed')
 
-      await createNewUser(supabase, { user }, role as Role)
+      // Create user record
+      const { error: userError } = await supabase
+        .from('User')
+        .insert({
+          id: user.id,
+          email: user.email,
+          role: role || 'STUDENT',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        })
 
-      const redirectUrl = role === Role.STUDENT ? '/#pricing' : '/dashboard'
+      if (userError) throw userError
+
+      // Create role-specific record
+      if (role === 'STUDENT') {
+        const { error: studentError } = await supabase
+          .from('Student')
+          .insert({
+            userId: user.id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          })
+
+        if (studentError) throw studentError
+      } else if (role === 'TEACHER') {
+        const { error: teacherError } = await supabase
+          .from('Teacher')
+          .insert({
+            userId: user.id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          })
+
+        if (teacherError) throw teacherError
+      }
+
+      const redirectUrl = role === 'STUDENT' ? '/#pricing' : '/dashboard'
       return NextResponse.json({ success: true, redirectUrl }, { status: 201 })
     }
   } catch (error) {
+    console.error('Auth error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'An unknown error occurred' },
       { status: 400 }

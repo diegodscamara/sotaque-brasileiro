@@ -4,7 +4,10 @@ import Header from "@/components/auth/Header";
 import { getSEOTags } from "@/libs/seo";
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+  const awaitedParams = await params;
+  const { locale } = awaitedParams;
+  
   const t = await getTranslations({ locale, namespace: 'auth.sign-in' });
   const tShared = await getTranslations({ locale, namespace: 'shared' });
 
@@ -43,7 +46,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
       site: "@sotaquebrasileiro",
     },
     alternates: {
-      canonical: "/auth/signin",
+      canonical: `/${locale}/signin`,
       languages: {
         'en': '/en/auth/signin',
         'es': '/es/auth/signin',
