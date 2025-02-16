@@ -22,7 +22,10 @@ export const viewport: Viewport = {
 	initialScale: 1,
 };
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+	const awaitedParams = await params;
+	const { locale } = awaitedParams;
+
 	const t = await getTranslations({ locale, namespace: 'landing' });
 	const tShared = await getTranslations({ locale, namespace: 'shared' });
 
