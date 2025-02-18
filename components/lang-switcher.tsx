@@ -1,5 +1,6 @@
 'use client';
 
+import { CaretDown, GlobeSimple } from '@phosphor-icons/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCallback, useState } from 'react';
 
-import { CaretDown } from '@phosphor-icons/react';
 import { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
@@ -55,9 +55,10 @@ export default function LanguageSwitcher(): JSX.Element {
 
   return (
     <DropdownMenu onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger aria-label="Select language" className="inline-flex before:absolute relative before:inset-0 justify-center items-center gap-2 bg-gray-50 before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.5)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] hover:before:bg-[position:-100%_0,0_0] hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-800 before:bg-no-repeat disabled:opacity-50 px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md before:rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10 [&_svg]:size-4 overflow-hidden font-medium text-gray-800 dark:text-gray-200 text-sm whitespace-nowrap transition-colors before:transition-[background-position_0s_ease] before:duration-1000 hover:text-accent-foreground disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0"
+      <DropdownMenuTrigger aria-label="Select language" className="inline-flex justify-center items-center gap-2 hover:bg-accent dark:hover:bg-gray-700/50 disabled:opacity-50 px-4 py-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10 [&_svg]:size-4 font-medium [&_svg]:text-gray-800 dark:[&_svg]:text-gray-200 text-sm whitespace-nowrap transition-colors hover:text-accent-foreground disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0"
       >
-        <span className="mt-1 text-sm">{currentLanguage?.flag}</span>
+        <GlobeSimple className="w-4 h-4" />
+        <span className="text-sm">{currentLanguage?.name}</span>
         <CaretDown
           className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
             }`}

@@ -61,12 +61,9 @@ model Student {
   packageExpiration      DateTime?
   portugueseLevel        String?
   learningGoals          String[]
-  preferredSchedule      String[]
   nativeLanguage         String?
   otherLanguages         String[]
   timeZone               String?
-  professionalBackground String?
-  motivationForLearning  String?
   hasCompletedOnboarding Boolean   @default(false)
   classes                Class[]
 

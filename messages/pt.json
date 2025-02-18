@@ -2,9 +2,9 @@
     "landing": {
         "header": {
             "logoImage": "@/app/icon.png",
-            "logoAlt": "Logo do Sotaque",
+            "logoAlt": "Logo Sotaque",
             "nav": {
-                "features": "Características",
+                "features": "Recursos",
                 "featuresLink": "#features",
                 "howItWorks": "Como Funciona",
                 "howItWorksLink": "#how-it-works",
@@ -16,20 +16,20 @@
                 "dashboardLink": "/dashboard"
             },
             "cta": {
-                "primary": "Começar",
+                "primary": "Comece Agora",
                 "link": "#pricing",
-                "ariaLabel": "Comece com nosso serviço"
+                "ariaLabel": "Comece a usar nosso serviço"
             }
         },
         "hero": {
             "title": "Empodere Seu Futuro com o Português Brasileiro",
-            "subtitle": "Seja você um profissional ocupado precisando de vocabulário pronto para negócios ou um entusiasta cultural ansioso por uma experiência brasileira autêntica, nossas aulas flexíveis e personalizadas com instrutores nativos são projetadas para se adequar à sua vida e objetivos.",
+            "subtitle": "Seja você um profissional ocupado precisando de vocabulário para negócios ou um entusiasta cultural ansioso por uma experiência autêntica brasileira, nossas aulas flexíveis e personalizadas com instrutores nativos são projetadas para se adequar à sua vida e objetivos.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
-                "primary": "Começar",
+                "primary": "Comece Agora",
                 "link": "#pricing",
-                "ariaLabel": "Comece com nosso serviço"
+                "ariaLabel": "Comece a usar nosso serviço"
             }
         },
         "companies": {
@@ -69,18 +69,18 @@
         },
         "problem": {
             "title": "O Que Está Te Impedindo?",
-            "subtitle": "Dificuldades para Aprender Português Brasileiro? Você Não Está Sozinho.",
+            "subtitle": "Dificuldade em Aprender Português Brasileiro? Você Não Está Sozinho.",
             "cards": [
                 {
-                    "title": "Horários Rígidos que Não Se Adaptam à Sua Vida",
-                    "text": "Para profissionais com carreiras exigentes, horários fixos de aula podem entrar em conflito com seus compromissos de trabalho, família ou pessoais. Você merece uma solução de aprendizado que se adapte à sua agenda ocupada."
+                    "title": "Horários Rígidos Que Não Se Adaptam à Sua Vida",
+                    "text": "Para profissionais com carreiras exigentes, horários fixos de aula podem entrar em conflito com seu trabalho, família ou compromissos pessoais. Você merece uma solução de aprendizado que se adapte à sua agenda ocupada."
                 },
                 {
-                    "title": "Cursos que Não Atendem às Expectativas",
-                    "text": "Cursos de idiomas genéricos muitas vezes ignoram seus objetivos únicos. Profissionais de negócios precisam de terminologia específica da indústria, enquanto entusiastas culturais desejam uma experiência brasileira genuína — não uma versão diluída do português europeu."
+                    "title": "Cursos Que Não Atendem às Suas Necessidades",
+                    "text": "Cursos de idiomas genéricos muitas vezes ignoram seus objetivos únicos. Profissionais de negócios precisam de terminologia específica do setor, enquanto entusiastas culturais desejam uma experiência genuína brasileira—não uma versão diluída do português europeu."
                 },
                 {
-                    "title": "Falta da Verdadeira Vibração Brasileira",
+                    "title": "Faltando a Verdadeira Vibe Brasileira",
                     "text": "Sem um verdadeiro contexto cultural, aprender português parece incompleto. Você merece uma experiência imersiva que infunda arte, música e tradições brasileiras em cada lição."
                 }
             ]
@@ -88,99 +88,99 @@
         "features": {
             "title": "Por Que Escolher o Sotaque Brasileiro?",
             "subtitle": "Flexível, Personalizado e Imersivo – Aulas Projetadas com Seus Objetivos em Mente",
-            "description": "Acreditamos que o aprendizado de idiomas deve se adaptar à sua vida. Seja aprimorando suas habilidades de negócios ou mergulhando na vibrante cultura do Brasil, nossa plataforma oferece horários flexíveis, aulas personalizadas e imersão cultural autêntica liderada por instrutores nativos.",
+            "description": "Acreditamos que o aprendizado de idiomas deve se adaptar à sua vida. Seja você aprimorando suas habilidades de negócios ou mergulhando na vibrante cultura do Brasil, nossa plataforma oferece agendamento flexível, aulas personalizadas e imersão cultural autêntica liderada por instrutores nativos.",
             "cards": [
                 {
-                    "title": "Aprenda a Qualquer Hora e em Qualquer Lugar",
-                    "text": "Chega de horários rígidos. Escolha os horários de aula que funcionam para você — seja de manhã cedo, à noite ou nos fins de semana — para que você possa progredir sem compromissos.",
+                    "title": "Aprenda a Qualquer Hora, em Qualquer Lugar",
+                    "text": "Chega de horários rígidos. Escolha os horários das aulas que funcionam para você—seja de manhã cedo, à noite ou nos fins de semana—para que você possa progredir sem compromissos.",
                     "image": "/images/landing-page/features/learn-anywhere.png",
-                    "imageAlt": "Aprenda a Qualquer Hora e em Qualquer Lugar"
+                    "imageAlt": "Aprenda a Qualquer Hora, em Qualquer Lugar"
                 },
                 {
-                    "title": "Aulas Adaptadas às Suas Ambições",
-                    "text": "Nosso currículo é elaborado para atender às suas necessidades específicas. Para profissionais de negócios, enfatizamos habilidades práticas e focadas na indústria; para entusiastas culturais, trazemos expressões brasileiras autênticas e insights criativos em cada sessão.",
+                    "title": "Aulas Personalizadas para Suas Ambições",
+                    "text": "Nosso currículo é elaborado para atender às suas necessidades específicas. Para profissionais de negócios, enfatizamos habilidades linguísticas práticas e focadas no setor; para entusiastas culturais, trazemos expressões brasileiras autênticas e insights criativos em cada sessão.",
                     "image": "/images/landing-page/features/personalized-lessons.png",
-                    "imageAlt": "Aulas Adaptadas às Suas Ambições"
+                    "imageAlt": "Aulas Personalizadas para Suas Ambições"
                 },
                 {
                     "title": "Experiência Cultural Imersiva",
-                    "text": "Experimente o Brasil como nunca antes. Nossas aulas integram música, arte e contexto da vida real para criar uma jornada envolvente na vibrante cultura do Brasil.",
+                    "text": "Experimente o Brasil como nunca antes. Nossas aulas integram música, arte e contexto da vida real para criar uma jornada envolvente na vibrante cultura brasileira.",
                     "image": "/images/landing-page/features/culturally-immersive-lessons.png",
                     "imageAlt": "Experiência Cultural Imersiva"
                 },
                 {
-                    "title": "Instrutores Nativos com Verdadeira Perspectiva",
-                    "text": "Aprenda com instrutores brasileiros nativos certificados que trazem conhecimento cultural de primeira mão e expertise prática a cada lição, garantindo que seu aprendizado seja autêntico e eficaz.",
+                    "title": "Instrutores Nativos com Conhecimento Real",
+                    "text": "Aprenda com instrutores brasileiros nativos certificados que trazem conhecimento cultural de primeira mão e experiência prática para cada lição, garantindo que seu aprendizado seja autêntico e eficaz.",
                     "image": "/images/landing-page/features/native-instructors.png",
-                    "imageAlt": "Instrutores Nativos com Verdadeira Perspectiva"
+                    "imageAlt": "Instrutores Nativos com Conhecimento Real"
                 }
             ]
         },
         "how-it-works": {
             "title": "Como Funciona",
-            "subtitle": "3 Passos Simples para Começar Sua Jornada em Português Brasileiro",
+            "subtitle": "3 Passos Simples para Começar Sua Jornada no Português Brasileiro",
             "steps": [
                 {
                     "title": "1. Crie Seu Perfil",
-                    "text": "Inscreva-se e compartilhe seus objetivos — seja visando a excelência nos negócios ou a imersão cultural. Vamos personalizar seu plano de aprendizado desde o início.",
+                    "text": "Inscreva-se e compartilhe seus objetivos—seja você buscando excelência nos negócios ou imersão cultural. Vamos personalizar seu plano de aprendizado desde o início.",
                     "image": "/images/landing-page/howItWorks/create-account.png",
                     "imageAlt": "Crie Seu Perfil"
                 },
                 {
                     "title": "2. Selecione Seu Horário Ideal",
-                    "text": "Escolha horários de aula que se encaixem perfeitamente na sua vida ocupada. Nossas opções flexíveis significam que você pode aprender quando for mais conveniente — de manhã, à noite ou nos fins de semana.",
+                    "text": "Escolha horários de aula que se encaixem perfeitamente na sua vida ocupada. Nossas opções flexíveis significam que você pode aprender quando for mais conveniente—de manhã, à noite ou nos fins de semana.",
                     "image": "/images/landing-page/howItWorks/choose-schedule.png",
                     "imageAlt": "Selecione Seu Horário Ideal"
                 },
                 {
                     "title": "3. Interaja com Especialistas Nativos",
-                    "text": "Participe de sessões ao vivo com nossos instrutores nativos. Mergulhe na língua e cultura autênticas e comece a fazer progresso real desde o primeiro dia.",
+                    "text": "Participe de sessões ao vivo com nossos instrutores nativos. Mergulhe na linguagem e cultura autênticas e comece a fazer progresso real desde o primeiro dia.",
                     "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
                     "imageAlt": "Interaja com Especialistas Nativos"
                 }
             ]
         },
         "testimonials": {
-            "title": "O Que Nossos Estudantes Estão Dizendo",
+            "title": "O Que Nossos Alunos Estão Dizendo",
             "subtitle": "Ouça Nossos Alunos Sobre Suas Experiências",
             "cards": [
                 {
-                    "text": "Vim ao Brasil para trabalhar e precisava aprender português rapidamente. As aulas personalizadas e focadas em negócios me ajudaram a me comunicar com confiança em apenas alguns meses!",
+                    "text": "Vim ao Brasil a trabalho e precisava aprender português rapidamente. As aulas personalizadas e focadas em negócios me ajudaram a me comunicar com confiança em apenas alguns meses!",
                     "name": "Emily Johnson",
                     "position": "Gerente de Marketing (EUA)",
                     "image": "https://i.pravatar.cc/150?img=1",
                     "imageAlt": "Emily Johnson"
                 },
                 {
-                    "text": "Sempre quis aprender português para viajar, e esta escola facilitou muito. Os professores são incríveis e a imersão cultural é fantástica!",
+                    "text": "Sempre quis aprender português para viajar, e esta escola facilitou muito. Os professores são incríveis, e a imersão cultural é fantástica!",
                     "name": "James Carter",
                     "position": "Blogueiro de Viagens (Reino Unido)",
                     "image": "https://i.pravatar.cc/150?img=2",
                     "imageAlt": "James Carter"
                 },
                 {
-                    "text": "Como profissional de negócios, precisava aprender português para reuniões. As aulas personalizadas e a programação flexível foram perfeitas para minha vida agitada.",
+                    "text": "Como profissional de negócios, precisava aprender português para reuniões. As aulas personalizadas e o agendamento flexível foram perfeitos para minha vida agitada.",
                     "name": "Sarah Müller",
                     "position": "Consultora de Negócios (Alemanha)",
                     "image": "https://i.pravatar.cc/150?img=3",
                     "imageAlt": "Sarah Müller"
                 },
                 {
-                    "text": "Comecei a aprender português para me conectar com meus amigos brasileiros. As aulas são envolventes e culturalmente ricas — nunca me senti tão conectado!",
+                    "text": "Comecei a aprender português para me conectar com meus amigos brasileiros. As aulas são envolventes e culturalmente ricas—nunca me senti tão conectado!",
                     "name": "Liam O'Connor",
                     "position": "Desenvolvedor de Software (Irlanda)",
                     "image": "https://i.pravatar.cc/150?img=4",
                     "imageAlt": "Liam O'Connor"
                 },
                 {
-                    "text": "Adoro como os professores infundem cada aula com cultura brasileira autêntica. Aprender português se tornou o destaque da minha semana!",
+                    "text": "Adoro como os professores infundem cada aula com a cultura brasileira autêntica. Aprender português se tornou o destaque da minha semana!",
                     "name": "Sofia Rossi",
                     "position": "Artista (Itália)",
                     "image": "https://i.pravatar.cc/150?img=5",
                     "imageAlt": "Sofia Rossi"
                 },
                 {
-                    "text": "A imersão cultural é incrível — sinto que estou realmente vivenciando o Brasil enquanto aprendo a língua. Recomendo muito esta escola!",
+                    "text": "A imersão cultural é incrível—sinto que estou realmente experienciando o Brasil enquanto aprendo a língua. Recomendo muito esta escola!",
                     "name": "Emma Dubois",
                     "position": "Estudante Universitária (França)",
                     "image": "https://i.pravatar.cc/150?img=6",
@@ -189,7 +189,7 @@
             ]
         },
         "pricing": {
-            "title": "Planos Acessíveis para Cada Aluno",
+            "title": "Planos Acessíveis para Cada Aprendiz",
             "subtitle": "Comece Sua Jornada Hoje",
             "intervals": {
                 "monthly": "Mensal",
@@ -203,18 +203,18 @@
                 "monthly": "Cobrado mensalmente",
                 "yearly": "Cobrado anualmente"
             },
-            "CTA": "Começar",
+            "CTA": "Comece Agora",
             "featured": "Popular",
-            "disclaimer": "Preços em USD, pode haver aplicação de IVA. Pagamento seguro via Stripe",
+            "disclaimer": "Preços em USD, VAT pode ser aplicado. Pagamento seguro via Stripe",
             "plans": [
                 {
                     "tier": "Explorador",
-                    "description": "Perfeito para iniciantes ou alunos casuais que valorizam a flexibilidade.",
+                    "description": "Perfeito para iniciantes ou aprendizes casuais que valorizam a flexibilidade.",
                     "features": [
                         "8 horas de aulas por mês",
                         "Instrutores brasileiros nativos",
                         "Plano de aprendizado personalizado",
-                        "Horários flexíveis",
+                        "Agendamento flexível",
                         "Suporte por e-mail"
                     ],
                     "variants": [
@@ -241,13 +241,13 @@
                 {
                     "tier": "Entusiasta",
                     "isFeatured": true,
-                    "description": "Ideal para alunos consistentes que buscam progresso constante com prática extra.",
+                    "description": "Ideal para aprendizes consistentes que buscam progresso constante com prática extra.",
                     "features": [
                         "12 horas de aulas por mês",
                         "Instrutores brasileiros nativos",
                         "Plano de aprendizado personalizado",
-                        "Horários flexíveis",
-                        "Suporte por e-mail prioritário"
+                        "Agendamento flexível",
+                        "Suporte prioritário por e-mail"
                     ],
                     "variants": [
                         {
@@ -273,12 +273,12 @@
                 {
                     "tier": "Mestre",
                     "isFeatured": false,
-                    "description": "Para alunos dedicados ou profissionais com objetivos ambiciosos.",
+                    "description": "Para aprendizes dedicados ou profissionais com objetivos ambiciosos.",
                     "features": [
                         "16 horas de aulas por mês",
                         "Instrutores brasileiros nativos",
                         "Plano de aprendizado personalizado",
-                        "Horários flexíveis",
+                        "Agendamento flexível",
                         "Suporte prioritário por e-mail e chat"
                     ],
                     "variants": [
@@ -310,23 +310,23 @@
             "questions": {
                 "1": {
                     "question": "Quão flexíveis são os horários das aulas?",
-                    "answer": "Nossas aulas são projetadas para se encaixar na sua vida ocupada. Você pode escolher entre horários de manhã, à noite ou nos fins de semana e reprogramar facilmente se necessário — perfeito para profissionais e entusiastas!"
+                    "answer": "Nossas aulas são projetadas para se encaixar na sua vida ocupada. Você pode escolher entre horários de manhã, à noite ou nos fins de semana e reagendar facilmente se necessário—perfeito para profissionais e entusiastas!"
                 },
                 "2": {
-                    "question": "As aulas são adaptadas aos meus objetivos?",
-                    "answer": "Absolutamente. Personalizamos cada aula para suas necessidades específicas. Seja aprendendo para o sucesso nos negócios ou para a imersão cultural, nossos instrutores criam lições que se alinham aos seus objetivos."
+                    "question": "As aulas são personalizadas para meus objetivos?",
+                    "answer": "Absolutamente. Personalizamos cada aula para atender às suas necessidades específicas. Seja você aprendendo para o sucesso nos negócios ou imersão cultural, nossos instrutores elaboram lições que se alinham aos seus objetivos."
                 },
                 "3": {
                     "question": "Vocês oferecem cursos de português para negócios?",
-                    "answer": "Sim, oferecemos cursos especificamente projetados para profissionais de negócios. Nossos instrutores experientes ajudam você a dominar o vocabulário específico da indústria e as habilidades de comunicação para suas reuniões e apresentações."
+                    "answer": "Sim, oferecemos cursos especificamente projetados para profissionais de negócios. Nossos instrutores experientes ajudam você a dominar o vocabulário e as habilidades de comunicação específicas do setor para suas reuniões e apresentações."
                 },
                 "4": {
                     "question": "Como vocês incorporam a cultura brasileira nas aulas?",
-                    "answer": "Nós entrelaçamos a cultura brasileira autêntica em cada lição — desde expressões locais e música até arte e tradições — garantindo que você experimente o verdadeiro Brasil enquanto aprende a língua."
+                    "answer": "Nós entrelaçamos a cultura brasileira autêntica em cada lição—desde expressões locais e música até arte e tradições—garantindo que você experimente o verdadeiro Brasil enquanto aprende a língua."
                 },
                 "5": {
-                    "question": "E se eu precisar cancelar ou reprogramar uma aula?",
-                    "answer": "Você pode cancelar ou reprogramar uma aula até 24 horas antes da sessão. Para mudanças feitas dentro de 24 horas da aula programada, entre em contato conosco diretamente."
+                    "question": "E se eu precisar cancelar ou reagendar uma aula?",
+                    "answer": "Você pode cancelar ou reagendar uma aula até 24 horas antes da sessão. Para mudanças feitas dentro de 24 horas da aula agendada, entre em contato conosco diretamente."
                 }
             },
             "disclaimer": "Ainda tem perguntas? Envie-nos um e-mail para",
@@ -335,18 +335,18 @@
         "cta": {
             "title": "Pronto para Elevar Seu Português Brasileiro?",
             "subtitle": "Transforme Suas Conexões Empresariais e Culturais",
-            "description": "Junte-se a centenas de alunos que redefiniram seus futuros com nossas aulas flexíveis e personalizadas. Seja se preparando para reuniões de negócios globais ou ansioso para mergulhar na vibrante cultura do Brasil, estamos aqui para ajudá-lo a ter sucesso no seu horário.",
+            "description": "Junte-se a centenas de alunos que redefiniram seus futuros com nossas aulas flexíveis e personalizadas. Seja você se preparando para reuniões de negócios globais ou ansioso para mergulhar na vibrante cultura do Brasil, estamos aqui para ajudá-lo a ter sucesso no seu próprio ritmo.",
             "button": "Comece Sua Jornada Hoje",
             "link": "#pricing"
         },
         "footer": {
-            "description": "Transforme seu português com o Sotaque Brasileiro: aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+            "description": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas à sua agenda e objetivos, ministradas por instrutores brasileiros nativos.",
             "services": {
                 "title": "Serviços",
                 "links": [
                     {
                         "features": {
-                            "name": "Características",
+                            "name": "Recursos",
                             "link": "#features"
                         },
                         "howItWorks": {
@@ -420,65 +420,67 @@
             "copyright": "Copyright © 2024 Sotaque Brasileiro. Todos os direitos reservados."
         },
         "seo": {
-            "seoDescription": "Transforme seu português com o Sotaque Brasileiro: aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
-            "keywords": "aulas de português, português brasileiro, aprendizado de idiomas, aulas de português online, instrutores brasileiros nativos, cultura brasileira, horário flexível, aprendizado personalizado, cultura brasileira"
+            "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas à sua agenda e objetivos, ministradas por instrutores brasileiros nativos.",
+            "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, agenda flexível"
         }
     },
     "dashboard": {},
     "auth": {
         "sign-in": {
             "title": "Bem-vindo de volta",
-            "subtitle": "Digite seu email abaixo para entrar na sua conta",
-            "email": "Email",
-            "emailPlaceholder": "seu@email.com",
+            "subtitle": "Digite seu e-mail abaixo para entrar na sua conta",
+            "email": "E-mail",
+            "emailPlaceholder": "você@exemplo.com",
             "password": "Senha",
             "passwordPlaceholder": "********",
             "forgotPassword": "Esqueceu sua senha?",
             "signIn": "Entrar",
             "continue": "Ou continue com",
-            "signInWithGoogle": "Entrar com Google",
+            "signInWithGoogle": "Entrar com o Google",
             "noAccount": "Não tem uma conta?",
-            "signUp": "Registrar",
+            "signUp": "Inscreva-se",
             "disclaimer": "Ao entrar, você concorda com nossos",
             "and": "e",
-            "termsOfService": "Termos de serviço",
-            "privacyPolicy": "Política de privacidade",
-            "seoDescription": "Entre na sua conta do Sotaque Brasileiro para acessar seu aprendizado português personalizado com instrutores brasileiros nativos.",
-            "ogImageAlt": "Entre na sua conta do Sotaque Brasileiro - Aprenda português com instrutores brasileiros nativos",
-            "keywords": "login, entrar, aulas de português, português brasileiro, aprendizado de idiomas, aulas de português online, instrutores brasileiros nativos"
+            "termsOfService": "Termos de Serviço",
+            "privacyPolicy": "Política de Privacidade",
+            "seoDescription": "Entre no Sotaque Brasileiro para acessar sua jornada personalizada de aprendizado de português com instrutores brasileiros nativos.",
+            "ogImageAlt": "Entre no Sotaque Brasileiro - Aprenda português com instrutores nativos",
+            "keywords": "entrar, login, aulas de português, português brasileiro, aprendizado de idiomas, aulas online de português, instrutores nativos"
         },
         "sign-up": {
             "title": "Crie uma conta",
-            "subtitle": "Digite seu email abaixo para criar uma conta",
+            "subtitle": "Digite seu e-mail abaixo para criar uma conta",
             "selectRole": "Selecione seu papel",
-            "studentTab": "Registrar como aluno",
-            "teacherTab": "Registrar como professor",
-            "email": "Email",
-            "emailPlaceholder": "seu@email.com",
+            "studentTab": "Inscreva-se como aluno",
+            "teacherTab": "Inscreva-se como professor",
+            "email": "E-mail",
+            "emailPlaceholder": "você@exemplo.com",
             "password": "Senha",
             "passwordPlaceholder": "********",
-            "repeatPassword": "Repetir senha",
+            "repeatPassword": "Repita a senha",
             "repeatPasswordPlaceholder": "********",
             "passwordsDoNotMatch": "As senhas não coincidem",
-            "passwordStrength": "Fortaleza da senha",
-            "signUp": "Registrar",
+            "passwordStrength": "Força da senha",
+            "showPassword": "Mostrar senha",
+            "hidePassword": "Ocultar senha",
+            "signUp": "Inscreva-se",
             "alreadyHaveAccount": "Já tem uma conta?",
             "signIn": "Entrar",
-            "disclaimer": "Ao registrar, você concorda com nossos",
+            "disclaimer": "Ao se inscrever, você concorda com nossos",
             "and": "e",
-            "termsOfService": "Termos de serviço",
-            "privacyPolicy": "Política de privacidade",
+            "termsOfService": "Termos de Serviço",
+            "privacyPolicy": "Política de Privacidade",
             "becomeTeacher": "Torne-se um Professor",
-            "teacherSubtitle": "Crie sua conta de professor e comece a compartilhar seus conhecimentos",
-            "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
-            "ogImageAlt": "Torne-se um professor de português brasileiro no Sotaque Brasileiro",
-            "keywords": "professor, professor de português, ensino de idiomas, ensino online, instrutores brasileiros nativos, educação cultural, oportunidades de ensino, educação em idiomas"
+            "teacherSubtitle": "Crie sua conta de professor e comece a compartilhar conhecimento",
+            "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas à sua agenda e objetivos, ministradas por instrutores brasileiros nativos.",
+            "ogImageAlt": "Inscreva-se no Sotaque Brasileiro - Aprenda português com instrutores nativos",
+            "keywords": "aulas de português, português brasileiro, aprendizado de idiomas, aulas online de português, instrutores nativos, imersão cultural, português para negócios, agenda flexível, aprendizado personalizado, cultura brasileira"
         },
         "become-teacher": {
             "title": "Torne-se um Professor",
-            "seoDescription": "Junte-se ao Sotaque Brasileiro como professor e compartilhe seus conhecimentos em português brasileiro. Ajude os alunos a atingir seus objetivos de aprendizado através de aulas personalizadas e culturalmente imersivas.",
-            "ogImageAlt": "Torne-se um professor de português brasileiro no Sotaque Brasileiro",
-            "keywords": "professor, professor de português, ensino de idiomas, ensino online, instrutores brasileiros nativos, educação cultural, oportunidades de ensino, educação em idiomas"
+            "seoDescription": "Junte-se ao Sotaque Brasileiro como professor e compartilhe sua experiência em português brasileiro. Ajude os alunos a alcançarem seus objetivos linguísticos através de aulas personalizadas e culturalmente imersivas.",
+            "ogImageAlt": "Torne-se um professor de português no Sotaque Brasileiro",
+            "keywords": "ensinar português, professor de português brasileiro, ensino de idiomas, ensino online, instrutores nativos, educação cultural, oportunidades de ensino, educação linguística"
         }
     },
     "shared": {
@@ -489,7 +491,7 @@
             "cancel": "Cancelar",
             "delete": "Excluir",
             "sign-in": "Entrar",
-            "sign-up": "Registrar"
+            "sign-up": "Inscrever-se"
         },
         "nav-user": {
             "profile": "Perfil",
@@ -516,6 +518,6 @@
         }
     },
     "index": {
-        "title": "Olá mundo!"
+        "title": "Olá, mundo!"
     }
 }
