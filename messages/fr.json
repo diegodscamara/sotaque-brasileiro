@@ -4,11 +4,11 @@
             "logoImage": "@/app/icon.png",
             "logoAlt": "Logo de Sotaque",
             "nav": {
-                "features": "Caractéristiques",
+                "features": "Fonctionnalités",
                 "featuresLink": "#features",
                 "howItWorks": "Comment Ça Marche",
                 "howItWorksLink": "#how-it-works",
-                "pricing": "Tarification",
+                "pricing": "Tarifs",
                 "pricingLink": "#pricing",
                 "faq": "FAQ",
                 "faqLink": "#faq",
@@ -23,7 +23,7 @@
         },
         "hero": {
             "title": "Donnez du Pouvoir à Votre Avenir avec le Portugais Brésilien",
-            "subtitle": "Que vous soyez un professionnel occupé ayant besoin d'un vocabulaire prêt pour les affaires ou un passionné de culture désireux d'une expérience brésilienne authentique, nos cours flexibles et personnalisés avec des instructeurs natifs sont conçus pour s'adapter à votre vie et à vos objectifs.",
+            "subtitle": "Que vous soyez un professionnel occupé ayant besoin d'un vocabulaire adapté aux affaires ou un passionné de culture désireux d'une expérience brésilienne authentique, nos cours flexibles et personnalisés avec des instructeurs natifs sont conçus pour s'adapter à votre vie et à vos objectifs.",
             "image": "/images/hero.png",
             "imageAlt": "Sotaque Brasileiro",
             "cta": {
@@ -33,7 +33,7 @@
             }
         },
         "companies": {
-            "title": "ÉLÈVES ENSEIGNÉS PAR DES ENTREPRISES COMME",
+            "title": "ÉTUDIANTS DANS DES ENTREPRISES COMME",
             "logos": [
                 {
                     "name": "Google",
@@ -69,19 +69,19 @@
         },
         "problem": {
             "title": "Qu'est-ce qui Vous Retient ?",
-            "subtitle": "Avez-vous des Difficultés à Apprendre le Portugais Brésilien ? Vous n'êtes pas Seul.",
+            "subtitle": "Des Difficultés à Apprendre le Portugais Brésilien ? Vous n'êtes Pas Seul.",
             "cards": [
                 {
-                    "title": "Horaires Rigides qui Ne Correspondent Pas à Votre Vie",
+                    "title": "Horaires Rigides qui Ne S'adaptent Pas à Votre Vie",
                     "text": "Pour les professionnels ayant des carrières exigeantes, des horaires de cours fixes peuvent entrer en conflit avec vos engagements professionnels, familiaux ou personnels. Vous méritez une solution d'apprentissage qui s'adapte à votre emploi du temps chargé."
                 },
                 {
                     "title": "Cours qui Ne Correspondent Pas aux Attentes",
-                    "text": "Les cours de langue génériques négligent souvent vos objectifs uniques. Les professionnels ont besoin d'une terminologie spécifique à l'industrie, tandis que les passionnés de culture désirent une expérience brésilienne authentique, et non une version diluée du portugais européen."
+                    "text": "Les cours de langue génériques négligent souvent vos objectifs uniques. Les professionnels ont besoin d'une terminologie spécifique à leur secteur, tandis que les passionnés de culture aspirent à une expérience brésilienne authentique, et non à une version diluée du portugais européen."
                 },
                 {
                     "title": "Manque de la Vraie Ambiance Brésilienne",
-                    "text": "Sans un véritable contexte culturel, apprendre le portugais semble incomplet. Vous méritez une expérience immersive qui infuse l'art, la musique et les traditions brésiliennes dans chaque leçon."
+                    "text": "Sans un véritable contexte culturel, apprendre le portugais semble incomplet. Vous méritez une expérience immersive qui intègre l'art, la musique et les traditions brésiliennes dans chaque leçon."
                 }
             ]
         },
@@ -92,7 +92,7 @@
             "cards": [
                 {
                     "title": "Apprenez à Tout Moment et en Tout Lieu",
-                    "text": "Fini les horaires rigides. Choisissez les horaires de cours qui vous conviennent, que ce soit tôt le matin, tard le soir ou le week-end, afin de progresser sans compromis.",
+                    "text": "Fini les horaires rigides. Choisissez les horaires de cours qui vous conviennent, que ce soit tôt le matin, tard le soir ou le week-end, pour progresser sans compromis.",
                     "image": "/images/landing-page/features/learn-anywhere.png",
                     "imageAlt": "Apprenez à Tout Moment et en Tout Lieu"
                 },
@@ -104,15 +104,15 @@
                 },
                 {
                     "title": "Expérience Culturelle Immersive",
-                    "text": "Découvrez le Brésil comme jamais auparavant. Nos cours intègrent musique, art et contexte de la vie réelle pour créer un voyage engageant dans la culture vibrante du Brésil.",
+                    "text": "Découvrez le Brésil comme jamais auparavant. Nos cours intègrent musique, art et contexte réel pour créer un voyage engageant dans la culture vibrante du Brésil.",
                     "image": "/images/landing-page/features/culturally-immersive-lessons.png",
                     "imageAlt": "Expérience Culturelle Immersive"
                 },
                 {
-                    "title": "Instructeurs Natifs avec une Réelle Perspicacité",
-                    "text": "Apprenez avec des instructeurs brésiliens natifs certifiés qui apportent des connaissances culturelles de première main et une expertise pratique à chaque leçon, garantissant que votre apprentissage soit à la fois authentique et efficace.",
+                    "title": "Instructeurs Natifs avec une Réelle Expertise",
+                    "text": "Apprenez auprès d'instructeurs brésiliens natifs certifiés qui apportent une connaissance culturelle de première main et une expertise pratique à chaque leçon, garantissant que votre apprentissage soit à la fois authentique et efficace.",
                     "image": "/images/landing-page/features/native-instructors.png",
-                    "imageAlt": "Instructeurs Natifs avec une Réelle Perspicacité"
+                    "imageAlt": "Instructeurs Natifs avec une Réelle Expertise"
                 }
             ]
         },
@@ -122,21 +122,21 @@
             "steps": [
                 {
                     "title": "1. Créez Votre Profil",
-                    "text": "Inscrivez-vous et partagez vos objectifs, que vous visiez l'excellence professionnelle ou l'immersion culturelle. Nous personnaliserons votre plan d'apprentissage dès le départ.",
+                    "text": "Inscrivez-vous et partagez vos objectifs, que vous visiez l'excellence professionnelle ou l'immersion culturelle. Nous adapterons votre plan d'apprentissage dès le départ.",
                     "image": "/images/landing-page/howItWorks/create-account.png",
                     "imageAlt": "Créez Votre Profil"
                 },
                 {
                     "title": "2. Sélectionnez Votre Horaire Idéal",
-                    "text": "Choisissez des horaires de cours qui s'adaptent parfaitement à votre vie chargée. Nos options flexibles signifient que vous pouvez apprendre quand cela vous convient le mieux : le matin, le soir ou le week-end.",
+                    "text": "Choisissez des horaires de cours qui s'intègrent parfaitement à votre vie chargée. Nos options flexibles vous permettent d'apprendre quand cela vous convient le mieux : le matin, le soir ou le week-end.",
                     "image": "/images/landing-page/howItWorks/choose-schedule.png",
                     "imageAlt": "Sélectionnez Votre Horaire Idéal"
                 },
                 {
-                    "title": "3. Engagez-vous avec des Experts Natifs",
+                    "title": "3. Interagissez avec des Experts Natifs",
                     "text": "Participez à des sessions en direct avec nos instructeurs natifs. Imprégnez-vous de la langue et de la culture authentiques, et commencez à faire de réels progrès dès le premier jour.",
                     "image": "/images/landing-page/howItWorks/learn-with-native-instructors.png",
-                    "imageAlt": "Engagez-vous avec des Experts Natifs"
+                    "imageAlt": "Interagissez avec des Experts Natifs"
                 }
             ]
         },
@@ -147,14 +147,14 @@
                 {
                     "text": "Je suis venu au Brésil pour le travail et j'avais besoin d'apprendre le portugais rapidement. Les leçons personnalisées axées sur les affaires m'ont aidé à communiquer avec confiance en quelques mois seulement !",
                     "name": "Emily Johnson",
-                    "position": "Responsable Marketing (USA)",
+                    "position": "Responsable Marketing (États-Unis)",
                     "image": "https://i.pravatar.cc/150?img=1",
                     "imageAlt": "Emily Johnson"
                 },
                 {
                     "text": "J'ai toujours voulu apprendre le portugais pour voyager, et cette école a rendu cela si facile. Les enseignants sont incroyables et l'immersion culturelle est fantastique !",
                     "name": "James Carter",
-                    "position": "Blogueur Voyageur (UK)",
+                    "position": "Blogueur Voyage (Royaume-Uni)",
                     "image": "https://i.pravatar.cc/150?img=2",
                     "imageAlt": "James Carter"
                 },
@@ -279,7 +279,7 @@
                         "Instructeurs brésiliens natifs",
                         "Plan d'apprentissage personnalisé",
                         "Horaires flexibles",
-                        "Support prioritaire par e-mail et chat"
+                        "Support par e-mail et chat prioritaire"
                     ],
                     "variants": [
                         {
@@ -310,7 +310,7 @@
             "questions": {
                 "1": {
                     "question": "Quelle est la flexibilité des horaires de cours ?",
-                    "answer": "Nos cours sont conçus pour s'adapter à votre vie chargée. Vous pouvez choisir parmi des créneaux matin, soir ou week-end et reprogrammer facilement si nécessaire, parfait pour les professionnels et les passionnés !"
+                    "answer": "Nos cours sont conçus pour s'adapter à votre vie chargée. Vous pouvez choisir parmi des créneaux matinaux, en soirée ou le week-end et reprogrammer facilement si nécessaire, parfait pour les professionnels et les passionnés !"
                 },
                 "2": {
                     "question": "Les cours sont-ils adaptés à mes objectifs ?",
@@ -335,18 +335,18 @@
         "cta": {
             "title": "Prêt à Élever Votre Portugais Brésilien ?",
             "subtitle": "Transformez Vos Connexions Professionnelles et Culturelles",
-            "description": "Rejoignez des centaines d'apprenants qui ont redéfini leur avenir avec nos cours flexibles et personnalisés. Que vous vous prépariez à des réunions d'affaires mondiales ou que vous soyez désireux de plonger dans la culture vibrante du Brésil, nous sommes là pour vous aider à réussir selon votre emploi du temps.",
+            "description": "Rejoignez des centaines d'apprenants qui ont redéfini leur avenir avec nos cours flexibles et personnalisés. Que vous vous prépariez à des réunions d'affaires mondiales ou que vous souhaitiez plonger dans la culture vibrante du Brésil, nous sommes là pour vous aider à réussir selon votre emploi du temps.",
             "button": "Commencez Votre Voyage Aujourd'hui",
             "link": "#pricing"
         },
         "footer": {
-            "description": "Transformez votre portugais avec Sotaque Brasileiro : des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
+            "description": "Transformez votre portugais avec des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
             "services": {
                 "title": "Services",
                 "links": [
                     {
                         "features": {
-                            "name": "Caractéristiques",
+                            "name": "Fonctionnalités",
                             "link": "#features"
                         },
                         "howItWorks": {
@@ -354,7 +354,7 @@
                             "link": "#how-it-works"
                         },
                         "pricing": {
-                            "name": "Tarification",
+                            "name": "Tarifs",
                             "link": "#pricing"
                         },
                         "faq": {
@@ -377,7 +377,7 @@
                             "link": "/support"
                         },
                         "teacher": {
-                            "name": "Devenir Enseignant",
+                            "name": "Devenez Enseignant",
                             "link": "/become-a-teacher"
                         }
                     }
@@ -421,64 +421,66 @@
         },
         "seo": {
             "seoDescription": "Transformez votre portugais avec des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
-            "keywords": "leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs brésiliens natifs, culture brésilienne, emploi du temps flexible, apprentissage personnalisé, culture brésilienne"
+            "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible"
         }
     },
     "dashboard": {},
     "auth": {
         "sign-in": {
             "title": "Bienvenue de nouveau",
-            "subtitle": "Entrez votre email ci-dessous pour vous connecter à votre compte",
-            "email": "Courriel",
-            "emailPlaceholder": "votre@courriel.com",
+            "subtitle": "Entrez votre e-mail ci-dessous pour vous connecter à votre compte",
+            "email": "E-mail",
+            "emailPlaceholder": "vous@exemple.com",
             "password": "Mot de passe",
             "passwordPlaceholder": "********",
-            "forgotPassword": "Mot de passe oublié?",
+            "forgotPassword": "Mot de passe oublié ?",
             "signIn": "Se connecter",
             "continue": "Ou continuez avec",
             "signInWithGoogle": "Se connecter avec Google",
-            "noAccount": "Pas de compte?",
+            "noAccount": "Vous n'avez pas de compte ?",
             "signUp": "S'inscrire",
             "disclaimer": "En vous connectant, vous acceptez nos",
             "and": "et",
-            "termsOfService": "Conditions de service",
-            "privacyPolicy": "Politique de confidentialité",
-            "seoDescription": "Connectez-vous à Sotaque Brasileiro pour accéder à votre voyage d'apprentissage portugais personnalisé avec des instructeurs brésiliens natifs.",
-            "ogImageAlt": "Connectez-vous à Sotaque Brasileiro - Apprenez le portugais avec des instructeurs brésiliens natifs",
-            "keywords": "connexion, connexion, leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs brésiliens natifs"
+            "termsOfService": "Conditions de Service",
+            "privacyPolicy": "Politique de Confidentialité",
+            "seoDescription": "Connectez-vous à Sotaque Brasileiro pour accéder à votre parcours d'apprentissage du portugais personnalisé avec des instructeurs brésiliens natifs.",
+            "ogImageAlt": "Connectez-vous à Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs",
+            "keywords": "connexion, accès, leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs natifs"
         },
         "sign-up": {
             "title": "Créer un compte",
-            "subtitle": "Entrez votre email ci-dessous pour créer un compte",
+            "subtitle": "Entrez votre e-mail ci-dessous pour créer un compte",
             "selectRole": "Sélectionnez votre rôle",
-            "studentTab": "S'inscrire comme étudiant",
-            "teacherTab": "S'inscrire comme enseignant",
-            "email": "Courriel",
-            "emailPlaceholder": "votre@courriel.com",
+            "studentTab": "Inscrivez-vous en tant qu'étudiant",
+            "teacherTab": "Inscrivez-vous en tant qu'enseignant",
+            "email": "E-mail",
+            "emailPlaceholder": "vous@exemple.com",
             "password": "Mot de passe",
             "passwordPlaceholder": "********",
-            "repeatPassword": "Répéter le mot de passe",
+            "repeatPassword": "Répétez le mot de passe",
             "repeatPasswordPlaceholder": "********",
             "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
             "passwordStrength": "Force du mot de passe",
+            "showPassword": "Afficher le mot de passe",
+            "hidePassword": "Masquer le mot de passe",
             "signUp": "S'inscrire",
-            "alreadyHaveAccount": "Vous avez déjà un compte?",
+            "alreadyHaveAccount": "Vous avez déjà un compte ?",
             "signIn": "Se connecter",
             "disclaimer": "En vous inscrivant, vous acceptez nos",
             "and": "et",
-            "termsOfService": "Conditions de service",
-            "privacyPolicy": "Politique de confidentialité",
-            "becomeTeacher": "Devenir Enseignant",
-            "teacherSubtitle": "Créez votre compte enseignant et commencez à partager vos connaissances",
+            "termsOfService": "Conditions de Service",
+            "privacyPolicy": "Politique de Confidentialité",
+            "becomeTeacher": "Devenez Enseignant",
+            "teacherSubtitle": "Créez votre compte d'enseignant et commencez à partager vos connaissances",
             "seoDescription": "Transformez votre portugais avec des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
-            "ogImageAlt": "S'inscrire à Sotaque Brasileiro - Apprenez le portugais avec des instructeurs brésiliens natifs",
-            "keywords": "inscription, inscription, leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs brésiliens natifs"
+            "ogImageAlt": "Inscrivez-vous à Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs",
+            "keywords": "leçons de portugais, portugais brésilien, apprentissage des langues, cours de portugais en ligne, instructeurs natifs, immersion culturelle, portugais pour les affaires, emploi du temps flexible, apprentissage personnalisé, culture brésilienne"
         },
         "become-teacher": {
-            "title": "Devenir Enseignant",
-            "seoDescription": "Rejoignez Sotaque Brasileiro en tant qu'enseignant et partagez vos compétences en portugais brésilien. Aidez les apprenants à atteindre leurs objectifs de langue grâce à des cours personnalisés et culturellement immersifs.",
-            "ogImageAlt": "Devenir enseignant de portugais brésilien à Sotaque Brasileiro",
-            "keywords": "enseigner le portugais, enseignant de portugais brésilien, enseignement des langues, enseignement en ligne, instructeurs brésiliens natifs, éducation culturelle, opportunités d'enseignement, éducation des langues"
+            "title": "Devenez Enseignant",
+            "seoDescription": "Rejoignez Sotaque Brasileiro en tant qu'enseignant et partagez votre expertise en portugais brésilien. Aidez les étudiants à atteindre leurs objectifs linguistiques grâce à des leçons personnalisées et culturellement immersives.",
+            "ogImageAlt": "Devenez enseignant de portugais chez Sotaque Brasileiro",
+            "keywords": "enseigner le portugais, enseignant de portugais brésilien, enseignement des langues, enseignement en ligne, instructeurs natifs, éducation culturelle, opportunités d'enseignement, éducation linguistique"
         }
     },
     "shared": {
@@ -488,17 +490,17 @@
             "save": "Enregistrer",
             "cancel": "Annuler",
             "delete": "Supprimer",
-            "sign-in": "Se Connecter",
+            "sign-in": "Se connecter",
             "sign-up": "S'inscrire"
         },
         "nav-user": {
             "profile": "Profil",
             "billing": "Facturation",
-            "sign-out": "Se Déconnecter",
-            "upgrade": "Mettre à Niveau",
+            "sign-out": "Se déconnecter",
+            "upgrade": "Mettre à niveau",
             "notifications": "Notifications",
             "loading": "Chargement",
-            "accountMenu": "Menu du Compte"
+            "accountMenu": "Menu de Compte"
         },
         "langSwitcher": {
             "english": "Anglais",
@@ -507,7 +509,7 @@
             "spanish": "Espagnol"
         },
         "themeToggle": {
-            "system": "Thème du Système",
+            "system": "Thème Système",
             "light": "Thème Clair",
             "dark": "Thème Sombre"
         },
