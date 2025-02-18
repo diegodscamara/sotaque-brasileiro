@@ -33,7 +33,7 @@
             }
         },
         "companies": {
-            "title": "ESTUDIANTES ENSEÑADOS DE COMPAÑÍAS COMO",
+            "title": "ESTUDIANTES EN EMPRESAS COMO",
             "logos": [
                 {
                     "name": "Google",
@@ -68,7 +68,7 @@
             ]
         },
         "problem": {
-            "title": "¿Qué Te Está Deteniendo?",
+            "title": "¿Qué Te Detiene?",
             "subtitle": "¿Tienes Dificultades para Aprender Portugués Brasileño? No Estás Solo.",
             "cards": [
                 {
@@ -88,11 +88,11 @@
         "features": {
             "title": "¿Por Qué Elegir Sotaque Brasileiro?",
             "subtitle": "Flexible, Personalizado e Inmersivo – Clases Diseñadas con Tus Objetivos en Mente",
-            "description": "Creemos que el aprendizaje de idiomas debe adaptarse a tu vida. Ya sea que estés perfeccionando tus habilidades comerciales o sumergiéndote en la vibrante cultura de Brasil, nuestra plataforma ofrece horarios flexibles, lecciones personalizadas e inmersión cultural auténtica liderada por instructores nativos.",
+            "description": "Creemos que el aprendizaje de idiomas debe adaptarse a tu vida. Ya sea que estés perfeccionando tus habilidades empresariales o sumergiéndote en la vibrante cultura de Brasil, nuestra plataforma ofrece horarios flexibles, lecciones personalizadas e inmersión cultural auténtica liderada por instructores nativos.",
             "cards": [
                 {
                     "title": "Aprende en Cualquier Momento y Lugar",
-                    "text": "No más horarios rígidos. Elige los horarios de clase que funcionen para ti, ya sean temprano en la mañana, tarde en la noche o fines de semana, para que puedas avanzar sin compromisos.",
+                    "text": "No más horarios rígidos. Elige los horarios de clase que funcionen para ti, ya sea por la mañana, por la noche o los fines de semana, para que puedas avanzar sin compromisos.",
                     "image": "/images/landing-page/features/learn-anywhere.png",
                     "imageAlt": "Aprende en Cualquier Momento y Lugar"
                 },
@@ -104,15 +104,15 @@
                 },
                 {
                     "title": "Experiencia Cultural Inmersiva",
-                    "text": "Experimenta Brasil como nunca antes. Nuestras clases integran música, arte y contexto de la vida real para crear un viaje atractivo a la vibrante cultura de Brasil.",
+                    "text": "Experimenta Brasil como nunca antes. Nuestras clases integran música, arte y contexto real para crear un viaje atractivo a la vibrante cultura de Brasil.",
                     "image": "/images/landing-page/features/culturally-immersive-lessons.png",
                     "imageAlt": "Experiencia Cultural Inmersiva"
                 },
                 {
-                    "title": "Instructores Nativos con Verdadera Perspectiva",
+                    "title": "Instructores Nativos con Conocimiento Real",
                     "text": "Aprende de instructores brasileños nativos certificados que aportan conocimiento cultural de primera mano y experiencia práctica a cada lección, asegurando que tu aprendizaje sea auténtico y efectivo.",
                     "image": "/images/landing-page/features/native-instructors.png",
-                    "imageAlt": "Instructores Nativos con Verdadera Perspectiva"
+                    "imageAlt": "Instructores Nativos con Conocimiento Real"
                 }
             ]
         },
@@ -122,13 +122,13 @@
             "steps": [
                 {
                     "title": "1. Crea Tu Perfil",
-                    "text": "Regístrate y comparte tus objetivos, ya sea que busques la excelencia empresarial o la inmersión cultural. Personalizaremos tu plan de aprendizaje desde el principio.",
+                    "text": "Regístrate y comparte tus objetivos, ya sea que busques excelencia empresarial o inmersión cultural. Adaptaremos tu plan de aprendizaje desde el principio.",
                     "image": "/images/landing-page/howItWorks/create-account.png",
                     "imageAlt": "Crea Tu Perfil"
                 },
                 {
                     "title": "2. Selecciona Tu Horario Ideal",
-                    "text": "Elige horarios de clase que se adapten perfectamente a tu vida ocupada. Nuestras opciones flexibles significan que puedes aprender cuando sea más conveniente: mañana, tarde o fines de semana.",
+                    "text": "Elige horarios de clase que se adapten perfectamente a tu vida ocupada. Nuestras opciones flexibles significan que puedes aprender cuando sea más conveniente: por la mañana, por la tarde o los fines de semana.",
                     "image": "/images/landing-page/howItWorks/choose-schedule.png",
                     "imageAlt": "Selecciona Tu Horario Ideal"
                 },
@@ -279,7 +279,7 @@
                         "Instructores brasileños nativos",
                         "Plan de aprendizaje personalizado",
                         "Programación flexible",
-                        "Soporte prioritario por correo electrónico y chat"
+                        "Soporte por correo electrónico y chat prioritario"
                     ],
                     "variants": [
                         {
@@ -314,7 +314,7 @@
                 },
                 "2": {
                     "question": "¿Las clases están adaptadas a mis objetivos?",
-                    "answer": "Absolutamente. Personalizamos cada clase a tus necesidades específicas. Ya sea que estés aprendiendo para el éxito empresarial o la inmersión cultural, nuestros instructores crean lecciones que se alinean con tus objetivos."
+                    "answer": "Absolutamente. Personalizamos cada clase según tus necesidades específicas. Ya sea que estés aprendiendo para el éxito empresarial o la inmersión cultural, nuestros instructores crean lecciones que se alinean con tus objetivos."
                 },
                 "3": {
                     "question": "¿Ofrecen cursos de portugués para negocios?",
@@ -322,7 +322,7 @@
                 },
                 "4": {
                     "question": "¿Cómo incorporan la cultura brasileña en las clases?",
-                    "answer": "Integramos la cultura brasileña auténtica en cada lección, desde expresiones locales y música hasta arte y tradiciones, asegurando que experimentes el verdadero Brasil mientras aprendes el idioma."
+                    "answer": "Integramos la auténtica cultura brasileña en cada lección, desde expresiones locales y música hasta arte y tradiciones, asegurando que experimentes el verdadero Brasil mientras aprendes el idioma."
                 },
                 "5": {
                     "question": "¿Qué pasa si necesito cancelar o reprogramar una clase?",
@@ -340,7 +340,7 @@
             "link": "#pricing"
         },
         "footer": {
-            "description": "Transforma tu portugués con Sotaque Brasileiro: clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
+            "description": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
             "services": {
                 "title": "Servicios",
                 "links": [
@@ -421,64 +421,66 @@
         },
         "seo": {
             "seoDescription": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
-            "keywords": "lecciones de portugués, portugués brasileño, aprendizaje de idiomas, clases de portugués en línea, instructores brasileños nativos, cultura brasileña, horario flexible, aprendizaje personalizado, cultura brasileña"
+            "keywords": "aprendizaje de portugués, portugués brasileño, cursos de idiomas, clases en línea, instructores nativos, inmersión cultural, educación en idiomas, cultura brasileña, aprendizaje personalizado, horario flexible"
         }
     },
     "dashboard": {},
     "auth": {
         "sign-in": {
             "title": "Bienvenido de nuevo",
-            "subtitle": "Ingresa tu correo electrónico para iniciar sesión en tu cuenta",
+            "subtitle": "Ingresa tu correo electrónico a continuación para iniciar sesión en tu cuenta",
             "email": "Correo electrónico",
-            "emailPlaceholder": "tu@correo.com",
+            "emailPlaceholder": "tú@ejemplo.com",
             "password": "Contraseña",
             "passwordPlaceholder": "********",
             "forgotPassword": "¿Olvidaste tu contraseña?",
             "signIn": "Iniciar sesión",
-            "continue": "O continuar con",
+            "continue": "O continúa con",
             "signInWithGoogle": "Iniciar sesión con Google",
             "noAccount": "¿No tienes una cuenta?",
-            "signUp": "Registrarse",
+            "signUp": "Regístrate",
             "disclaimer": "Al iniciar sesión, aceptas nuestros",
             "and": "y",
-            "termsOfService": "Términos de servicio",
-            "privacyPolicy": "Política de privacidad",
-            "seoDescription": "Inicia sesión en Sotaque Brasileiro para acceder a tu viaje de aprendizaje portugués personalizado con instructores brasileños nativos.",
-            "ogImageAlt": "Inicia sesión en Sotaque Brasileiro - Aprende portugués con instructores brasileños nativos",
-            "keywords": "iniciar sesión, inicio de sesión, lecciones de portugués, portugués brasileño, aprendizaje de idiomas, clases de portugués en línea, instructores brasileños nativos"
+            "termsOfService": "Términos de Servicio",
+            "privacyPolicy": "Política de Privacidad",
+            "seoDescription": "Inicia sesión en Sotaque Brasileiro para acceder a tu viaje de aprendizaje de portugués personalizado con instructores brasileños nativos.",
+            "ogImageAlt": "Inicia sesión en Sotaque Brasileiro - Aprende portugués con instructores nativos",
+            "keywords": "iniciar sesión, acceso, lecciones de portugués, portugués brasileño, aprendizaje de idiomas, clases de portugués en línea, instructores nativos"
         },
         "sign-up": {
             "title": "Crea una cuenta",
-            "subtitle": "Ingresa tu correo electrónico para crear una cuenta",
+            "subtitle": "Ingresa tu correo electrónico a continuación para crear una cuenta",
             "selectRole": "Selecciona tu rol",
-            "studentTab": "Registrarse como estudiante",
-            "teacherTab": "Registrarse como profesor",
+            "studentTab": "Regístrate como estudiante",
+            "teacherTab": "Regístrate como profesor",
             "email": "Correo electrónico",
-            "emailPlaceholder": "tu@correo.com",
+            "emailPlaceholder": "tú@ejemplo.com",
             "password": "Contraseña",
             "passwordPlaceholder": "********",
-            "repeatPassword": "Repetir contraseña",
+            "repeatPassword": "Repite la contraseña",
             "repeatPasswordPlaceholder": "********",
             "passwordsDoNotMatch": "Las contraseñas no coinciden",
             "passwordStrength": "Fortaleza de la contraseña",
-            "signUp": "Registrarse",
+            "showPassword": "Mostrar contraseña",
+            "hidePassword": "Ocultar contraseña",
+            "signUp": "Regístrate",
             "alreadyHaveAccount": "¿Ya tienes una cuenta?",
             "signIn": "Iniciar sesión",
-            "disclaimer": "Al registrarse, aceptas nuestros",
+            "disclaimer": "Al registrarte, aceptas nuestros",
             "and": "y",
-            "termsOfService": "Términos de servicio",
-            "privacyPolicy": "Política de privacidad",
+            "termsOfService": "Términos de Servicio",
+            "privacyPolicy": "Política de Privacidad",
             "becomeTeacher": "Conviértete en Profesor",
-            "teacherSubtitle": "Crea tu cuenta de profesor y comienza a compartir tus conocimientos",
+            "teacherSubtitle": "Crea tu cuenta de profesor y comienza a compartir conocimiento",
             "seoDescription": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
-            "ogImageAlt": "Regístrate en Sotaque Brasileiro - Aprende portugués con instructores brasileños nativos",
-            "keywords": "lecciones de portugués, portugués brasileño, aprendizaje de idiomas, clases de portugués en línea, instructores brasileños nativos, cultura brasileña, horario flexible, aprendizaje personalizado, cultura brasileña"
+            "ogImageAlt": "Regístrate en Sotaque Brasileiro - Aprende portugués con instructores nativos",
+            "keywords": "lecciones de portugués, portugués brasileño, aprendizaje de idiomas, clases de portugués en línea, instructores nativos, inmersión cultural, portugués para negocios, horario flexible, aprendizaje personalizado, cultura brasileña"
         },
         "become-teacher": {
             "title": "Conviértete en Profesor",
-            "seoDescription": "Únete a Sotaque Brasileiro como profesor y comparte tus conocimientos en portugués brasileño. Ayuda a los estudiantes a alcanzar sus objetivos de aprendizaje a través de lecciones personalizadas y culturalmente inmersivas.",
-            "ogImageAlt": "Conviértete en profesor de portugués brasileño en Sotaque Brasileiro",
-            "keywords": "enseñar portugués, profesor de portugués brasileño, enseñanza de idiomas, enseñanza en línea, instructores brasileños nativos, educación cultural, oportunidades de enseñanza, educación en idiomas"
+            "seoDescription": "Únete a Sotaque Brasileiro como profesor y comparte tu experiencia en portugués brasileño. Ayuda a los estudiantes a alcanzar sus objetivos lingüísticos a través de lecciones personalizadas y culturalmente inmersivas.",
+            "ogImageAlt": "Conviértete en profesor de portugués en Sotaque Brasileiro",
+            "keywords": "enseñar portugués, profesor de portugués brasileño, enseñanza de idiomas, enseñanza en línea, instructores nativos, educación cultural, oportunidades de enseñanza, educación en idiomas"
         }
     },
     "shared": {
@@ -488,17 +490,17 @@
             "save": "Guardar",
             "cancel": "Cancelar",
             "delete": "Eliminar",
-            "sign-in": "Iniciar Sesión",
-            "sign-up": "Registrarse"
+            "sign-in": "Iniciar sesión",
+            "sign-up": "Regístrate"
         },
         "nav-user": {
             "profile": "Perfil",
             "billing": "Facturación",
-            "sign-out": "Cerrar Sesión",
+            "sign-out": "Cerrar sesión",
             "upgrade": "Actualizar",
             "notifications": "Notificaciones",
             "loading": "Cargando",
-            "accountMenu": "Menú de cuenta"
+            "accountMenu": "Menú de Cuenta"
         },
         "langSwitcher": {
             "english": "Inglés",
