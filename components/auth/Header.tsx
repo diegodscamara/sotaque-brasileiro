@@ -36,7 +36,7 @@ const Header = () => {
       >
         <nav className="flex justify-end items-center gap-4 mx-auto px-4 w-full max-w-7xl h-14 container">
           <LanguageSwitcher />
-          <ThemeToggle />
+          <ThemeToggle variant="dropdown" />
         </nav>
       </motion.header>
     </AnimatePresence>
