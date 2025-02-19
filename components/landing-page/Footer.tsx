@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import Image from "next/image";
+import LanguageSwitcher from "../lang-switcher";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import logo from "@/app/icon.png";
@@ -94,9 +95,12 @@ const Footer = () => {
         <hr className="border-gray-200 dark:border-gray-700 border-t w-full" />
 
         {/* Row 3: Copyright */}
-        <span className="text-gray-600 dark:text-gray-400 text-sm leading-5">
-          {t("copyright")}
-        </span>
+        <div className="flex flex-row flex-wrap justify-between items-center gap-4 w-full">
+          <span className="text-gray-600 dark:text-gray-400 text-sm leading-5">
+            {t("copyright")}
+          </span>
+          <LanguageSwitcher />
+        </div>
       </div>
     </footer>
   );
