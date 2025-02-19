@@ -10,6 +10,7 @@ import Image from "next/image";
 import LanguageSwitcher from "@/components/lang-switcher";
 import Link from "next/link";
 import { List } from "@phosphor-icons/react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { User } from "@supabase/supabase-js";
 import { cn } from "@/libs/utils";
 import config from "@/config";
@@ -104,7 +105,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="lg:flex lg:items-center lg:gap-2 hidden">
+          <div className="hidden lg:flex lg:items-center lg:gap-2">
             {links.map((link) => (
               <Button
                 variant="link"
@@ -119,20 +120,22 @@ const Header = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="lg:flex lg:items-center gap-4 hidden">
+          <div className="hidden lg:flex lg:items-center gap-4">
             <LanguageSwitcher />
-            {user && hasAccess ? (
+            <ThemeToggle variant="dropdown" />
+
+            {user ? (
               <>
                 <Button variant="default" asChild>
-                  <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+                  <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
                 </Button>
                 <ButtonSignin />
               </>
             ) : (
               <>
                 <ButtonSignin />
-                <Button variant="default" asChild effect="shineHover">
-                  <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+                <Button variant="default" asChild>
+                  <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
                 </Button>
               </>
             )}
@@ -167,7 +170,7 @@ const Header = () => {
                   </SheetTitle>
                 </SheetHeader>
 
-                <div className="flex flex-col items-start gap-4 mt-8">
+                <div className="flex flex-col items-start mt-8">
                   <nav className="flex flex-col items-start gap-4">
                     {links.map((link) => (
                       <Button variant="link" effect="hoverUnderline" className="px-0 text-gray-800 dark:text-gray-50" key={link.href} asChild>
@@ -179,26 +182,26 @@ const Header = () => {
                         </Link>
                       </Button>
                     ))}
-                  </nav>
 
-                  <div className="flex flex-col sm:flex-col items-start gap-6">
-                    <LanguageSwitcher />
-                    {user && hasAccess ? (
-                      <div className="flex flex-col items-start gap-6 sm:m-0">
-                        <Button variant="default" asChild effect="shineHover">
-                          <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+                    {user ? (
+                      <>
+                        <Button variant="default" asChild>
+                          <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
                         </Button>
                         <ButtonSignin />
-                      </div>
+                      </>
                     ) : (
-                      <div className="flex flex-col items-start gap-6 sm:m-0">
+                      <>
                         <ButtonSignin />
-                        <Button variant="default" asChild effect="shineHover">
-                          <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+                        <Button variant="default" asChild>
+                          <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
                         </Button>
-                      </div>
+                      </>
                     )}
-                  </div>
+
+                    <LanguageSwitcher />
+                    <ThemeToggle variant="dropdown" />
+                  </nav>
                 </div>
               </div>
             </SheetContent>

@@ -35,7 +35,7 @@ const ButtonSignin = () => {
   }
 
   return (
-    <Button variant="outline" asChild effect="shineHover" >
+    <Button variant="outline" asChild>
       <Link
         href={config.auth.loginUrl}
       >
