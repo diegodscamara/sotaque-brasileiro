@@ -12,6 +12,7 @@ import { JSX, useCallback } from 'react'
 import { Monitor, Moon, Sun } from "@phosphor-icons/react"
 
 import { Button } from "./ui/button"
+import { motion } from "framer-motion"
 import { useTheme } from "next-themes"
 import { useTranslations } from "next-intl"
 
@@ -43,23 +44,30 @@ export function ThemeToggle({ variant = "default" }: { variant?: "default" | "dr
 
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger aria-label="Select theme" className="inline-flex justify-center items-center gap-2 hover:bg-accent dark:hover:bg-gray-700/50 p-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10">
+        <DropdownMenuTrigger aria-label="Select theme" className="inline-flex justify-center items-center gap-2 hover:bg-accent dark:hover:bg-gray-700/50 disabled:opacity-50 p-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10 [&_svg]:size-4 font-medium [&_svg]:text-gray-800 dark:[&_svg]:text-gray-200 text-sm whitespace-nowrap transition-colors hover:text-accent-foreground disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0">
           {activeIcon}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="bg-white dark:bg-gray-700">
-          <DropdownMenuItem onClick={() => handleThemeChange("system")} className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600`}>
-            <Monitor className="w-4 h-4" />
-            <span>{t("themeToggle.system")}</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleThemeChange("light")} className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600`}>
-            <Sun className="w-4 h-4" />
-            <span>{t("themeToggle.light")}</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleThemeChange("dark")} className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600`}>
-            <Moon className="w-4 h-4" />
-            <span>{t("themeToggle.dark")}</span>
-          </DropdownMenuItem>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <DropdownMenuItem onClick={() => handleThemeChange("system")} className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 ${theme === "system" ? "bg-gray-200 dark:bg-gray-600" : ""}`}>
+              <Monitor className="w-4 h-4" />
+              <span className="text-sm">{t("themeToggle.system")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleThemeChange("light")} className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 ${theme === "light" ? "bg-gray-200 dark:bg-gray-600" : ""}`}>
+              <Sun className="w-4 h-4" />
+              <span className="text-sm">{t("themeToggle.light")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleThemeChange("dark")} className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 ${theme === "dark" ? "bg-gray-200 dark:bg-gray-600" : ""}`}>
+              <Moon className="w-4 h-4" />
+              <span className="text-sm">{t("themeToggle.dark")}</span>
+            </DropdownMenuItem>
+          </motion.div>
         </DropdownMenuContent>
       </DropdownMenu>
     )
