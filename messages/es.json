@@ -481,6 +481,19 @@
             "seoDescription": "Únete a Sotaque Brasileiro como profesor y comparte tu experiencia en portugués brasileño. Ayuda a los estudiantes a alcanzar sus objetivos lingüísticos a través de lecciones personalizadas y culturalmente inmersivas.",
             "ogImageAlt": "Conviértete en profesor de portugués en Sotaque Brasileiro",
             "keywords": "enseñar portugués, profesor de portugués brasileño, enseñanza de idiomas, enseñanza en línea, instructores nativos, educación cultural, oportunidades de enseñanza, educación en idiomas"
+        },
+        "forgot-password": {
+            "title": "Restablece tu contraseña",
+            "subtitle": "Ingresa tu correo electrónico a continuación para recibir un enlace para restablecer tu contraseña",
+            "description": "Te enviaremos un correo electrónico con instrucciones para restablecer tu contraseña.",
+            "email": "Correo electrónico",
+            "emailPlaceholder": "tú@ejemplo.com",
+            "resetPassword": "Enviar enlace de restablecimiento",
+            "backToSignIn": "Volver a iniciar sesión",
+            "checkEmail": "Revisa tu correo electrónico para un enlace para restablecer tu contraseña.",
+            "seoDescription": "Restablece tu contraseña para Sotaque Brasileiro para recuperar acceso a tu cuenta.",
+            "ogImageAlt": "Restablece tu contraseña para Sotaque Brasileiro",
+            "keywords": "restablecer contraseña, olvidaste tu contraseña, recuperación de contraseña, portugués brasileño"
         }
     },
     "shared": {
@@ -516,6 +529,24 @@
         "errors": {
             "general": "Algo salió mal"
         }
+    },
+    "errors": {
+        "general": "Algo salió mal",
+        "invalidEmail": "Correo electrónico inválido",
+        "invalidPassword": "Contraseña inválida",
+        "passwordsDoNotMatch": "Las contraseñas no coinciden",
+        "passwordStrength": "Fortaleza de la contraseña",
+        "showPassword": "Mostrar contraseña",
+        "hidePassword": "Ocultar contraseña",
+        "emailRequired": "Correo electrónico requerido",
+        "passwordRequired": "Contraseña requerida",
+        "repeatPasswordRequired": "Contraseña requerida",
+        "emailAlreadyInUse": "Correo electrónico ya en uso",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "emailInvalid": "Correo electrónico inválido",
+        "passwordInvalid": "Contraseña inválida",
+        "unknownError": "Ocurrió un error desconocido",
+        "resetPassword": "Restablecer contraseña"
     },
     "index": {
         "title": "¡Hola mundo!"
