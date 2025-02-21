@@ -1,38 +1,41 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { JSX } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import React from "react";
 import { createClient } from "@/libs/supabase/client";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { validateEmail } from "@/libs/utils/validation";
 
-export default function ForgotPasswordForm() {
+/**
+ * ForgotPasswordForm component for password reset requests
+ * @returns {JSX.Element} The forgot password form
+ */
+export default function ForgotPasswordForm(): JSX.Element {
+    const t = useTranslations("auth.forgot-password");
+    const tErrors = useTranslations("errors");
+
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
-    const router = useRouter();
     const supabase = createClient();
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) router.push("/dashboard");
-        };
-        checkUser();
-    }, [router, supabase.auth]);
-
-    const handleResetPassword = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
+        if (!validateEmail(email.trim())) {
+            setError(tErrors("invalidEmail"));
+            return;
+        }
+
         setLoading(true);
         setError(null);
-        setSuccess(false);
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -42,63 +45,76 @@ export default function ForgotPasswordForm() {
             if (error) throw error;
             setSuccess(true);
         } catch (error) {
-            setError(error.message);
+            setError(error instanceof Error ? error.message : tErrors("unknownError"));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Card className="w-full max-w-sm">
+        <Card className="bg-gray-100 dark:bg-gray-700 rounded-lg w-full max-w-md">
             <CardHeader>
-                <CardTitle className="text-2xl">Reset password</CardTitle>
-                <CardDescription>
-                    Enter your email address and we&apos;ll send you a link to reset your password
+                <CardTitle className="font-semibold text-lg text-center leading-8">
+                    {t("title")}
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-300 text-sm text-center leading-none">
+                    {t("description")}
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleResetPassword}>
-                    <div className="flex flex-col gap-6">
+                {success ? (
+                    <p className="text-green-600 dark:text-green-400 text-center">
+                        {t("checkEmail")}
+                    </p>
+                ) : (
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                         <div className="gap-2 grid">
-                            <Label htmlFor="email">Email</Label>
+                            <Label
+                                htmlFor="email"
+                                className="text-gray-800 dark:text-gray-200 text-sm leading-none"
+                            >
+                                {t("email")}
+                            </Label>
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="m@example.com"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    setError(null);
+                                }}
+                                placeholder={t("emailPlaceholder")}
                                 required
+                                aria-invalid={error ? "true" : undefined}
+                                aria-errormessage={error ? "email-error" : undefined}
+                                className="bg-transparent dark:bg-transparent border-gray-300 dark:border-gray-600 placeholder:font-normal text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 placeholder:text-sm placeholder:leading-none"
                             />
+                            {error && (
+                                <div id="email-error" role="alert" className="text-red-500 text-sm">
+                                    {error}
+                                </div>
+                            )}
                         </div>
-
-                        {error && (
-                            <div className="text-red-500 text-sm">
-                                {error}
-                            </div>
-                        )}
-
-                        {success && (
-                            <div className="text-green-500 text-sm">
-                                Check your email for a link to reset your password
-                            </div>
-                        )}
-
-                        <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? (
-                                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                            ) : null}
-                            Send reset link
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={loading}
+                            aria-busy={loading}
+                        >
+                            {loading && <Loader2 className="mr-2 w-4 h-4 animate-spin" aria-hidden="true" />}
+                            {t("resetPassword")}
                         </Button>
-                    </div>
-                </form>
-
-                <div className="mt-4 text-center text-sm">
-                    Remember your password?{" "}
-                    <Link href="/signin" className="underline underline-offset-4">
-                        Sign in
-                    </Link>
-                </div>
+                    </form>
+                )}
             </CardContent>
+            <CardFooter className="flex flex-row flex-wrap justify-center items-center">
+                <Link
+                    href="/signin"
+                    className="text-gray-600 dark:text-gray-400 text-sm hover:underline"
+                >
+                    {t("backToSignIn")}
+                </Link>
+            </CardFooter>
         </Card>
     );
 } 
