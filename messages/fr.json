@@ -481,6 +481,19 @@
             "seoDescription": "Rejoignez Sotaque Brasileiro en tant qu'enseignant et partagez votre expertise en portugais brésilien. Aidez les étudiants à atteindre leurs objectifs linguistiques grâce à des leçons personnalisées et culturellement immersives.",
             "ogImageAlt": "Devenez enseignant de portugais chez Sotaque Brasileiro",
             "keywords": "enseigner le portugais, enseignant de portugais brésilien, enseignement des langues, enseignement en ligne, instructeurs natifs, éducation culturelle, opportunités d'enseignement, éducation linguistique"
+        },
+        "forgot-password": {
+            "title": "Réinitialiser votre mot de passe",
+            "subtitle": "Entrez votre e-mail ci-dessous pour recevoir un lien pour réinitialiser votre mot de passe",
+            "description": "Nous vous enverrons un e-mail avec les instructions pour réinitialiser votre mot de passe.",
+            "email": "E-mail",
+            "emailPlaceholder": "vous@exemple.com",
+            "resetPassword": "Envoyer le lien de réinitialisation",
+            "backToSignIn": "Retour à la connexion",
+            "checkEmail": "Vérifiez votre e-mail pour un lien pour réinitialiser votre mot de passe.",
+            "seoDescription": "Réinitialisez votre mot de passe pour Sotaque Brasileiro pour récupérer accès à votre compte.",
+            "ogImageAlt": "Réinitialiser votre mot de passe pour Sotaque Brasileiro",
+            "keywords": "réinitialiser le mot de passe, mot de passe oublié, récupération de mot de passe, portugais brésilien"
         }
     },
     "shared": {
@@ -516,6 +529,24 @@
         "errors": {
             "general": "Quelque chose a mal tourné"
         }
+    },
+    "errors": {
+        "general": "Quelque chose a mal tourné",
+        "invalidEmail": "Email invalide",
+        "invalidPassword": "Mot de passe invalide",
+        "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+        "passwordStrength": "Force du mot de passe",
+        "showPassword": "Afficher le mot de passe",
+        "hidePassword": "Masquer le mot de passe",
+        "emailRequired": "Email est requis",
+        "passwordRequired": "Mot de passe est requis",
+        "repeatPasswordRequired": "Répéter le mot de passe est requis",
+        "emailAlreadyInUse": "Email déjà utilisé",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+        "emailInvalid": "Email invalide",
+        "passwordInvalid": "Mot de passe invalide",
+        "unknownError": "Une erreur inconnue est survenue",
+        "resetPassword": "Réinitialiser le mot de passe"
     },
     "index": {
         "title": "Bonjour le monde !"
