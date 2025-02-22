@@ -1,3 +1,5 @@
+"use client";
+
 import ResetPasswordForm from "@/components/auth/reset-password-form";
 import { createClient } from "@/libs/supabase/client";
 import { useEffect } from "react";
