@@ -3,7 +3,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import React, { JSX } from "react";
-import { useEffect, useRef, useState } from "react";
 import { validateEmail, validatePassword } from "@/libs/utils/validation";
 
 import { Button } from "@/components/ui/button";
@@ -13,13 +12,13 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/libs/supabase/client";
+import { getStudent } from "@/app/actions/students";
+import { getUser } from "@/app/actions/users";
 import logo from "@/app/icon.png";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
 import { useTranslations } from "next-intl";
-import useUserApi from "@/hooks/useUserApi";
 
 /**
  * SignIn component handles user authentication and sign-in functionality
@@ -32,15 +31,15 @@ export default function SignIn(): JSX.Element {
   const tErrors = useTranslations("errors");
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     email: "",
     password: "",
     showPassword: false,
   });
 
   // UI state
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{
+  const [loading, setLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState<{
     email?: string;
     password?: string;
     general?: string;
@@ -49,14 +48,11 @@ export default function SignIn(): JSX.Element {
   // Hooks
   const router = useRouter();
   const supabase = createClient();
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = React.useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true });
-  const { getUser } = useUserApi();
-  const { getStudent } = useStudentApi();
 
   /**
    * Handles input change events
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event
    */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -73,7 +69,6 @@ export default function SignIn(): JSX.Element {
 
   /**
    * Validates form inputs
-   * @returns {boolean} Whether the form is valid
    */
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
@@ -92,7 +87,6 @@ export default function SignIn(): JSX.Element {
 
   /**
    * Handles form submission
-   * @param {React.FormEvent} e - The form submission event
    */
   const handleSignIn = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
@@ -115,12 +109,12 @@ export default function SignIn(): JSX.Element {
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (!response.ok) {
-        setErrors({ general: data.error || tErrors("unknownError") });
+      if (!result.success) {
+        setErrors({ general: result.error || tErrors("unknownError") });
       } else {
-        router.push(data.redirectUrl);
+        router.push(result.data?.redirectUrl || '/dashboard');
       }
     } catch (error) {
       setErrors({
@@ -132,7 +126,7 @@ export default function SignIn(): JSX.Element {
   };
 
   // Check user authentication status and redirect if needed
-  useEffect(() => {
+  React.useEffect(() => {
     const checkUser = async (): Promise<void> => {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -159,7 +153,7 @@ export default function SignIn(): JSX.Element {
     };
 
     checkUser();
-  }, [getStudent, getUser, router, supabase.auth]);
+  }, [router, supabase.auth]);
 
   return (
     <motion.section
