@@ -7,7 +7,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { GlobeSimple } from '@phosphor-icons/react';
+// @ts-ignore
+import { CircleFlag } from 'react-circle-flags';
 import { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { useCallback } from 'react';
@@ -18,6 +19,7 @@ interface Language {
   code: string;
   name: string;
   nativeName: string;
+  countryCode: string; // ISO country code for the flag
 }
 
 /**
@@ -30,10 +32,10 @@ export default function LanguageSwitcher(): JSX.Element {
   const currentLocale = pathname.split('/')[1] || 'en';
 
   const SUPPORTED_LANGUAGES: Language[] = [
-    { code: 'en', name: t('english'), nativeName: 'English' },
-    { code: 'fr', name: t('french'), nativeName: 'Français' },
-    { code: 'pt', name: t('portuguese'), nativeName: 'Português' },
-    { code: 'es', name: t('spanish'), nativeName: 'Español' },
+    { code: 'en', name: t('english'), nativeName: 'English', countryCode: 'us' },
+    { code: 'fr', name: t('french'), nativeName: 'Français', countryCode: 'fr' },
+    { code: 'pt', name: t('portuguese'), nativeName: 'Português', countryCode: 'br' },
+    { code: 'es', name: t('spanish'), nativeName: 'Español', countryCode: 'es' },
   ];
 
   const currentLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLocale);
@@ -53,14 +55,23 @@ export default function LanguageSwitcher(): JSX.Element {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger aria-label="Select language" className="inline-flex justify-center items-center gap-2 hover:bg-accent dark:hover:bg-gray-700/50 disabled:opacity-50 p-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10 [&_svg]:size-4 font-medium [&_svg]:text-gray-800 dark:[&_svg]:text-gray-200 text-sm whitespace-nowrap transition-colors hover:text-accent-foreground disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0"
+      <DropdownMenuTrigger
+        aria-label={`Select language, current language: ${currentLanguage?.name}`}
+        className="inline-flex justify-center items-center gap-2 hover:bg-accent dark:hover:bg-gray-700/50 disabled:opacity-50 p-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10 font-medium text-sm whitespace-nowrap transition-colors hover:text-accent-foreground disabled:pointer-events-none"
       >
-        <GlobeSimple className="w-4 h-4" />
-        <span className="text-sm">{currentLanguage?.name}</span>
+        {currentLanguage && (
+          <CircleFlag
+            countryCode={currentLanguage.countryCode}
+            height={20}
+            width={20}
+            className="rounded-full"
+            aria-hidden="true"
+          />
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="bg-white dark:bg-gray-700">
-        {SUPPORTED_LANGUAGES.map(({ code, name, nativeName }) => (
+        {SUPPORTED_LANGUAGES.map(({ code, name, nativeName, countryCode }) => (
           <motion.div
             key={code}
             initial={{ opacity: 0, y: -10 }}
@@ -73,6 +84,13 @@ export default function LanguageSwitcher(): JSX.Element {
               className={`flex items-center gap-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600
                 ${currentLocale === code ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
             >
+              <CircleFlag
+                countryCode={countryCode}
+                height={16}
+                width={16}
+                className="rounded-full"
+                aria-hidden="true"
+              />
               <span className="text-sm">{nativeName}</span>
               <span className="text-muted-foreground text-xs">({name})</span>
             </DropdownMenuItem>
