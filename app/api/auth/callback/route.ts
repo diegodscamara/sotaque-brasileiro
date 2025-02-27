@@ -1,169 +1,115 @@
 import { NextResponse } from 'next/server'
 import { Role } from '@prisma/client'
 import { createClient } from '@/libs/supabase/server'
-import { getUserTimeZone } from '@/libs/utils/timezone'
+import { prisma } from '@/libs/prisma'
 
 /**
- * Handles user authentication and account creation
+ * Handles authentication callback from Supabase
  * @param {Request} request - The incoming request
  * @returns {Promise<NextResponse>} - Response with redirect URL or error
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const next = searchParams.get('next') || ''
   const error = searchParams.get('error')
   const supabase = createClient()
 
-  // Remove language prefix from origin
-  const baseUrl = origin.replace(/\/(en|fr|pt)(\/|$)/, '/')
-
+  // Handle errors
   if (error) {
-    return NextResponse.redirect(`${baseUrl}auth/auth-code-error?error=${error}`)
+    return NextResponse.redirect(`${origin}/auth/error?error=${error}`)
   }
 
+  // Handle missing code
   if (!code) {
-    return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+    return NextResponse.redirect(`${origin}/auth/error?error=missing_code`)
   }
 
   try {
+    // Exchange code for session
     const { data: { session }, error: authError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (authError) {
       console.error('Error exchanging code for session:', authError)
-      return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+      return NextResponse.redirect(`${origin}/auth/error?error=auth_error`)
     }
 
-    // Check if user exists
-    const { data: existingUser, error: userFetchError } = await supabase
-      .from('User')
-      .select('*')
-      .eq('id', session.user.id)
-      .single()
+    // Check if user exists in database
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    })
 
-    if (userFetchError && userFetchError.code === 'PGRST116') {
-      // User doesn't exist, create new user
-      await createNewUser(supabase, session, Role.STUDENT)
-    } else if (!userFetchError && existingUser) {
-      // User exists, update with Google info if available
-      await updateUserWithGoogleInfo(supabase, session, existingUser)
-    } else if (userFetchError) {
-      return NextResponse.json({ error: userFetchError.message }, { status: 400 })
+    // If user doesn't exist in database, create it
+    if (!user) {
+      try {
+        // Get user metadata from Supabase
+        const role = session.user.user_metadata?.role || Role.STUDENT
+        
+        // Create user in database with transaction to ensure consistency
+        await prisma.$transaction(async (tx) => {
+          // Create user record
+          await tx.user.create({
+            data: {
+              id: session.user.id,
+              email: session.user.email!,
+              role: role as Role,
+            },
+          })
+
+          // Create role-specific record
+          if (role === Role.STUDENT) {
+            await tx.student.create({
+              data: {
+                userId: session.user.id,
+              },
+            })
+          } else if (role === Role.TEACHER) {
+            await tx.teacher.create({
+              data: {
+                userId: session.user.id,
+              },
+            })
+          }
+        })
+      } catch (dbError) {
+        console.error('Error creating user in database:', dbError)
+        return NextResponse.redirect(`${origin}/auth/error?error=database_error`)
+      }
     }
 
-    // Get updated user info for redirect
-    const { data: updatedUser } = await supabase
-      .from('User')
-      .select('*')
-      .eq('id', session.user.id)
-      .single()
-
-    if (!updatedUser) {
-      return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
+    // Handle specific redirects
+    if (next) {
+      return NextResponse.redirect(`${origin}${next}`)
     }
 
-    // Handle role-based redirect
-    const redirectUrl = await handleRoleBasedRedirect(supabase, updatedUser)
-    return NextResponse.redirect(`${baseUrl}${redirectUrl.replace(/^\//, '')}`)
+    // Get user from database for role-based redirect
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    })
 
+    if (!dbUser) {
+      return NextResponse.redirect(`${origin}/auth/error?error=user_not_found`)
+    }
+
+    // Determine redirect URL based on user role
+    let redirectUrl = '/dashboard'
+    if (dbUser.role === Role.STUDENT) {
+      // Check if student has completed onboarding
+      const student = await prisma.student.findFirst({
+        where: { userId: dbUser.id },
+      })
+      
+      if (student && !student.hasCompletedOnboarding) {
+        redirectUrl = '/onboarding'
+      } else if (student && !student.hasAccess) {
+        redirectUrl = '/#pricing'
+      }
+    }
+
+    return NextResponse.redirect(`${origin}${redirectUrl}`)
   } catch (error) {
     console.error('Error in auth callback:', error)
-    return NextResponse.redirect(`${baseUrl}auth/auth-code-error`)
-  }
-}
-
-/**
- * Updates existing user with Google info if available
- * @param {ReturnType<typeof createClient>} supabase - Supabase client
- * @param {any} session - Auth session
- * @param {any} existingUser - Existing user data
- * @returns {Promise<void>}
- */
-async function updateUserWithGoogleInfo(supabase: ReturnType<typeof createClient>, session: any, existingUser: any): Promise<void> {
-  if (session.user.user_metadata?.full_name) {
-    const googleName = session.user.user_metadata.full_name
-    const googleAvatar = session.user.user_metadata.avatar_url || null
-    const [firstName, ...lastNameParts] = googleName.split(' ')
-    const lastName = lastNameParts.join(' ')
-
-    const updateData: any = {}
-
-    // Only update fields that are empty, null or different from existing values
-    if (!existingUser.firstName || existingUser.firstName !== firstName) updateData.firstName = firstName
-    if (!existingUser.lastName || existingUser.lastName !== lastName) updateData.lastName = lastName
-    if (!existingUser.avatarUrl || existingUser.avatarUrl !== googleAvatar) updateData.avatarUrl = googleAvatar
-
-    if (Object.keys(updateData).length > 0) {
-      updateData.updatedAt = new Date().toLocaleString('en-US', { timeZone: getUserTimeZone() })
-      const { error } = await supabase
-        .from('User')
-        .update(updateData)
-        .eq('id', session.user.id)
-
-      if (error) throw new Error(`User update failed: ${error.message}`)
-    }
-  }
-}
-
-/**
- * Creates a new user in the database
- * @param {ReturnType<typeof createClient>} supabase - Supabase client
- * @param {any} session - Auth session
- * @param {Role} role - User role
- * @returns {Promise<void>}
- */
-async function createNewUser(supabase: ReturnType<typeof createClient>, session: any, role: Role): Promise<void> {
-  const userTimeZone = getUserTimeZone()
-  const currentDate = new Date().toLocaleString('en-US', { timeZone: userTimeZone })
-
-  // Only extract name for Google sign-ups
-  const userData: any = {
-    id: session.user.id,
-    email: session.user.email,
-    role,
-    updatedAt: currentDate,
-    createdAt: currentDate,
-  }
-
-  // Add name and avatar only if it's a Google sign-up
-  if (session.user.user_metadata?.full_name) {
-    const googleName = session.user.user_metadata.full_name
-    const googleAvatar = session.user.user_metadata.avatar_url || null
-    const [firstName, ...lastNameParts] = googleName.split(' ')
-    const lastName = lastNameParts.join(' ')
-
-    userData.firstName = firstName
-    userData.lastName = lastName
-    userData.avatarUrl = googleAvatar
-  }
-
-  const { error: userError } = await supabase
-    .from('User')
-    .insert(userData)
-
-  if (userError) throw new Error(`User creation failed: ${userError.message}`)
-
-  if (role === Role.STUDENT) {
-    const { error: studentError } = await supabase
-      .from('Student')
-      .insert({
-        id: session.user.id,
-        userId: session.user.id,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-      })
-
-    if (studentError) throw new Error(`Student creation failed: ${studentError.message}`)
-  } else if (role === Role.TEACHER) {
-    const { error: teacherError } = await supabase
-      .from('Teacher')
-      .insert({
-        id: session.user.id,
-        userId: session.user.id,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-      })
-
-    if (teacherError) throw new Error(`Teacher creation failed: ${teacherError.message}`)
+    return NextResponse.redirect(`${origin}/auth/error?error=unknown_error`)
   }
 }
 
@@ -173,122 +119,132 @@ async function createNewUser(supabase: ReturnType<typeof createClient>, session:
  * @returns {Promise<NextResponse>} - Response with redirect URL or error
  */
 export async function POST(request: Request): Promise<NextResponse> {
-  const supabase = createClient()
-  const { email, password, signIn, role } = await request.json()
-
   try {
+    const { email, password, signIn, role } = await request.json()
+    const supabase = createClient()
+
     if (signIn) {
+      // Sign in flow
       const { data: { session }, error: authError } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       })
 
-      if (authError) throw authError
-
-      const { data: existingUser, error: userFetchError } = await supabase
-        .from('User')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
-
-      if (userFetchError && userFetchError.code !== 'PGRST116') {
-        throw userFetchError
+      if (authError) {
+        return NextResponse.json({ 
+          success: false, 
+          error: authError.message 
+        }, { status: 400 })
       }
 
-      if (!existingUser) {
-        throw new Error('User not found.')
+      // Get user from database
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+      })
+
+      if (!user) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'User not found' 
+        }, { status: 404 })
       }
 
-      const redirectUrl = await handleRoleBasedRedirect(supabase, existingUser)
-      return NextResponse.json({ success: true, redirectUrl }, { status: 200 })
+      // Determine redirect URL based on user role
+      let redirectUrl = '/dashboard'
+      if (user.role === Role.STUDENT) {
+        // Check if student has completed onboarding
+        const student = await prisma.student.findFirst({
+          where: { userId: user.id },
+        })
+        
+        if (student && !student.hasCompletedOnboarding) {
+          redirectUrl = '/onboarding'
+        } else if (student && !student.hasAccess) {
+          redirectUrl = '/#pricing'
+        }
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        redirectUrl 
+      }, { status: 200 })
     } else {
       // Sign up flow
-      const { data: { user, session }, error: signUpError } = await supabase.auth.signUp({
+      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            role: role || 'STUDENT'
+            role: role || Role.STUDENT
           }
         }
       })
 
-      if (signUpError) throw signUpError
-      if (!user || !session) throw new Error('Signup failed')
-
-      // Create user record
-      const { error: userError } = await supabase
-        .from('User')
-        .insert({
-          id: user.id,
-          email: user.email,
-          role: role || 'STUDENT',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        })
-
-      if (userError) throw userError
-
-      // Create role-specific record
-      if (role === 'STUDENT') {
-        const { error: studentError } = await supabase
-          .from('Student')
-          .insert({
-            userId: user.id,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          })
-
-        if (studentError) throw studentError
-      } else if (role === 'TEACHER') {
-        const { error: teacherError } = await supabase
-          .from('Teacher')
-          .insert({
-            userId: user.id,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          })
-
-        if (teacherError) throw teacherError
+      if (signUpError) {
+        return NextResponse.json({ 
+          success: false, 
+          error: signUpError.message 
+        }, { status: 400 })
       }
 
-      const redirectUrl = role === 'STUDENT' ? '/#pricing' : '/dashboard'
-      return NextResponse.json({ success: true, redirectUrl }, { status: 201 })
+      if (!user) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Signup failed' 
+        }, { status: 400 })
+      }
+
+      try {
+        // Create user in database with transaction to ensure consistency
+        await prisma.$transaction(async (tx) => {
+          // Create user record
+          await tx.user.create({
+            data: {
+              id: user.id,
+              email: user.email!,
+              role: (role || Role.STUDENT) as Role,
+            },
+          })
+
+          // Create role-specific record
+          if (role === Role.STUDENT) {
+            await tx.student.create({
+              data: {
+                userId: user.id,
+              },
+            })
+          } else if (role === Role.TEACHER) {
+            await tx.teacher.create({
+              data: {
+                userId: user.id,
+              },
+            })
+          }
+        })
+      } catch (dbError) {
+        console.error('Database error during signup:', dbError)
+        
+        // Clean up Supabase user if database creation fails
+        await supabase.auth.admin.deleteUser(user.id)
+        
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Failed to create user record' 
+        }, { status: 500 })
+      }
+
+      // Determine redirect URL based on role
+      const redirectUrl = role === Role.STUDENT ? '/#pricing' : '/dashboard'
+      return NextResponse.json({ 
+        success: true, 
+        redirectUrl 
+      }, { status: 200 })
     }
   } catch (error) {
-    console.error('Auth error:', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'An unknown error occurred' },
-      { status: 400 }
-    )
+    console.error('Error in auth API:', error)
+    return NextResponse.json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'An unknown error occurred' 
+    }, { status: 500 })
   }
-}
-
-/**
- * Handles role-based redirect logic
- * @param {ReturnType<typeof createClient>} supabase - Supabase client
- * @param {any} user - User data
- * @returns {Promise<string>} - Redirect URL
- */
-async function handleRoleBasedRedirect(supabase: ReturnType<typeof createClient>, user: any): Promise<string> {
-  if (user.role === Role.STUDENT) {
-    const { data: studentRecord, error } = await supabase
-      .from('Student')
-      .select('hasAccess')
-      .eq('userId', user.id)
-      .single()
-
-    if (error) throw error
-    return studentRecord?.hasAccess ? '/dashboard' : '/#pricing'
-  } else if (user.role === Role.TEACHER) {
-    const { error } = await supabase
-      .from('Teacher')
-      .select('id')
-      .eq('userId', user.id)
-      .single()
-
-    if (error) throw error
-    return '/dashboard'
-  }
-  throw new Error('Invalid role.')
 }
