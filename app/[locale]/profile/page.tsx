@@ -11,20 +11,19 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, FormEvent } from "react";
 
 import { BasicInfo } from "../../../components/profile/user-info";
 import Breadcrumb from '@/components/Breadcrumb';
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
-import { FloppyDisk } from "@phosphor-icons/react";
 import { LanguageLearning } from "../../../components/profile/language-info";
 import { StudentProfileData } from '@/types/profile';
-import { User } from "@supabase/supabase-js";
+import { Student, User } from "@/types";
 import { createClient } from "@/libs/supabase/client";
-import useStudentApi from "@/hooks/useStudentApi";
+import { getStudent, editStudent } from "@/app/actions/students";
+import { updateUser } from "@/app/actions/users";
 import { useToast } from "@/hooks/use-toast"
-import { z } from "zod";
 
 const genderOptions = [
   { id: 'male', name: 'Male' },
@@ -43,22 +42,85 @@ const languageOptions = [
   // Add more languages as needed
 ];
 
+/**
+ * Converts a Student object to StudentProfileData
+ * @param student - The student object from the database
+ * @param user - The user object from Supabase auth
+ * @returns StudentProfileData object with all required properties
+ */
+const mapStudentToProfileData = (student: Student, user: User): StudentProfileData => {
+  // Validate gender to ensure it matches the expected union type
+  const validateGender = (gender: string | undefined): 'male' | 'female' | 'other' | 'prefer_not_to_say' => {
+    const validGenders = ['male', 'female', 'other', 'prefer_not_to_say'];
+    return (gender && validGenders.includes(gender.toLowerCase())) 
+      ? gender.toLowerCase() as 'male' | 'female' | 'other' | 'prefer_not_to_say'
+      : 'prefer_not_to_say'; // Default value
+  };
+
+  // Validate Portuguese level
+  const validatePortugueseLevel = (level: string | undefined): 'beginner' | 'intermediate' | 'advanced' | 'native' | 'unknown' => {
+    const validLevels = ['beginner', 'intermediate', 'advanced', 'native'];
+    return (level && validLevels.includes(level.toLowerCase()))
+      ? level.toLowerCase() as 'beginner' | 'intermediate' | 'advanced' | 'native'
+      : 'unknown'; // Default value
+  };
+
+  return {
+    id: student.id,
+    gender: validateGender(user.gender),
+    country: user.country || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    email: user.email || '',
+    avatarUrl: user.avatarUrl || '',
+    role: user.role === 'STUDENT' ? 'student' : 'teacher', // Convert to expected format
+    hasAccess: student.hasAccess,
+    createdAt: student.createdAt.toISOString(), // Convert Date to string
+    packageName: student.packageName || '',
+    updatedAt: student.updatedAt.toISOString(), // Convert Date to string
+    credits: student.credits,
+    portugueseLevel: validatePortugueseLevel(student.portugueseLevel),
+    learningGoals: student.learningGoals || [],
+    preferredSchedule: [],
+    nativeLanguage: student.nativeLanguage || '',
+    otherLanguages: student.otherLanguages || [],
+    professionalBackground: '',
+    motivationForLearning: '',
+    hasCompletedOnboarding: student.hasCompletedOnboarding,
+    timeZone: student.timeZone || ''
+  };
+};
+
 const StudentProfile = () => {
   const supabase = createClient();
-  const { getStudent, editStudent } = useStudentApi();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
-  const { toast } = useToast()
-
-  const [isEditing, setIsEditing] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState("");
+  const { toast } = useToast();
+  
+  // Form state
+  const [formData, setFormData] = useState<Partial<StudentProfileData>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("personal-info");
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
+        const { data: { user: authUser }, error } = await supabase.auth.getUser();
         if (error) throw error;
-        setUser(user);
+        
+        // Convert Supabase User to our User type
+        setUser({
+          id: authUser.id,
+          email: authUser.email || '',
+          createdAt: new Date(authUser.created_at),
+          updatedAt: new Date(),
+          role: 'STUDENT',
+          firstName: authUser.user_metadata?.first_name,
+          lastName: authUser.user_metadata?.last_name,
+          avatarUrl: authUser.user_metadata?.avatar_url,
+          country: authUser.user_metadata?.country,
+          gender: authUser.user_metadata?.gender
+        });
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -71,151 +133,187 @@ const StudentProfile = () => {
     const fetchUserProfile = async () => {
       if (!user) return;
       try {
-        const fetchedProfile = await getStudent(user.id);
-        setProfile(fetchedProfile);
+        const studentData = await getStudent(user.id);
+        if (studentData) {
+          // Create a Student object with the required user property
+          const studentWithUser: Student = {
+            ...studentData,
+            user: user
+          };
+          const profileData = mapStudentToProfileData(studentWithUser, user);
+          setProfile(profileData);
+          setFormData(profileData);
+        }
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
     };
 
     fetchUserProfile();
-  }, [getStudent, user]);
+  }, [user]);
 
-  const handleUpdate = useCallback(async (field: string, value: string | number | string[]) => {
+  /**
+   * Handles form field changes
+   * @param field - The field name to update
+   * @param value - The new value
+   */
+  const handleFieldChange = useCallback((field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  }, []);
+
+  /**
+   * Handles form submission
+   */
+  const handleSubmit = useCallback(async (e?: FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault();
+    if (!user?.id || !profile || !formData) return;
+    
     try {
-      const sanitizedValue = DOMPurify.sanitize(value.toString());
-      const updatedProfile = await editStudent(user?.id, { [field]: sanitizedValue, updated_at: new Date().toISOString() });
-      setProfile(updatedProfile);
-
-      const fieldNameMap: Record<string, string> = {
-        first_name: 'First Name',
-        last_name: 'Last Name',
-        gender: 'Gender',
-        country: 'Country',
-        portuguese_level: 'Portuguese Level',
-        native_language: 'Native Language',
-        learning_goals: 'Learning Goals',
-        motivation_for_learning: 'Motivation for Learning',
+      setIsSubmitting(true);
+      
+      // Sanitize string values
+      const sanitizedData = Object.entries(formData).reduce((acc, [key, value]) => {
+        if (typeof value === 'string') {
+          acc[key] = DOMPurify.sanitize(value);
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
+      
+      // Separate user and student data
+      const userData = {
+        firstName: sanitizedData.firstName,
+        lastName: sanitizedData.lastName,
+        gender: sanitizedData.gender,
+        country: sanitizedData.country,
       };
-
-      const fieldName = fieldNameMap[field] || field.replace(/_/g, ' ');
+      
+      // Update user data
+      await updateUser(user.id, userData);
+      
+      // Create student update data
+      const studentUpdate = {
+        userId: user.id,
+        credits: profile.credits,
+        hasAccess: profile.hasAccess,
+        portugueseLevel: sanitizedData.portugueseLevel,
+        learningGoals: sanitizedData.learningGoals || [],
+        nativeLanguage: sanitizedData.nativeLanguage,
+        otherLanguages: sanitizedData.otherLanguages || [],
+        hasCompletedOnboarding: profile.hasCompletedOnboarding,
+        timeZone: sanitizedData.timeZone,
+      };
+      
+      // Update student data
+      await editStudent(user.id, studentUpdate as any);
+      
+      // Update the profile state with the new data
+      if (profile) {
+        setProfile({
+          ...profile,
+          ...sanitizedData,
+          updatedAt: new Date().toISOString()
+        });
+      }
+      
       toast({
-        title: `${fieldName} updated successfully`,
+        title: "Profile updated successfully",
         variant: "default",
       });
     } catch (error) {
-      console.error(`Error updating ${field}:`, error);
+      console.error("Error updating profile:", error);
       toast({
-        title: `Failed to update ${field}`,
+        title: "Failed to update profile",
+        description: "Please try again later",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [editStudent, profile, user]);
-
-  const handleMultiSelect = useCallback(async (field: string, values: string[]) => {
-    try {
-      const sanitizedValues = values.map(value => DOMPurify.sanitize(value));
-      const updatedProfile = await editStudent(user?.id, { [field]: sanitizedValues });
-      setProfile(updatedProfile);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    }
-  }, [editStudent, user]);
+  }, [user, profile, formData, toast]);
 
   if (!user || !profile) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-screen-lg">
+    <div className="mx-auto py-6 container">
       <Breadcrumb />
-      <div className="flex lg:flex-row flex-col gap-6 w-full">
-        {/* Sidebar Tabs */}
-        <Tabs defaultValue="basic" className="flex flex-col gap-6 w-full">
-          <TabsList className="w-fit">
-            <TabsTrigger value="basic">
-              <div className="flex items-center gap-x-3">
-                <UserIcon className="w-5 h-5" />
-                Basic Information
-              </div>
+
+      <div className="mt-6">
+        <Tabs defaultValue="personal-info" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger value="personal-info" className="flex items-center gap-2">
+              <UserIcon className="w-4 h-4" />
+              Personal Info
             </TabsTrigger>
-            <TabsTrigger value="learning">
-              <div className="flex items-center gap-x-3">
-                <GraduationCap className="w-5 h-5" />
-                Language Learning
-              </div>
+            <TabsTrigger value="language-learning" className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4" />
+              Language Learning
             </TabsTrigger>
           </TabsList>
 
-          {/* Content Area */}
-          <div className="w-full">
-            <Card>
-              <CardContent>
-                <TabsContent value="basic">
+          <form onSubmit={handleSubmit}>
+            <TabsContent value="personal-info" className="mt-6">
+              <Card>
+                <CardContent className="pt-6">
                   <BasicInfo
                     profile={profile}
-                    isEditing={isEditing}
-                    setIsEditing={setIsEditing}
-                    editValue={editValue}
-                    setEditValue={setEditValue}
-                    handleUpdate={handleUpdate}
+                    formData={formData}
+                    onFieldChange={handleFieldChange}
                     genderOptions={genderOptions}
                   />
-                </TabsContent>
-                <TabsContent value="learning">
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2 p-4 border-t">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setFormData(profile)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                  >
+                    Save Changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="language-learning" className="mt-6">
+              <Card>
+                <CardContent className="pt-6">
                   <LanguageLearning
                     profile={profile}
-                    handleUpdate={handleUpdate}
-                    handleMultiSelect={handleMultiSelect}
+                    formData={formData}
+                    onFieldChange={handleFieldChange}
                     languageOptions={languageOptions}
-                    isEditing={isEditing}
-                    setIsEditing={setIsEditing}
-                    editValue={editValue}
-                    setEditValue={setEditValue}
                   />
-                </TabsContent>
-              </CardContent>
-
-              <CardFooter className="flex justify-end items-center gap-x-4">
-                {/* Save Changes Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsEditing(null);
-                    setEditValue("");
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={async () => {
-                    try {
-                      await handleMultiSelect('other_languages', profile.other_languages || []);
-                      const updatedProfile = await editStudent(user?.id, {
-                        ...profile,
-                        updated_at: new Date().toISOString()
-                      });
-                      setProfile(updatedProfile);
-                      toast({
-                        title: 'All changes saved successfully',
-                        variant: "default",
-                      });
-                    } catch (error) {
-                      console.error('Error updating profile:', error);
-                      toast({
-                        title: 'Failed to save changes',
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                >
-                  <FloppyDisk className="w-5 h-5" />
-                  Save all changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2 p-4 border-t">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setFormData(profile)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                  >
+                    Save Changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </form>
         </Tabs>
       </div>
     </div>

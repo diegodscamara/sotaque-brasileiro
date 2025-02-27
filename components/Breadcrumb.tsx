@@ -31,7 +31,7 @@ const BreadcrumbComponent = () => {
           {isLast ? (
             <BreadcrumbPage>{capitalizeFirstLetter(segment)}</BreadcrumbPage>
           ) : (
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link href={href}>{capitalizeFirstLetter(segment)}</Link>
             </BreadcrumbLink>
           )}
@@ -44,7 +44,7 @@ const BreadcrumbComponent = () => {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink>
+          <BreadcrumbLink asChild>
             <Link href="/" className="flex items-center gap-2">
               <House className="w-4 h-4" />
               Home
