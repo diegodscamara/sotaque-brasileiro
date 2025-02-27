@@ -25,7 +25,16 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*
+.env
+.env*.local
+.env.development
+.env.staging
+.env.production
+
+# Keep Docker environment templates
+!.env.docker.development
+!.env.docker.staging
+!.env.docker.production
 
 # vercel
 .vercel
