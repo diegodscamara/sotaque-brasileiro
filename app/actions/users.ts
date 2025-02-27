@@ -1,16 +1,15 @@
 "use server";
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/libs/supabase/server";
+import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 
-import { type User } from "@/types";
+import { type UserData } from "@/types";
 
 const userSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
   avatarUrl: z.string().url().optional(),
   role: z.enum(["STUDENT", "TEACHER", "ADMIN"]).default("STUDENT"),
   country: z.string().optional(),
@@ -18,182 +17,152 @@ const userSchema = z.object({
 });
 
 /**
- * Fetches a single user by ID
- */
-export async function getUser(userId: string) {
-  try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/get?id=${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data[0] || null;
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw error;
-  }
-}
-
-/**
- * Fetches all users with optional role filter
- */
-export async function getUsers(role?: "STUDENT" | "TEACHER" | "ADMIN") {
-  try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    const queryString = role ? `?role=${role}` : "";
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/get${queryString}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch users: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-}
-
-/**
- * Updates a user's information
- */
-export async function editUser(userId: string, userData: Partial<User>) {
-  try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    // Validate user data
-    const validatedData = userSchema.partial().parse(userData);
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/edit`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ userId, userData: validatedData }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to edit user: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error editing user:", error);
-    throw error;
-  }
-}
-
-/**
- * Deletes a user
- */
-export async function deleteUser(userId: string) {
-  try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/delete`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ userId }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete user: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
-  }
-}
-
-/**
- * Gets the current authenticated user
+ * Gets the current user's data
+ * @returns {Promise<UserData | null>} The user data or null if not authenticated
  */
 export async function getCurrentUser() {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       return null;
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      }
-    );
+    const userId = session.user.id;
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch current user: ${response.statusText}`);
+    // Query user directly using Prisma
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    throw error;
+  }
+}
+
+/**
+ * Gets a user by ID
+ * @param {string} userId - The ID of the user to get
+ * @returns {Promise<UserData | null>} The user data or null if not found
+ */
+export async function getUser(userId: string) {
+  try {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("Unauthorized");
     }
 
-    return await response.json();
+    // Query user directly using Prisma
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   } catch (error) {
-    console.error("Error fetching current user:", error);
+    console.error("Error getting user:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates a user's profile
+ * @param {string} userId - The ID of the user to update
+ * @param {Partial<UserData>} userData - The user data to update
+ * @returns {Promise<UserData>} The updated user data
+ */
+export async function updateUser(userId: string, userData: Partial<UserData>) {
+  try {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    // Ensure the user can only update their own profile unless they're an admin
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (currentUser?.id !== userId && currentUser?.role !== "ADMIN") {
+      throw new Error("Unauthorized to update this user");
+    }
+
+    // Validate user data
+    const validatedData = userSchema.partial().parse(userData);
+
+    // Update user directly using Prisma
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: validatedData,
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+}
+
+/**
+ * Gets all users with optional filtering and pagination
+ * @param {object} filters - Optional filters for the query
+ * @param {object} pagination - Pagination options
+ * @returns {Promise<{ data: UserData[], total: number }>} Paginated user data
+ */
+export async function getUsers(
+  filters = {},
+  pagination = { page: 1, limit: 10 }
+) {
+  try {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    // Check if user is admin
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (currentUser?.role !== "ADMIN") {
+      throw new Error("Unauthorized to view all users");
+    }
+
+    // Calculate skip for pagination
+    const skip = (pagination.page - 1) * pagination.limit;
+
+    // Build where clause from filters
+    const where = { ...filters };
+
+    // Query users directly using Prisma
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        skip,
+        take: pagination.limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.user.count({ where }),
+    ]);
+
+    return {
+      data: users,
+      total,
+    };
+  } catch (error) {
+    console.error("Error getting users:", error);
     throw error;
   }
 }

@@ -1,7 +1,7 @@
 "use server";
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/libs/supabase/server";
+import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 
 import { type Teacher } from "@/types";
@@ -15,33 +15,36 @@ const teacherSchema = z.object({
 
 /**
  * Fetches a single teacher by ID
+ * @param {string} teacherId - The ID of the teacher to fetch
+ * @returns {Promise<Teacher | null>} The teacher data or null if not found
  */
 export async function getTeacher(teacherId: string) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/teachers/get?id=${teacherId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
+    // Find the teacher by userId
+    const teacher = await prisma.teacher.findFirst({
+      where: {
+        userId: teacherId
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            avatarUrl: true
+          }
+        }
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch teacher: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data[0] || null;
+    return teacher;
   } catch (error) {
     console.error("Error fetching teacher:", error);
     throw error;
@@ -50,32 +53,32 @@ export async function getTeacher(teacherId: string) {
 
 /**
  * Fetches all teachers
+ * @returns {Promise<Teacher[]>} Array of teacher data
  */
 export async function getTeachers() {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/teachers/get`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
+    // Query all teachers with user information
+    const teachers = await prisma.teacher.findMany({
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            avatarUrl: true
+          }
+        }
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch teachers: ${response.statusText}`);
-    }
-
-    return await response.json();
+    return teachers;
   } catch (error) {
     console.error("Error fetching teachers:", error);
     throw error;
@@ -84,13 +87,14 @@ export async function getTeachers() {
 
 /**
  * Updates a teacher's information
+ * @param {string} teacherId - The ID of the teacher to update
+ * @param {Teacher} teacherData - The updated teacher data
+ * @returns {Promise<Teacher>} The updated teacher data
  */
 export async function editTeacher(teacherId: string, teacherData: Teacher) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
@@ -99,23 +103,34 @@ export async function editTeacher(teacherId: string, teacherData: Teacher) {
     // Validate teacher data
     const validatedData = teacherSchema.parse(teacherData);
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/teachers/edit`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ teacherId, teacherData: validatedData }),
+    // First find the teacher by userId to get the actual id
+    const teacher = await prisma.teacher.findFirst({
+      where: {
+        userId: teacherId
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to edit teacher: ${response.statusText}`);
+    if (!teacher) {
+      throw new Error("Teacher not found");
     }
 
-    return await response.json();
+    // Update teacher directly using Prisma with the correct id
+    const updatedTeacher = await prisma.teacher.update({
+      where: { id: teacher.id },
+      data: validatedData,
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            avatarUrl: true
+          }
+        }
+      }
+    });
+
+    return updatedTeacher;
   } catch (error) {
     console.error("Error editing teacher:", error);
     throw error;
@@ -124,35 +139,53 @@ export async function editTeacher(teacherId: string, teacherData: Teacher) {
 
 /**
  * Deletes a teacher
+ * @param {string} teacherId - The ID of the teacher to delete
+ * @returns {Promise<{ success: boolean }>} Success status
  */
 export async function deleteTeacher(teacherId: string) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/teachers/delete`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ teacherId }),
+    // First find the teacher by userId to get the actual id
+    const teacher = await prisma.teacher.findFirst({
+      where: {
+        userId: teacherId
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to delete teacher: ${response.statusText}`);
+    if (!teacher) {
+      throw new Error("Teacher not found");
     }
 
-    return await response.json();
+    // Check if teacher has any classes
+    const classesCount = await prisma.class.count({
+      where: {
+        teacherId: teacher.id
+      }
+    });
+
+    if (classesCount > 0) {
+      throw new Error("Cannot delete teacher with existing classes");
+    }
+
+    // Delete teacher's availability records first
+    await prisma.teacherAvailability.deleteMany({
+      where: {
+        teacherId: teacher.id
+      }
+    });
+
+    // Delete teacher directly using Prisma with the correct id
+    await prisma.teacher.delete({
+      where: { id: teacher.id },
+    });
+
+    return { success: true };
   } catch (error) {
     console.error("Error deleting teacher:", error);
     throw error;

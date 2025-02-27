@@ -1,7 +1,7 @@
 "use server";
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/libs/supabase/server";
+import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 
 import { type ClassData } from "@/types";
@@ -12,7 +12,7 @@ const classDataSchema = z.object({
   status: z.enum(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']).default('PENDING'),
   startDateTime: z.coerce.date(),
   endDateTime: z.coerce.date(),
-  duration: z.number().int().positive(),
+  duration: z.number().int().positive().min(30, "Class duration must be at least 30 minutes").max(180, "Class duration cannot exceed 3 hours"),
   notes: z.string().optional(),
   feedback: z.string().optional(),
   rating: z.number().int().min(1).max(5).optional(),
@@ -21,41 +21,69 @@ const classDataSchema = z.object({
 
 /**
  * Fetches classes with optional filtering and pagination
+ * @param {object} filters - Optional filters for the query
+ * @param {object} pagination - Pagination options
+ * @returns {Promise<{ data: ClassData[], total: number }>} Paginated class data
  */
 export async function fetchClasses(
   filters = {},
   pagination = { page: 1, limit: 10 }
 ) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const queryString = new URLSearchParams({
-      ...filters,
-      page: pagination.page.toString(),
-      limit: pagination.limit.toString(),
-    }).toString();
+    // Calculate skip for pagination
+    const skip = (pagination.page - 1) * pagination.limit;
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/get?${queryString}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      }
-    );
+    // Build where clause from filters
+    const where = { ...filters };
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch classes: ${response.statusText}`);
-    }
+    // Query classes directly using Prisma with related data
+    const [classes, total] = await Promise.all([
+      prisma.class.findMany({
+        where,
+        skip,
+        take: pagination.limit,
+        orderBy: { startDateTime: 'desc' },
+        include: {
+          teacher: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  avatarUrl: true
+                }
+              }
+            }
+          },
+          student: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  avatarUrl: true
+                }
+              }
+            }
+          }
+        }
+      }),
+      prisma.class.count({ where }),
+    ]);
 
-    return await response.json();
+    return {
+      data: classes,
+      total,
+    };
   } catch (error) {
     console.error("Error fetching classes:", error);
     throw error;
@@ -64,13 +92,14 @@ export async function fetchClasses(
 
 /**
  * Edits an existing class
+ * @param {string} classId - The ID of the class to update
+ * @param {ClassData} classData - The updated class data
+ * @returns {Promise<ClassData>} The updated class data
  */
 export async function editClass(classId: string, classData: ClassData) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
@@ -79,23 +108,82 @@ export async function editClass(classId: string, classData: ClassData) {
     // Validate class data
     const validatedData = classDataSchema.parse(classData);
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/edit`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ classId, classData: validatedData }),
-      }
-    );
+    // Ensure the class exists
+    const existingClass = await prisma.class.findUnique({
+      where: { id: classId }
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to edit class: ${response.statusText}`);
+    if (!existingClass) {
+      throw new Error("Class not found");
     }
 
-    return await response.json();
+    // Rule: Classes can be rescheduled only 24 hours in advance
+    const classStartTime = new Date(existingClass.startDateTime);
+    const currentTime = new Date();
+    const timeDifference = classStartTime.getTime() - currentTime.getTime();
+
+    if (timeDifference < 24 * 60 * 60 * 1000) {
+      throw new Error("Class cannot be changed less than 24 hours before the scheduled time");
+    }
+
+    // Validate time conflicts for teacher
+    if (validatedData.startDateTime && validatedData.endDateTime) {
+      const conflictingClasses = await prisma.class.findMany({
+        where: {
+          id: { not: classId },
+          teacherId: validatedData.teacherId,
+          status: { not: 'CANCELLED' },
+          OR: [
+            {
+              startDateTime: {
+                lt: validatedData.endDateTime,
+              },
+              endDateTime: {
+                gt: validatedData.startDateTime,
+              },
+            },
+          ],
+        },
+      });
+
+      if (conflictingClasses.length > 0) {
+        throw new Error("Teacher has a scheduling conflict");
+      }
+    }
+
+    // Update class directly using Prisma
+    const updatedClass = await prisma.class.update({
+      where: { id: classId },
+      data: validatedData,
+      include: {
+        teacher: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true
+              }
+            }
+          }
+        },
+        student: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return updatedClass;
   } catch (error) {
     console.error("Error editing class:", error);
     throw error;
@@ -104,35 +192,102 @@ export async function editClass(classId: string, classData: ClassData) {
 
 /**
  * Cancels a class
+ * @param {string} classId - The ID of the class to cancel
+ * @returns {Promise<ClassData>} The cancelled class data
  */
 export async function cancelClass(classId: string) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/cancel`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ classId }),
-      }
-    );
+    // Ensure the class exists
+    const existingClass = await prisma.class.findUnique({
+      where: { id: classId }
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to cancel class: ${response.statusText}`);
+    if (!existingClass) {
+      throw new Error("Class not found");
     }
 
-    return await response.json();
+    // Check if class is already cancelled
+    if (existingClass.status === 'CANCELLED') {
+      throw new Error("Class is already cancelled");
+    }
+
+    // Check if class is already completed
+    if (existingClass.status === 'COMPLETED') {
+      throw new Error("Cannot cancel a completed class");
+    }
+
+    // Rule: Only future classes can be cancelled
+    const classStartTime = new Date(existingClass.startDateTime);
+    const currentTime = new Date();
+    const timeDifference = classStartTime.getTime() - currentTime.getTime();
+
+    if (timeDifference <= 0) {
+      throw new Error("Only future classes can be cancelled");
+    }
+
+    // Rule: Classes cancelled at least 24 hours in advance are refunded credits
+    if (timeDifference >= 24 * 60 * 60 * 1000) {
+      // Get the student to refund credits
+      const student = await prisma.student.findUnique({
+        where: { id: existingClass.studentId }
+      });
+
+      if (student && !student.hasAccess) {
+        // Refund credits based on class duration
+        await prisma.student.update({
+          where: { id: student.id },
+          data: {
+            credits: student.credits + existingClass.duration
+          }
+        });
+      }
+    }
+
+    // Update class status to CANCELLED using Prisma
+    const cancelledClass = await prisma.class.update({
+      where: { id: classId },
+      data: { status: 'CANCELLED' },
+      include: {
+        teacher: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true
+              }
+            }
+          }
+        },
+        student: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // If the class is part of a recurring group and it's in the future, handle it
+    if (existingClass.recurringGroupId && existingClass.startDateTime > new Date()) {
+      // You could add logic here to handle recurring classes if needed
+    }
+
+    return cancelledClass;
   } catch (error) {
     console.error("Error canceling class:", error);
     throw error;
@@ -141,13 +296,13 @@ export async function cancelClass(classId: string) {
 
 /**
  * Schedules a new class
+ * @param {ClassData} classData - The class data to create
+ * @returns {Promise<ClassData>} The created class data
  */
 export async function scheduleClass(classData: ClassData) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
@@ -156,26 +311,101 @@ export async function scheduleClass(classData: ClassData) {
     // Validate class data
     const validatedData = classDataSchema.parse(classData);
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/classes/schedule`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          userId: session.user.id,
-          classData: validatedData,
-        }),
-      }
-    );
+    // Rule: Students can only schedule a class 24 hours in advance
+    const classStartTime = new Date(validatedData.startDateTime);
+    const currentTime = new Date();
+    const timeDifference = classStartTime.getTime() - currentTime.getTime();
 
-    if (!response.ok) {
-      throw new Error(`Failed to schedule class: ${response.statusText}`);
+    if (timeDifference < 24 * 60 * 60 * 1000) {
+      throw new Error("Class must be scheduled at least 24 hours in advance");
     }
 
-    return await response.json();
+    // Validate time conflicts for teacher
+    const conflictingClasses = await prisma.class.findMany({
+      where: {
+        teacherId: validatedData.teacherId,
+        status: { not: 'CANCELLED' },
+        OR: [
+          {
+            startDateTime: {
+              lt: validatedData.endDateTime,
+            },
+            endDateTime: {
+              gt: validatedData.startDateTime,
+            },
+          },
+        ],
+      },
+    });
+
+    if (conflictingClasses.length > 0) {
+      throw new Error("Teacher has a scheduling conflict");
+    }
+
+    // Check if student has enough credits
+    const student = await prisma.student.findFirst({
+      where: { id: validatedData.studentId }
+    });
+
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    if (!student.hasAccess && student.credits < validatedData.duration) {
+      throw new Error("Student doesn't have enough credits");
+    }
+
+    // Create class directly using Prisma
+    const newClass = await prisma.class.create({
+      data: {
+        teacherId: validatedData.teacherId,
+        studentId: validatedData.studentId,
+        status: validatedData.status,
+        startDateTime: validatedData.startDateTime,
+        endDateTime: validatedData.endDateTime,
+        duration: validatedData.duration,
+        notes: validatedData.notes,
+        recurringGroupId: validatedData.recurringGroupId
+      },
+      include: {
+        teacher: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true
+              }
+            }
+          }
+        },
+        student: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Deduct credits from student if they don't have unlimited access
+    if (!student.hasAccess) {
+      await prisma.student.update({
+        where: { id: student.id },
+        data: {
+          credits: student.credits - validatedData.duration
+        }
+      });
+    }
+
+    return newClass;
   } catch (error) {
     console.error("Error scheduling class:", error);
     throw error;

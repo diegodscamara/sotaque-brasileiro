@@ -1,7 +1,7 @@
 "use server";
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/libs/supabase/server";
+import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 
 import { type Student } from "@/types";
@@ -24,33 +24,26 @@ const studentSchema = z.object({
 
 /**
  * Fetches a single student by ID
+ * @param {string} studentId - The ID of the student to fetch
+ * @returns {Promise<Student | null>} The student data or null if not found
  */
 export async function getStudent(studentId: string) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/students/get?id=${studentId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
+    // Find the student by userId using where clause
+    const student = await prisma.student.findFirst({
+      where: {
+        userId: studentId
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch student: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data[0] || null;
+    return student;
   } catch (error) {
     console.error("Error fetching student:", error);
     throw error;
@@ -59,32 +52,21 @@ export async function getStudent(studentId: string) {
 
 /**
  * Fetches all students
+ * @returns {Promise<Student[]>} Array of student data
  */
 export async function getStudents() {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/students/get`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      }
-    );
+    // Query all students directly using Prisma
+    const students = await prisma.student.findMany();
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch students: ${response.statusText}`);
-    }
-
-    return await response.json();
+    return students;
   } catch (error) {
     console.error("Error fetching students:", error);
     throw error;
@@ -93,13 +75,14 @@ export async function getStudents() {
 
 /**
  * Updates a student's information
+ * @param {string} studentId - The ID of the student to update
+ * @param {Student} studentData - The updated student data
+ * @returns {Promise<Student>} The updated student data
  */
 export async function editStudent(studentId: string, studentData: Student) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
@@ -108,23 +91,24 @@ export async function editStudent(studentId: string, studentData: Student) {
     // Validate student data
     const validatedData = studentSchema.parse(studentData);
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/students/edit`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ studentId, studentData: validatedData }),
+    // First find the student by userId to get the actual id
+    const student = await prisma.student.findFirst({
+      where: {
+        userId: studentId
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to edit student: ${response.statusText}`);
+    if (!student) {
+      throw new Error("Student not found");
     }
 
-    return await response.json();
+    // Update student directly using Prisma with the correct id
+    const updatedStudent = await prisma.student.update({
+      where: { id: student.id },
+      data: validatedData,
+    });
+
+    return updatedStudent;
   } catch (error) {
     console.error("Error editing student:", error);
     throw error;
@@ -133,35 +117,35 @@ export async function editStudent(studentId: string, studentData: Student) {
 
 /**
  * Deletes a student
+ * @param {string} studentId - The ID of the student to delete
+ * @returns {Promise<{ success: boolean }>} Success status
  */
 export async function deleteStudent(studentId: string) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
       throw new Error("Unauthorized");
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/students/delete`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ studentId }),
+    // First find the student by userId to get the actual id
+    const student = await prisma.student.findFirst({
+      where: {
+        userId: studentId
       }
-    );
+    });
 
-    if (!response.ok) {
-      throw new Error(`Failed to delete student: ${response.statusText}`);
+    if (!student) {
+      throw new Error("Student not found");
     }
 
-    return await response.json();
+    // Delete student directly using Prisma with the correct id
+    await prisma.student.delete({
+      where: { id: student.id },
+    });
+
+    return { success: true };
   } catch (error) {
     console.error("Error deleting student:", error);
     throw error;
