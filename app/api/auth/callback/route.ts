@@ -100,7 +100,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       })
       
       if (student && !student.hasCompletedOnboarding) {
-        redirectUrl = '/onboarding'
+        redirectUrl = '/student/onboarding'
       } else if (student && !student.hasAccess) {
         redirectUrl = '/#pricing'
       }
@@ -158,7 +158,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         })
         
         if (student && !student.hasCompletedOnboarding) {
-          redirectUrl = '/onboarding'
+          redirectUrl = '/student/onboarding'
         } else if (student && !student.hasAccess) {
           redirectUrl = '/#pricing'
         }
