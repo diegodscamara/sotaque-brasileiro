@@ -11,6 +11,8 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  // Enable standalone output for Docker deployment
+  output: 'standalone',
   images: {
     domains: [
       // NextJS <Image> component needs to whitelist domains for src={}
