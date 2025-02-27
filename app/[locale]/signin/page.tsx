@@ -114,7 +114,7 @@ export default function SignIn(): JSX.Element {
       if (!result.success) {
         setErrors({ general: result.error || tErrors("unknownError") });
       } else {
-        router.push(result.data?.redirectUrl || '/dashboard');
+        router.push(result.redirectUrl || '/dashboard');
       }
     } catch (error) {
       setErrors({
