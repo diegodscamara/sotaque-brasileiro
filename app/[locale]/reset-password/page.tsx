@@ -2,16 +2,15 @@
 
 import ResetPasswordForm from "@/components/auth/reset-password-form";
 import { createClient } from "@/libs/supabase/client";
-import { useEffect } from "react";
+import { getStudent } from "@/app/actions/students";
+import { getUser } from "@/app/actions/users";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
-import useUserApi from "@/hooks/useUserApi";
+import { useEffect } from "react";
 
 export default function ResetPassword() {
-  const supabase = createClient();
-  const { getStudent } = useStudentApi();
-  const { getUser } = useUserApi();
   const router = useRouter();
+  const supabase = createClient();
+
   // Check user authentication status and redirect if needed
   useEffect(() => {
     const checkUser = async (): Promise<void> => {
@@ -40,7 +39,7 @@ export default function ResetPassword() {
     };
 
     checkUser();
-  }, [getStudent, getUser, router, supabase.auth]);
+  }, [router, supabase.auth]);
 
   return (
     <section className="flex justify-center items-center mx-auto py-24 w-full h-full container">

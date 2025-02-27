@@ -10,15 +10,13 @@ import { useEffect } from "react";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
+import { getStudent } from "@/app/actions/students";
+import { getUser } from "@/app/actions/users";
 import { useTranslations } from "next-intl";
-import useUserApi from "@/hooks/useUserApi";
 
 export default function SignUp() {
     const router = useRouter();
     const supabase = createClient();
-    const { getStudent } = useStudentApi();
-    const { getUser } = useUserApi();
     const tShared = useTranslations("shared");
     const t = useTranslations("auth.sign-up");
     const sectionRef = useRef<HTMLElement>(null);
@@ -52,7 +50,7 @@ export default function SignUp() {
         };
 
         checkUser();
-    }, [getStudent, getUser, router, supabase.auth]);
+    }, [router, supabase.auth]);
 
     return (
         <motion.section
