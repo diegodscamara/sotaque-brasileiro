@@ -3,7 +3,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MultiCombobox } from "@/components/ui/multi-combobox";
 import { StudentProfileData } from '@/types/profile';
 import { Textarea } from "@/components/ui/textarea";
-import { FormLabel } from "@/components/ui/form";
 
 interface LanguageLearningProps {
   profile: StudentProfileData;
@@ -94,9 +93,9 @@ export const LanguageLearning = ({
         <div className="pb-8 border-b border-border">
           <h3 className="font-medium text-lg">Learning Goals</h3>
           <div className="mt-4">
-            <FormLabel htmlFor="learningGoals" className="sr-only">
+            <label htmlFor="learningGoals" className="sr-only">
               Learning Goals
-            </FormLabel>
+            </label>
             <Textarea
               id="learningGoals"
               value={Array.isArray(formData.learningGoals) ? formData.learningGoals.join('\n') : ''}
@@ -114,9 +113,9 @@ export const LanguageLearning = ({
         <div className="pb-8">
           <h3 className="font-medium text-lg">Motivation</h3>
           <div className="mt-4">
-            <FormLabel htmlFor="motivationForLearning" className="sr-only">
+            <label htmlFor="motivationForLearning" className="sr-only">
               Motivation for Learning
-            </FormLabel>
+            </label>
             <Textarea
               id="motivationForLearning"
               value={formData.motivationForLearning || ''}

@@ -1,12 +1,9 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
-import { PencilLine } from "@phosphor-icons/react";
 import { StudentProfileData } from '@/types/profile';
 import { countries } from '@/data/countries';
-import { FormLabel } from "@/components/ui/form";
 
 interface BasicInfoProps {
   profile: StudentProfileData;
@@ -39,7 +36,7 @@ export const BasicInfo = ({
       <div className="space-y-6 mt-6 divide-y divide-border text-sm">
         {/* First Name */}
         <div className="sm:items-start sm:gap-4 sm:grid sm:grid-cols-3 pt-6">
-          <FormLabel className="sm:pt-1.5">First Name</FormLabel>
+          <label htmlFor="firstName" className="sm:pt-1.5 font-medium">First Name</label>
           <div className="sm:col-span-2 mt-2 sm:mt-0">
             <Input
               type="text"
@@ -55,7 +52,7 @@ export const BasicInfo = ({
 
         {/* Last Name */}
         <div className="sm:items-start sm:gap-4 sm:grid sm:grid-cols-3 pt-6">
-          <FormLabel className="sm:pt-1.5">Last Name</FormLabel>
+          <label htmlFor="lastName" className="sm:pt-1.5 font-medium">Last Name</label>
           <div className="sm:col-span-2 mt-2 sm:mt-0">
             <Input
               type="text"
@@ -71,7 +68,7 @@ export const BasicInfo = ({
 
         {/* Email */}
         <div className="sm:items-start sm:gap-4 sm:grid sm:grid-cols-3 pt-6">
-          <FormLabel className="sm:pt-1.5">Email</FormLabel>
+          <label htmlFor="email" className="sm:pt-1.5 font-medium">Email</label>
           <div className="sm:col-span-2 mt-2 sm:mt-0">
             <Input
               type="email"
@@ -89,13 +86,13 @@ export const BasicInfo = ({
 
         {/* Gender */}
         <div className="sm:items-start sm:gap-4 sm:grid sm:grid-cols-3 pt-6">
-          <FormLabel className="sm:pt-1.5">Gender</FormLabel>
+          <label htmlFor="gender" className="sm:pt-1.5 font-medium">Gender</label>
           <div className="sm:col-span-2 mt-2 sm:mt-0">
             <Select
               value={formData.gender || ''}
               onValueChange={(value) => onFieldChange('gender', value)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="gender" className="w-full">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
@@ -111,7 +108,7 @@ export const BasicInfo = ({
 
         {/* Country */}
         <div className="sm:items-start sm:gap-4 sm:grid sm:grid-cols-3 pt-6">
-          <FormLabel className="sm:pt-1.5">Country</FormLabel>
+          <label htmlFor="country" className="sm:pt-1.5 font-medium">Country</label>
           <div className="sm:col-span-2 mt-2 sm:mt-0">
             <Combobox
               options={countries}
