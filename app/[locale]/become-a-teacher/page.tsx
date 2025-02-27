@@ -10,9 +10,9 @@ import { useEffect } from "react";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
+import { getStudent } from "@/app/actions/students";
+import { getUser } from "@/app/actions/users";
 import { useTranslations } from "next-intl";
-import useUserApi from "@/hooks/useUserApi";
 
 export default function BecomeATeacher() {
     const router = useRouter();
@@ -20,9 +20,8 @@ export default function BecomeATeacher() {
     const t = useTranslations("auth.sign-up");
     const sectionRef = useRef<HTMLElement>(null);
     const isInView = useInView(sectionRef, { once: true });
-    const { getUser } = useUserApi();
-    const { getStudent } = useStudentApi();
     const supabase = createClient();
+
     // Check user authentication status and redirect if needed
     useEffect(() => {
         const checkUser = async (): Promise<void> => {
@@ -51,7 +50,7 @@ export default function BecomeATeacher() {
         };
 
         checkUser();
-    }, [getStudent, getUser, router, supabase.auth]);
+    }, [router, supabase.auth]);
 
     return (
         <motion.section
