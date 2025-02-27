@@ -1,0 +1,60 @@
+services:
+  # Next.js application in development mode
+  app:
+    container_name: sotaque-brasileiro-app-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker.development
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    networks:
+      - app-network
+      - supabase_network
+    depends_on:
+      - db
+    command: pnpm dev
+    extra_hosts:
+      # This allows the container to access the host machine's localhost
+      # Needed for connecting to Supabase running on the host
+      - "host.docker.internal:host-gateway"
+      
+  # Database service (PostgreSQL for Supabase)
+  db:
+    container_name: sotaque-brasileiro-db-dev
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres-data-dev:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+  # External network to connect to Supabase
+  supabase_network:
+    external: true
+    name: supabase_network_dev
+
+volumes:
+  postgres-data-dev:
+    driver: local 
