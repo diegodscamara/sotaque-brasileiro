@@ -424,7 +424,86 @@
             "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule"
         }
     },
-    "dashboard": {},
+    "student": {
+        "onboarding": {
+            "stepper": {
+                "stepLabel": "Step {step}",
+                "step1": "Set up your profile",
+                "step2": "Book your first class",
+                "step3": "Choose your plan and pay"
+            },
+            "comingSoon": {
+                "title": "Coming Soon",
+                "message": "We're working on this feature. It will be available soon. Please continue to the next step."
+            },
+            "step1": {
+                "step": "STEP 1",
+                "title": "Set up your profile",
+                "forms": {
+                    "personalDetails": {
+                        "title": "Personal details",
+                        "subtitle": "Tell us a bit about yourself so we can tailor your learning experience.",
+                        "firstNameLabel": "First name",
+                        "firstNamePlaceholder": "John",
+                        "firstNameError": "First name is required",
+                        "lastNameLabel": "Last name",
+                        "lastNamePlaceholder": "Doe",
+                        "lastNameError": "Last name is required",
+                        "emailLabel": "Email",
+                        "emailPlaceholder": "john.doe@example.com",
+                        "emailError": "Email is required",
+                        "timezoneLabel": "Timezone",
+                        "timezonePlaceholder": "Choose your timezone",
+                        "timezoneError": "Timezone is required",
+                        "countryLabel": "Country",
+                        "countryPlaceholder": "Choose your country",
+                        "countryError": "Country is required",
+                        "genderLabel": "Gender",
+                        "genderPlaceholder": "Choose your gender",
+                        "genderError": "Gender is required"
+                    },
+                    "learningPreferences": {
+                        "title": "Learning preferences",
+                        "subtitle": "We want your learning to be as effective as possible. Please share your learning preferences.",
+                        "portugueseLevelLabel": "Portuguese level",
+                        "portugueseLevelPlaceholder": "Choose your Portuguese level",
+                        "portugueseLevelError": "Portuguese level is required",
+                        "nativeLanguageLabel": "Native language",
+                        "nativeLanguagePlaceholder": "Choose your native language",
+                        "nativeLanguageError": "Native language is required",
+                        "learningGoalsLabel": "Learning goals",
+                        "learningGoalsPlaceholder": "Choose your learning goals",
+                        "learningGoalsError": "Learning goals are required",
+                        "otherLanguagesLabel": "Other languages you speak",
+                        "otherLanguagesPlaceholder": "Choose your other languages",
+                        "otherLanguagesError": "Other languages is required"
+                    }
+                },
+                "dataPrivacy": {
+                    "text": "Your privacy matters to us. We'll only use your info to tailor your learning journey and won't share it without your say-so. Curious? Check out our",
+                    "link": "/privacy-policy",
+                    "linkText": "Privacy Policy"
+                },
+                "formActions": {
+                    "back": "Back",
+                    "next": "Next Step",
+                    "submit": "Submit",
+                    "cancel": "Cancel",
+                    "loading": "Loading..."
+                }
+            }
+        },
+        "step2": {
+            "step": "STEP 2",
+            "title": "Choose Your Package",
+            "subtitle": "Select the package that best fits your learning goals and schedule."
+        },
+        "step3": {
+            "step": "STEP 3",
+            "title": "Confirm Your Details",
+            "subtitle": "Review and confirm your information before finalizing your registration."
+        }
+    },
     "auth": {
         "sign-in": {
             "title": "Welcome back",
@@ -504,7 +583,11 @@
             "cancel": "Cancel",
             "delete": "Delete",
             "sign-in": "Sign In",
-            "sign-up": "Sign Up"
+            "sign-up": "Sign Up",
+            "loading": "Loading...",
+            "back": "Back",
+            "continue": "Continue",
+            "finish": "Finish"
         },
         "nav-user": {
             "profile": "Profile",
