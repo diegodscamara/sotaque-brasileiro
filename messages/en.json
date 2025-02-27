@@ -481,6 +481,19 @@
             "seoDescription": "Join Sotaque Brasileiro as a teacher and share your expertise in Brazilian Portuguese. Help students achieve their language goals through personalized, culturally immersive lessons.",
             "ogImageAlt": "Become a Portuguese teacher at Sotaque Brasileiro",
             "keywords": "teach portuguese, brazilian portuguese teacher, language teaching, online teaching, native instructors, cultural education, teaching opportunities, language education"
+        },
+        "forgot-password": {
+            "title": "Reset your password",
+            "subtitle": "Enter your email below to receive a password reset link",
+            "description": "We'll send you an email with instructions to reset your password.",
+            "email": "Email",
+            "emailPlaceholder": "you@example.com",
+            "resetPassword": "Send reset link",
+            "backToSignIn": "Back to sign in",
+            "checkEmail": "Check your email for a link to reset your password.",
+            "seoDescription": "Reset your password for Sotaque Brasileiro to regain access to your account.",
+            "ogImageAlt": "Reset password for Sotaque Brasileiro",
+            "keywords": "reset password, forgot password, password recovery, sotaque brasileiro"
         }
     },
     "shared": {
@@ -516,6 +529,24 @@
         "errors": {
             "general": "Something went wrong"
         }
+    },
+    "errors": {
+        "general": "Something went wrong",
+        "invalidEmail": "Invalid email",
+        "invalidPassword": "Invalid password",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "passwordStrength": "Password strength",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required",
+        "repeatPasswordRequired": "Repeat password is required",
+        "emailAlreadyInUse": "Email already in use",
+        "passwordTooShort": "Password must be at least 8 characters long",
+        "emailInvalid": "Invalid email",
+        "passwordInvalid": "Invalid password",
+        "unknownError": "An unknown error occurred",
+        "resetPassword": "Reset Password"
     },
     "index": {
         "title": "Hello world!"

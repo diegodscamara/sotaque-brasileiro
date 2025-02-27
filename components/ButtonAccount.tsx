@@ -9,8 +9,8 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import apiClient from "@/libs/api";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
-import useTeacherApi from "@/hooks/useTeacherApi";
+import { getStudent } from "@/app/actions/students";
+import { getTeacher } from "@/app/actions/teachers";
 import { useTranslations } from "next-intl";
 
 // Extend the Supabase User type
@@ -22,7 +22,13 @@ interface User extends SupabaseUser {
 
 interface UserData {
   id: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
   hasAccess?: boolean;
+  packageName?: string;
+  role?: string;
 }
 
 /**
@@ -34,33 +40,29 @@ const ButtonAccount = () => {
   const supabase = createClient();
   const router = useRouter();
   const t = useTranslations('shared.nav-user');
-  const { getStudent } = useStudentApi();
-  const { getTeacher } = useTeacherApi();
-
-  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [profile, setProfile] = useState<UserData | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
 
   const fetchUser = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
+    const { data: userData } = await supabase.auth.getUser();
+    setUser(userData.user);
+
+    if (userData.user?.id) {
+      const studentData = await getStudent(userData.user.id);
+      if (studentData) {
+        setProfile(studentData as unknown as UserData);
+        setHasAccess(studentData.hasAccess || false);
+      } else {
+        const teacherData = await getTeacher(userData.user.id);
+        if (teacherData) {
+          setProfile(teacherData as unknown as UserData);
+        }
+      }
+    }
   }, [supabase]);
 
-  const fetchUserData = useCallback(async () => {
-    if (!user?.id) return;
-
-    const studentData = await getStudent(user.id);
-    setUserData(studentData || await getTeacher(user.id));
-  }, [user?.id, getStudent, getTeacher]);
-
-  const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-    window.location.reload();
-  }, [supabase, router]);
-
   const handleBilling = useCallback(async () => {
-    setIsLoading(true);
     try {
       const { url }: { url: string } = await apiClient.post(
         "/stripe/create-portal",
@@ -72,10 +74,41 @@ const ButtonAccount = () => {
       router.push(url);
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsLoading(false);
     }
   }, [router]);
+
+  const handleSignOut = useCallback(async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  }, [supabase, router]);
+
+  const handleUpgrade = useCallback(async () => {
+    try {
+      const { url }: { url: string } = await apiClient.post(
+        "/stripe/create-checkout",
+        {
+          priceId:
+            profile?.packageName === "Explorer" ||
+            profile?.packageName === "Enthusiast"
+              ? config.stripe.plans.find(
+                  (plan: { name: string; interval: string }) => 
+                    plan.name === "Master" && plan.interval === "monthly"
+                )?.priceId
+              : config.stripe.plans.find(
+                  (plan: { name: string; interval: string }) =>
+                    plan.name === "Enthusiast" && plan.interval === "monthly"
+                )?.priceId,
+          successUrl: window.location.href + "/dashboard",
+          cancelUrl: window.location.href,
+          mode: "subscription",
+        }
+      );
+
+      router.push(url);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [profile, router]);
 
   const avatarFallback = useMemo(() => user?.email?.charAt(0).toUpperCase() || "", [user?.email]);
 
@@ -83,15 +116,9 @@ const ButtonAccount = () => {
     fetchUser();
   }, [fetchUser]);
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchUserData();
-    }
-  }, [user?.id, fetchUserData]);
-
   return (
-    <DropdownMenu aria-label={t('accountMenu')} aria-busy={isLoading} aria-live="polite" aria-atomic={true}>
-      <DropdownMenuTrigger className="rounded-full hover:scale-105 transition-transform duration-200" aria-label={t('accountMenu')} aria-haspopup="dialog" aria-expanded={true} aria-controls="account-menu" role="button" tabIndex={0} aria-busy={isLoading}>
+    <DropdownMenu aria-label={t('accountMenu')} aria-busy={false} aria-live="polite" aria-atomic={true}>
+      <DropdownMenuTrigger className="rounded-full hover:scale-105 transition-transform duration-200" aria-label={t('accountMenu')} aria-haspopup="dialog" aria-expanded={true} aria-controls="account-menu" role="button" tabIndex={0} aria-busy={false}>
         <Avatar>
           <AvatarImage
             src={user?.avatarUrl}
@@ -106,11 +133,8 @@ const ButtonAccount = () => {
           />
           <AvatarFallback className="bg-gray-200 dark:bg-gray-600" aria-hidden="true">{avatarFallback}</AvatarFallback>
         </Avatar>
-        {isLoading && (
-          <span className="loading loading-spinner loading-xs" aria-hidden="true" aria-label={t('loading')} aria-busy={true} />
-        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white dark:bg-gray-700 rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56 transition-opacity duration-200" side="bottom" align="end" aria-label={t('accountMenu')} aria-busy={isLoading}>
+      <DropdownMenuContent className="bg-white dark:bg-gray-700 rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56 transition-opacity duration-200" side="bottom" align="end" aria-label={t('accountMenu')} aria-busy={false}>
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
             <Avatar className="rounded-lg w-8 h-8">
@@ -127,7 +151,7 @@ const ButtonAccount = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup aria-label={t('accountMenu')}>
-          {userData?.hasAccess && (
+          {hasAccess && (
             <DropdownMenuItem
               className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
               onClick={handleBilling}

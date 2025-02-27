@@ -2,7 +2,8 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import React, { JSX } from "react";
+import { validateEmail, validatePassword } from "@/libs/utils/validation";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -10,39 +11,90 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import React from "react";
 import { createClient } from "@/libs/supabase/client";
+import { getStudent } from "@/app/actions/students";
+import { getUser } from "@/app/actions/users";
 import logo from "@/app/icon.png";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-export default function SignIn() {
+/**
+ * SignIn component handles user authentication and sign-in functionality
+ * @returns {JSX.Element} The SignIn form component
+ */
+export default function SignIn(): JSX.Element {
+  // Translations
   const t = useTranslations("auth.sign-in");
   const tShared = useTranslations("shared");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const tErrors = useTranslations("errors");
+
+  // Form state
+  const [formData, setFormData] = React.useState({
+    email: "",
+    password: "",
+    showPassword: false,
+  });
+
+  // UI state
+  const [loading, setLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState<{
+    email?: string;
+    password?: string;
+    general?: string;
+  }>({});
+
+  // Hooks
   const router = useRouter();
   const supabase = createClient();
-  const sectionRef = useRef(null);
+  const sectionRef = React.useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true });
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) router.push("/dashboard");
-    };
-    checkUser();
-  }, [router, supabase.auth]);
+  /**
+   * Handles input change events
+   */
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: undefined }));
+  };
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  /**
+   * Toggles password visibility
+   */
+  const togglePasswordVisibility = (): void => {
+    setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }));
+  };
+
+  /**
+   * Validates form inputs
+   */
+  const validateForm = (): boolean => {
+    const newErrors: typeof errors = {};
+
+    if (!validateEmail(formData.email)) {
+      newErrors.email = tErrors("invalidEmail");
+    }
+
+    if (!validatePassword(formData.password)) {
+      newErrors.password = tErrors("invalidPassword");
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  /**
+   * Handles form submission
+   */
+  const handleSignIn = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     setLoading(true);
-    setError(null);
+    setErrors({});
 
     try {
       const response = await fetch('/api/auth/callback', {
@@ -50,22 +102,58 @@ export default function SignIn() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, signIn: true }),
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password,
+          signIn: true
+        }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || "An unknown error occurred");
+      if (!result.success) {
+        setErrors({ general: result.error || tErrors("unknownError") });
       } else {
-        router.push(data.redirectUrl);
+        router.push(result.redirectUrl || '/dashboard');
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
+      setErrors({
+        general: error instanceof Error ? error.message : tErrors("unknownError")
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  // Check user authentication status and redirect if needed
+  React.useEffect(() => {
+    const checkUser = async (): Promise<void> => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const role = user.user_metadata?.role;
+        const userData = await getUser(user.id);
+
+        if (!userData) return;
+
+        switch (role) {
+          case "ADMIN":
+            router.push("/admin");
+            break;
+          case "TEACHER":
+            router.push("/dashboard");
+            break;
+          case "STUDENT": {
+            const studentData = await getStudent(user.id);
+            router.push(studentData?.hasAccess ? "/dashboard" : "/#pricing");
+            break;
+          }
+        }
+      }
+    };
+
+    checkUser();
+  }, [router, supabase.auth]);
 
   return (
     <motion.section
@@ -125,10 +213,17 @@ export default function SignIn() {
                     autoComplete="email"
                     type="email"
                     placeholder={t("emailPlaceholder")}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleInputChange}
                     required
+                    aria-invalid={errors.email ? "true" : undefined}
+                    aria-errormessage={errors.email ? "email-error" : undefined}
                   />
+                  {errors.email && (
+                    <div id="email-error" role="alert" className="text-red-500 text-sm">
+                      {errors.email}
+                    </div>
+                  )}
                 </div>
                 <div className="gap-2 grid">
                   <div className="flex flex-row flex-wrap justify-between items-center gap-2">
@@ -143,21 +238,23 @@ export default function SignIn() {
                       id="password"
                       name="password"
                       autoComplete="current-password"
-                      type={showPassword ? "text" : "password"}
+                      type={formData.showPassword ? "text" : "password"}
                       placeholder={t("passwordPlaceholder")}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={formData.password}
+                      onChange={handleInputChange}
                       required
+                      aria-invalid={errors.password ? "true" : undefined}
+                      aria-errormessage={errors.password ? "password-error" : undefined}
                     />
-                    {password && (
-                      <button type="button" className="top-1/2 right-2 absolute -translate-y-1/2 transform" onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+                    {formData.password && (
+                      <button type="button" className="top-1/2 right-2 absolute -translate-y-1/2 transform" onClick={togglePasswordVisibility}>
+                        {formData.showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
                       </button>
                     )}
                   </div>
-                  {error && (
-                    <div className="text-red-500 text-sm">
-                      {error}
+                  {errors.password && (
+                    <div id="password-error" role="alert" className="text-red-500 text-sm">
+                      {errors.password}
                     </div>
                   )}
                 </div>

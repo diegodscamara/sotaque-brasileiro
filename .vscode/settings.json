@@ -1,6 +1,6 @@
 {
   "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
   "deno.enablePaths": [
     "supabase/functions"

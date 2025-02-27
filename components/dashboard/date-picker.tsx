@@ -25,6 +25,7 @@ const validateAndSanitizeDate = (date: Date | null): Date | null => {
 interface DatePickerTimeExampleProps {
     value: Date | null;
     setValue: (value: Date | null) => void;
+    disabled?: boolean;
 }
 
 /**
@@ -32,7 +33,7 @@ interface DatePickerTimeExampleProps {
  * @param {DatePickerTimeExampleProps} props - The component props.
  * @returns {JSX.Element} - The rendered component.
  */
-export const DatePickerTimeExample = ({ value, setValue }: DatePickerTimeExampleProps): JSX.Element => {
+export const DatePickerTimeExample = ({ value, setValue, disabled }: DatePickerTimeExampleProps): JSX.Element => {
     const presets = React.useMemo(() => [
         { label: "Today", date: new Date() },
         { label: "Tomorrow", date: new Date(new Date().setDate(new Date().getDate() + 1)) },
@@ -57,6 +58,7 @@ export const DatePickerTimeExample = ({ value, setValue }: DatePickerTimeExample
                             const sanitizedDate = validateAndSanitizeDate(date);
                             setValue(sanitizedDate);
                         }}
+                        disabled={disabled}
                     />
                 </div>
             </div>

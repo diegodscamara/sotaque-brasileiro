@@ -17,11 +17,10 @@ import config from "@/config";
 import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { useSearchParams } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
+import { getStudent } from "@/app/actions/students";
 import { useTranslations } from "next-intl";
 
 const Header = () => {
-  const { getStudent } = useStudentApi();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
@@ -45,7 +44,7 @@ const Header = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    const getUser = async () => {
+    const fetchUserData = async () => {
       try {
         const { data: { user } } = await createClient().auth.getUser();
 
@@ -61,8 +60,8 @@ const Header = () => {
       }
     };
 
-    getUser();
-  }, [getStudent]);
+    fetchUserData();
+  }, []);
 
   const links = [
     { href: t("nav.featuresLink"), label: t("nav.features") },

@@ -481,6 +481,19 @@
             "seoDescription": "Junte-se ao Sotaque Brasileiro como professor e compartilhe sua experiência em português brasileiro. Ajude os alunos a alcançarem seus objetivos linguísticos através de aulas personalizadas e culturalmente imersivas.",
             "ogImageAlt": "Torne-se um professor de português no Sotaque Brasileiro",
             "keywords": "ensinar português, professor de português brasileiro, ensino de idiomas, ensino online, instrutores nativos, educação cultural, oportunidades de ensino, educação linguística"
+        },
+        "forgot-password": {
+            "title": "Redefina sua senha",
+            "subtitle": "Digite seu e-mail abaixo para receber um link para redefinir sua senha",
+            "description": "Veremos um e-mail com instruções para redefinir sua senha.",
+            "email": "E-mail",
+            "emailPlaceholder": "você@exemplo.com",
+            "resetPassword": "Enviar link de redefinição",
+            "backToSignIn": "Voltar para o login",
+            "checkEmail": "Revise seu e-mail para um link para redefinir sua senha.",
+            "seoDescription": "Redefina sua senha para o Sotaque Brasileiro para recuperar acesso à sua conta.",
+            "ogImageAlt": "Redefina sua senha para o Sotaque Brasileiro",
+            "keywords": "redefinir senha, esqueceu sua senha, recuperação de senha, português brasileiro"
         }
     },
     "shared": {
@@ -516,6 +529,24 @@
         "errors": {
             "general": "Algo deu errado"
         }
+    },
+    "errors": {
+        "general": "Algo deu errado",
+        "invalidEmail": "Email inválido",
+        "invalidPassword": "Senha inválida",
+        "passwordsDoNotMatch": "As senhas não coincidem",
+        "passwordStrength": "Força da senha",
+        "showPassword": "Mostrar senha",
+        "hidePassword": "Ocultar senha",
+        "emailRequired": "Email é obrigatório",
+        "passwordRequired": "Senha é obrigatória",
+        "repeatPasswordRequired": "Repita a senha é obrigatória",
+        "emailAlreadyInUse": "Email já em uso",
+        "passwordTooShort": "A senha deve conter pelo menos 8 caracteres",
+        "emailInvalid": "Email inválido",
+        "passwordInvalid": "Senha inválida",
+        "unknownError": "Um erro desconhecido ocorreu",
+        "resetPassword": "Redefinir senha"
     },
     "index": {
         "title": "Olá, mundo!"

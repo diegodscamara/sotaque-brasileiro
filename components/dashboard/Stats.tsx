@@ -2,12 +2,14 @@
 
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Clock, CreditCard, Trophy } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import { Button } from "../ui/button";
 import Link from "next/link";
 import React from "react";
-import { useSupabase } from "@/hooks/useSupabase";
+import { createClient } from "@/libs/supabase/client";
+import { getStudent } from "@/app/actions/students";
+import { fetchClasses } from "@/app/actions/classes";
 
 const cardConfigs: CardConfig[] = [
   {
@@ -56,84 +58,110 @@ function StatsCard({
   isLoading: boolean;
   dashboardStats: DashboardStats;
 }) {
+  const value = dashboardStats[config.statKey];
+
   return (
-    <Card className="flex flex-col justify-between">
-      <CardHeader className="flex flex-row items-center gap-4">
-        <div className="bg-primary/10 p-3 rounded-lg">{config.icon}</div>
-        <div>
-          <p className="text-muted-foreground text-sm">{config.title}</p>
-          <div className="rounded w-1/2 h-6 skeleton">
-            {isLoading ? (
-              <p className="font-semibold text-2xl" />
-            ) : (
-              dashboardStats[config.statKey]
-            )}
-          </div>
+    <Card className="overflow-hidden">
+      <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+        <div className="flex items-center space-x-2">
+          {config.icon}
+          <h3 className="font-medium text-sm">{config.title}</h3>
         </div>
       </CardHeader>
-      <CardFooter>
-        <Button asChild variant="outline">
-          <Link href={config.link}>{config.linkText}</Link>
-        </Button>
+      <div className="p-6 pt-0">
+        {isLoading ? (
+          <div className="bg-muted rounded w-24 h-8 animate-pulse"></div>
+        ) : (
+          <div className="font-bold text-2xl">{value}</div>
+        )}
+      </div>
+      <CardFooter className="bg-muted/50 p-2 border-t">
+        <Link href={config.link} className="w-full">
+          <Button variant="ghost" className="justify-center w-full">
+            {config.linkText}
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );
 }
 
 export default function Stats() {
-  const { supabase } = useSupabase();
-  const [dashboardStats, setDashboardStats] = useState({
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
     credits: 0,
     scheduledClasses: 0,
     completedClasses: 0,
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
+    setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      
+      if (!user) {
+        console.error("User not authenticated");
+        return;
+      }
 
-      // Fetch profile for credits
-      const { data: profile } = await supabase
-        .from("Student")
-        .select("credits")
-        .eq("userId", user.id)
-        .single();
-
-      // Count scheduled classes
-      const { count: scheduledCount } = await supabase
-        .from("Class")
-        .select("*", { count: "exact", head: true })
-        .eq("studentId", user.id)
-        .eq("status", "scheduled");
-
-      // Count completed classes
-      const { count: completedCount } = await supabase
-        .from("Class")
-        .select("*", { count: "exact", head: true })
-        .eq("studentId", user.id)
-        .eq("status", "completed");
+      // Fetch student data to get credits
+      const studentData = await getStudent(user.id);
+      
+      // Fetch classes to count scheduled and completed
+      const classesResult = await fetchClasses({});
+      const classes = classesResult.data || [];
+      
+      // Use type assertion to avoid type errors
+      const scheduledClasses = classes.filter(
+        (c) => (c.status as string).toLowerCase() === 'scheduled' || (c.status as string).toLowerCase() === 'pending'
+      ).length;
+      
+      const completedClasses = classes.filter(
+        (c) => (c.status as string).toLowerCase() === 'completed'
+      ).length;
 
       setDashboardStats({
-        credits: profile?.credits || 0,
-        scheduledClasses: scheduledCount || 0,
-        completedClasses: completedCount || 0,
+        credits: studentData?.credits || 0,
+        scheduledClasses,
+        completedClasses,
       });
-      setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error("Error fetching dashboard stats:", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     fetchStats();
 
+    // Set up real-time subscriptions
     const setupSubscriptions = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (!user) return;
 
-      const classesChannel = supabase.channel('stats-classes-changes')
+      // Subscribe to changes in the student table
+      const studentSubscription = supabase
+        .channel('student-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'students',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            fetchStats();
+          }
+        )
+        .subscribe();
+
+      // Subscribe to changes in the classes table
+      const classesSubscription = supabase
+        .channel('classes-changes')
         .on(
           'postgres_changes',
           {
@@ -148,38 +176,26 @@ export default function Stats() {
         )
         .subscribe();
 
-      const studentsChannel = supabase.channel('stats-students-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'students',
-            filter: `id=eq.${user.id}`,
-          },
-          () => {
-            fetchStats();
-          }
-        )
-        .subscribe();
-
+      // Cleanup function
       return () => {
-        supabase.removeChannel(classesChannel);
-        supabase.removeChannel(studentsChannel);
+        studentSubscription.unsubscribe();
+        classesSubscription.unsubscribe();
       };
     };
 
     const cleanup = setupSubscriptions();
     return () => {
-      cleanup.then(cleanupFn => cleanupFn?.());
+      cleanup.then(unsub => {
+        if (unsub) unsub();
+      });
     };
-  }, [supabase]);
+  }, [fetchStats, supabase]);
 
   return (
     <>
       {cardConfigs.map((config) => (
         <StatsCard
-          key={config.title}
+          key={config.statKey}
           config={config}
           isLoading={isLoading}
           dashboardStats={dashboardStats}

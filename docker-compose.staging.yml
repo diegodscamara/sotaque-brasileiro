@@ -1,0 +1,44 @@
+services:
+  # Next.js application in staging environment
+  app:
+    container_name: sotaque-brasileiro-app-staging
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker.staging
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    networks:
+      - app-network
+    depends_on:
+      - db
+      
+  # Database service (PostgreSQL for Supabase)
+  db:
+    container_name: sotaque-brasileiro-db-staging
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres-data-staging:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data-staging:
+    driver: local 

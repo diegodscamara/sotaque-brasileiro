@@ -37,8 +37,8 @@ import apiClient from "@/libs/api"
 import config from "@/config"
 import { createClient } from "@/libs/supabase/client"
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
-import useTeacherApi from "@/hooks/useTeacherApi";
+import { getStudent } from "@/app/actions/students";
+import { getTeacher } from "@/app/actions/teachers";
 import { useTranslations } from "next-intl";
 
 export function NavUser() {
@@ -48,8 +48,6 @@ export function NavUser() {
   const supabase = createClient()
   const [hasAccess, setHasAccess] = useState<boolean>(false);
   const router = useRouter();
-  const { getStudent } = useStudentApi();
-  const { getTeacher } = useTeacherApi();
   const t = useTranslations('shared.nav-user');
 
   useEffect(() => {
@@ -57,19 +55,21 @@ export function NavUser() {
       const { data: userData } = await supabase.auth.getUser();
       setUser(userData.user);
 
-      const studentData = await getStudent(userData.user?.id);
-      if (studentData) {
-        setProfile(studentData);
-        setHasAccess(studentData.hasAccess);
-      } else {
-        const teacherData = await getTeacher(userData.user?.id);
-        if (teacherData) {
-          setProfile(teacherData);
+      if (userData.user?.id) {
+        const studentData = await getStudent(userData.user.id);
+        if (studentData) {
+          setProfile(studentData);
+          setHasAccess(studentData.hasAccess);
+        } else {
+          const teacherData = await getTeacher(userData.user.id);
+          if (teacherData) {
+            setProfile(teacherData);
+          }
         }
       }
     }
     fetchUser();
-  }, [supabase, getStudent, getTeacher]);
+  }, [supabase]);
 
   const handleBilling = async () => {
     try {
