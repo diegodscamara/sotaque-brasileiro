@@ -10,18 +10,16 @@ import { useEffect } from "react";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import useStudentApi from "@/hooks/useStudentApi";
+import { getStudent } from "@/app/actions/students";
+import { getUser } from "@/app/actions/users";
 import { useTranslations } from "next-intl";
-import useUserApi from "@/hooks/useUserApi";
 
 export default function ForgotPassword() {
+  const router = useRouter();
+  const supabase = createClient();
   const tShared = useTranslations("shared");
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true });
-  const supabase = createClient();
-  const { getStudent } = useStudentApi();
-  const { getUser } = useUserApi();
-  const router = useRouter();
 
   // Check user authentication status and redirect if needed
   useEffect(() => {
@@ -51,7 +49,7 @@ export default function ForgotPassword() {
     };
 
     checkUser();
-  }, [getStudent, getUser, router, supabase.auth]);
+  }, [router, supabase.auth]);
 
   return (
     <motion.section
