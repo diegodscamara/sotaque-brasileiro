@@ -66,7 +66,7 @@ export async function signIn(email: string, password: string) {
       });
       
       if (student && !student.hasCompletedOnboarding) {
-        redirectUrl = "/onboarding";
+        redirectUrl = "/student/onboarding";
       } else if (student && !student.hasAccess) {
         redirectUrl = "/#pricing";
       }

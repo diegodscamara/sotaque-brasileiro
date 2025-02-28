@@ -550,5 +550,61 @@
     },
     "index": {
         "title": "Bonjour le monde !"
+    },
+    "student": {
+        "onboarding": {
+            "stepper": {
+                "stepLabel": "Étape {step}",
+                "step1": "Configurez votre profil",
+                "step2": "Réservez votre premier cours",
+                "step3": "Choisissez votre forfait et payez",
+                "progress": "Étape {current} sur {total}"
+            },
+            "comingSoon": {
+                "title": "Bientôt disponible",
+                "message": "Nous travaillons sur cette fonctionnalité. Elle sera bientôt disponible. Veuillez passer à l'étape suivante."
+            },
+            "step1": {
+                "step": "ÉTAPE 1",
+                "title": "Informations Personnelles",
+                "subtitle": "Faisons connaissance",
+                "forms": {
+                    "requiredField": "Ce champ est obligatoire",
+                    "personalDetails": {
+                        "title": "Données Personnelles",
+                        "subtitle": "Parlez-nous un peu de vous pour personnaliser votre expérience",
+                        "firstNameLabel": "Prénom",
+                        "firstNamePlaceholder": "Entrez votre prénom",
+                        "lastNameLabel": "Nom",
+                        "lastNamePlaceholder": "Entrez votre nom",
+                        "emailLabel": "Email",
+                        "emailPlaceholder": "Entrez votre email",
+                        "timezoneLabel": "Fuseau horaire",
+                        "timezonePlaceholder": "Sélectionnez votre fuseau horaire",
+                        "timezoneHelp": "Cela nous aide à programmer des cours à des heures qui vous conviennent",
+                        "countryLabel": "Pays",
+                        "countryPlaceholder": "Sélectionnez votre pays",
+                        "genderLabel": "Genre",
+                        "genderPlaceholder": "Sélectionnez votre genre (facultatif)",
+                        "genderHelp": "Cette information nous aide à comprendre la démographie de nos étudiants"
+                    },
+                    "learningPreferences": {
+                        "title": "Préférences d'Apprentissage",
+                        "subtitle": "Aidez-nous à comprendre vos objectifs et votre expérience linguistique",
+                        "portugueseLevelLabel": "Niveau de Portugais",
+                        "portugueseLevelPlaceholder": "Sélectionnez votre niveau actuel",
+                        "portugueseLevelHelp": "Soyez honnête sur votre niveau actuel afin que nous puissions vous proposer les cours adaptés",
+                        "nativeLanguageLabel": "Langue Maternelle",
+                        "nativeLanguagePlaceholder": "Sélectionnez votre langue maternelle",
+                        "learningGoalsLabel": "Objectifs d'Apprentissage",
+                        "learningGoalsPlaceholder": "Sélectionnez vos objectifs d'apprentissage",
+                        "learningGoalsHelp": "Qu'espérez-vous accomplir en apprenant le portugais ?",
+                        "otherLanguagesLabel": "Autres Langues",
+                        "otherLanguagesPlaceholder": "Sélectionnez les autres langues que vous parlez",
+                        "otherLanguagesHelp": "Cela nous aide à comprendre votre expérience en apprentissage des langues"
+                    }
+                }
+            }
+        }
     }
 }

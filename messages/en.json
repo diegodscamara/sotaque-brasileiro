@@ -424,7 +424,89 @@
             "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule"
         }
     },
-    "dashboard": {},
+    "student": {
+        "onboarding": {
+            "stepper": {
+                "stepLabel": "Step {step}",
+                "step1": "Set up your profile",
+                "step2": "Book your first class",
+                "step3": "Choose your plan and pay",
+                "progress": "Step {current} of {total}"
+            },
+            "comingSoon": {
+                "title": "Coming Soon",
+                "message": "We're working on this feature. It will be available soon. Please continue to the next step."
+            },
+            "step1": {
+                "step": "STEP 1",
+                "title": "Personal Information",
+                "subtitle": "Let's get to know you better",
+                "forms": {
+                    "requiredField": "This field is required",
+                    "personalDetails": {
+                        "title": "Personal Details",
+                        "subtitle": "Tell us a bit about yourself so we can personalize your experience",
+                        "firstNameLabel": "First Name",
+                        "firstNamePlaceholder": "Enter your first name",
+                        "lastNameLabel": "Last Name",
+                        "lastNamePlaceholder": "Enter your last name",
+                        "emailLabel": "Email",
+                        "emailPlaceholder": "Enter your email",
+                        "timezoneLabel": "Timezone",
+                        "timezonePlaceholder": "Select your timezone",
+                        "timezoneHelp": "This helps us schedule classes at convenient times for you",
+                        "countryLabel": "Country",
+                        "countryPlaceholder": "Select your country",
+                        "genderLabel": "Gender",
+                        "genderPlaceholder": "Select your gender (optional)",
+                        "genderHelp": "This information helps us understand our student demographics"
+                    },
+                    "learningPreferences": {
+                        "title": "Learning Preferences",
+                        "subtitle": "Help us understand your language learning goals and background",
+                        "portugueseLevelLabel": "Portuguese Level",
+                        "portugueseLevelPlaceholder": "Select your current level",
+                        "portugueseLevelHelp": "Be honest about your current level so we can match you with the right classes",
+                        "nativeLanguageLabel": "Native Language",
+                        "nativeLanguagePlaceholder": "Select your native language",
+                        "learningGoalsLabel": "Learning Goals",
+                        "learningGoalsPlaceholder": "Select your learning goals",
+                        "learningGoalsHelp": "What do you hope to achieve by learning Portuguese?",
+                        "otherLanguagesLabel": "Other Languages",
+                        "otherLanguagesPlaceholder": "Select other languages you speak",
+                        "otherLanguagesHelp": "This helps us understand your language learning background"
+                    }
+                },
+                "dataPrivacy": {
+                    "text": "Your privacy matters to us. We'll only use your info to tailor your learning journey and won't share it without your say-so. Curious? Check out our",
+                    "link": "/privacy-policy",
+                    "linkText": "Privacy Policy"
+                },
+                "formActions": {
+                    "back": "Back",
+                    "next": "Next Step",
+                    "submit": "Submit",
+                    "cancel": "Cancel",
+                    "loading": "Loading..."
+                }
+            }
+        },
+        "step2": {
+            "step": "STEP 2",
+            "title": "Choose Your Package",
+            "subtitle": "Select the package that best fits your learning goals and schedule."
+        },
+        "step3": {
+            "step": "STEP 3",
+            "title": "Confirm Your Details",
+            "subtitle": "Review and confirm your information before finalizing your registration."
+        },
+        "seo": {
+            "title": "Sotaque Brasileiro - Learn Portuguese with native instructors",
+            "description": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule"
+        }
+    },
     "auth": {
         "sign-in": {
             "title": "Welcome back",
@@ -504,7 +586,11 @@
             "cancel": "Cancel",
             "delete": "Delete",
             "sign-in": "Sign In",
-            "sign-up": "Sign Up"
+            "sign-up": "Sign Up",
+            "loading": "Loading...",
+            "back": "Back",
+            "continue": "Continue",
+            "finish": "Finish"
         },
         "nav-user": {
             "profile": "Profile",
