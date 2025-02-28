@@ -47,7 +47,7 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="justify-between w-full"
+          className="justify-between w-full truncate text-wrap whitespace-break-spaces"
         >
           {selectedOptions.length > 0
             ? selectedOptions.map(o => o.name).join(", ")
@@ -55,9 +55,9 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
           <ChevronsUpDown className="opacity-50 ml-2 w-4 h-4 shrink-0" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-full">
+      <PopoverContent className="p-0 w-full max-h-96 overflow-y-auto">
         <Command>
-          <CommandInput placeholder="Search..." value={searchTerm} onValueChange={setSearchTerm} />
+          <CommandInput className="bg-transparent border-gray-300 dark:border-gray-500 focus:outline-none focus:ring-1 focus:ring-primary-600 text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 text-sm leading-none" placeholder="Search..." value={searchTerm} onValueChange={setSearchTerm} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
