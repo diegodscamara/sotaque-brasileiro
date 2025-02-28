@@ -430,7 +430,8 @@
                 "stepLabel": "Step {step}",
                 "step1": "Set up your profile",
                 "step2": "Book your first class",
-                "step3": "Choose your plan and pay"
+                "step3": "Choose your plan and pay",
+                "progress": "Step {current} of {total}"
             },
             "comingSoon": {
                 "title": "Coming Soon",
@@ -438,45 +439,42 @@
             },
             "step1": {
                 "step": "STEP 1",
-                "title": "Set up your profile",
+                "title": "Personal Information",
+                "subtitle": "Let's get to know you better",
                 "forms": {
+                    "requiredField": "This field is required",
                     "personalDetails": {
-                        "title": "Personal details",
-                        "subtitle": "Tell us a bit about yourself so we can tailor your learning experience.",
-                        "firstNameLabel": "First name",
-                        "firstNamePlaceholder": "John",
-                        "firstNameError": "First name is required",
-                        "lastNameLabel": "Last name",
-                        "lastNamePlaceholder": "Doe",
-                        "lastNameError": "Last name is required",
+                        "title": "Personal Details",
+                        "subtitle": "Tell us a bit about yourself so we can personalize your experience",
+                        "firstNameLabel": "First Name",
+                        "firstNamePlaceholder": "Enter your first name",
+                        "lastNameLabel": "Last Name",
+                        "lastNamePlaceholder": "Enter your last name",
                         "emailLabel": "Email",
-                        "emailPlaceholder": "john.doe@example.com",
-                        "emailError": "Email is required",
+                        "emailPlaceholder": "Enter your email",
                         "timezoneLabel": "Timezone",
-                        "timezonePlaceholder": "Choose your timezone",
-                        "timezoneError": "Timezone is required",
+                        "timezonePlaceholder": "Select your timezone",
+                        "timezoneHelp": "This helps us schedule classes at convenient times for you",
                         "countryLabel": "Country",
-                        "countryPlaceholder": "Choose your country",
-                        "countryError": "Country is required",
+                        "countryPlaceholder": "Select your country",
                         "genderLabel": "Gender",
-                        "genderPlaceholder": "Choose your gender",
-                        "genderError": "Gender is required"
+                        "genderPlaceholder": "Select your gender (optional)",
+                        "genderHelp": "This information helps us understand our student demographics"
                     },
                     "learningPreferences": {
-                        "title": "Learning preferences",
-                        "subtitle": "We want your learning to be as effective as possible. Please share your learning preferences.",
-                        "portugueseLevelLabel": "Portuguese level",
-                        "portugueseLevelPlaceholder": "Choose your Portuguese level",
-                        "portugueseLevelError": "Portuguese level is required",
-                        "nativeLanguageLabel": "Native language",
-                        "nativeLanguagePlaceholder": "Choose your native language",
-                        "nativeLanguageError": "Native language is required",
-                        "learningGoalsLabel": "Learning goals",
-                        "learningGoalsPlaceholder": "Choose your learning goals",
-                        "learningGoalsError": "Learning goals are required",
-                        "otherLanguagesLabel": "Other languages you speak",
-                        "otherLanguagesPlaceholder": "Choose your other languages",
-                        "otherLanguagesError": "Other languages is required"
+                        "title": "Learning Preferences",
+                        "subtitle": "Help us understand your language learning goals and background",
+                        "portugueseLevelLabel": "Portuguese Level",
+                        "portugueseLevelPlaceholder": "Select your current level",
+                        "portugueseLevelHelp": "Be honest about your current level so we can match you with the right classes",
+                        "nativeLanguageLabel": "Native Language",
+                        "nativeLanguagePlaceholder": "Select your native language",
+                        "learningGoalsLabel": "Learning Goals",
+                        "learningGoalsPlaceholder": "Select your learning goals",
+                        "learningGoalsHelp": "What do you hope to achieve by learning Portuguese?",
+                        "otherLanguagesLabel": "Other Languages",
+                        "otherLanguagesPlaceholder": "Select other languages you speak",
+                        "otherLanguagesHelp": "This helps us understand your language learning background"
                     }
                 },
                 "dataPrivacy": {
@@ -502,6 +500,11 @@
             "step": "STEP 3",
             "title": "Confirm Your Details",
             "subtitle": "Review and confirm your information before finalizing your registration."
+        },
+        "seo": {
+            "title": "Sotaque Brasileiro - Learn Portuguese with native instructors",
+            "description": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule"
         }
     },
     "auth": {

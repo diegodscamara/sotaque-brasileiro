@@ -550,5 +550,61 @@
     },
     "index": {
         "title": "Olá, mundo!"
+    },
+    "student": {
+        "onboarding": {
+            "stepper": {
+                "stepLabel": "Etapa {step}",
+                "step1": "Configure seu perfil",
+                "step2": "Agende sua primeira aula",
+                "step3": "Escolha seu plano e pague",
+                "progress": "Etapa {current} de {total}"
+            },
+            "comingSoon": {
+                "title": "Em breve",
+                "message": "Estamos trabalhando neste recurso. Estará disponível em breve. Por favor, continue para a próxima etapa."
+            },
+            "step1": {
+                "step": "ETAPA 1",
+                "title": "Informações Pessoais",
+                "subtitle": "Vamos conhecer você melhor",
+                "forms": {
+                    "requiredField": "Este campo é obrigatório",
+                    "personalDetails": {
+                        "title": "Dados Pessoais",
+                        "subtitle": "Conte-nos um pouco sobre você para personalizarmos sua experiência",
+                        "firstNameLabel": "Nome",
+                        "firstNamePlaceholder": "Digite seu nome",
+                        "lastNameLabel": "Sobrenome",
+                        "lastNamePlaceholder": "Digite seu sobrenome",
+                        "emailLabel": "Email",
+                        "emailPlaceholder": "Digite seu email",
+                        "timezoneLabel": "Fuso Horário",
+                        "timezonePlaceholder": "Selecione seu fuso horário",
+                        "timezoneHelp": "Isso nos ajuda a agendar aulas em horários convenientes para você",
+                        "countryLabel": "País",
+                        "countryPlaceholder": "Selecione seu país",
+                        "genderLabel": "Gênero",
+                        "genderPlaceholder": "Selecione seu gênero (opcional)",
+                        "genderHelp": "Esta informação nos ajuda a entender a demografia dos nossos alunos"
+                    },
+                    "learningPreferences": {
+                        "title": "Preferências de Aprendizado",
+                        "subtitle": "Ajude-nos a entender seus objetivos e experiência com idiomas",
+                        "portugueseLevelLabel": "Nível de Português",
+                        "portugueseLevelPlaceholder": "Selecione seu nível atual",
+                        "portugueseLevelHelp": "Seja honesto sobre seu nível atual para que possamos combinar você com as aulas certas",
+                        "nativeLanguageLabel": "Língua Nativa",
+                        "nativeLanguagePlaceholder": "Selecione sua língua nativa",
+                        "learningGoalsLabel": "Objetivos de Aprendizado",
+                        "learningGoalsPlaceholder": "Selecione seus objetivos de aprendizado",
+                        "learningGoalsHelp": "O que você espera alcançar ao aprender português?",
+                        "otherLanguagesLabel": "Outros Idiomas",
+                        "otherLanguagesPlaceholder": "Selecione outros idiomas que você fala",
+                        "otherLanguagesHelp": "Isso nos ajuda a entender sua experiência com aprendizado de idiomas"
+                    }
+                }
+            }
+        }
     }
 }
