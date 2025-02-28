@@ -388,7 +388,7 @@ export default function StudentOnboarding(): React.JSX.Element {
             {t("step1.dataPrivacy.text")}{" "}
             <Link
               href={t("step1.dataPrivacy.link")}
-              className="font-medium text-primary hover:underline"
+              className="font-medium text-green-700 hover:text-green-800 dark:hover:text-green-400 dark:text-green-500 hover:underline"
             >
               {t("step1.dataPrivacy.linkText")}
             </Link>
@@ -413,7 +413,7 @@ export default function StudentOnboarding(): React.JSX.Element {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-emerald-600 hover:bg-emerald-700 min-w-[120px]"
+              variant="default"
             >
               {loading ? (
                 <>
