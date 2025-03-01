@@ -63,6 +63,7 @@ export default function LanguageSwitcher(): JSX.Element {
             width={20}
             className="rounded-full"
             aria-hidden="true"
+            alt={currentLanguage.nativeName}
           />
         )}
       </DropdownMenuTrigger>
@@ -87,6 +88,7 @@ export default function LanguageSwitcher(): JSX.Element {
                 width={16}
                 className="rounded-full"
                 aria-hidden="true"
+                alt={nativeName}
               />
               <span className="text-sm">{nativeName}</span>
             </DropdownMenuItem>
