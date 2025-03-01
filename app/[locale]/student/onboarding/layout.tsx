@@ -7,13 +7,13 @@ import { getTranslations } from 'next-intl/server';
 export async function generateMetadata({ params }: { params: { locale: string } }) {
   const awaitedParams = await params;
   const { locale } = awaitedParams;
-  
-  const t = await getTranslations({ locale, namespace: 'auth.sign-in' });
+
+  const t = await getTranslations({ locale, namespace: 'student.seo' });
   const tShared = await getTranslations({ locale, namespace: 'shared' });
 
   return getSEOTags({
     title: `${tShared('appName')} - ${t('title')}`,
-    canonicalUrlRelative: "/auth/signin",
+    canonicalUrlRelative: "/student/onboarding",
     description: t('seoDescription'),
     openGraph: {
       title: `${tShared('appName')} - ${t('title')}`,
@@ -46,12 +46,12 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       site: "@sotaquebrasileiro",
     },
     alternates: {
-      canonical: `/${locale}/signin`,
+      canonical: `/${locale}/student/onboarding`,
       languages: {
-        'en': '/en/auth/signin',
-        'es': '/es/auth/signin',
-        'fr': '/fr/auth/signin',
-        'pt': '/pt/auth/signin',
+        'en': '/en/student/onboarding',
+        'es': '/es/student/onboarding',
+        'fr': '/fr/student/onboarding',
+        'pt': '/pt/student/onboarding',
       },
     },
     robots: {
