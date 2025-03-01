@@ -346,11 +346,11 @@
                 "links": [
                     {
                         "features": {
-                            "name": "Fonctionnalités",
+                            "name": "Caractéristiques",
                             "link": "#features"
                         },
                         "howItWorks": {
-                            "name": "Comment Ça Marche",
+                            "name": "Comment ça marche",
                             "link": "#how-it-works"
                         },
                         "pricing": {
@@ -358,7 +358,7 @@
                             "link": "#pricing"
                         },
                         "faq": {
-                            "name": "FAQ",
+                            "name": "Questions fréquentes",
                             "link": "#faq"
                         }
                     }
@@ -368,25 +368,14 @@
                 "title": "Ressources",
                 "links": [
                     {
-                        "contact": {
-                            "name": "Contact",
-                            "link": "/contact"
+                        "teacher": {
+                            "name": "Devenez Enseignant",
+                            "link": "/become-a-teacher"
                         },
                         "support": {
                             "name": "Support",
                             "link": "/support"
                         },
-                        "teacher": {
-                            "name": "Devenez Enseignant",
-                            "link": "/become-a-teacher"
-                        }
-                    }
-                ]
-            },
-            "legal": {
-                "title": "Légal",
-                "links": [
-                    {
                         "privacy": {
                             "name": "Politique de Confidentialité",
                             "link": "/privacy-policy"
@@ -398,26 +387,7 @@
                     }
                 ]
             },
-            "social": {
-                "title": "Social",
-                "links": [
-                    {
-                        "instagram": {
-                            "name": "Instagram",
-                            "link": "https://www.instagram.com/sotaquebrasileiro/"
-                        },
-                        "facebook": {
-                            "name": "Facebook",
-                            "link": "https://www.facebook.com/sotaquebrasileiro/"
-                        },
-                        "linkedin": {
-                            "name": "LinkedIn",
-                            "link": "https://www.linkedin.com/company/sotaquebrasileiro/"
-                        }
-                    }
-                ]
-            },
-            "copyright": "Copyright © 2024 Sotaque Brasileiro. Tous droits réservés."
+            "copyright": "Droits réservés © 2024 Sotaque Brasileiro."
         },
         "seo": {
             "seoDescription": "Transformez votre portugais avec des cours personnalisés et culturellement immersifs adaptés à votre emploi du temps et à vos objectifs, dispensés par des instructeurs brésiliens natifs.",
@@ -631,9 +601,10 @@
             "subtitle": "Revoyez et confirmez vos informations avant de finaliser votre inscription."
         },
         "seo": {
-            "title": "Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs",
-            "description": "Transformez votre portugais avec des classes personnalisées et culturellement immersives adaptées à votre emploi du temps et à vos objectifs, dispensées par des instructeurs brésiliens natifs.",
-            "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible"
+            "title": "Apprenez le portugais avec des instructeurs natifs",
+            "seoDescription": "Transformez votre portugais avec des classes personnalisées et culturellement immersives adaptées à votre emploi du temps et à vos objectifs, dispensées par des instructeurs brésiliens natifs.",
+            "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible",
+            "ogImageAlt": "Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs"
         }
     }
 }
