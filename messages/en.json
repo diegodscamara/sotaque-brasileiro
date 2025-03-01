@@ -601,12 +601,6 @@
             "loading": "Loading",
             "accountMenu": "Account Menu"
         },
-        "langSwitcher": {
-            "english": "English",
-            "french": "French",
-            "portuguese": "Portuguese",
-            "spanish": "Spanish"
-        },
         "themeToggle": {
             "system": "System Theme",
             "light": "Light Theme",
