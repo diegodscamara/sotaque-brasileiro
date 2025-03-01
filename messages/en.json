@@ -368,25 +368,14 @@
                 "title": "Resources",
                 "links": [
                     {
-                        "contact": {
-                            "name": "Contact",
-                            "link": "/contact"
+                        "teacher": {
+                            "name": "Become a Teacher",
+                            "link": "/become-a-teacher"
                         },
                         "support": {
                             "name": "Support",
                             "link": "/support"
                         },
-                        "teacher": {
-                            "name": "Become a Teacher",
-                            "link": "/become-a-teacher"
-                        }
-                    }
-                ]
-            },
-            "legal": {
-                "title": "Legal",
-                "links": [
-                    {
                         "privacy": {
                             "name": "Privacy Policy",
                             "link": "/privacy-policy"
@@ -394,25 +383,6 @@
                         "terms": {
                             "name": "Terms of Service",
                             "link": "/terms-of-service"
-                        }
-                    }
-                ]
-            },
-            "social": {
-                "title": "Social",
-                "links": [
-                    {
-                        "instagram": {
-                            "name": "Instagram",
-                            "link": "https://www.instagram.com/sotaquebrasileiro/"
-                        },
-                        "facebook": {
-                            "name": "Facebook",
-                            "link": "https://www.facebook.com/sotaquebrasileiro/"
-                        },
-                        "linkedin": {
-                            "name": "LinkedIn",
-                            "link": "https://www.linkedin.com/company/sotaquebrasileiro/"
                         }
                     }
                 ]
