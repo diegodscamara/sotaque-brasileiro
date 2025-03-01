@@ -26,9 +26,10 @@ interface ComboboxProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  ariaLabel?: string;
 }
 
-export function Combobox({ options, value, onChange, placeholder = "Select..." }: ComboboxProps) {
+export function Combobox({ options, value, onChange, placeholder = "Select...", ariaLabel }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -46,6 +47,7 @@ export function Combobox({ options, value, onChange, placeholder = "Select..." }
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-label={ariaLabel || placeholder}
           className="justify-between w-full"
         >
           {value
