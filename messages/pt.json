@@ -515,12 +515,6 @@
             "loading": "Carregando",
             "accountMenu": "Menu da Conta"
         },
-        "langSwitcher": {
-            "english": "Inglês",
-            "french": "Francês",
-            "portuguese": "Português",
-            "spanish": "Espanhol"
-        },
         "themeToggle": {
             "system": "Tema do Sistema",
             "light": "Tema Claro",
