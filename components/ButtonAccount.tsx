@@ -12,7 +12,8 @@ import { useRouter } from "next/navigation";
 import { getStudent } from "@/app/actions/students";
 import { getTeacher } from "@/app/actions/teachers";
 import { useTranslations } from "next-intl";
-
+import { signOut } from "@/app/actions/auth";
+import config from "@/config";
 // Extend the Supabase User type
 interface User extends SupabaseUser {
   avatarUrl?: string; // Add avatarUrl property
@@ -78,9 +79,10 @@ const ButtonAccount = () => {
   }, [router]);
 
   const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  }, [supabase, router]);
+    await signOut();
+    // Force a page reload to clear any cached state
+    window.location.href = '/';
+  }, []);
 
   const handleUpgrade = useCallback(async () => {
     try {
@@ -91,11 +93,11 @@ const ButtonAccount = () => {
             profile?.packageName === "Explorer" ||
             profile?.packageName === "Enthusiast"
               ? config.stripe.plans.find(
-                  (plan: { name: string; interval: string }) => 
+                  (plan) => 
                     plan.name === "Master" && plan.interval === "monthly"
                 )?.priceId
               : config.stripe.plans.find(
-                  (plan: { name: string; interval: string }) =>
+                  (plan) => 
                     plan.name === "Enthusiast" && plan.interval === "monthly"
                 )?.priceId,
           successUrl: window.location.href + "/dashboard",
