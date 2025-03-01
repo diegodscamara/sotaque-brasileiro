@@ -15,7 +15,7 @@ const emailSchema = z.string().email("Please enter a valid email address");
  * @param {string} password - User's password
  * @returns {Promise<{success: boolean, data?: {redirectUrl: string}, error?: string}>}
  */
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, password: string): Promise<{ success: boolean; data?: { redirectUrl: string; }; error?: string; }> {
   try {
     // Validate inputs
     emailSchema.parse(email);
@@ -65,10 +65,12 @@ export async function signIn(email: string, password: string) {
         where: { userId: user.id },
       });
       
-      if (student && !student.hasCompletedOnboarding) {
+      if (student && !student.hasCompletedOnboarding && !student.hasAccess) {
         redirectUrl = "/student/onboarding";
-      } else if (student && !student.hasAccess) {
-        redirectUrl = "/#pricing";
+      } else if (student && student.hasAccess && !student.hasCompletedOnboarding) {
+        redirectUrl = "/student/onboarding";
+      } else if (student && student.hasAccess && student.hasCompletedOnboarding) {
+        redirectUrl = "/dashboard";
       }
     }
 
@@ -96,7 +98,7 @@ export async function signUp(
   email: string,
   password: string,
   role: "STUDENT" | "TEACHER"
-) {
+): Promise<{ success: boolean; data?: { redirectUrl: string; }; error?: string; }> {
   try {
     // Validate inputs
     emailSchema.parse(email);
@@ -177,7 +179,7 @@ export async function signUp(
     }
 
     // Determine redirect URL based on role
-    const redirectUrl = role === "STUDENT" ? "/#pricing" : "/dashboard";
+    const redirectUrl = role === "STUDENT" ? "/student/onboarding" : "/dashboard";
     return { success: true, data: { redirectUrl } };
   } catch (error) {
     console.error("Error in signUp:", error);
@@ -189,10 +191,10 @@ export async function signUp(
 }
 
 /**
- * Signs out the current user
+ * Sign out the current user
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export async function signOut() {
+export async function signOut(): Promise<{ success: boolean; error?: string; }> {
   try {
     const supabase = createClient();
     const { error } = await supabase.auth.signOut();
@@ -202,6 +204,11 @@ export async function signOut() {
         success: false,
         error: error.message,
       };
+    }
+    
+    // Force a page refresh to clear any cached state
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
     }
     
     return { success: true };
@@ -218,7 +225,7 @@ export async function signOut() {
  * Gets the current authenticated user
  * @returns {Promise<{user: any, session: any} | null>}
  */
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<{ user: any; session: any; } | null> {
   try {
     const supabase = createClient();
     
@@ -259,7 +266,7 @@ export async function getCurrentUser() {
  * @param {string} email - The email address to send reset link to
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export async function resetPasswordForEmail(email: string) {
+export async function resetPasswordForEmail(email: string): Promise<{ success: boolean; error?: string; }> {
   try {
     const supabase = createClient();
     const validatedEmail = emailSchema.parse(email);
@@ -293,7 +300,7 @@ export async function resetPasswordForEmail(email: string) {
  * @param {string} password - The new password
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export async function updateUserPassword(password: string) {
+export async function updateUserPassword(password: string): Promise<{ success: boolean; error?: string; }> {
   try {
     const supabase = createClient();
     const validatedPassword = passwordSchema.parse(password);
