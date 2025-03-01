@@ -350,7 +350,7 @@
                             "link": "#features"
                         },
                         "howItWorks": {
-                            "name": "Cómo Funciona",
+                            "name": "Cómo funciona",
                             "link": "#how-it-works"
                         },
                         "pricing": {
@@ -358,7 +358,7 @@
                             "link": "#pricing"
                         },
                         "faq": {
-                            "name": "Preguntas Frecuentes",
+                            "name": "Preguntas frecuentes",
                             "link": "#faq"
                         }
                     }
@@ -368,25 +368,14 @@
                 "title": "Recursos",
                 "links": [
                     {
-                        "contact": {
-                            "name": "Contacto",
-                            "link": "/contact"
+                        "teacher": {
+                            "name": "Conviértete en Profesor",
+                            "link": "/become-a-teacher"
                         },
                         "support": {
                             "name": "Soporte",
                             "link": "/support"
                         },
-                        "teacher": {
-                            "name": "Conviértete en Profesor",
-                            "link": "/become-a-teacher"
-                        }
-                    }
-                ]
-            },
-            "legal": {
-                "title": "Legal",
-                "links": [
-                    {
                         "privacy": {
                             "name": "Política de Privacidad",
                             "link": "/privacy-policy"
@@ -398,26 +387,7 @@
                     }
                 ]
             },
-            "social": {
-                "title": "Social",
-                "links": [
-                    {
-                        "instagram": {
-                            "name": "Instagram",
-                            "link": "https://www.instagram.com/sotaquebrasileiro/"
-                        },
-                        "facebook": {
-                            "name": "Facebook",
-                            "link": "https://www.facebook.com/sotaquebrasileiro/"
-                        },
-                        "linkedin": {
-                            "name": "LinkedIn",
-                            "link": "https://www.linkedin.com/company/sotaquebrasileiro/"
-                        }
-                    }
-                ]
-            },
-            "copyright": "Copyright © 2024 Sotaque Brasileiro. Todos los derechos reservados."
+            "copyright": "Derechos reservados © 2024 Sotaque Brasileiro."
         },
         "seo": {
             "seoDescription": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
@@ -634,9 +604,10 @@
             "subtitle": "Revisa y confirma tu información antes de finalizar tu registro."
         },
         "seo": {
-            "title": "Sotaque Brasileiro - Aprende portugués con instructores nativos",
-            "description": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
-            "keywords": "aprendizaje de portugués, portugués brasileño, cursos de idiomas, clases en línea, instructores nativos, inmersión cultural, educación en idiomas, cultura brasileña, aprendizaje personalizado, horario flexible"
+            "title": "Aprende portugués con instructores nativos",
+            "seoDescription": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
+            "keywords": "aprendizaje de portugués, portugués brasileño, cursos de idiomas, clases en línea, instructores nativos, inmersión cultural, educación en idiomas, cultura brasileña, aprendizaje personalizado, horario flexible",
+            "ogImageAlt": "Sotaque Brasileiro - Aprende portugués con instructores nativos"
         }
     }
 }
