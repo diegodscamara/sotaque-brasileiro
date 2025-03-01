@@ -552,53 +552,84 @@
                 "step1": "Configurez votre profil",
                 "step2": "Réservez votre premier cours",
                 "step3": "Choisissez votre forfait et payez",
-                "progress": "Étape {current} sur {total}"
+                "progress": "Étape {current} sur {total}",
+                "ariaLabel": "Étapes de progression d'intégration"
             },
             "comingSoon": {
                 "title": "Bientôt disponible",
-                "message": "Nous travaillons sur cette fonctionnalité. Elle sera bientôt disponible. Veuillez passer à l'étape suivante."
+                "message": "Nous travaillons sur cette fonctionnalité. Elle sera disponible bientôt. Veuillez continuer à l'étape suivante."
             },
             "step1": {
-                "step": "ÉTAPE 1",
-                "title": "Informations Personnelles",
-                "subtitle": "Faisons connaissance",
                 "forms": {
-                    "requiredField": "Ce champ est obligatoire",
+                    "requiredField": "Ce champ est requis",
                     "personalDetails": {
-                        "title": "Données Personnelles",
-                        "subtitle": "Parlez-nous un peu de vous pour personnaliser votre expérience",
+                        "title": "Informations personnelles",
+                        "subtitle": "Dites-nous un peu sur vous pour personnaliser votre expérience",
                         "firstNameLabel": "Prénom",
                         "firstNamePlaceholder": "Entrez votre prénom",
+                        "firstNameError": "Prénom est requis",
                         "lastNameLabel": "Nom",
                         "lastNamePlaceholder": "Entrez votre nom",
+                        "lastNameError": "Nom est requis",
                         "emailLabel": "Email",
                         "emailPlaceholder": "Entrez votre email",
+                        "emailError": "Email est requis",
                         "timezoneLabel": "Fuseau horaire",
                         "timezonePlaceholder": "Sélectionnez votre fuseau horaire",
-                        "timezoneHelp": "Cela nous aide à programmer des cours à des heures qui vous conviennent",
+                        "timezoneHelp": "Cela nous aide à planifier les leçons à des moments commodes pour vous",
+                        "timezoneError": "Fuseau horaire est requis",
                         "countryLabel": "Pays",
                         "countryPlaceholder": "Sélectionnez votre pays",
+                        "countryError": "Pays est requis",
                         "genderLabel": "Genre",
-                        "genderPlaceholder": "Sélectionnez votre genre (facultatif)",
-                        "genderHelp": "Cette information nous aide à comprendre la démographie de nos étudiants"
+                        "genderPlaceholder": "Sélectionnez votre genre (optionnel)",
+                        "genderError": "Genre est requis",
+                        "genderHelp": "Cette information nous aide à comprendre le profil de nos étudiants"
                     },
                     "learningPreferences": {
-                        "title": "Préférences d'Apprentissage",
-                        "subtitle": "Aidez-nous à comprendre vos objectifs et votre expérience linguistique",
-                        "portugueseLevelLabel": "Niveau de Portugais",
+                        "title": "Préférences d'apprentissage",
+                        "subtitle": "Aidez-nous à comprendre vos objectifs d'apprentissage et votre parcours",
+                        "portugueseLevelLabel": "Niveau de portugais",
                         "portugueseLevelPlaceholder": "Sélectionnez votre niveau actuel",
-                        "portugueseLevelHelp": "Soyez honnête sur votre niveau actuel afin que nous puissions vous proposer les cours adaptés",
-                        "nativeLanguageLabel": "Langue Maternelle",
+                        "portugueseLevelHelp": "Soyez honnête sur votre niveau actuel pour que nous puissions vous mettre en relation avec les bonnes classes",
+                        "nativeLanguageLabel": "Langue maternelle",
                         "nativeLanguagePlaceholder": "Sélectionnez votre langue maternelle",
-                        "learningGoalsLabel": "Objectifs d'Apprentissage",
+                        "learningGoalsLabel": "Objectifs d'apprentissage",
                         "learningGoalsPlaceholder": "Sélectionnez vos objectifs d'apprentissage",
                         "learningGoalsHelp": "Qu'espérez-vous accomplir en apprenant le portugais ?",
-                        "otherLanguagesLabel": "Autres Langues",
-                        "otherLanguagesPlaceholder": "Sélectionnez les autres langues que vous parlez",
-                        "otherLanguagesHelp": "Cela nous aide à comprendre votre expérience en apprentissage des langues"
+                        "otherLanguagesLabel": "Autres langues",
+                        "otherLanguagesPlaceholder": "Sélectionnez d'autres langues que vous parlez",
+                        "otherLanguagesHelp": "Cela nous aide à comprendre votre parcours d'apprentissage des langues"
                     }
+                },
+                "dataPrivacy": {
+                    "text": "Votre vie privée est importante pour nous. Nous ne partagerons pas vos informations sans votre consentement. Vous souhaitez en savoir plus ? Consultez notre",
+                    "link": "/privacy-policy",
+                    "linkText": "Politique de confidentialité"
+                },
+                "formActions": {
+                    "back": "Retour",
+                    "next": "Étape suivante",
+                    "submit": "Envoyer",
+                    "cancel": "Annuler",
+                    "loading": "Chargement..."
                 }
             }
+        },
+        "step2": {
+            "step": "Étape 2",
+            "title": "Choisissez votre offre",
+            "subtitle": "Sélectionnez l'offre qui correspond le mieux à vos objectifs et à votre emploi du temps."
+        },
+        "step3": {
+            "step": "Étape 3",
+            "title": "Confirmez vos informations",
+            "subtitle": "Revoyez et confirmez vos informations avant de finaliser votre inscription."
+        },
+        "seo": {
+            "title": "Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs",
+            "description": "Transformez votre portugais avec des classes personnalisées et culturellement immersives adaptées à votre emploi du temps et à vos objectifs, dispensées par des instructeurs brésiliens natifs.",
+            "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible"
         }
     }
 }
