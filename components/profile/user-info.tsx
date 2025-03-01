@@ -115,6 +115,7 @@ export const BasicInfo = ({
               value={formData.country || ''}
               onChange={(value) => onFieldChange('country', value)}
               placeholder="Select country"
+              ariaLabel="Country"
             />
           </div>
         </div>

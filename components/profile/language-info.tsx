@@ -85,6 +85,7 @@ export const LanguageLearning = ({
               values={formData.otherLanguages || []}
               onChange={(values) => onFieldChange('otherLanguages', values)}
               placeholder="Select languages you speak"
+              ariaLabel="Other languages you speak"
             />
           </div>
         </div>

@@ -35,7 +35,6 @@ import { Student } from "@/types";
 export default function StudentOnboarding(): React.JSX.Element {
   // Translations
   const t = useTranslations("student.onboarding");
-  const tShared = useTranslations("shared");
   const tErrors = useTranslations("errors");
   const tFormActions = useTranslations("student.onboarding.step1.formActions");
 
@@ -102,7 +101,7 @@ export default function StudentOnboarding(): React.JSX.Element {
 
       detectCountry();
     }
-  }, []);
+  }, [formData.country]);
 
   /**
    * Fetches user data and pre-fills the form
@@ -146,8 +145,8 @@ export default function StudentOnboarding(): React.JSX.Element {
             // Set student data
             setStudentData(studentData as unknown as Student);
 
-            // If onboarding is already completed, redirect to dashboard
-            if (studentData.hasCompletedOnboarding) {
+            // If onboarding is already completed and user has access, redirect to dashboard
+            if (studentData.hasCompletedOnboarding && studentData.hasAccess) {
               router.push("/dashboard");
             }
           }
@@ -334,24 +333,40 @@ export default function StudentOnboarding(): React.JSX.Element {
    * Renders the current step content
    */
   const renderStepContent = (): React.ReactNode => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <Step1PersonalInfo
-            formData={formData}
-            errors={errors}
-            handleInputChange={handleInputChange}
-            handleSelectChange={handleSelectChange}
-            handleMultiSelectChange={handleMultiSelectChange}
-          />
-        );
-      case 2:
-        return <Step2ComingSoon />;
-      case 3:
-        return <Step3ComingSoon />;
-      default:
-        return null;
-    }
+    const panelId = `step-panel-${currentStep}`;
+    const stepId = `step-${currentStep}`;
+
+    const content = (() => {
+      switch (currentStep) {
+        case 1:
+          return (
+            <Step1PersonalInfo
+              formData={formData}
+              errors={errors}
+              handleInputChange={handleInputChange}
+              handleSelectChange={handleSelectChange}
+              handleMultiSelectChange={handleMultiSelectChange}
+            />
+          );
+        case 2:
+          return <Step2ComingSoon />;
+        case 3:
+          return <Step3ComingSoon />;
+        default:
+          return null;
+      }
+    })();
+
+    return (
+      <div 
+        id={panelId}
+        role="tabpanel"
+        aria-labelledby={stepId}
+        tabIndex={0}
+      >
+        {content}
+      </div>
+    );
   };
 
   return (

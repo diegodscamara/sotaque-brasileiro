@@ -93,12 +93,16 @@ export default function Stepper({
       <div 
         ref={stepsContainerRef}
         className="flex items-baseline py-2 md:overflow-visible overflow-x-auto hide-scrollbar"
+        role="tablist"
+        aria-label={t("stepper.ariaLabel") || "Onboarding Steps"}
       >
         {steps.map((step) => {
           const isActive = step === currentStep;
           const isCompleted = isStepCompleted(step);
           const isDisabled = isStepDisabled(step);
           const stepState = isActive ? "active" : isCompleted ? "completed" : "inactive";
+          const stepId = `step-${step}`;
+          const panelId = `step-panel-${step}`;
 
           return (
             <React.Fragment key={step}>
@@ -121,6 +125,8 @@ export default function Stepper({
                     !isActive && !isCompleted && !isDisabled && "border-gray-300 dark:border-gray-500 bg-transparent text-gray-800 dark:text-gray-200",
                     isDisabled && "cursor-not-allowed border-gray-300 dark:border-gray-500 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200",
                   )}
+                  id={stepId}
+                  aria-controls={panelId}
                   aria-current={isActive ? "step" : undefined}
                   aria-label={t("stepper.stepLabel", { step })}
                   role="tab"

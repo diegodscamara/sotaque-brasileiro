@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 
 import * as React from "react";
@@ -26,9 +27,10 @@ interface MultiComboboxProps {
   values: string[];
   onChange: (values: string[]) => void;
   placeholder?: string;
+  ariaLabel?: string;
 }
 
-export function MultiCombobox({ options, values, onChange, placeholder = "Select..." }: MultiComboboxProps) {
+export function MultiCombobox({ options, values, onChange, placeholder = "Select...", ariaLabel }: MultiComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -47,6 +49,7 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-label={ariaLabel || placeholder}
           className="justify-between w-full truncate text-wrap whitespace-break-spaces"
         >
           {selectedOptions.length > 0

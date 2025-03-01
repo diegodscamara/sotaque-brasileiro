@@ -515,12 +515,6 @@
             "loading": "Cargando",
             "accountMenu": "Menú de Cuenta"
         },
-        "langSwitcher": {
-            "english": "Inglés",
-            "french": "Francés",
-            "portuguese": "Portugués",
-            "spanish": "Español"
-        },
         "themeToggle": {
             "system": "Tema del Sistema",
             "light": "Tema Claro",
@@ -558,53 +552,87 @@
                 "step1": "Configura tu perfil",
                 "step2": "Reserva tu primera clase",
                 "step3": "Elige tu plan y paga",
-                "progress": "Paso {current} de {total}"
+                "progress": "Paso {current} de {total}",
+                "ariaLabel": "Pasos de progreso de incorporación"
             },
             "comingSoon": {
                 "title": "Próximamente",
                 "message": "Estamos trabajando en esta función. Estará disponible pronto. Por favor, continúa al siguiente paso."
             },
             "step1": {
-                "step": "PASO 1",
-                "title": "Información Personal",
-                "subtitle": "Vamos a conocerte mejor",
                 "forms": {
-                    "requiredField": "Este campo es obligatorio",
+                    "requiredField": "Este campo es requerido",
                     "personalDetails": {
-                        "title": "Datos Personales",
-                        "subtitle": "Cuéntanos un poco sobre ti para personalizar tu experiencia",
+                        "title": "Detalles Personales",
+                        "subtitle": "Cuéntanos algo sobre ti para personalizar tu experiencia",
                         "firstNameLabel": "Nombre",
                         "firstNamePlaceholder": "Ingresa tu nombre",
+                        "firstNameError": "Nombre es requerido",
                         "lastNameLabel": "Apellido",
                         "lastNamePlaceholder": "Ingresa tu apellido",
+                        "lastNameError": "Apellido es requerido",
                         "emailLabel": "Correo electrónico",
                         "emailPlaceholder": "Ingresa tu correo electrónico",
+                        "emailError": "Correo electrónico es requerido",
                         "timezoneLabel": "Zona horaria",
                         "timezonePlaceholder": "Selecciona tu zona horaria",
-                        "timezoneHelp": "Esto nos ayuda a programar clases en horarios convenientes para ti",
+                        "timezoneHelp": "Esto nos ayuda a programar clases en momentos convenientes para ti",
+                        "timezoneError": "Zona horaria es requerida",
                         "countryLabel": "País",
                         "countryPlaceholder": "Selecciona tu país",
                         "genderLabel": "Género",
                         "genderPlaceholder": "Selecciona tu género (opcional)",
-                        "genderHelp": "Esta información nos ayuda a entender la demografía de nuestros estudiantes"
+                        "genderError": "Género es requerido",
+                        "genderHelp": "Esta información nos ayuda a entender el perfil de nuestros estudiantes"
                     },
                     "learningPreferences": {
                         "title": "Preferencias de Aprendizaje",
-                        "subtitle": "Ayúdanos a entender tus objetivos y experiencia con idiomas",
+                        "subtitle": "Ayúdanos a entender tus objetivos de aprendizaje y tu背景",
                         "portugueseLevelLabel": "Nivel de Portugués",
                         "portugueseLevelPlaceholder": "Selecciona tu nivel actual",
-                        "portugueseLevelHelp": "Sé honesto sobre tu nivel actual para que podamos asignarte las clases adecuadas",
-                        "nativeLanguageLabel": "Lengua Materna",
-                        "nativeLanguagePlaceholder": "Selecciona tu lengua materna",
+                        "portugueseLevelHelp": "Sé honesto sobre tu nivel actual para que podamos emparejarte con las clases adecuadas",
+                        "portugueseLevelError": "Nivel de portugués es requerido",
+                        "nativeLanguageLabel": "Idioma Nativo",
+                        "nativeLanguagePlaceholder": "Selecciona tu idioma nativo",
+                        "nativeLanguageError": "Idioma nativo es requerido",
                         "learningGoalsLabel": "Objetivos de Aprendizaje",
                         "learningGoalsPlaceholder": "Selecciona tus objetivos de aprendizaje",
                         "learningGoalsHelp": "¿Qué esperas lograr al aprender portugués?",
+                        "learningGoalsError": "Objetivos de aprendizaje es requerido",
                         "otherLanguagesLabel": "Otros Idiomas",
                         "otherLanguagesPlaceholder": "Selecciona otros idiomas que hablas",
+                        "otherLanguagesError": "Otros idiomas es requerido",
                         "otherLanguagesHelp": "Esto nos ayuda a entender tu experiencia con el aprendizaje de idiomas"
                     }
+                },
+                "dataPrivacy": {
+                    "text": "Tu privacidad es importante para nosotros. Solo usaremos tu información para personalizar tu viaje de aprendizaje y no la compartiremos sin tu consentimiento. ¿Quieres saber más? Revisa nuestra",
+                    "link": "/privacy-policy",
+                    "linkText": "Política de Privacidad"
+                },
+                "formActions": {
+                    "back": "Volver",
+                    "next": "Paso siguiente",
+                    "submit": "Enviar",
+                    "cancel": "Cancelar",
+                    "loading": "Cargando..."
                 }
             }
+        },
+        "step2": {
+            "step": "Paso 2",
+            "title": "Elige tu plan",
+            "subtitle": "Selecciona el plan que mejor se adapte a tus objetivos y horario."
+        },
+        "step3": {
+            "step": "Paso 3",
+            "title": "Confirma tus detalles",
+            "subtitle": "Revisa y confirma tu información antes de finalizar tu registro."
+        },
+        "seo": {
+            "title": "Sotaque Brasileiro - Aprende portugués con instructores nativos",
+            "description": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
+            "keywords": "aprendizaje de portugués, portugués brasileño, cursos de idiomas, clases en línea, instructores nativos, inmersión cultural, educación en idiomas, cultura brasileña, aprendizaje personalizado, horario flexible"
         }
     }
 }

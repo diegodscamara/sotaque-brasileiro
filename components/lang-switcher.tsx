@@ -13,11 +13,9 @@ import { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 
 interface Language {
   code: string;
-  name: string;
   nativeName: string;
   countryCode: string; // ISO country code for the flag
 }
@@ -27,15 +25,14 @@ interface Language {
  * @returns {JSX.Element} The language switcher component
  */
 export default function LanguageSwitcher(): JSX.Element {
-  const t = useTranslations('shared.langSwitcher');
   const pathname = usePathname();
   const currentLocale = pathname.split('/')[1] || 'en';
 
   const SUPPORTED_LANGUAGES: Language[] = [
-    { code: 'en', name: t('english'), nativeName: 'English', countryCode: 'us' },
-    { code: 'fr', name: t('french'), nativeName: 'Français', countryCode: 'fr' },
-    { code: 'pt', name: t('portuguese'), nativeName: 'Português', countryCode: 'br' },
-    { code: 'es', name: t('spanish'), nativeName: 'Español', countryCode: 'es' },
+    { code: 'en', nativeName: 'English', countryCode: 'us' },
+    { code: 'fr', nativeName: 'Français', countryCode: 'fr' },
+    { code: 'pt', nativeName: 'Português', countryCode: 'br' },
+    { code: 'es', nativeName: 'Español', countryCode: 'es' },
   ];
 
   const currentLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLocale);
@@ -56,7 +53,7 @@ export default function LanguageSwitcher(): JSX.Element {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Select language, current language: ${currentLanguage?.name}`}
+        aria-label={`Select language, current language: ${currentLanguage?.nativeName}`}
         className="inline-flex justify-center items-center gap-2 hover:bg-accent dark:hover:bg-gray-700/50 disabled:opacity-50 p-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 h-10 font-medium text-sm whitespace-nowrap transition-colors hover:text-accent-foreground disabled:pointer-events-none"
       >
         {currentLanguage && (
@@ -66,12 +63,13 @@ export default function LanguageSwitcher(): JSX.Element {
             width={20}
             className="rounded-full"
             aria-hidden="true"
+            alt={currentLanguage.nativeName}
           />
         )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="bg-white dark:bg-gray-700">
-        {SUPPORTED_LANGUAGES.map(({ code, name, nativeName, countryCode }) => (
+        {SUPPORTED_LANGUAGES.map(({ code, nativeName, countryCode }) => (
           <motion.div
             key={code}
             initial={{ opacity: 0, y: -10 }}
@@ -90,9 +88,9 @@ export default function LanguageSwitcher(): JSX.Element {
                 width={16}
                 className="rounded-full"
                 aria-hidden="true"
+                alt={nativeName}
               />
               <span className="text-sm">{nativeName}</span>
-              <span className="text-muted-foreground text-xs">({name})</span>
             </DropdownMenuItem>
           </motion.div>
         ))}

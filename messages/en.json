@@ -431,16 +431,14 @@
                 "step1": "Set up your profile",
                 "step2": "Book your first class",
                 "step3": "Choose your plan and pay",
-                "progress": "Step {current} of {total}"
+                "progress": "Step {current} of {total}",
+                "ariaLabel": "Onboarding Progress Steps"
             },
             "comingSoon": {
                 "title": "Coming Soon",
                 "message": "We're working on this feature. It will be available soon. Please continue to the next step."
             },
             "step1": {
-                "step": "STEP 1",
-                "title": "Personal Information",
-                "subtitle": "Let's get to know you better",
                 "forms": {
                     "requiredField": "This field is required",
                     "personalDetails": {
@@ -448,18 +446,24 @@
                         "subtitle": "Tell us a bit about yourself so we can personalize your experience",
                         "firstNameLabel": "First Name",
                         "firstNamePlaceholder": "Enter your first name",
+                        "firstNameError": "First name is required",
                         "lastNameLabel": "Last Name",
                         "lastNamePlaceholder": "Enter your last name",
+                        "lastNameError": "Last name is required",
                         "emailLabel": "Email",
                         "emailPlaceholder": "Enter your email",
+                        "emailError": "Email is required",
                         "timezoneLabel": "Timezone",
                         "timezonePlaceholder": "Select your timezone",
                         "timezoneHelp": "This helps us schedule classes at convenient times for you",
+                        "timezoneError": "Timezone is required",
                         "countryLabel": "Country",
                         "countryPlaceholder": "Select your country",
+                        "countryError": "Country is required",
                         "genderLabel": "Gender",
                         "genderPlaceholder": "Select your gender (optional)",
-                        "genderHelp": "This information helps us understand our student demographics"
+                        "genderHelp": "This information helps us understand our student demographics",
+                        "genderError": "Gender is required"
                     },
                     "learningPreferences": {
                         "title": "Learning Preferences",
@@ -502,9 +506,10 @@
             "subtitle": "Review and confirm your information before finalizing your registration."
         },
         "seo": {
-            "title": "Sotaque Brasileiro - Learn Portuguese with native instructors",
-            "description": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
-            "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule"
+            "title": "Learn Portuguese with native instructors",
+            "seoDescription": "Transform your Portuguese with personalized, culturally immersive classes tailored to your schedule and goals, taught by native Brazilian instructors.",
+            "keywords": "portuguese learning, brazilian portuguese, language courses, online classes, native instructors, cultural immersion, language education, brazilian culture, personalized learning, flexible schedule",
+            "ogImageAlt": "Learn Portuguese with native instructors"
         }
     },
     "auth": {
@@ -600,12 +605,6 @@
             "notifications": "Notifications",
             "loading": "Loading",
             "accountMenu": "Account Menu"
-        },
-        "langSwitcher": {
-            "english": "English",
-            "french": "French",
-            "portuguese": "Portuguese",
-            "spanish": "Spanish"
         },
         "themeToggle": {
             "system": "System Theme",

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -6,7 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Info } from "@phosphor-icons/react";
 
 // UI Components
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -60,7 +60,7 @@ const FieldHelp = ({ content }: { content: string }): React.JSX.Element => (
                     <Info size={14} weight="fill" aria-hidden="true" />
                 </span>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-green-600 dark:bg-green-500 text-gray-200 dark:text-gray-800">
                 <p className="text-xs">{content}</p>
             </TooltipContent>
         </Tooltip>
@@ -143,17 +143,13 @@ const FormField = ({
         {children}
         <AnimatePresence>
             {error && (
-                <motion.div
+                <div
                     id={`${id}-error`}
                     role="alert"
                     className="font-medium text-red-500 text-xs"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
                 >
                     {error}
-                </motion.div>
+                </div>
             )}
         </AnimatePresence>
     </div>
@@ -449,6 +445,7 @@ export default function Step1PersonalInfo({
                                 values={formData.learningGoals}
                                 onChange={(values) => handleMultiSelectChange("learningGoals", values)}
                                 placeholder={t("forms.learningPreferences.learningGoalsPlaceholder")}
+                                ariaLabel={t("forms.learningPreferences.learningGoalsLabel")}
                             />
                         </FormField>
 
@@ -463,6 +460,7 @@ export default function Step1PersonalInfo({
                                 values={formData.otherLanguages}
                                 onChange={(values) => handleMultiSelectChange("otherLanguages", values)}
                                 placeholder={t("forms.learningPreferences.otherLanguagesPlaceholder")}
+                                ariaLabel={t("forms.learningPreferences.otherLanguagesLabel")}
                             />
                         </FormField>
                     </FormSection>

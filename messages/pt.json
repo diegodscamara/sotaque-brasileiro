@@ -515,12 +515,6 @@
             "loading": "Carregando",
             "accountMenu": "Menu da Conta"
         },
-        "langSwitcher": {
-            "english": "Inglês",
-            "french": "Francês",
-            "portuguese": "Português",
-            "spanish": "Espanhol"
-        },
         "themeToggle": {
             "system": "Tema do Sistema",
             "light": "Tema Claro",
@@ -558,53 +552,88 @@
                 "step1": "Configure seu perfil",
                 "step2": "Agende sua primeira aula",
                 "step3": "Escolha seu plano e pague",
-                "progress": "Etapa {current} de {total}"
+                "progress": "Etapa {current} de {total}",
+                "ariaLabel": "Etapas de progresso de integração"
             },
             "comingSoon": {
                 "title": "Em breve",
-                "message": "Estamos trabalhando neste recurso. Estará disponível em breve. Por favor, continue para a próxima etapa."
+                "message": "Estamos trabalhando nesta funcionalidade. Ela estará disponível em breve. Por favor, continue para o próximo passo."
             },
             "step1": {
-                "step": "ETAPA 1",
-                "title": "Informações Pessoais",
-                "subtitle": "Vamos conhecer você melhor",
                 "forms": {
                     "requiredField": "Este campo é obrigatório",
                     "personalDetails": {
-                        "title": "Dados Pessoais",
-                        "subtitle": "Conte-nos um pouco sobre você para personalizarmos sua experiência",
+                        "title": "Informações pessoais",
+                        "subtitle": "Diga-nos um pouco sobre você para personalizarmos sua experiência",
                         "firstNameLabel": "Nome",
-                        "firstNamePlaceholder": "Digite seu nome",
+                        "firstNamePlaceholder": "Digite seu primeiro nome",
+                        "firstNameError": "Nome é obrigatório",
                         "lastNameLabel": "Sobrenome",
                         "lastNamePlaceholder": "Digite seu sobrenome",
+                        "lastNameError": "Sobrenome é obrigatório",
                         "emailLabel": "Email",
                         "emailPlaceholder": "Digite seu email",
-                        "timezoneLabel": "Fuso Horário",
+                        "emailError": "Email é obrigatório",
+                        "timezoneLabel": "Fuso horário",
                         "timezonePlaceholder": "Selecione seu fuso horário",
-                        "timezoneHelp": "Isso nos ajuda a agendar aulas em horários convenientes para você",
+                        "timezoneHelp": "Isso nos ajuda a agendar aulas em momentos convenientes para você",
+                        "timezoneError": "Fuso horário é obrigatório",
                         "countryLabel": "País",
                         "countryPlaceholder": "Selecione seu país",
+                        "countryError": "País é obrigatório",
                         "genderLabel": "Gênero",
                         "genderPlaceholder": "Selecione seu gênero (opcional)",
-                        "genderHelp": "Esta informação nos ajuda a entender a demografia dos nossos alunos"
+                        "genderError": "Gênero é obrigatório",
+                        "genderHelp": "Esta informação nos ajuda a entender o perfil de nossos alunos"
                     },
                     "learningPreferences": {
-                        "title": "Preferências de Aprendizado",
-                        "subtitle": "Ajude-nos a entender seus objetivos e experiência com idiomas",
-                        "portugueseLevelLabel": "Nível de Português",
+                        "title": "Preferências de aprendizado",
+                        "subtitle": "Ajude-nos a entender seus objetivos de aprendizado e seu background",
+                        "portugueseLevelLabel": "Nível de português",
                         "portugueseLevelPlaceholder": "Selecione seu nível atual",
-                        "portugueseLevelHelp": "Seja honesto sobre seu nível atual para que possamos combinar você com as aulas certas",
-                        "nativeLanguageLabel": "Língua Nativa",
-                        "nativeLanguagePlaceholder": "Selecione sua língua nativa",
-                        "learningGoalsLabel": "Objetivos de Aprendizado",
+                        "portugueseLevelHelp": "Seja honesto sobre seu nível atual para que possamos te emparelhar com as aulas certas",
+                        "portugueseLevelError": "Nível de português é obrigatório",
+                        "nativeLanguageLabel": "Idioma nativo",
+                        "nativeLanguagePlaceholder": "Selecione seu idioma nativo",
+                        "nativeLanguageError": "Idioma nativo é obrigatório",
+                        "learningGoalsLabel": "Objetivos de aprendizado",
                         "learningGoalsPlaceholder": "Selecione seus objetivos de aprendizado",
                         "learningGoalsHelp": "O que você espera alcançar ao aprender português?",
-                        "otherLanguagesLabel": "Outros Idiomas",
+                        "learningGoalsError": "Objetivos de aprendizado é obrigatório",
+                        "otherLanguagesLabel": "Outros idiomas",
                         "otherLanguagesPlaceholder": "Selecione outros idiomas que você fala",
-                        "otherLanguagesHelp": "Isso nos ajuda a entender sua experiência com aprendizado de idiomas"
+                        "otherLanguagesError": "Outros idiomas é obrigatório",
+                        "otherLanguagesHelp": "Isso nos ajuda a entender seu background de aprendizado de idiomas"
                     }
+                },
+                "dataPrivacy": {
+                    "text": "Sua privacidade é importante para nós. Usaremos apenas suas informações para personalizar sua jornada de aprendizado e não compartilharemos sem seu consentimento. Curioso? Confira nossa",
+                    "link": "/privacy-policy",
+                    "linkText": "Política de privacidade"
+                },
+                "formActions": {
+                    "back": "Voltar",
+                    "next": "Próximo passo",
+                    "submit": "Enviar",
+                    "cancel": "Cancelar",
+                    "loading": "Carregando..."
                 }
             }
+        },
+        "step2": {
+            "step": "PASSO 2",
+            "title": "Escolha seu plano",
+            "subtitle": "Selecione o plano que melhor se adapta aos seus objetivos e ao seu horário."
+        },
+        "step3": {
+            "step": "PASSO 3",
+            "title": "Confirme seus detalhes",
+            "subtitle": "Revise e confirme suas informações antes de finalizar seu registro."
+        },
+        "seo": {
+            "title": "Sotaque Brasileiro - Aprenda português com instrutores nativos",
+            "description": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+            "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, horário flexível"
         }
     }
 }
