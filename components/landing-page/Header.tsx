@@ -18,6 +18,7 @@ import { createClient } from "@/libs/supabase/client";
 import logo from "@/app/icon.png";
 import { useSearchParams } from "next/navigation";
 import { getStudent } from "@/app/actions/students";
+import { getTeacher } from "@/app/actions/teachers";
 import { useTranslations } from "next-intl";
 
 const Header = () => {
@@ -25,6 +26,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const [isTeacher, setIsTeacher] = useState<boolean>(false);
   const t = useTranslations('landing.header');
 
   const { scrollY } = useScroll();
@@ -49,8 +51,15 @@ const Header = () => {
         const { data: { user } } = await createClient().auth.getUser();
 
         if (user) {
-          const student = await getStudent(user.id);
-          setHasAccess(student?.hasAccess || false);
+          // Check if user is a teacher
+          const teacher = await getTeacher(user.id);
+          if (teacher) {
+            setIsTeacher(true);
+          } else {
+            // If not a teacher, check if student has access
+            const student = await getStudent(user.id);
+            setHasAccess(student?.hasAccess || false);
+          }
         }
 
         setUser(user);
@@ -69,6 +78,47 @@ const Header = () => {
     { href: t("nav.pricingLink"), label: t("nav.pricing") },
     { href: t("nav.faqLink"), label: t("nav.faq") }
   ];
+
+  /**
+   * Renders the appropriate CTA buttons based on user authentication and role
+   * @returns JSX elements for CTA section
+   */
+  const renderCTAButtons = () => {
+    if (!user) {
+      // Not authenticated - show sign in and CTA buttons
+      return (
+        <>
+          <ButtonSignin />
+          <Button variant="default" asChild>
+            <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+          </Button>
+        </>
+      );
+    } else if (isTeacher) {
+      // Teacher - always show dashboard button
+      return (
+        <>
+          <Button variant="default" asChild>
+            <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+          </Button>
+          <ButtonSignin />
+        </>
+      );
+    } else if (hasAccess) {
+      // Student with access - show dashboard button
+      return (
+        <>
+          <Button variant="default" asChild>
+            <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
+          </Button>
+          <ButtonSignin />
+        </>
+      );
+    } else {
+      // Student without access - only show sign in button
+      return <ButtonSignin />;
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -119,25 +169,10 @@ const Header = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex lg:items-center gap-4">
+          <div className="hidden lg:flex lg:items-center gap-2 md:gap-4">
             <LanguageSwitcher />
-            <ThemeToggle variant="dropdown" />
-
-            {user ? (
-              <>
-                <Button variant="default" asChild>
-                  <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
-                </Button>
-                <ButtonSignin />
-              </>
-            ) : (
-              <>
-                <ButtonSignin />
-                <Button variant="default" asChild>
-                  <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
-                </Button>
-              </>
-            )}
+            <ThemeToggle />
+            {renderCTAButtons()}
           </div>
 
           {/* Mobile Navigation */}
@@ -170,6 +205,11 @@ const Header = () => {
                 </SheetHeader>
 
                 <div className="flex flex-col items-start mt-8">
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <LanguageSwitcher />
+                    <ThemeToggle />
+                  </div>
+
                   <nav className="flex flex-col items-start gap-4">
                     {links.map((link) => (
                       <Button variant="link" effect="hoverUnderline" className="px-0 text-gray-800 dark:text-gray-50" key={link.href} asChild>
@@ -182,24 +222,7 @@ const Header = () => {
                       </Button>
                     ))}
 
-                    {user ? (
-                      <>
-                        <Button variant="default" asChild>
-                          <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
-                        </Button>
-                        <ButtonSignin />
-                      </>
-                    ) : (
-                      <>
-                        <ButtonSignin />
-                        <Button variant="default" asChild>
-                          <Link href={hasAccess ? t("nav.dashboardLink") : t("cta.link")}>{hasAccess ? t("nav.dashboard") : t("cta.primary")}</Link>
-                        </Button>
-                      </>
-                    )}
-
-                    <LanguageSwitcher />
-                    <ThemeToggle variant="dropdown" />
+                    {renderCTAButtons()}
                   </nav>
                 </div>
               </div>

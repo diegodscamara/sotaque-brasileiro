@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 import LanguageSwitcher from "@/components/lang-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/libs/utils";
+import config from "@/config";
+import logo from "@/app/icon.png";
+import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
   const { scrollY } = useScroll();
@@ -34,9 +38,29 @@ const Header = () => {
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
       >
-        <nav className="flex justify-end items-center gap-4 mx-auto px-4 w-full max-w-7xl h-14 container">
-          <LanguageSwitcher />
-          <ThemeToggle variant="dropdown" />
+        <nav className="flex justify-between items-center mx-auto px-4 max-w-7xl h-14 container">
+          {/* Logo */}
+          <Link
+            className="flex items-center gap-2 shrink-0"
+            href="/"
+            title={`${config.appName} homepage`}
+          >
+            <Image
+              src={logo}
+              alt={`${config.appName} logo`}
+              className="w-8"
+              placeholder="blur"
+              priority={true}
+              width={32}
+              height={32}
+            />
+            <span className="font-extrabold text-lg">{config.appName}</span>
+          </Link>
+
+          <div className="flex items-center gap-2 md:gap-4">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </nav>
       </motion.header>
     </AnimatePresence>
