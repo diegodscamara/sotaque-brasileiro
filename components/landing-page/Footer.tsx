@@ -36,8 +36,8 @@ const Footer = () => {
     };
   }, []);
 
-  // Define the sections to be displayed in the footer
-  const sections = ["services", "resources", "legal", "social"];
+  // Define the sections to be displayed in the footer - only services and resources
+  const sections = ["services", "resources"];
 
   return (
     <footer
@@ -65,11 +65,10 @@ const Footer = () => {
             <p className="font-normal text-gray-600 dark:text-gray-400 text-sm leading-5">
               {t("description")}
             </p>
-            <ThemeToggle />
           </div>
 
-          {/* Row 2: Dynamic Columns */}
-          <div className="justify-end gap-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full">
+          {/* Row 2: Services and Resources Columns */}
+          <div className="justify-end gap-8 grid grid-cols-2 w-full md:max-w-md">
             {sections.map((section) => (
               <div key={section} className="flex flex-col gap-4 w-full">
                 <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-base leading-6">
@@ -99,7 +98,11 @@ const Footer = () => {
           <span className="text-gray-600 dark:text-gray-400 text-sm leading-5">
             {t("copyright")}
           </span>
-          <LanguageSwitcher />
+
+          <div className="flex flex-row gap-2 md:gap-4">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
     </footer>
