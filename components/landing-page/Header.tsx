@@ -170,8 +170,8 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex lg:items-center gap-2 md:gap-4">
-            <LanguageSwitcher />
             <ThemeToggle />
+            <LanguageSwitcher />
             {renderCTAButtons()}
           </div>
 
@@ -206,8 +206,8 @@ const Header = () => {
 
                 <div className="flex flex-col items-start mt-8">
                   <div className="flex items-center gap-2 md:gap-4">
-                    <LanguageSwitcher />
                     <ThemeToggle />
+                    <LanguageSwitcher />
                   </div>
 
                   <nav className="flex flex-col items-start gap-4">
