@@ -515,12 +515,6 @@
             "loading": "Chargement",
             "accountMenu": "Menu de Compte"
         },
-        "langSwitcher": {
-            "english": "Anglais",
-            "french": "Français",
-            "portuguese": "Portugais",
-            "spanish": "Espagnol"
-        },
         "themeToggle": {
             "system": "Thème Système",
             "light": "Thème Clair",
