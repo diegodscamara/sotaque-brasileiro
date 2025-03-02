@@ -237,7 +237,7 @@ export async function getCurrentUser(): Promise<{ user: any; session: any; } | n
     }
     
     // Get session data
-    const { data: sessionData } = await supabase.auth.getSession();
+    const { data: sessionData } = await supabase.auth.getUser();
     
     // Get user from database with additional info using Prisma
     const dbUser = await prisma.user.findUnique({
@@ -253,7 +253,7 @@ export async function getCurrentUser(): Promise<{ user: any; session: any; } | n
         ...authData.user,
         ...dbUser,
       },
-      session: sessionData.session,
+      session: sessionData.user,
     };
   } catch (error) {
     console.error("Error in getCurrentUser:", error);

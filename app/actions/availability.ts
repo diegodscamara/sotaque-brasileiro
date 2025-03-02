@@ -23,9 +23,9 @@ const availabilitySchema = z.object({
 export async function addTeacherAvailability(data: Omit<TeacherAvailability, 'id' | 'createdAt' | 'updatedAt'>) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -106,9 +106,9 @@ export async function addTeacherAvailability(data: Omit<TeacherAvailability, 'id
 export async function getTeacherAvailability(teacherId: string, date: string) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -161,9 +161,9 @@ export async function updateTeacherAvailability(
 ) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -259,9 +259,9 @@ export async function updateTeacherAvailability(
 export async function deleteTeacherAvailability(availabilityId: string) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -314,9 +314,9 @@ export async function getTeacherAvailabilityRange(
 ) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
