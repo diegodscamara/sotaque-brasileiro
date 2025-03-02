@@ -21,7 +21,8 @@ enum Role {
 }
 
 enum ClassStatus {
-  PENDING
+  SCHEDULED  // Class is scheduled but not yet paid for
+  PENDING    // Class is paid for and pending teacher confirmation
   CONFIRMED
   COMPLETED
   CANCELLED
