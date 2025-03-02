@@ -502,8 +502,10 @@
                     "minutes": "{duration} minutes"
                 },
                 "errors": {
-                    "selectedTeacherId": "Please select a teacher to continue.",
-                    "classStartDateTime": "Please select a date and time for your class."
+                    "classStartDateTime": "Please select a date and time for your class.",
+                    "dateTimeRequired": "Please select a date and time for your class.",
+                    "teacherRequired": "Please select a teacher to continue.",
+                    "timeSlotRequired": "Please select a time slot to continue."
                 },
                 "requiredSelections": "Required selections",
                 "validationComplete": "All selections complete",
