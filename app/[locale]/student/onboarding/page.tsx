@@ -13,7 +13,7 @@ import Link from "next/link";
 
 // Step Components
 import Step1PersonalInfo from "./components/Step1PersonalInfo";
-import Step2ComingSoon from "./components/Step2ComingSoon";
+import Step2TeacherSelection from "./components/Step2TeacherSelection";
 import Step3ComingSoon from "./components/Step3ComingSoon";
 import Stepper from "./components/Stepper";
 
@@ -22,6 +22,7 @@ import { createClient } from "@/libs/supabase/client";
 import { getStudent } from "@/app/actions/students";
 import { getUser, updateUser } from "@/app/actions/users";
 import { editStudent } from "@/app/actions/students";
+import { scheduleOnboardingClass } from "@/app/actions/classes";
 import { validateEmail } from "@/libs/utils/validation";
 
 // Types
@@ -164,7 +165,7 @@ export default function StudentOnboarding(): React.JSX.Element {
   /**
    * Handles input change events for text inputs
    */
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -174,6 +175,14 @@ export default function StudentOnboarding(): React.JSX.Element {
    * Handles select change events
    */
   const handleSelectChange = (name: string, value: string): void => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: undefined }));
+  };
+
+  /**
+   * Handles date/time change events
+   */
+  const handleDateTimeChange = (name: string, value: Date): void => {
     setFormData(prev => ({ ...prev, [name]: value }));
     setErrors(prev => ({ ...prev, [name]: undefined }));
   };
@@ -225,6 +234,15 @@ export default function StudentOnboarding(): React.JSX.Element {
       if (formData.learningGoals.length === 0) {
         newErrors.learningGoals = t("step1.forms.learningPreferences.learningGoalsError");
       }
+    } else if (step === 2) {
+      // Validate teacher selection and class scheduling
+      if (!formData.selectedTeacherId) {
+        newErrors.selectedTeacherId = t("step2.errors.teacherRequired");
+      }
+
+      if (!formData.classStartDateTime) {
+        newErrors.classStartDateTime = t("step2.errors.dateTimeRequired");
+      }
     }
 
     // Add validation for future steps here
@@ -239,18 +257,18 @@ export default function StudentOnboarding(): React.JSX.Element {
   const handleNextStep = async (): Promise<void> => {
     if (!validateStep(currentStep)) return;
 
-    // If this is the first step, save the data
-    if (currentStep === 1) {
-      setLoading(true);
+    setLoading(true);
 
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) {
-          router.push("/signin");
-          return;
-        }
+      if (!user) {
+        router.push("/signin");
+        return;
+      }
 
+      // If this is the first step, save the personal data
+      if (currentStep === 1) {
         // Update user data
         await updateUser(user.id, {
           firstName: formData.firstName,
@@ -289,18 +307,62 @@ export default function StudentOnboarding(): React.JSX.Element {
 
         // Move to the next step
         setCurrentStep(prev => prev + 1);
-      } catch (error) {
-        console.error("Error saving onboarding data:", error);
-        setErrors({
-          general: error instanceof Error ? error.message : tErrors("unknownError")
+      } 
+      // If this is the second step, schedule the class
+      else if (currentStep === 2) {
+        if (!formData.selectedTeacherId || !formData.classStartDateTime || !formData.classEndDateTime) {
+          setErrors({
+            general: tErrors("missingRequiredFields")
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Get the latest student data
+        const updatedStudentData = await getStudent(user.id);
+        
+        if (!updatedStudentData) {
+          setErrors({
+            general: tErrors("studentNotFound")
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Calculate class duration in minutes
+        const startTime = new Date(formData.classStartDateTime);
+        const endTime = new Date(formData.classEndDateTime);
+        const durationMs = endTime.getTime() - startTime.getTime();
+        const durationMinutes = Math.round(durationMs / (1000 * 60));
+
+        // Schedule the onboarding class
+        await scheduleOnboardingClass({
+          teacherId: formData.selectedTeacherId,
+          studentId: updatedStudentData.id,
+          startDateTime: startTime,
+          endDateTime: endTime,
+          duration: durationMinutes,
+          notes: formData.classNotes || "",
+          status: "SCHEDULED"
         });
-      } finally {
-        setLoading(false);
+
+        // Mark this step as completed
+        setCompletedSteps(prev => [...prev, currentStep]);
+
+        // Move to the next step
+        setCurrentStep(prev => prev + 1);
+      } else {
+        // For future steps, just navigate to the next one
+        setCompletedSteps(prev => [...prev, currentStep]);
+        setCurrentStep(prev => prev + 1);
       }
-    } else {
-      // For future steps, just navigate to the next one
-      setCompletedSteps(prev => [...prev, currentStep]);
-      setCurrentStep(prev => prev + 1);
+    } catch (error) {
+      console.error("Error saving onboarding data:", error);
+      setErrors({
+        general: error instanceof Error ? error.message : tErrors("unknownError")
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -349,7 +411,15 @@ export default function StudentOnboarding(): React.JSX.Element {
             />
           );
         case 2:
-          return <Step2ComingSoon />;
+          return (
+            <Step2TeacherSelection
+              formData={formData}
+              errors={errors}
+              handleSelectChange={handleSelectChange}
+              handleDateTimeChange={handleDateTimeChange}
+              handleInputChange={handleInputChange}
+            />
+          );
         case 3:
           return <Step3ComingSoon />;
         default:
