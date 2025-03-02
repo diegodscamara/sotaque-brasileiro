@@ -190,13 +190,13 @@ export default function Page() {
       <AnimatePresence>
         {isDragging && (
           <motion.div
-            className="z-10 fixed flex flex flex-row flex-col justify-center items-center gap-1 bg-zinc-100/90 dark:bg-zinc-900/90 w-dvw h-dvh pointer-events-none"
+            className="z-10 fixed flex flex-col justify-center items-center gap-1 bg-zinc-100/90 dark:bg-zinc-900/90 w-dvw h-dvh pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <div>Drag and drop files here</div>
-            <div className="text-sm text-zinc-500 dark:text-zinc-400">
+            <div className="text-zinc-500 dark:text-zinc-400 text-sm">
               {"(images and text)"}
             </div>
           </motion.div>
@@ -214,7 +214,7 @@ export default function Page() {
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
               >
-                <div className="flex flex-col flex-shrink-0 justify-center items-center text-zinc-400 size-[24px]">
+                <div className="flex flex-col flex-shrink-0 justify-center items-center size-[24px] text-zinc-400">
                   {message.role === "assistant" ? <BotIcon /> : <UserIcon />}
                 </div>
 
@@ -229,10 +229,10 @@ export default function Page() {
                           className="mb-3 rounded-md w-40"
                           key={attachment.name}
                           src={attachment.url}
-                          alt={attachment.name}
+                          alt={attachment.name ?? "Attachment"}
                         />
                       ) : attachment.contentType?.startsWith("text") ? (
-                        <div className="dark:border-zinc-700 dark:bg-zinc-800 mb-3 p-2 border rounded-md w-40 h-24 text-xs text-zinc-400 overflow-hidden">
+                        <div className="dark:bg-zinc-800 mb-3 p-2 border dark:border-zinc-700 rounded-md w-40 h-24 overflow-hidden text-zinc-400 text-xs">
                           {getTextFromDataUrl(attachment.url)}
                         </div>
                       ) : null
@@ -245,7 +245,7 @@ export default function Page() {
             {isLoading &&
               messages[messages.length - 1].role !== "assistant" && (
                 <div className="flex flex-row gap-2 px-4 md:px-0 w-full md:w-[500px]">
-                  <div className="flex flex-col flex-shrink-0 justify-center items-center text-zinc-400 size-[24px]">
+                  <div className="flex flex-col flex-shrink-0 justify-center items-center size-[24px] text-zinc-400">
                     <BotIcon />
                   </div>
                   <div className="flex flex-col gap-1 text-zinc-400">
@@ -258,7 +258,7 @@ export default function Page() {
           </div>
         ) : (
           <motion.div className="px-4 md:px-0 pt-20 w-full md:w-[500px] h-[350px]">
-            <div className="flex flex-col gap-4 dark:border-zinc-700 p-6 border rounded-lg text-sm text-zinc-500 dark:text-zinc-400">
+            <div className="flex flex-col gap-4 p-6 border dark:border-zinc-700 rounded-lg text-zinc-500 dark:text-zinc-400 text-sm">
               <p className="flex flex-row justify-center items-center gap-4 text-zinc-900 dark:text-zinc-50">
                 <VercelIcon />
                 <span>+</span>
@@ -317,7 +317,7 @@ export default function Page() {
                   ) : file.type.startsWith("text") ? (
                     <motion.div
                       key={file.name}
-                      className="dark:border-zinc-700 bg-white dark:bg-zinc-800 p-2 border rounded-lg w-28 h-16 text-[8px] text-zinc-500 dark:text-zinc-400 leading-1 overflow-hidden"
+                      className="bg-white dark:bg-zinc-800 p-2 border dark:border-zinc-700 rounded-lg w-28 h-16 overflow-hidden text-[8px] text-zinc-500 dark:text-zinc-400 leading-1"
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{
@@ -359,7 +359,7 @@ export default function Page() {
             {/* Message Input */}
             <Input
               ref={inputRef}
-              className="flex-grow bg-transparent shadow-none border-none focus:ring-0 text-zinc-800 dark:text-zinc-300 outline-none placeholder-zinc-400"
+              className="flex-grow bg-transparent shadow-none border-none outline-none focus:ring-0 text-zinc-800 dark:text-zinc-300 placeholder-zinc-400"
               placeholder="Send a message..."
               value={input}
               onChange={handleInputChange}
