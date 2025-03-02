@@ -471,7 +471,7 @@ export default function Step2TeacherSelection({
                 <Card
                   key={teacher.id}
                   className={cn(
-                    "cursor-pointer transition-all hover:border-green-500 justify-between",
+                    "cursor-pointer transition-all hover:border-green-500 flex flex-col justify-between",
                     selectedTeacher === teacher.id ? "border-2 border-green-500" : ""
                   )}
                   onClick={() => handleTeacherSelect(teacher.id)}
