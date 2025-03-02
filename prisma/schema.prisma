@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,36 +8,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum Role {
-  STUDENT
-  TEACHER
-  ADMIN
-}
-
-enum ClassStatus {
-  SCHEDULED  // Class is scheduled but not yet paid for
-  PENDING    // Class is paid for and pending teacher confirmation
-  CONFIRMED
-  COMPLETED
-  CANCELLED
-}
-
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  firstName String?
-  lastName  String?
-  avatarUrl String?
-  role      Role     @default(STUDENT)
-  country   String?
-  gender    String?
-
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  firstName     String?
+  lastName      String?
+  avatarUrl     String?
+  role          Role           @default(STUDENT)
+  country       String?
+  gender        String?
+  errorLogs     ErrorLog[]
+  notifications Notification[]
   students      Student[]      @relation("UserStudents")
   teachers      Teacher[]      @relation("UserTeachers")
-  notifications Notification[]
-  errorLogs     ErrorLog[]
 
   @@index([email])
 }
@@ -51,7 +30,6 @@ model User {
 model Student {
   id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId                 String    @db.Uuid
-  user                   User      @relation("UserStudents", fields: [userId], references: [id])
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   credits                Int       @default(0)
@@ -67,6 +45,7 @@ model Student {
   timeZone               String?
   hasCompletedOnboarding Boolean   @default(false)
   classes                Class[]
+  user                   User      @relation("UserStudents", fields: [userId], references: [id])
 
   @@index([userId])
 }
@@ -74,13 +53,13 @@ model Student {
 model Teacher {
   id           String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String                @db.Uuid
-  user         User                  @relation("UserTeachers", fields: [userId], references: [id])
   createdAt    DateTime              @default(now())
   updatedAt    DateTime              @updatedAt
   biography    String?
   specialties  String[]
   languages    String[]
   classes      Class[]
+  user         User                  @relation("UserTeachers", fields: [userId], references: [id])
   availability TeacherAvailability[]
 
   @@index([userId])
@@ -89,7 +68,6 @@ model Teacher {
 model TeacherAvailability {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   teacherId      String   @db.Uuid
-  teacher        Teacher  @relation(fields: [teacherId], references: [id])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   startDateTime  DateTime
@@ -97,6 +75,7 @@ model TeacherAvailability {
   isAvailable    Boolean  @default(true)
   recurringRules Json?
   notes          String?
+  teacher        Teacher  @relation(fields: [teacherId], references: [id])
 
   @@index([teacherId])
 }
@@ -104,9 +83,7 @@ model TeacherAvailability {
 model Class {
   id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   teacherId        String          @db.Uuid
-  teacher          Teacher         @relation(fields: [teacherId], references: [id])
   studentId        String          @db.Uuid
-  student          Student         @relation(fields: [studentId], references: [id])
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   status           ClassStatus     @default(PENDING)
@@ -118,6 +95,8 @@ model Class {
   rating           Int?
   recurringGroupId String?         @db.Uuid
   recurringGroup   RecurringGroup? @relation(fields: [recurringGroupId], references: [id])
+  student          Student         @relation(fields: [studentId], references: [id])
+  teacher          Teacher         @relation(fields: [teacherId], references: [id])
 
   @@index([teacherId, studentId])
 }
@@ -126,7 +105,7 @@ model RecurringGroup {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  schedule    Json // e.g., {"pattern": "weekly", "days_of_week": [1, 3, 5]}
+  schedule    Json
   occurrences Int
   endType     String
   endDate     DateTime?
@@ -136,28 +115,42 @@ model RecurringGroup {
 }
 
 model Notification {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   type      String
   message   String
   metadata  Json?
-  isRead    Boolean   @default(false)
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String    @db.Uuid
+  isRead    Boolean  @default(false)
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 model ErrorLog {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  occurredAt   DateTime  @default(now())
-  userId       String?   @db.Uuid
-  user         User?     @relation(fields: [userId], references: [id])
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  occurredAt   DateTime @default(now())
+  userId       String?  @db.Uuid
   errorMessage String
   errorStack   String?
   table        String
   operation    String
+  user         User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum ClassStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  SCHEDULED
 }
