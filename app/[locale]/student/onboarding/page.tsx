@@ -14,7 +14,7 @@ import Link from "next/link";
 // Step Components
 import Step1PersonalInfo from "./components/Step1PersonalInfo";
 import Step2TeacherSelection from "./components/Step2TeacherSelection";
-import Step3ComingSoon from "./components/Step3ComingSoon";
+import Step3Pricing from "./components/Step3Pricing";
 import Stepper from "./components/Stepper";
 
 // Utils and API
@@ -63,7 +63,7 @@ export default function StudentOnboarding(): React.JSX.Element {
 
   // UI state
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -118,28 +118,102 @@ export default function StudentOnboarding(): React.JSX.Element {
             return;
           }
 
+          // Check for saved onboarding data in localStorage first
+          const savedFormData = localStorage.getItem("onboardingFormData");
+          let parsedFormData: Partial<OnboardingFormData> = {};
+          let shouldRestoreFromLocalStorage = false;
+
+          if (savedFormData) {
+            try {
+              parsedFormData = JSON.parse(savedFormData);
+              shouldRestoreFromLocalStorage = true;
+              console.log("Restored form data from localStorage:", parsedFormData);
+            } catch (parseError) {
+              console.error("Error parsing saved form data:", parseError);
+            }
+          }
+
           // Get user and student data
           const userData = await getUser(user.id);
           const studentData = await getStudent(user.id);
 
           if (userData) {
-            // Pre-fill form with existing user data
+            // Pre-fill form with existing user data, prioritizing localStorage data if available
             setFormData(prev => ({
               ...prev,
-              firstName: userData.firstName || "",
-              lastName: userData.lastName || "",
-              email: userData.email || "",
-              country: userData.country || prev.country,
-              gender: userData.gender || "",
-              timeZone: studentData?.timeZone || prev.timeZone,
-              portugueseLevel: studentData?.portugueseLevel || "",
-              nativeLanguage: studentData?.nativeLanguage || "",
-              learningGoals: studentData?.learningGoals || [],
-              otherLanguages: studentData?.otherLanguages || [],
+              firstName: shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : userData.firstName || "",
+              lastName: shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : userData.lastName || "",
+              email: shouldRestoreFromLocalStorage ? parsedFormData.email || "" : userData.email || "",
+              country: shouldRestoreFromLocalStorage ? parsedFormData.country || "" : userData.country || prev.country,
+              gender: shouldRestoreFromLocalStorage ? parsedFormData.gender || "" : userData.gender || "",
+              timeZone: shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : studentData?.timeZone || prev.timeZone,
+              portugueseLevel: shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : studentData?.portugueseLevel || "",
+              nativeLanguage: shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : studentData?.nativeLanguage || "",
+              learningGoals: shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : studentData?.learningGoals || [],
+              otherLanguages: shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : studentData?.otherLanguages || [],
               customerId: studentData?.customerId || "",
               priceId: studentData?.priceId || "",
               packageName: studentData?.packageName || "",
+              // Restore Step 2 data if available
+              selectedTeacherId: shouldRestoreFromLocalStorage ? parsedFormData.selectedTeacherId : undefined,
+              classNotes: shouldRestoreFromLocalStorage ? parsedFormData.classNotes : undefined,
+              classDuration: shouldRestoreFromLocalStorage ? parsedFormData.classDuration : undefined,
             }));
+
+            // Restore date/time objects if they exist in localStorage
+            if (shouldRestoreFromLocalStorage) {
+              if (parsedFormData.classStartDateTime) {
+                setFormData(prev => ({
+                  ...prev,
+                  classStartDateTime: new Date(String(parsedFormData.classStartDateTime))
+                }));
+              }
+              
+              if (parsedFormData.classEndDateTime) {
+                setFormData(prev => ({
+                  ...prev,
+                  classEndDateTime: new Date(String(parsedFormData.classEndDateTime))
+                }));
+              }
+
+              // Restore pending class data if available
+              if (parsedFormData.pendingClass) {
+                const pendingClass = {
+                  ...parsedFormData.pendingClass,
+                  startDateTime: new Date(String(parsedFormData.pendingClass.startDateTime)),
+                  endDateTime: new Date(String(parsedFormData.pendingClass.endDateTime))
+                };
+                
+                setFormData(prev => ({
+                  ...prev,
+                  pendingClass
+                }));
+              }
+
+              // Set completed steps based on available data
+              const completedStepsArray = [];
+              
+              // Step 1 is completed if we have basic personal info
+              if (parsedFormData.firstName && parsedFormData.lastName && parsedFormData.email) {
+                completedStepsArray.push(1);
+              }
+              
+              // Step 2 is completed if we have teacher and class details
+              if (parsedFormData.pendingClass && parsedFormData.pendingClass.teacherId) {
+                completedStepsArray.push(2);
+              }
+              
+              setCompletedSteps(completedStepsArray);
+              
+              // Navigate to the appropriate step
+              if (completedStepsArray.includes(2)) {
+                // If step 2 is completed, go to step 3 (pricing)
+                setCurrentStep(3);
+              } else if (completedStepsArray.includes(1)) {
+                // If only step 1 is completed, go to step 2
+                setCurrentStep(2);
+              }
+            }
           }
 
           if (studentData) {
@@ -308,7 +382,7 @@ export default function StudentOnboarding(): React.JSX.Element {
         // Move to the next step
         setCurrentStep(prev => prev + 1);
       } 
-      // If this is the second step, schedule the class
+      // If this is the second step, validate class selection
       else if (currentStep === 2) {
         if (!formData.selectedTeacherId || !formData.classStartDateTime || !formData.classEndDateTime) {
           setErrors({
@@ -329,28 +403,57 @@ export default function StudentOnboarding(): React.JSX.Element {
           return;
         }
 
-        // Calculate class duration in minutes
+        // Calculate class duration in minutes (for validation)
         const startTime = new Date(formData.classStartDateTime);
         const endTime = new Date(formData.classEndDateTime);
         const durationMs = endTime.getTime() - startTime.getTime();
         const durationMinutes = Math.round(durationMs / (1000 * 60));
 
-        // Schedule the onboarding class
-        await scheduleOnboardingClass({
+        // Store class details in form data for later use
+        const pendingClass = {
           teacherId: formData.selectedTeacherId,
           studentId: updatedStudentData.id,
           startDateTime: startTime,
           endDateTime: endTime,
           duration: durationMinutes,
           notes: formData.classNotes || "",
-          status: "SCHEDULED"
-        });
+          status: "PENDING" as const // Will be scheduled after payment
+        };
+
+        setFormData(prev => ({
+          ...prev,
+          pendingClass
+        }));
 
         // Mark this step as completed
         setCompletedSteps(prev => [...prev, currentStep]);
 
         // Move to the next step
         setCurrentStep(prev => prev + 1);
+      } 
+      // If this is the third step (pricing), store form data in localStorage
+      else if (currentStep === 3) {
+        try {
+          // Store form data in localStorage before proceeding to checkout
+          localStorage.setItem("onboardingFormData", JSON.stringify({
+            ...formData,
+            classStartDateTime: formData.classStartDateTime?.toISOString(),
+            classEndDateTime: formData.classEndDateTime?.toISOString(),
+            pendingClass: formData.pendingClass ? {
+              ...formData.pendingClass,
+              startDateTime: formData.pendingClass.startDateTime.toISOString(),
+              endDateTime: formData.pendingClass.endDateTime.toISOString(),
+            } : undefined
+          }));
+
+          // Mark this step as completed
+          setCompletedSteps(prev => [...prev, currentStep]);
+        } catch (error) {
+          console.error("Error storing form data:", error);
+          setErrors({
+            general: error instanceof Error ? error.message : tErrors("unknownError")
+          });
+        }
       } else {
         // For future steps, just navigate to the next one
         setCompletedSteps(prev => [...prev, currentStep]);
@@ -421,7 +524,7 @@ export default function StudentOnboarding(): React.JSX.Element {
             />
           );
         case 3:
-          return <Step3ComingSoon />;
+          return <Step3Pricing formData={formData} />;
         default:
           return null;
       }
@@ -445,7 +548,7 @@ export default function StudentOnboarding(): React.JSX.Element {
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="mx-auto px-4 py-16 max-w-4xl container"
+      className="mx-auto px-4 py-16 md:py-24 max-w-4xl container"
     >
       {/* Stepper */}
       <Stepper

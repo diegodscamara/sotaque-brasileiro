@@ -78,11 +78,23 @@ const mockTeachers = [
 
 interface Step2TeacherSelectionProps {
   formData: OnboardingFormData;
-  errors: Record<string, string>;
+  errors: Record<string, string | undefined>;
   handleSelectChange: (name: string, value: string) => void;
   handleDateTimeChange: (name: string, value: Date) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   setIsStepValid?: (isValid: boolean) => void;
+}
+
+// Add proper type definitions for availability and time slots
+interface TimeSlot {
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
+}
+
+interface DailyAvailability {
+  date: string;
+  slots: TimeSlot[];
 }
 
 /**
@@ -109,6 +121,44 @@ export default function Step2TeacherSelection({
   const [teachers, setTeachers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
+
+  // Add useEffect to handle restored data from localStorage
+  useEffect(() => {
+    // If we have a selected teacher ID from restored data, select that teacher
+    if (formData.selectedTeacherId) {
+      handleTeacherSelect(formData.selectedTeacherId);
+    }
+    
+    // If we have a class start date/time from restored data, select that date and fetch availability
+    if (formData.classStartDateTime) {
+      setSelectedDate(formData.classStartDateTime);
+      
+      // If we have a teacher selected, fetch availability for that date
+      if (formData.selectedTeacherId) {
+        fetchAvailabilityForDate(formData.classStartDateTime, formData.selectedTeacherId);
+      }
+    }
+    
+    // Validate the step based on restored data
+    validateStep();
+  }, []);
+
+  // Update the validateStep function to check if we have all required data
+  const validateStep = useCallback(() => {
+    const hasTeacher = !!selectedTeacher || !!formData.selectedTeacherId;
+    const hasDate = !!selectedDate || !!formData.classStartDateTime;
+    const hasTimeSlot = !!selectedTimeSlot || (!!formData.classStartDateTime && !!formData.classEndDateTime);
+    
+    const isValid = hasTeacher && hasDate && hasTimeSlot;
+    
+    if (setIsStepValid) {
+      setIsStepValid(isValid);
+    }
+    
+    return isValid;
+  }, [selectedTeacher, selectedDate, selectedTimeSlot, formData, setIsStepValid]);
 
   // Fetch teachers on component mount
   useEffect(() => {
@@ -131,7 +181,7 @@ export default function Step2TeacherSelection({
           console.warn("No teachers found in the database. Using mock data instead.");
           setTeachers(mockTeachers);
           setError("No teachers found in the database. Using sample teachers instead.");
-          
+
           // Auto-clear error after 5 seconds
           setTimeout(() => {
             setError(null);
@@ -140,7 +190,7 @@ export default function Step2TeacherSelection({
       } catch (err) {
         console.error("Error fetching teachers:", err);
         setError("Failed to load teachers. Using mock data instead.");
-        
+
         // Use mock data as fallback
         setTeachers(mockTeachers);
       } finally {
@@ -151,88 +201,50 @@ export default function Step2TeacherSelection({
     fetchTeachers();
   }, []);
 
-  // Fetch availability when a teacher and date are selected
-  useEffect(() => {
-    // Clear time slots when teacher changes to avoid showing previous teacher's slots
-    if (selectedTeacher && !selectedDate) {
-      setTimeSlots([]);
-      return;
-    }
-
-    // Skip if we don't have both teacher and date
-    if (!selectedTeacher || !selectedDate) return;
-
-    // Create a flag to track if the component is still mounted
-    let isMounted = true;
-
-    const fetchAvailability = async () => {
-      try {
-        setLoading(true);
-
-        // Format date for API
-        const dateStr = selectedDate.toISOString().split('T')[0];
-
-        // Get next day for range
-        const nextDay = new Date(selectedDate);
-        nextDay.setDate(nextDay.getDate() + 1);
-        const nextDayStr = nextDay.toISOString().split('T')[0];
-
-        // Fetch availability from API
-        const availability = await getTeacherAvailabilityRange(
-          selectedTeacher,
-          dateStr,
-          nextDayStr
-        );
-
-        // Only update state if component is still mounted
-        if (!isMounted) return;
-
-        if (availability && availability.length > 0) {
-          // Convert availability to time slots
-          const slots = availability.map(slot => ({
-            id: slot.id,
-            startTime: new Date(slot.startDateTime),
-            endTime: new Date(slot.endDateTime),
-            available: slot.isAvailable
-          }));
-
-          setTimeSlots(slots);
-          console.log(`Found ${slots.length} availability slots for teacher ${selectedTeacher} on ${dateStr}`);
-        } else {
-          console.log(`No availability found for teacher ${selectedTeacher} on ${dateStr}.`);
-          setTimeSlots([]);
-          setError(t("step2.schedule.noAvailability"));
+  // Update the fetchAvailabilityForDate function with proper types
+  const fetchAvailabilityForDate = async (date: Date, teacherId: string) => {
+    if (!date || !teacherId) return;
+    
+    setIsLoadingTimeSlots(true);
+    
+    try {
+      // Format date for API
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      
+      // Fetch availability for the selected date and teacher
+      const availability = await getTeacherAvailabilityRange(
+        teacherId,
+        formattedDate,
+        formattedDate
+      ) as DailyAvailability[];
+      
+      if (availability && availability.length > 0) {
+        setTimeSlots(availability[0].slots || []);
+        
+        // If we have a class start time from restored data, select that time slot
+        if (formData.classStartDateTime) {
+          const startTime = format(formData.classStartDateTime, 'HH:mm');
           
-          // Auto-clear error after 5 seconds
-          setTimeout(() => {
-            if (isMounted) setError(null);
-          }, 5000);
+          // Find the matching time slot
+          const matchingSlot = availability[0].slots.find(
+            (slot: TimeSlot) => format(new Date(`${formattedDate}T${slot.startTime}`), 'HH:mm') === startTime
+          );
+          
+          if (matchingSlot) {
+            handleTimeSlotSelect(matchingSlot);
+          }
         }
-      } catch (err) {
-        // Only update state if component is still mounted
-        if (!isMounted) return;
-
-        console.error(`Error fetching availability for teacher ${selectedTeacher}:`, err);
+      } else {
         setTimeSlots([]);
-        setError(t("step2.schedule.availabilityError"));
-
-        // Auto-clear error after 5 seconds
-        setTimeout(() => {
-          if (isMounted) setError(null);
-        }, 5000);
-      } finally {
-        // Only update state if component is still mounted
-        if (isMounted) setLoading(false);
       }
-    };
-
-    fetchAvailability();
-
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedTeacher, selectedDate, t]);
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+      setTimeSlots([]);
+      setAvailabilityError(t("schedule.availabilityError"));
+    } finally {
+      setIsLoadingTimeSlots(false);
+    }
+  };
 
   // Effect to update form data when selections change
   useEffect(() => {
@@ -244,15 +256,11 @@ export default function Step2TeacherSelection({
   // Effect to update form data when time slot changes
   useEffect(() => {
     if (!selectedTimeSlot || timeSlots.length === 0) return;
-    
-    console.log("Time slot effect running with selectedTimeSlot:", selectedTimeSlot);
-    
+
     // Find the selected time slot in the array
     const slot = timeSlots.find((s) => s.id === selectedTimeSlot);
-    
+
     if (slot) {
-      console.log("Effect updating form data with slot:", slot.id);
-      
       // Update form data with the selected time slot
       // We're now doing this directly in the handleTimeSlotSelect function
       // This is just a backup to ensure the data is consistent
@@ -268,27 +276,19 @@ export default function Step2TeacherSelection({
     }
   }, [selectedTimeSlot, timeSlots]);
 
-  // Debug effect to log state changes
-  useEffect(() => {
-    console.log("State updated - selectedTimeSlot:", selectedTimeSlot);
-    console.log("State updated - timeSlots count:", timeSlots.length);
-  }, [selectedTimeSlot, timeSlots]);
-
   // Reset selected time slot when teacher changes
   useEffect(() => {
     // Only run this effect when selectedTeacher changes, not on every render
     if (!selectedTeacher || !formData.classStartDateTime) return;
-    
+
     // Get previous teacher ID to check if it actually changed
     const prevTeacherId = formData.selectedTeacherId;
-    
+
     // Only reset time slot if the teacher actually changed
     if (prevTeacherId && prevTeacherId !== selectedTeacher) {
-      console.log("Teacher changed, resetting time slot");
-      
       // Clear selected time slot when teacher changes
       setSelectedTimeSlot(null);
-  
+
       // Reset class date/time in form data when teacher changes
       // Add a check to prevent unnecessary updates
       const isEmptyDate = formData.classStartDateTime.getTime() === 0;
@@ -321,19 +321,18 @@ export default function Step2TeacherSelection({
   // Handle date selection
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
-    
+
     // Only update if the date has actually changed
     if (!selectedDate || date.toDateString() !== selectedDate.toDateString()) {
-      console.log("Date changed, resetting time slot");
       setSelectedDate(date);
-      
+
       // Reset time slot only when date changes
       setSelectedTimeSlot(null);
-      
+
       // We need to set a default time (noon) to avoid time zone issues
       const dateWithDefaultTime = new Date(date);
       dateWithDefaultTime.setHours(12, 0, 0, 0);
-      
+
       // We'll update the actual time when a time slot is selected
       // This is just to track that a date was selected
       handleDateTimeChange("classStartDateTime", dateWithDefaultTime);
@@ -343,40 +342,18 @@ export default function Step2TeacherSelection({
   // Handle time slot selection
   const handleTimeSlotSelect = (slot: any) => {
     if (!slot.available) return;
-    
-    console.log("Time slot selected:", slot.id, format(slot.startTime, "h:mm a"), format(slot.endTime, "h:mm a"));
-    console.log("Previous selectedTimeSlot:", selectedTimeSlot);
-    
     // Just update the selected time slot ID
     setSelectedTimeSlot(slot.id);
-    
+
     // Force update the form data immediately to ensure it's set
     const durationMs = slot.endTime.getTime() - slot.startTime.getTime();
     const durationMinutes = Math.round(durationMs / (1000 * 60));
-    
+
     // Update form data directly in addition to the useEffect
     handleDateTimeChange("classStartDateTime", slot.startTime);
     handleDateTimeChange("classEndDateTime", slot.endTime);
     handleSelectChange("classDuration", durationMinutes.toString());
   };
-
-  // Check if all required selections are made
-  const checkStepValidity = useCallback(() => {
-    const hasTeacher = !!selectedTeacher;
-    const hasDate = !!selectedDate;
-    const hasTimeSlot = !!selectedTimeSlot;
-    
-    return hasTeacher && hasDate && hasTimeSlot;
-  }, [selectedTeacher, selectedDate, selectedTimeSlot]);
-
-  // Effect to update step validity whenever selections change
-  useEffect(() => {
-    // Only update parent component if the setIsStepValid prop is provided
-    if (setIsStepValid) {
-      const isValid = checkStepValidity();
-      setIsStepValid(isValid);
-    }
-  }, [checkStepValidity, setIsStepValid]);
 
   return (
     <motion.div
@@ -390,26 +367,23 @@ export default function Step2TeacherSelection({
       <div className="mb-6">
         <h1 className="font-semibold text-2xl">{t("step2.title")}</h1>
         <p className="mt-2 text-gray-500 dark:text-gray-400">{t("step2.subtitle")}</p>
-        
+
         {/* Required selections indicator */}
         <div className="mt-3 text-sm">
           <p className="text-gray-500 dark:text-gray-400">
             {t("step2.requiredSelections", { default: "Required selections" })}:
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
-            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-              selectedTeacher ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-            }`}>
+            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${selectedTeacher ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+              }`}>
               {selectedTeacher ? "✓" : "○"} {t("step2.tabs.teachers")}
             </span>
-            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-              selectedDate ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-            }`}>
+            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${selectedDate ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+              }`}>
               {selectedDate ? "✓" : "○"} {t("step2.schedule.selectDate")}
             </span>
-            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-              selectedTimeSlot ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-            }`}>
+            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${selectedTimeSlot ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+              }`}>
               {selectedTimeSlot ? "✓" : "○"} {t("step2.schedule.selectTime")}
             </span>
           </div>
@@ -483,6 +457,7 @@ export default function Step2TeacherSelection({
                           src={teacher.user.avatarUrl || "https://i.pravatar.cc/150"}
                           alt={`${teacher.user.firstName} ${teacher.user.lastName}`}
                           fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           className="object-cover"
                         />
                       </div>
@@ -593,15 +568,15 @@ export default function Step2TeacherSelection({
 
                     {selectedDate ? (
                       <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg h-[300px] overflow-y-auto">
-                        {loading ? (
+                        {isLoadingTimeSlots ? (
                           // Loading state for time slots
                           <div className="flex flex-col justify-center items-center h-full">
                             <div className="mb-2 border-green-500 border-b-2 rounded-full w-8 h-8 animate-spin"></div>
                             <p className="text-gray-500 text-sm">{t("step2.schedule.loadingTimeSlots")}</p>
                           </div>
                         ) : (
-                          <div 
-                            role="radiogroup" 
+                          <div
+                            role="radiogroup"
                             aria-label={t("step2.schedule.selectTime")}
                             className="gap-2 grid grid-cols-2"
                           >
@@ -612,7 +587,6 @@ export default function Step2TeacherSelection({
                                   onClick={(e) => {
                                     e.preventDefault();
                                     if (slot.available) {
-                                      console.log("Clicking time slot:", slot.id);
                                       handleTimeSlotSelect(slot);
                                     }
                                   }}
@@ -623,8 +597,8 @@ export default function Step2TeacherSelection({
                                   className={cn(
                                     "w-full flex flex-col items-center justify-center rounded-md border-2 p-2",
                                     "transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
-                                    selectedTimeSlot === slot.id 
-                                      ? "border-green-500 bg-green-50 dark:bg-green-900/20" 
+                                    selectedTimeSlot === slot.id
+                                      ? "border-green-500 bg-green-50 dark:bg-green-900/20"
                                       : "border-muted bg-popover",
                                     "hover:bg-accent hover:text-accent-foreground",
                                     !slot.available ? "cursor-not-allowed opacity-50 bg-gray-100 dark:bg-gray-800" : "cursor-pointer"
@@ -639,7 +613,7 @@ export default function Step2TeacherSelection({
                           </div>
                         )}
 
-                        {!loading && timeSlots.length === 0 && (
+                        {!isLoadingTimeSlots && timeSlots.length === 0 && (
                           <div className="py-8 text-gray-500 text-center">
                             {t("step2.schedule.noTimeSlotsAvailable")}
                           </div>
@@ -691,6 +665,7 @@ export default function Step2TeacherSelection({
                               src={teacher.user.avatarUrl || "https://i.pravatar.cc/150"}
                               alt={`${teacher.user.firstName} ${teacher.user.lastName}`}
                               fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               className="object-cover"
                             />
                           </div>
@@ -702,7 +677,7 @@ export default function Step2TeacherSelection({
                               <Star className="mr-1 w-4 h-4 text-yellow-500" weight="fill" />
                               <span className="text-sm">{teacher.rating}</span>
                             </div>
-                            
+
                             {/* Date information */}
                             {selectedDate && (
                               <div className="text-gray-600 dark:text-gray-300 text-sm">
@@ -710,25 +685,21 @@ export default function Step2TeacherSelection({
                                   <Calendar className="mr-2 w-4 h-4" />
                                   <span>{format(selectedDate, "EEEE, MMMM d, yyyy")}</span>
                                 </div>
-                                
+
                                 {/* Time slot information */}
                                 {selectedTimeSlot ? (
                                   <div className="flex items-center mt-1">
                                     <Clock className="mr-2 w-4 h-4" />
                                     {(() => {
-                                      console.log("Looking for time slot:", selectedTimeSlot);
-                                      console.log("Available time slots:", timeSlots.map(s => s.id));
-                                      
                                       const slot = timeSlots.find(s => s.id === selectedTimeSlot);
                                       if (!slot) {
-                                        console.log("Time slot not found in timeSlots array");
                                         return <span>{t("step2.schedule.timeSlotNotFound")}</span>;
                                       }
-                                      
+
                                       // Calculate duration in minutes
                                       const durationMs = slot.endTime.getTime() - slot.startTime.getTime();
                                       const durationMinutes = Math.round(durationMs / (1000 * 60));
-                                      
+
                                       return (
                                         <>
                                           <span>
@@ -751,7 +722,7 @@ export default function Step2TeacherSelection({
                                 )}
                               </div>
                             )}
-                            
+
                             {/* Show message if no date is selected */}
                             {!selectedDate && (
                               <div className="flex items-center text-amber-600 text-sm">
@@ -772,13 +743,12 @@ export default function Step2TeacherSelection({
       </Tabs>
 
       {/* Validation Summary */}
-      <div className={`mt-6 p-4 rounded-lg border ${
-        checkStepValidity() 
-          ? "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300" 
+      <div className={`mt-6 p-4 rounded-lg border ${validateStep()
+          ? "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300"
           : "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300"
-      }`}>
+        }`}>
         <div className="flex items-center">
-          {checkStepValidity() ? (
+          {validateStep() ? (
             <>
               <div className="flex-shrink-0 mr-3">
                 <div className="flex justify-center items-center bg-green-100 dark:bg-green-800 rounded-full w-8 h-8">
