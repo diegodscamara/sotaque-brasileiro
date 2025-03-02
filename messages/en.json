@@ -426,6 +426,7 @@
                         "timezoneLabel": "Timezone",
                         "timezonePlaceholder": "Select your timezone",
                         "timezoneHelp": "This helps us schedule classes at convenient times for you",
+                        "detectingTimezone": "Detecting timezone...",
                         "timezoneError": "Timezone is required",
                         "countryLabel": "Country",
                         "countryPlaceholder": "Select your country",
@@ -473,10 +474,10 @@
                 "title": "Book Your First Class",
                 "subtitle": "Choose a teacher and schedule your first class to start your learning journey.",
                 "tabs": {
-                    "teachers": "Select Teacher",
-                    "schedule": "Schedule Class"
+                    "teachers": "Select a Teacher",
+                    "schedule": "Schedule a Class"
                 },
-                "selectTeacher": "Select Teacher",
+                "selectTeacher": "Select a Teacher",
                 "teacherSelected": "Teacher Selected",
                 "schedule": {
                     "title": "Choose Your Class Time",
