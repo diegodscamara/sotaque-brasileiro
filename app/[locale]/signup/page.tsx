@@ -42,7 +42,13 @@ export default function SignUp() {
                         break;
                     case "STUDENT": {
                         const studentData = await getStudent(user.id);
-                        router.push(studentData?.hasAccess ? "/dashboard" : "/#pricing");
+                        if (!studentData) return;
+                        
+                        if (studentData.hasCompletedOnboarding) {
+                            router.push("/dashboard");
+                        } else {
+                            router.push("/student/onboarding");
+                        }
                         break;
                     }
                 }

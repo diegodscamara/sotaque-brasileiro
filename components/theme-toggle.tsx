@@ -19,7 +19,7 @@ export function ThemeToggle(): React.JSX.Element {
   const [mounted, setMounted] = useState(false)
 
   // Determine if the theme is dark based on the resolved theme
-  const isDarkTheme = resolvedTheme === "dark"
+  const isLightTheme = resolvedTheme === "light"
 
   // Effect to handle initial mounting and system preference
   useEffect(() => {
@@ -28,7 +28,7 @@ export function ThemeToggle(): React.JSX.Element {
 
   // Handle theme toggle
   const toggleTheme = () => {
-    setTheme(isDarkTheme ? "light" : "dark")
+    setTheme(isLightTheme ? "dark" : "light")
   }
 
   // Don't render anything until mounted to prevent hydration mismatch
@@ -47,16 +47,16 @@ export function ThemeToggle(): React.JSX.Element {
         variant="ghost"
         size="icon"
         onClick={toggleTheme}
-        aria-label={isDarkTheme ? t("themeToggle.light") : t("themeToggle.dark")}
+        aria-label={isLightTheme ? t("themeToggle.light") : t("themeToggle.dark")}
         className="relative rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-10 h-10"
       >
         <motion.div
           className="absolute inset-0 flex justify-center items-center"
           initial={false}
           animate={{
-            opacity: isDarkTheme ? 1 : 0,
-            scale: isDarkTheme ? 1 : 0.5,
-            rotate: isDarkTheme ? 0 : -30
+            opacity: isLightTheme ? 1 : 0,
+            scale: isLightTheme ? 1 : 0.5,
+            rotate: isLightTheme ? 0 : -30
           }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
         >
@@ -71,9 +71,9 @@ export function ThemeToggle(): React.JSX.Element {
           className="absolute inset-0 flex justify-center items-center"
           initial={false}
           animate={{
-            opacity: !isDarkTheme ? 1 : 0,
-            scale: !isDarkTheme ? 1 : 0.5,
-            rotate: !isDarkTheme ? 0 : 30
+            opacity: !isLightTheme ? 1 : 0,
+            scale: !isLightTheme ? 1 : 0.5,
+            rotate: !isLightTheme ? 0 : 30
           }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
         >
@@ -86,7 +86,7 @@ export function ThemeToggle(): React.JSX.Element {
       </Button>
 
       <span className="sr-only">
-        {isDarkTheme ? t("themeToggle.dark") : t("themeToggle.light")}
+        {isLightTheme ? t("themeToggle.light") : t("themeToggle.dark")}
       </span>
     </motion.div>
   )

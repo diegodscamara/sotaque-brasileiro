@@ -68,7 +68,7 @@ export default function LanguageSwitcher(): JSX.Element {
         )}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="bg-white dark:bg-gray-700">
+      <DropdownMenuContent align="end" className="bg-white dark:bg-gray-700 border-none">
         {SUPPORTED_LANGUAGES.map(({ code, nativeName, countryCode }) => (
           <motion.div
             key={code}

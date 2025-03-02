@@ -315,7 +315,6 @@ export default function Step1PersonalInfo({
                         label={t("forms.personalDetails.countryLabel")}
                         id="country"
                         error={errors.country}
-                        required
                     >
                         <Select
                             value={formData.country}

@@ -1,8 +1,12 @@
 import { ReactNode, Suspense } from "react";
-
 import Header from "@/components/auth/Header";
 import { getSEOTags } from "@/libs/seo";
 import { getTranslations } from 'next-intl/server';
+import { createClient } from "@/libs/supabase/server";
+import { redirect } from "next/navigation";
+import { Role } from "@prisma/client";
+import { getCurrentUser } from "@/app/actions/users";
+import { getStudent } from "@/app/actions/students";
 
 export async function generateMetadata({ params }: { params: { locale: string } }) {
   const awaitedParams = await params;
@@ -66,7 +70,51 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   });
 }
 
-export default function Layout({ children }: { children: ReactNode }) {
+/**
+ * Layout component for student onboarding
+ * Ensures only students who need to complete onboarding can access this page
+ * @param {Object} props - Component props
+ * @param {ReactNode} props.children - Child components to render
+ * @returns {ReactNode} The protected layout with children
+ */
+export default async function Layout({ children }: { children: ReactNode }) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    redirect("/signin");
+  }
+
+  // Get user data using server action
+  const dbUser = await getCurrentUser();
+
+  // If user not found in database, redirect to login
+  if (!dbUser) {
+    redirect("/signin");
+  }
+
+  // If user is not a student, redirect to dashboard
+  if (dbUser.role !== Role.STUDENT) {
+    redirect("/dashboard");
+  }
+
+  // Get student data using server action
+  const student = await getStudent(user.id);
+
+  // If student data not found, redirect to login
+  if (!student) {
+    redirect("/signin");
+  }
+
+  // If student has completed onboarding and has access, redirect to dashboard
+  if (student.hasCompletedOnboarding && student.hasAccess) {
+    redirect("/dashboard");
+  }
+
   return (
     <>
       <Suspense>

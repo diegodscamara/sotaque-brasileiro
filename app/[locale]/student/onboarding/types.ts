@@ -15,6 +15,13 @@ export interface OnboardingFormData {
   nativeLanguage: string;
   learningGoals: string[];
   otherLanguages: string[];
+
+  // Step 2: Teacher Selection & Class Scheduling
+  selectedTeacherId?: string;
+  classStartDateTime?: Date;
+  classEndDateTime?: Date;
+  classDuration?: number;
+  classNotes?: string;
   
   // Package Details (added with default values if not purchased yet)
   customerId: string;

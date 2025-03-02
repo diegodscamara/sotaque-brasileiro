@@ -346,11 +346,11 @@
                 "links": [
                     {
                         "features": {
-                            "name": "Recursos",
+                            "name": "Características",
                             "link": "#features"
                         },
                         "howItWorks": {
-                            "name": "Como Funciona",
+                            "name": "Como funciona",
                             "link": "#how-it-works"
                         },
                         "pricing": {
@@ -358,7 +358,7 @@
                             "link": "#pricing"
                         },
                         "faq": {
-                            "name": "FAQ",
+                            "name": "Perguntas frequentes",
                             "link": "#faq"
                         }
                     }
@@ -368,56 +368,26 @@
                 "title": "Recursos",
                 "links": [
                     {
-                        "contact": {
-                            "name": "Contato",
-                            "link": "/contact"
+                        "teacher": {
+                            "name": "Torne-se um Professor",
+                            "link": "/become-a-teacher"
                         },
                         "support": {
                             "name": "Suporte",
                             "link": "/support"
                         },
-                        "teacher": {
-                            "name": "Torne-se um Professor",
-                            "link": "/become-a-teacher"
-                        }
-                    }
-                ]
-            },
-            "legal": {
-                "title": "Legal",
-                "links": [
-                    {
                         "privacy": {
-                            "name": "Política de Privacidade",
+                            "name": "Política de privacidade",
                             "link": "/privacy-policy"
                         },
                         "terms": {
-                            "name": "Termos de Serviço",
+                            "name": "Termos de serviço",
                             "link": "/terms-of-service"
                         }
                     }
                 ]
             },
-            "social": {
-                "title": "Social",
-                "links": [
-                    {
-                        "instagram": {
-                            "name": "Instagram",
-                            "link": "https://www.instagram.com/sotaquebrasileiro/"
-                        },
-                        "facebook": {
-                            "name": "Facebook",
-                            "link": "https://www.facebook.com/sotaquebrasileiro/"
-                        },
-                        "linkedin": {
-                            "name": "LinkedIn",
-                            "link": "https://www.linkedin.com/company/sotaquebrasileiro/"
-                        }
-                    }
-                ]
-            },
-            "copyright": "Copyright © 2024 Sotaque Brasileiro. Todos os direitos reservados."
+            "copyright": "Direitos reservados © 2024 Sotaque Brasileiro."
         },
         "seo": {
             "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas à sua agenda e objetivos, ministradas por instrutores brasileiros nativos.",
@@ -463,6 +433,10 @@
             "passwordStrength": "Força da senha",
             "showPassword": "Mostrar senha",
             "hidePassword": "Ocultar senha",
+            "minLength": "Mínimo de 8 caracteres",
+            "hasUppercase": "Letras maiúsculas",
+            "hasLowercase": "Letras minúsculas",
+            "hasNumber": "Número",
             "signUp": "Inscreva-se",
             "alreadyHaveAccount": "Já tem uma conta?",
             "signIn": "Entrar",
@@ -631,9 +605,10 @@
             "subtitle": "Revise e confirme suas informações antes de finalizar seu registro."
         },
         "seo": {
-            "title": "Sotaque Brasileiro - Aprenda português com instrutores nativos",
-            "description": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
-            "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, horário flexível"
+            "title": "Aprenda português com instrutores nativos",
+            "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+            "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, horário flexível",
+            "ogImageAlt": "Sotaque Brasileiro - Aprenda português com instrutores nativos"
         }
     }
 }
