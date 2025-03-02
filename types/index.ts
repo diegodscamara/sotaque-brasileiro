@@ -50,7 +50,7 @@ export interface ClassData {
   studentId: string;
   createdAt: Date;
   updatedAt: Date;
-  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status: 'SCHEDULED' | 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
   startDateTime: Date;
   endDateTime: Date;
   duration: number;
