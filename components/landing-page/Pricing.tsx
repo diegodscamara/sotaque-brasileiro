@@ -28,11 +28,16 @@ interface Plan {
   variants: PlanVariant[];
 }
 
+interface Props {
+  successUrl?: string;
+}
+
 /**
  * Pricing component displays available subscription plans with their features and pricing.
+ * @param {Props} props - Component props
  * @returns {JSX.Element} - Rendered pricing section with interactive plan selection
  */
-const Pricing = (): JSX.Element => {
+const Pricing = ({ successUrl }: Props): JSX.Element => {
   const t = useTranslations("landing.pricing");
   const plans = t.raw("plans") as Plan[];
 
@@ -51,7 +56,13 @@ const Pricing = (): JSX.Element => {
   const [selectedInterval, setSelectedInterval] = useState(intervals[0] || 'monthly');
 
   const handleIntervalChange = (checked: boolean) => {
-    setSelectedInterval(checked ? 'yearly' : 'monthly');
+    setSelectedInterval(checked ? "yearly" : "monthly");
+  };
+
+  const getCorrectPriceId = (priceId: { development: string; production: string }) => {
+    return process.env.NODE_ENV === "development" 
+      ? priceId.development 
+      : priceId.production;
   };
 
   const getMonthlyPrice = (variant: PlanVariant) =>
@@ -155,12 +166,11 @@ const Pricing = (): JSX.Element => {
                     </div>
 
                     <ButtonCheckout
-                      priceId={process.env.NODE_ENV === 'production'
-                        ? variant.priceId.production
-                        : variant.priceId.development}
+                      priceId={getCorrectPriceId(variant.priceId)}
                       mode={getMode(variant.interval)}
                       variant={plan.isFeatured ? "default" : "outline"}
                       aria-label={`Subscribe to ${plan.tier} plan`}
+                      successUrl={successUrl}
                     />
 
                     {plan.features && (
