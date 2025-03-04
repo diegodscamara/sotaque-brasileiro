@@ -204,10 +204,16 @@ export default function Step1PersonalInfo({
                 } else if (error) {
                     setTimezoneError(error);
                     console.error("Timezone detection error:", error);
+                    
+                    // Fallback: Use a default timezone (UTC) if detection fails
+                    handleSelectChange("timeZone", "Etc/UTC");
                 }
             } catch (error) {
                 console.error("Failed to detect timezone:", error);
                 setTimezoneError(t("forms.personalDetails.timezoneDetectionError"));
+                
+                // Fallback: Use a default timezone (UTC) if detection fails
+                handleSelectChange("timeZone", "Etc/UTC");
             } finally {
                 setIsDetectingTimezone(false);
             }
