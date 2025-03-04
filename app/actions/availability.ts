@@ -5,6 +5,7 @@ import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 
 import { type TeacherAvailability } from "@/types";
+import { standardizeDate, logDateInfo, formatDateInTimezone } from "@/app/utils/timezone";
 
 const availabilitySchema = z.object({
   teacherId: z.string().uuid(),
@@ -121,12 +122,16 @@ export async function getTeacherAvailability(teacherId: string, date: string) {
       throw new Error("Teacher not found");
     }
 
-    // Parse the date to get start and end of day
+    // Parse the date to get start and end of day in UTC
     const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
+    startDate.setUTCHours(0, 0, 0, 0);
     
     const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
+    endDate.setUTCHours(23, 59, 59, 999);
+
+    console.log(`Fetching availability for teacher ${teacherId} on ${date}`);
+    console.log(`  - UTC start date: ${startDate.toISOString()}`);
+    console.log(`  - UTC end date: ${endDate.toISOString()}`);
 
     // Query availability directly using Prisma
     const availability = await prisma.teacherAvailability.findMany({
@@ -141,6 +146,19 @@ export async function getTeacherAvailability(teacherId: string, date: string) {
         startDateTime: 'asc',
       },
     });
+
+    console.log(`Found ${availability.length} availability slots`);
+    
+    // Log the first few slots for debugging
+    if (availability.length > 0) {
+      availability.slice(0, 3).forEach((slot, index) => {
+        console.log(`Slot ${index + 1}:`);
+        console.log(`  - ID: ${slot.id}`);
+        console.log(`  - Start: ${slot.startDateTime.toISOString()}`);
+        console.log(`  - End: ${slot.endDateTime.toISOString()}`);
+        console.log(`  - Available: ${slot.isAvailable}`);
+      });
+    }
 
     return availability;
   } catch (error) {
@@ -329,12 +347,16 @@ export async function getTeacherAvailabilityRange(
       throw new Error("Teacher not found");
     }
 
-    // Parse the dates
+    // Parse the dates to ensure UTC consistency
     const parsedStartDate = new Date(startDate);
-    parsedStartDate.setHours(0, 0, 0, 0);
+    parsedStartDate.setUTCHours(0, 0, 0, 0);
     
     const parsedEndDate = new Date(endDate);
-    parsedEndDate.setHours(23, 59, 59, 999);
+    parsedEndDate.setUTCHours(23, 59, 59, 999);
+
+    console.log(`Fetching availability range for teacher ${teacherId} from ${startDate} to ${endDate}`);
+    console.log(`  - UTC start date: ${parsedStartDate.toISOString()}`);
+    console.log(`  - UTC end date: ${parsedEndDate.toISOString()}`);
 
     // Query availability directly using Prisma
     const availability = await prisma.teacherAvailability.findMany({
@@ -350,6 +372,8 @@ export async function getTeacherAvailabilityRange(
       },
     });
 
+    console.log(`Found ${availability.length} availability slots in range`);
+    
     return availability;
   } catch (error) {
     console.error("Error fetching availability range:", error);
@@ -372,13 +396,14 @@ export async function createTemporaryReservation(
   studentId: string
 ): Promise<{reservationId: string, expiresAt: Date}> {
   try {
+    // Standardize dates to ensure consistent time zone handling
+    const standardizedStartDateTime = standardizeDate(startDateTime);
+    const standardizedEndDateTime = standardizeDate(endDateTime);
+    
     // Log timezone information for debugging
-    console.log(`Creating reservation with the following times:`);
-    console.log(`  - startDateTime (UTC): ${startDateTime.toISOString()}`);
-    console.log(`  - endDateTime (UTC): ${endDateTime.toISOString()}`);
-    console.log(`  - startDateTime (local): ${startDateTime.toString()}`);
-    console.log(`  - endDateTime (local): ${endDateTime.toString()}`);
-    console.log(`  - Browser timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+    console.log(`Creating temporary reservation with UTC times:`);
+    console.log(`  - UTC startDateTime: ${standardizedStartDateTime.toISOString()}`);
+    console.log(`  - UTC endDateTime: ${standardizedEndDateTime.toISOString()}`);
     
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -396,13 +421,32 @@ export async function createTemporaryReservation(
       throw new Error("Teacher not found");
     }
 
-    // Verify the student exists
+    // Verify the student exists and get their timezone
     const student = await prisma.student.findUnique({
-      where: { id: studentId }
+      where: { id: studentId },
+      select: {
+        id: true,
+        timeZone: true
+      }
     });
 
     if (!student) {
       throw new Error("Student not found");
+    }
+
+    // Log the student's timezone for debugging
+    const studentTimezone = student.timeZone || 'UTC';
+    console.log(`Student timezone: ${studentTimezone}`);
+    
+    // Format times in student's timezone for logging
+    if (studentTimezone) {
+      try {
+        const localStartTime = formatDateInTimezone(standardizedStartDateTime, studentTimezone, 'HH:mm');
+        const localEndTime = formatDateInTimezone(standardizedEndDateTime, studentTimezone, 'HH:mm');
+        console.log(`  - Student local time: ${localStartTime}-${localEndTime}`);
+      } catch (error) {
+        console.error("Error formatting time in student timezone:", error);
+      }
     }
 
     // Check if the student already has a reservation for this time slot
@@ -410,8 +454,8 @@ export async function createTemporaryReservation(
       where: {
         teacherId,
         studentId,
-        startDateTime,
-        endDateTime,
+        startDateTime: standardizedStartDateTime,
+        endDateTime: standardizedEndDateTime,
         status: 'PENDING',
         notes: 'TEMPORARY_RESERVATION'
       }
@@ -441,24 +485,24 @@ export async function createTemporaryReservation(
           // Class starts during the requested time slot
           {
             startDateTime: {
-              gte: startDateTime,
-              lt: endDateTime,
+              gte: standardizedStartDateTime,
+              lt: standardizedEndDateTime,
             },
           },
           // Class ends during the requested time slot
           {
             endDateTime: {
-              gt: startDateTime,
-              lte: endDateTime,
+              gt: standardizedStartDateTime,
+              lte: standardizedEndDateTime,
             },
           },
           // Class completely encompasses the requested time slot
           {
             startDateTime: {
-              lte: startDateTime,
+              lte: standardizedStartDateTime,
             },
             endDateTime: {
-              gte: endDateTime,
+              gte: standardizedEndDateTime,
             },
           },
         ],
@@ -472,8 +516,8 @@ export async function createTemporaryReservation(
     }
 
     // Check if there's teacher availability for this time slot
-    const date = new Date(startDateTime);
-    date.setHours(0, 0, 0, 0);
+    const date = new Date(standardizedStartDateTime);
+    date.setUTCHours(0, 0, 0, 0);
     const dateStr = date.toISOString().split('T')[0];
 
     // Get all availability for this day
@@ -486,14 +530,24 @@ export async function createTemporaryReservation(
 
     // Check if the requested time slot falls within any available time slot
     const isWithinAvailability = availabilityList.some(slot => {
-      const slotStart = new Date(slot.startDateTime);
-      const slotEnd = new Date(slot.endDateTime);
+      const slotStart = standardizeDate(slot.startDateTime);
+      const slotEnd = standardizeDate(slot.endDateTime);
       
-      return (
-        slotStart <= startDateTime &&
-        slotEnd >= endDateTime &&
+      const isAvailable = (
+        slotStart <= standardizedStartDateTime &&
+        slotEnd >= standardizedEndDateTime &&
         slot.isAvailable
       );
+      
+      if (isAvailable) {
+        console.log(`Found matching availability slot: ${slot.id}`);
+        console.log(`  - Slot start: ${slotStart.toISOString()}`);
+        console.log(`  - Slot end: ${slotEnd.toISOString()}`);
+        console.log(`  - Requested start: ${standardizedStartDateTime.toISOString()}`);
+        console.log(`  - Requested end: ${standardizedEndDateTime.toISOString()}`);
+      }
+      
+      return isAvailable;
     });
 
     if (!isWithinAvailability) {
@@ -508,9 +562,9 @@ export async function createTemporaryReservation(
       data: {
         teacherId,
         studentId,
-        startDateTime,
-        endDateTime,
-        duration: Math.round((endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)),
+        startDateTime: standardizedStartDateTime,
+        endDateTime: standardizedEndDateTime,
+        duration: Math.round((standardizedEndDateTime.getTime() - standardizedStartDateTime.getTime()) / (1000 * 60)),
         status: 'PENDING', // Using PENDING status for reservations
         notes: 'TEMPORARY_RESERVATION', // Mark as temporary
       }
@@ -547,6 +601,30 @@ export async function checkTimeSlotAvailability(
   studentId?: string
 ): Promise<boolean> {
   try {
+    // Standardize dates to ensure consistent time zone handling
+    const standardizedStartDateTime = standardizeDate(startDateTime);
+    const standardizedEndDateTime = standardizeDate(endDateTime);
+    
+    // Log timezone information for debugging
+    logDateInfo("Checking availability - Original startDateTime", startDateTime);
+    logDateInfo("Checking availability - Standardized startDateTime", standardizedStartDateTime);
+    
+    // If studentId is provided, get their timezone for logging
+    if (studentId) {
+      try {
+        const student = await prisma.student.findUnique({
+          where: { id: studentId },
+          select: { timeZone: true }
+        });
+        
+        if (student && student.timeZone) {
+          console.log(`Checking availability with student timezone: ${student.timeZone}`);
+        }
+      } catch (error) {
+        console.error("Error fetching student timezone:", error);
+      }
+    }
+    
     // Check for existing classes or reservations that would conflict
     const conflictingClassesQuery: any = {
       teacherId,
@@ -555,24 +633,24 @@ export async function checkTimeSlotAvailability(
         // Class starts during the requested time slot
         {
           startDateTime: {
-            gte: startDateTime,
-            lt: endDateTime,
+            gte: standardizedStartDateTime,
+            lt: standardizedEndDateTime,
           },
         },
         // Class ends during the requested time slot
         {
           endDateTime: {
-            gt: startDateTime,
-            lte: endDateTime,
+            gt: standardizedStartDateTime,
+            lte: standardizedEndDateTime,
           },
         },
         // Class completely encompasses the requested time slot
         {
           startDateTime: {
-            lte: startDateTime,
+            lte: standardizedStartDateTime,
           },
           endDateTime: {
-            gte: endDateTime,
+            gte: standardizedEndDateTime,
           },
         },
       ],
@@ -594,8 +672,8 @@ export async function checkTimeSlotAvailability(
     }
 
     // Check if there's teacher availability for this time slot
-    const date = new Date(startDateTime);
-    date.setHours(0, 0, 0, 0);
+    const date = new Date(standardizedStartDateTime);
+    date.setUTCHours(0, 0, 0, 0);
     const dateStr = date.toISOString().split('T')[0];
 
     // Get all availability for this day
@@ -608,14 +686,24 @@ export async function checkTimeSlotAvailability(
 
     // Check if the requested time slot falls within any available time slot
     const isWithinAvailability = availabilityList.some(slot => {
-      const slotStart = new Date(slot.startDateTime);
-      const slotEnd = new Date(slot.endDateTime);
+      const slotStart = standardizeDate(slot.startDateTime);
+      const slotEnd = standardizeDate(slot.endDateTime);
       
-      return (
-        slotStart <= startDateTime &&
-        slotEnd >= endDateTime &&
+      const isAvailable = (
+        slotStart <= standardizedStartDateTime &&
+        slotEnd >= standardizedEndDateTime &&
         slot.isAvailable
       );
+      
+      if (isAvailable) {
+        console.log(`Found matching availability slot: ${slot.id}`);
+        console.log(`  - Slot start: ${slotStart.toISOString()}`);
+        console.log(`  - Slot end: ${slotEnd.toISOString()}`);
+        console.log(`  - Requested start: ${standardizedStartDateTime.toISOString()}`);
+        console.log(`  - Requested end: ${standardizedEndDateTime.toISOString()}`);
+      }
+      
+      return isAvailable;
     });
 
     if (!isWithinAvailability) {
