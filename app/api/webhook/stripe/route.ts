@@ -95,6 +95,7 @@ export async function POST(req: NextRequest) {
                   customerId,
                   priceId,
                   hasAccess: true,
+                  hasCompletedOnboarding: true,
                   packageName: planName
                 })
                 .select()
