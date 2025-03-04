@@ -363,15 +363,23 @@ export async function getTeacherAvailabilityRange(
  * @param {Date} startDateTime - The start date and time of the reservation
  * @param {Date} endDateTime - The end date and time of the reservation
  * @param {string} studentId - The ID of the student making the reservation
- * @returns {Promise<{ reservationId: string; expiresAt: Date }>} The reservation ID and expiration time
+ * @returns {Promise<{reservationId: string, expiresAt: Date}>} The reservation ID and expiration time
  */
 export async function createTemporaryReservation(
   teacherId: string,
   startDateTime: Date,
   endDateTime: Date,
   studentId: string
-) {
+): Promise<{reservationId: string, expiresAt: Date}> {
   try {
+    // Log timezone information for debugging
+    console.log(`Creating reservation with the following times:`);
+    console.log(`  - startDateTime (UTC): ${startDateTime.toISOString()}`);
+    console.log(`  - endDateTime (UTC): ${endDateTime.toISOString()}`);
+    console.log(`  - startDateTime (local): ${startDateTime.toString()}`);
+    console.log(`  - endDateTime (local): ${endDateTime.toString()}`);
+    console.log(`  - Browser timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+    
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -397,60 +405,38 @@ export async function createTemporaryReservation(
       throw new Error("Student not found");
     }
 
-    // Check if the time slot is available
-    const isAvailable = await checkTimeSlotAvailability(teacherId, startDateTime, endDateTime);
-    
-    if (!isAvailable) {
-      throw new Error("Time slot is no longer available");
-    }
-
-    // Create a temporary reservation in the database
-    // We'll use a custom table or field to track these
-    // For now, we'll create a class with a special status
-    const reservation = await prisma.class.create({
-      data: {
+    // Check if the student already has a reservation for this time slot
+    const existingReservation = await prisma.class.findFirst({
+      where: {
         teacherId,
         studentId,
         startDateTime,
         endDateTime,
-        duration: Math.round((endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)),
-        status: 'PENDING', // Using PENDING status for reservations
-        notes: 'TEMPORARY_RESERVATION', // Mark as temporary
+        status: 'PENDING',
+        notes: 'TEMPORARY_RESERVATION'
       }
     });
 
-    // Set expiration time (15 minutes from now)
-    const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+    if (existingReservation) {
+      console.log(`Student ${studentId} already has reservation ${existingReservation.id} for this time slot, returning it`);
+      
+      // If the student already has a reservation for this time slot, return it
+      // Set expiration time (15 minutes from now)
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
-    return {
-      reservationId: reservation.id,
-      expiresAt
-    };
-  } catch (error) {
-    console.error("Error creating temporary reservation:", error);
-    throw error;
-  }
-}
+      return {
+        reservationId: existingReservation.id,
+        expiresAt
+      };
+    }
 
-/**
- * Checks if a time slot is still available
- * @param {string} teacherId - The ID of the teacher
- * @param {Date} startDateTime - The start date and time to check
- * @param {Date} endDateTime - The end date and time to check
- * @returns {Promise<boolean>} Whether the time slot is available
- */
-export async function checkTimeSlotAvailability(
-  teacherId: string,
-  startDateTime: Date,
-  endDateTime: Date
-): Promise<boolean> {
-  try {
-    // Check for existing classes or reservations that would conflict
+    // Check if there are any conflicting classes from other students
     const conflictingClasses = await prisma.class.findMany({
       where: {
         teacherId,
         status: { in: ['PENDING', 'CONFIRMED', 'SCHEDULED'] },
+        studentId: { not: studentId }, // Exclude this student's reservations
         OR: [
           // Class starts during the requested time slot
           {
@@ -479,8 +465,131 @@ export async function checkTimeSlotAvailability(
       },
     });
 
-    // If there are any conflicting classes, the time slot is not available
+    // If there are any conflicting classes from other students, the time slot is not available
     if (conflictingClasses.length > 0) {
+      console.log(`Time slot is taken by another student: ${conflictingClasses[0].id}`);
+      throw new Error("Time slot is no longer available");
+    }
+
+    // Check if there's teacher availability for this time slot
+    const date = new Date(startDateTime);
+    date.setHours(0, 0, 0, 0);
+    const dateStr = date.toISOString().split('T')[0];
+
+    // Get all availability for this day
+    const availabilityList = await getTeacherAvailability(teacherId, dateStr);
+    
+    if (!availabilityList || availabilityList.length === 0) {
+      console.log(`No availability found for teacher ${teacherId} on ${dateStr}`);
+      throw new Error("Teacher is not available on this date");
+    }
+
+    // Check if the requested time slot falls within any available time slot
+    const isWithinAvailability = availabilityList.some(slot => {
+      const slotStart = new Date(slot.startDateTime);
+      const slotEnd = new Date(slot.endDateTime);
+      
+      return (
+        slotStart <= startDateTime &&
+        slotEnd >= endDateTime &&
+        slot.isAvailable
+      );
+    });
+
+    if (!isWithinAvailability) {
+      console.log(`Time slot is not within teacher's availability`);
+      throw new Error("This time slot is not available in the teacher's schedule");
+    }
+
+    console.log(`Creating new reservation for student ${studentId} with teacher ${teacherId}`);
+
+    // Create a temporary reservation in the database
+    const reservation = await prisma.class.create({
+      data: {
+        teacherId,
+        studentId,
+        startDateTime,
+        endDateTime,
+        duration: Math.round((endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)),
+        status: 'PENDING', // Using PENDING status for reservations
+        notes: 'TEMPORARY_RESERVATION', // Mark as temporary
+      }
+    });
+
+    // Set expiration time (15 minutes from now)
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+
+    console.log(`Created reservation ${reservation.id} expiring at ${expiresAt.toISOString()}`);
+
+    return {
+      reservationId: reservation.id,
+      expiresAt
+    };
+  } catch (error) {
+    console.error("Error creating temporary reservation:", error);
+    throw error;
+  }
+}
+
+/**
+ * Checks if a time slot is available for a teacher
+ * @param {string} teacherId - The ID of the teacher
+ * @param {Date} startDateTime - The start time of the slot
+ * @param {Date} endDateTime - The end time of the slot
+ * @param {string} studentId - The ID of the student (to exclude their own reservations)
+ * @returns {Promise<boolean>} Whether the time slot is available
+ */
+export async function checkTimeSlotAvailability(
+  teacherId: string,
+  startDateTime: Date,
+  endDateTime: Date,
+  studentId?: string
+): Promise<boolean> {
+  try {
+    // Check for existing classes or reservations that would conflict
+    const conflictingClassesQuery: any = {
+      teacherId,
+      status: { in: ['PENDING', 'CONFIRMED', 'SCHEDULED'] },
+      OR: [
+        // Class starts during the requested time slot
+        {
+          startDateTime: {
+            gte: startDateTime,
+            lt: endDateTime,
+          },
+        },
+        // Class ends during the requested time slot
+        {
+          endDateTime: {
+            gt: startDateTime,
+            lte: endDateTime,
+          },
+        },
+        // Class completely encompasses the requested time slot
+        {
+          startDateTime: {
+            lte: startDateTime,
+          },
+          endDateTime: {
+            gte: endDateTime,
+          },
+        },
+      ],
+    };
+
+    // If studentId is provided, exclude their own reservations
+    if (studentId) {
+      conflictingClassesQuery.studentId = { not: studentId };
+    }
+
+    const conflictingClasses = await prisma.class.findMany({
+      where: conflictingClassesQuery,
+    });
+
+    // If there are any conflicting classes from other students, the time slot is not available
+    if (conflictingClasses.length > 0) {
+      console.log(`Time slot is taken by another student: ${conflictingClasses[0].id}`);
       return false;
     }
 
@@ -493,6 +602,7 @@ export async function checkTimeSlotAvailability(
     const availabilityList = await getTeacherAvailability(teacherId, dateStr);
     
     if (!availabilityList || availabilityList.length === 0) {
+      console.log(`No availability found for teacher ${teacherId} on ${dateStr}`);
       return false;
     }
 
@@ -508,7 +618,12 @@ export async function checkTimeSlotAvailability(
       );
     });
 
-    return isWithinAvailability;
+    if (!isWithinAvailability) {
+      console.log(`Time slot is not within teacher's availability`);
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.error("Error checking time slot availability:", error);
     return false;
