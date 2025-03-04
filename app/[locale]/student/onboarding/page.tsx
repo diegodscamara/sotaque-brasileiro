@@ -546,11 +546,17 @@ export default function StudentOnboarding(): React.JSX.Element {
         case 2:
           return (
             <Step2TeacherSelection
+              key="teacher-selection"
               formData={formData}
               errors={errors}
               handleSelectChange={handleSelectChange}
               handleDateTimeChange={handleDateTimeChange}
               handleInputChange={handleInputChange}
+              setIsStepValid={(isValid) => {
+                if (isValid && !completedSteps.includes(2)) {
+                  setCompletedSteps(prev => prev.includes(2) ? prev : [...prev, 2]);
+                }
+              }}
             />
           );
         case 3:
