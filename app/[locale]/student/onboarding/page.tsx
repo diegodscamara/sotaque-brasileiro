@@ -343,44 +343,69 @@ export default function StudentOnboarding(): React.JSX.Element {
 
       // If this is the first step, save the personal data
       if (currentStep === 1) {
-        // Update user data
-        await updateUser(user.id, {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          country: formData.country,
-          gender: formData.gender,
-        });
+        try {
+          // Update user data
+          const userUpdateResult = await updateUser(user.id, {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            country: formData.country,
+            gender: formData.gender,
+          });
 
-        // Update or create student data
-        if (studentData) {
-          // Create a partial student object with only the fields we want to update
-          const updateData = {
-            userId: studentData.userId,
-            timeZone: formData.timeZone,
-            portugueseLevel: formData.portugueseLevel,
-            nativeLanguage: formData.nativeLanguage,
-            learningGoals: formData.learningGoals,
-            otherLanguages: formData.otherLanguages,
-            // Add placeholder values for required package fields
-            customerId: studentData.customerId || "pending",
-            priceId: studentData.priceId || "pending",
-            packageName: studentData.packageName || "pending",
-            // Preserve existing values
-            credits: studentData.credits,
-            hasAccess: studentData.hasAccess,
-            // We'll set this to true after all steps are completed
-            hasCompletedOnboarding: false
-          };
+          if (!userUpdateResult) {
+            throw new Error(tErrors("failedToUpdateUser"));
+          }
 
-          await editStudent(user.id, updateData as Student);
+          // Update or create student data
+          if (studentData) {
+            try {
+              // Create a partial student object with only the fields we want to update
+              const updateData = {
+                userId: studentData.userId,
+                timeZone: formData.timeZone || "Etc/UTC", // Ensure we have a fallback timezone
+                portugueseLevel: formData.portugueseLevel,
+                nativeLanguage: formData.nativeLanguage,
+                learningGoals: formData.learningGoals,
+                otherLanguages: formData.otherLanguages,
+                // Add placeholder values for required package fields
+                customerId: studentData.customerId || "pending",
+                priceId: studentData.priceId || "pending",
+                packageName: studentData.packageName || "pending",
+                // Preserve existing values
+                credits: studentData.credits,
+                hasAccess: studentData.hasAccess,
+                // We'll set this to true after all steps are completed
+                hasCompletedOnboarding: false
+              };
+
+              const studentUpdateResult = await editStudent(user.id, updateData as Student);
+              
+              if (!studentUpdateResult) {
+                throw new Error(tErrors("failedToUpdateStudentProfile"));
+              }
+            } catch (studentUpdateError) {
+              console.error("Error updating student data:", studentUpdateError);
+              throw new Error(
+                studentUpdateError instanceof Error 
+                  ? studentUpdateError.message 
+                  : tErrors("failedToUpdateStudentProfile")
+              );
+            }
+          }
+
+          // Mark this step as completed
+          setCompletedSteps(prev => [...prev, currentStep]);
+
+          // Move to the next step
+          setCurrentStep(prev => prev + 1);
+        } catch (step1Error) {
+          console.error("Error in step 1:", step1Error);
+          setErrors({
+            general: step1Error instanceof Error ? step1Error.message : tErrors("failedToSavePersonalInfo")
+          });
+          return;
         }
-
-        // Mark this step as completed
-        setCompletedSteps(prev => [...prev, currentStep]);
-
-        // Move to the next step
-        setCurrentStep(prev => prev + 1);
       } 
       // If this is the second step, validate class selection
       else if (currentStep === 2) {
@@ -392,44 +417,48 @@ export default function StudentOnboarding(): React.JSX.Element {
           return;
         }
 
-        // Get the latest student data
-        const updatedStudentData = await getStudent(user.id);
-        
-        if (!updatedStudentData) {
+        try {
+          // Get the latest student data
+          const updatedStudentData = await getStudent(user.id);
+          
+          if (!updatedStudentData) {
+            throw new Error(tErrors("studentNotFound"));
+          }
+
+          // Calculate class duration in minutes (for validation)
+          const startTime = new Date(formData.classStartDateTime);
+          const endTime = new Date(formData.classEndDateTime);
+          const durationMs = endTime.getTime() - startTime.getTime();
+          const durationMinutes = Math.round(durationMs / (1000 * 60));
+
+          // Store class details in form data for later use
+          const pendingClass = {
+            teacherId: formData.selectedTeacherId,
+            studentId: updatedStudentData.id,
+            startDateTime: startTime,
+            endDateTime: endTime,
+            duration: durationMinutes,
+            notes: formData.classNotes || "",
+            status: "PENDING" as const // Will be scheduled after payment
+          };
+
+          setFormData(prev => ({
+            ...prev,
+            pendingClass
+          }));
+
+          // Mark this step as completed
+          setCompletedSteps(prev => [...prev, currentStep]);
+
+          // Move to the next step
+          setCurrentStep(prev => prev + 1);
+        } catch (step2Error) {
+          console.error("Error in step 2:", step2Error);
           setErrors({
-            general: tErrors("studentNotFound")
+            general: step2Error instanceof Error ? step2Error.message : tErrors("failedToProcessClassSelection")
           });
-          setLoading(false);
           return;
         }
-
-        // Calculate class duration in minutes (for validation)
-        const startTime = new Date(formData.classStartDateTime);
-        const endTime = new Date(formData.classEndDateTime);
-        const durationMs = endTime.getTime() - startTime.getTime();
-        const durationMinutes = Math.round(durationMs / (1000 * 60));
-
-        // Store class details in form data for later use
-        const pendingClass = {
-          teacherId: formData.selectedTeacherId,
-          studentId: updatedStudentData.id,
-          startDateTime: startTime,
-          endDateTime: endTime,
-          duration: durationMinutes,
-          notes: formData.classNotes || "",
-          status: "PENDING" as const // Will be scheduled after payment
-        };
-
-        setFormData(prev => ({
-          ...prev,
-          pendingClass
-        }));
-
-        // Mark this step as completed
-        setCompletedSteps(prev => [...prev, currentStep]);
-
-        // Move to the next step
-        setCurrentStep(prev => prev + 1);
       } 
       // If this is the third step (pricing), store form data in localStorage
       else if (currentStep === 3) {
@@ -448,11 +477,12 @@ export default function StudentOnboarding(): React.JSX.Element {
 
           // Mark this step as completed
           setCompletedSteps(prev => [...prev, currentStep]);
-        } catch (error) {
-          console.error("Error storing form data:", error);
+        } catch (storageError) {
+          console.error("Error storing form data:", storageError);
           setErrors({
-            general: error instanceof Error ? error.message : tErrors("unknownError")
+            general: storageError instanceof Error ? storageError.message : tErrors("failedToSaveFormData")
           });
+          return;
         }
       } else {
         // For future steps, just navigate to the next one
