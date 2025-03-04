@@ -356,3 +356,214 @@ export async function getTeacherAvailabilityRange(
     throw error;
   }
 }
+
+/**
+ * Creates a temporary reservation for a time slot
+ * @param {string} teacherId - The ID of the teacher
+ * @param {Date} startDateTime - The start date and time of the reservation
+ * @param {Date} endDateTime - The end date and time of the reservation
+ * @param {string} studentId - The ID of the student making the reservation
+ * @returns {Promise<{ reservationId: string; expiresAt: Date }>} The reservation ID and expiration time
+ */
+export async function createTemporaryReservation(
+  teacherId: string,
+  startDateTime: Date,
+  endDateTime: Date,
+  studentId: string
+) {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Verify the teacher exists
+    const teacher = await prisma.teacher.findUnique({
+      where: { id: teacherId }
+    });
+
+    if (!teacher) {
+      throw new Error("Teacher not found");
+    }
+
+    // Verify the student exists
+    const student = await prisma.student.findUnique({
+      where: { id: studentId }
+    });
+
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    // Check if the time slot is available
+    const isAvailable = await checkTimeSlotAvailability(teacherId, startDateTime, endDateTime);
+    
+    if (!isAvailable) {
+      throw new Error("Time slot is no longer available");
+    }
+
+    // Create a temporary reservation in the database
+    // We'll use a custom table or field to track these
+    // For now, we'll create a class with a special status
+    const reservation = await prisma.class.create({
+      data: {
+        teacherId,
+        studentId,
+        startDateTime,
+        endDateTime,
+        duration: Math.round((endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)),
+        status: 'PENDING', // Using PENDING status for reservations
+        notes: 'TEMPORARY_RESERVATION', // Mark as temporary
+      }
+    });
+
+    // Set expiration time (15 minutes from now)
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+
+    return {
+      reservationId: reservation.id,
+      expiresAt
+    };
+  } catch (error) {
+    console.error("Error creating temporary reservation:", error);
+    throw error;
+  }
+}
+
+/**
+ * Checks if a time slot is still available
+ * @param {string} teacherId - The ID of the teacher
+ * @param {Date} startDateTime - The start date and time to check
+ * @param {Date} endDateTime - The end date and time to check
+ * @returns {Promise<boolean>} Whether the time slot is available
+ */
+export async function checkTimeSlotAvailability(
+  teacherId: string,
+  startDateTime: Date,
+  endDateTime: Date
+): Promise<boolean> {
+  try {
+    // Check for existing classes or reservations that would conflict
+    const conflictingClasses = await prisma.class.findMany({
+      where: {
+        teacherId,
+        status: { in: ['PENDING', 'CONFIRMED', 'SCHEDULED'] },
+        OR: [
+          // Class starts during the requested time slot
+          {
+            startDateTime: {
+              gte: startDateTime,
+              lt: endDateTime,
+            },
+          },
+          // Class ends during the requested time slot
+          {
+            endDateTime: {
+              gt: startDateTime,
+              lte: endDateTime,
+            },
+          },
+          // Class completely encompasses the requested time slot
+          {
+            startDateTime: {
+              lte: startDateTime,
+            },
+            endDateTime: {
+              gte: endDateTime,
+            },
+          },
+        ],
+      },
+    });
+
+    // If there are any conflicting classes, the time slot is not available
+    if (conflictingClasses.length > 0) {
+      return false;
+    }
+
+    // Check if there's teacher availability for this time slot
+    const date = new Date(startDateTime);
+    date.setHours(0, 0, 0, 0);
+    const dateStr = date.toISOString().split('T')[0];
+
+    // Get all availability for this day
+    const availabilityList = await getTeacherAvailability(teacherId, dateStr);
+    
+    if (!availabilityList || availabilityList.length === 0) {
+      return false;
+    }
+
+    // Check if the requested time slot falls within any available time slot
+    const isWithinAvailability = availabilityList.some(slot => {
+      const slotStart = new Date(slot.startDateTime);
+      const slotEnd = new Date(slot.endDateTime);
+      
+      return (
+        slotStart <= startDateTime &&
+        slotEnd >= endDateTime &&
+        slot.isAvailable
+      );
+    });
+
+    return isWithinAvailability;
+  } catch (error) {
+    console.error("Error checking time slot availability:", error);
+    return false;
+  }
+}
+
+/**
+ * Cancels a temporary reservation
+ * @param {string} reservationId - The ID of the reservation to cancel
+ * @returns {Promise<boolean>} Whether the cancellation was successful
+ */
+export async function cancelTemporaryReservation(reservationId: string): Promise<boolean> {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Find the reservation
+    const reservation = await prisma.class.findUnique({
+      where: { id: reservationId }
+    });
+
+    // Only delete if it's a temporary reservation
+    if (reservation && reservation.notes === 'TEMPORARY_RESERVATION') {
+      await prisma.class.delete({
+        where: { id: reservationId }
+      });
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error canceling temporary reservation:", error);
+    return false;
+  }
+}
+
+/**
+ * Refreshes availability data for a teacher on a specific date
+ * @param {string} teacherId - The ID of the teacher
+ * @param {string} date - The date to refresh availability for
+ * @returns {Promise<any[]>} The updated availability data
+ */
+export async function refreshAvailability(
+  teacherId: string,
+  date: string
+): Promise<any[]> {
+  try {
+    // This is just a wrapper around getTeacherAvailability that ensures we get fresh data
+    return await getTeacherAvailability(teacherId, date);
+  } catch (error) {
+    console.error("Error refreshing availability:", error);
+    throw error;
+  }
+}
