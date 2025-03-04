@@ -491,6 +491,12 @@
                     "availabilityError": "Failed to load teacher's availability. Please try again or select a different date.",
                     "noAvailability": "No availability found for this teacher on the selected date."
                 },
+                "reservation": {
+                    "timeSlotReserved": "Time slot reserved",
+                    "reservationNotFound": "Reservation not found",
+                    "reservationError": "Failed to load reservation. Please try again or select a different date.",
+                    "reservationNoAvailability": "No availability found for this teacher on the selected date."
+                },
                 "notes": {
                     "title": "Class Notes",
                     "placeholder": "Add any notes for your teacher about what you'd like to focus on in this class, your learning preferences, or any questions you have."
@@ -506,7 +512,10 @@
                     "classStartDateTime": "Please select a date and time for your class.",
                     "dateTimeRequired": "Please select a date and time for your class.",
                     "teacherRequired": "Please select a teacher to continue.",
-                    "timeSlotRequired": "Please select a time slot to continue."
+                    "timeSlotRequired": "Please select a time slot to continue.",
+                    "refreshAvailability": "Failed to load teacher's availability. Please try again or select a different date.",
+                    "slotNoLongerAvailable": "The selected time slot is no longer available. Please select a different time slot.",
+                    "failedToLoadTeachers": "Failed to load teachers. Please try again later."
                 },
                 "requiredSelections": "Required selections",
                 "validationComplete": "All selections complete",
@@ -633,7 +642,9 @@
             "upgrade": "Upgrade",
             "notifications": "Notifications",
             "loading": "Loading",
-            "accountMenu": "Account Menu"
+            "accountMenu": "Account Menu",
+            "onboarding": "Onboarding",
+            "admin": "Admin"
         },
         "themeToggle": {
             "system": "System Theme",

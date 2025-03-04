@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react";
 
 // Utils and API
 import { createClient } from "@/libs/supabase/client";
-import { getStudent } from "@/app/actions/students";
+import { getStudent, editStudent } from "@/app/actions/students";
 import { scheduleOnboardingClass } from "@/app/actions/classes";
 import { OnboardingFormData } from "../types";
 
@@ -49,6 +49,29 @@ export default function OnboardingSuccess() {
         if (!studentData) {
           throw new Error("Student not found");
         }
+
+        // Create a proper Student object with the user property
+        const studentWithUser = {
+          ...studentData,
+          // Convert null values to undefined to match the Student interface
+          customerId: studentData.customerId || undefined,
+          priceId: studentData.priceId || undefined,
+          packageName: studentData.packageName || undefined,
+          packageExpiration: studentData.packageExpiration || undefined,
+          portugueseLevel: studentData.portugueseLevel || undefined,
+          nativeLanguage: studentData.nativeLanguage || undefined,
+          timeZone: studentData.timeZone || undefined,
+          // Ensure arrays are properly handled
+          learningGoals: Array.isArray(studentData.learningGoals) ? studentData.learningGoals : [],
+          otherLanguages: Array.isArray(studentData.otherLanguages) ? studentData.otherLanguages : [],
+          user: {
+            id: user.id,
+            email: user.email || "",
+            createdAt: new Date(user.created_at || Date.now()),
+            updatedAt: new Date(),
+            role: "STUDENT" as const
+          }
+        };
 
         // Get stored form data from localStorage
         const storedFormData = localStorage.getItem("onboardingFormData");
@@ -87,6 +110,13 @@ export default function OnboardingSuccess() {
           duration,
           notes,
           status: "SCHEDULED"
+        });
+
+        // Update student record to mark onboarding as completed
+        await editStudent(user.id, {
+          ...studentWithUser,
+          hasCompletedOnboarding: true,
+          hasAccess: true
         });
 
         // Clear stored form data

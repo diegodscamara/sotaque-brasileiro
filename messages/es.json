@@ -487,7 +487,9 @@
             "upgrade": "Actualizar",
             "notifications": "Notificaciones",
             "loading": "Cargando",
-            "accountMenu": "Menú de Cuenta"
+            "accountMenu": "Menú de Cuenta",
+            "onboarding": "Incorporación",
+            "admin": "Administrador"
         },
         "themeToggle": {
             "system": "Tema del Sistema",
