@@ -1,4 +1,17 @@
 /**
+ * Pending class data structure
+ */
+export interface PendingClassData {
+  teacherId: string | undefined;
+  studentId: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  duration: number;
+  notes: string;
+  status: "PENDING";
+}
+
+/**
  * Form data for the student onboarding process
  */
 export interface OnboardingFormData {
@@ -22,6 +35,7 @@ export interface OnboardingFormData {
   classEndDateTime?: Date;
   classDuration?: number;
   classNotes?: string;
+  pendingClass?: PendingClassData;
   
   // Package Details (added with default values if not purchased yet)
   customerId: string;

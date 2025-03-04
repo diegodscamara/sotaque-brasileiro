@@ -30,9 +30,9 @@ const studentSchema = z.object({
 export async function getStudent(studentId: string) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -57,9 +57,9 @@ export async function getStudent(studentId: string) {
 export async function getStudents() {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -82,9 +82,9 @@ export async function getStudents() {
 export async function editStudent(studentId: string, studentData: Student) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -123,9 +123,9 @@ export async function editStudent(studentId: string, studentData: Student) {
 export async function deleteStudent(studentId: string) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 

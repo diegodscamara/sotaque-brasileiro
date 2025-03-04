@@ -42,20 +42,46 @@ export async function POST(req: NextRequest) {
       supabase.from("Student").select("*").eq("userId", user.id).single(),
     ]);
 
-    // Create Stripe checkout session
-    const stripeSessionURL = await createCheckout({
-      priceId,
-      mode,
-      successUrl,
-      cancelUrl,
-      clientReferenceId: user.id,
-      user: {
-        email: userData.data?.email,
-        customerId: studentData.data?.customerId,
-      },
-    });
+    // Check if we have the required environment variables
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("Missing Stripe secret key");
+      return NextResponse.json(
+        { error: "Stripe is not properly configured" },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ url: stripeSessionURL });
+    // Create Stripe checkout session
+    try {
+      // Only pass customerId if it's a valid Stripe customer ID (not 'pending' or empty)
+      const customerId = studentData.data?.customerId && 
+                         studentData.data.customerId !== 'pending' ? 
+                         studentData.data.customerId : undefined;
+      
+      const stripeSessionURL = await createCheckout({
+        priceId,
+        mode,
+        successUrl,
+        cancelUrl,
+        clientReferenceId: user.id,
+        user: {
+          email: userData.data?.email,
+          customerId: customerId,
+        },
+      });
+
+      return NextResponse.json({ url: stripeSessionURL });
+    } catch (stripeError) {
+      console.error("Stripe checkout creation error:", stripeError);
+      return NextResponse.json(
+        { 
+          error: stripeError instanceof Error 
+            ? stripeError.message 
+            : "Failed to create checkout session with Stripe" 
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     // Handle validation errors
     if (error instanceof z.ZodError) {
@@ -68,7 +94,7 @@ export async function POST(req: NextRequest) {
     // Log and return generic error
     console.error("Stripe Checkout Error:", error);
     return NextResponse.json(
-      { error: "An error occurred while creating the checkout session" },
+      { error: error instanceof Error ? error.message : "An error occurred while creating the checkout session" },
       { status: 500 }
     );
   }

@@ -14,7 +14,7 @@ import Link from "next/link";
 // Step Components
 import Step1PersonalInfo from "./components/Step1PersonalInfo";
 import Step2TeacherSelection from "./components/Step2TeacherSelection";
-import Step3ComingSoon from "./components/Step3ComingSoon";
+import Step3Pricing from "./components/Step3Pricing";
 import Stepper from "./components/Stepper";
 
 // Utils and API
@@ -63,7 +63,7 @@ export default function StudentOnboarding(): React.JSX.Element {
 
   // UI state
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -118,28 +118,102 @@ export default function StudentOnboarding(): React.JSX.Element {
             return;
           }
 
+          // Check for saved onboarding data in localStorage first
+          const savedFormData = localStorage.getItem("onboardingFormData");
+          let parsedFormData: Partial<OnboardingFormData> = {};
+          let shouldRestoreFromLocalStorage = false;
+
+          if (savedFormData) {
+            try {
+              parsedFormData = JSON.parse(savedFormData);
+              shouldRestoreFromLocalStorage = true;
+              console.log("Restored form data from localStorage:", parsedFormData);
+            } catch (parseError) {
+              console.error("Error parsing saved form data:", parseError);
+            }
+          }
+
           // Get user and student data
           const userData = await getUser(user.id);
           const studentData = await getStudent(user.id);
 
           if (userData) {
-            // Pre-fill form with existing user data
+            // Pre-fill form with existing user data, prioritizing localStorage data if available
             setFormData(prev => ({
               ...prev,
-              firstName: userData.firstName || "",
-              lastName: userData.lastName || "",
-              email: userData.email || "",
-              country: userData.country || prev.country,
-              gender: userData.gender || "",
-              timeZone: studentData?.timeZone || prev.timeZone,
-              portugueseLevel: studentData?.portugueseLevel || "",
-              nativeLanguage: studentData?.nativeLanguage || "",
-              learningGoals: studentData?.learningGoals || [],
-              otherLanguages: studentData?.otherLanguages || [],
+              firstName: shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : userData.firstName || "",
+              lastName: shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : userData.lastName || "",
+              email: shouldRestoreFromLocalStorage ? parsedFormData.email || "" : userData.email || "",
+              country: shouldRestoreFromLocalStorage ? parsedFormData.country || "" : userData.country || prev.country,
+              gender: shouldRestoreFromLocalStorage ? parsedFormData.gender || "" : userData.gender || "",
+              timeZone: shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : studentData?.timeZone || prev.timeZone,
+              portugueseLevel: shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : studentData?.portugueseLevel || "",
+              nativeLanguage: shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : studentData?.nativeLanguage || "",
+              learningGoals: shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : studentData?.learningGoals || [],
+              otherLanguages: shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : studentData?.otherLanguages || [],
               customerId: studentData?.customerId || "",
               priceId: studentData?.priceId || "",
               packageName: studentData?.packageName || "",
+              // Restore Step 2 data if available
+              selectedTeacherId: shouldRestoreFromLocalStorage ? parsedFormData.selectedTeacherId : undefined,
+              classNotes: shouldRestoreFromLocalStorage ? parsedFormData.classNotes : undefined,
+              classDuration: shouldRestoreFromLocalStorage ? parsedFormData.classDuration : undefined,
             }));
+
+            // Restore date/time objects if they exist in localStorage
+            if (shouldRestoreFromLocalStorage) {
+              if (parsedFormData.classStartDateTime) {
+                setFormData(prev => ({
+                  ...prev,
+                  classStartDateTime: new Date(String(parsedFormData.classStartDateTime))
+                }));
+              }
+              
+              if (parsedFormData.classEndDateTime) {
+                setFormData(prev => ({
+                  ...prev,
+                  classEndDateTime: new Date(String(parsedFormData.classEndDateTime))
+                }));
+              }
+
+              // Restore pending class data if available
+              if (parsedFormData.pendingClass) {
+                const pendingClass = {
+                  ...parsedFormData.pendingClass,
+                  startDateTime: new Date(String(parsedFormData.pendingClass.startDateTime)),
+                  endDateTime: new Date(String(parsedFormData.pendingClass.endDateTime))
+                };
+                
+                setFormData(prev => ({
+                  ...prev,
+                  pendingClass
+                }));
+              }
+
+              // Set completed steps based on available data
+              const completedStepsArray = [];
+              
+              // Step 1 is completed if we have basic personal info
+              if (parsedFormData.firstName && parsedFormData.lastName && parsedFormData.email) {
+                completedStepsArray.push(1);
+              }
+              
+              // Step 2 is completed if we have teacher and class details
+              if (parsedFormData.pendingClass && parsedFormData.pendingClass.teacherId) {
+                completedStepsArray.push(2);
+              }
+              
+              setCompletedSteps(completedStepsArray);
+              
+              // Navigate to the appropriate step
+              if (completedStepsArray.includes(2)) {
+                // If step 2 is completed, go to step 3 (pricing)
+                setCurrentStep(3);
+              } else if (completedStepsArray.includes(1)) {
+                // If only step 1 is completed, go to step 2
+                setCurrentStep(2);
+              }
+            }
           }
 
           if (studentData) {
@@ -269,46 +343,71 @@ export default function StudentOnboarding(): React.JSX.Element {
 
       // If this is the first step, save the personal data
       if (currentStep === 1) {
-        // Update user data
-        await updateUser(user.id, {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          country: formData.country,
-          gender: formData.gender,
-        });
+        try {
+          // Update user data
+          const userUpdateResult = await updateUser(user.id, {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            country: formData.country,
+            gender: formData.gender,
+          });
 
-        // Update or create student data
-        if (studentData) {
-          // Create a partial student object with only the fields we want to update
-          const updateData = {
-            userId: studentData.userId,
-            timeZone: formData.timeZone,
-            portugueseLevel: formData.portugueseLevel,
-            nativeLanguage: formData.nativeLanguage,
-            learningGoals: formData.learningGoals,
-            otherLanguages: formData.otherLanguages,
-            // Add placeholder values for required package fields
-            customerId: studentData.customerId || "pending",
-            priceId: studentData.priceId || "pending",
-            packageName: studentData.packageName || "pending",
-            // Preserve existing values
-            credits: studentData.credits,
-            hasAccess: studentData.hasAccess,
-            // We'll set this to true after all steps are completed
-            hasCompletedOnboarding: false
-          };
+          if (!userUpdateResult) {
+            throw new Error(tErrors("failedToUpdateUser"));
+          }
 
-          await editStudent(user.id, updateData as Student);
+          // Update or create student data
+          if (studentData) {
+            try {
+              // Create a partial student object with only the fields we want to update
+              const updateData = {
+                userId: studentData.userId,
+                timeZone: formData.timeZone || "Etc/UTC", // Ensure we have a fallback timezone
+                portugueseLevel: formData.portugueseLevel,
+                nativeLanguage: formData.nativeLanguage,
+                learningGoals: formData.learningGoals,
+                otherLanguages: formData.otherLanguages,
+                // Add placeholder values for required package fields
+                customerId: studentData.customerId || "pending",
+                priceId: studentData.priceId || "pending",
+                packageName: studentData.packageName || "pending",
+                // Preserve existing values
+                credits: studentData.credits,
+                hasAccess: studentData.hasAccess,
+                // We'll set this to true after all steps are completed
+                hasCompletedOnboarding: false
+              };
+
+              const studentUpdateResult = await editStudent(user.id, updateData as Student);
+              
+              if (!studentUpdateResult) {
+                throw new Error(tErrors("failedToUpdateStudentProfile"));
+              }
+            } catch (studentUpdateError) {
+              console.error("Error updating student data:", studentUpdateError);
+              throw new Error(
+                studentUpdateError instanceof Error 
+                  ? studentUpdateError.message 
+                  : tErrors("failedToUpdateStudentProfile")
+              );
+            }
+          }
+
+          // Mark this step as completed
+          setCompletedSteps(prev => [...prev, currentStep]);
+
+          // Move to the next step
+          setCurrentStep(prev => prev + 1);
+        } catch (step1Error) {
+          console.error("Error in step 1:", step1Error);
+          setErrors({
+            general: step1Error instanceof Error ? step1Error.message : tErrors("failedToSavePersonalInfo")
+          });
+          return;
         }
-
-        // Mark this step as completed
-        setCompletedSteps(prev => [...prev, currentStep]);
-
-        // Move to the next step
-        setCurrentStep(prev => prev + 1);
       } 
-      // If this is the second step, schedule the class
+      // If this is the second step, validate class selection
       else if (currentStep === 2) {
         if (!formData.selectedTeacherId || !formData.classStartDateTime || !formData.classEndDateTime) {
           setErrors({
@@ -318,39 +417,73 @@ export default function StudentOnboarding(): React.JSX.Element {
           return;
         }
 
-        // Get the latest student data
-        const updatedStudentData = await getStudent(user.id);
-        
-        if (!updatedStudentData) {
+        try {
+          // Get the latest student data
+          const updatedStudentData = await getStudent(user.id);
+          
+          if (!updatedStudentData) {
+            throw new Error(tErrors("studentNotFound"));
+          }
+
+          // Calculate class duration in minutes (for validation)
+          const startTime = new Date(formData.classStartDateTime);
+          const endTime = new Date(formData.classEndDateTime);
+          const durationMs = endTime.getTime() - startTime.getTime();
+          const durationMinutes = Math.round(durationMs / (1000 * 60));
+
+          // Store class details in form data for later use
+          const pendingClass = {
+            teacherId: formData.selectedTeacherId,
+            studentId: updatedStudentData.id,
+            startDateTime: startTime,
+            endDateTime: endTime,
+            duration: durationMinutes,
+            notes: formData.classNotes || "",
+            status: "PENDING" as const // Will be scheduled after payment
+          };
+
+          setFormData(prev => ({
+            ...prev,
+            pendingClass
+          }));
+
+          // Mark this step as completed
+          setCompletedSteps(prev => [...prev, currentStep]);
+
+          // Move to the next step
+          setCurrentStep(prev => prev + 1);
+        } catch (step2Error) {
+          console.error("Error in step 2:", step2Error);
           setErrors({
-            general: tErrors("studentNotFound")
+            general: step2Error instanceof Error ? step2Error.message : tErrors("failedToProcessClassSelection")
           });
-          setLoading(false);
           return;
         }
+      } 
+      // If this is the third step (pricing), store form data in localStorage
+      else if (currentStep === 3) {
+        try {
+          // Store form data in localStorage before proceeding to checkout
+          localStorage.setItem("onboardingFormData", JSON.stringify({
+            ...formData,
+            classStartDateTime: formData.classStartDateTime?.toISOString(),
+            classEndDateTime: formData.classEndDateTime?.toISOString(),
+            pendingClass: formData.pendingClass ? {
+              ...formData.pendingClass,
+              startDateTime: formData.pendingClass.startDateTime.toISOString(),
+              endDateTime: formData.pendingClass.endDateTime.toISOString(),
+            } : undefined
+          }));
 
-        // Calculate class duration in minutes
-        const startTime = new Date(formData.classStartDateTime);
-        const endTime = new Date(formData.classEndDateTime);
-        const durationMs = endTime.getTime() - startTime.getTime();
-        const durationMinutes = Math.round(durationMs / (1000 * 60));
-
-        // Schedule the onboarding class
-        await scheduleOnboardingClass({
-          teacherId: formData.selectedTeacherId,
-          studentId: updatedStudentData.id,
-          startDateTime: startTime,
-          endDateTime: endTime,
-          duration: durationMinutes,
-          notes: formData.classNotes || "",
-          status: "SCHEDULED"
-        });
-
-        // Mark this step as completed
-        setCompletedSteps(prev => [...prev, currentStep]);
-
-        // Move to the next step
-        setCurrentStep(prev => prev + 1);
+          // Mark this step as completed
+          setCompletedSteps(prev => [...prev, currentStep]);
+        } catch (storageError) {
+          console.error("Error storing form data:", storageError);
+          setErrors({
+            general: storageError instanceof Error ? storageError.message : tErrors("failedToSaveFormData")
+          });
+          return;
+        }
       } else {
         // For future steps, just navigate to the next one
         setCompletedSteps(prev => [...prev, currentStep]);
@@ -413,15 +546,21 @@ export default function StudentOnboarding(): React.JSX.Element {
         case 2:
           return (
             <Step2TeacherSelection
+              key="teacher-selection"
               formData={formData}
               errors={errors}
               handleSelectChange={handleSelectChange}
               handleDateTimeChange={handleDateTimeChange}
               handleInputChange={handleInputChange}
+              setIsStepValid={(isValid) => {
+                if (isValid && !completedSteps.includes(2)) {
+                  setCompletedSteps(prev => prev.includes(2) ? prev : [...prev, 2]);
+                }
+              }}
             />
           );
         case 3:
-          return <Step3ComingSoon />;
+          return <Step3Pricing formData={formData} />;
         default:
           return null;
       }
@@ -445,7 +584,7 @@ export default function StudentOnboarding(): React.JSX.Element {
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="mx-auto px-4 py-16 max-w-4xl container"
+      className="mx-auto px-4 py-16 md:py-24 max-w-4xl container"
     >
       {/* Stepper */}
       <Stepper

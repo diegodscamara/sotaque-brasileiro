@@ -426,6 +426,7 @@
                         "timezoneLabel": "Timezone",
                         "timezonePlaceholder": "Select your timezone",
                         "timezoneHelp": "This helps us schedule classes at convenient times for you",
+                        "detectingTimezone": "Detecting timezone...",
                         "timezoneError": "Timezone is required",
                         "countryLabel": "Country",
                         "countryPlaceholder": "Select your country",
@@ -473,10 +474,10 @@
                 "title": "Book Your First Class",
                 "subtitle": "Choose a teacher and schedule your first class to start your learning journey.",
                 "tabs": {
-                    "teachers": "Select Teacher",
-                    "schedule": "Schedule Class"
+                    "teachers": "Select a Teacher",
+                    "schedule": "Schedule a Class"
                 },
-                "selectTeacher": "Select Teacher",
+                "selectTeacher": "Select a Teacher",
                 "teacherSelected": "Teacher Selected",
                 "schedule": {
                     "title": "Choose Your Class Time",
@@ -489,6 +490,17 @@
                     "timeSlotNotFound": "Time slot not found",
                     "availabilityError": "Failed to load teacher's availability. Please try again or select a different date.",
                     "noAvailability": "No availability found for this teacher on the selected date."
+                },
+                "reservation": {
+                    "timeSlotReserved": "Time slot reserved",
+                    "reservationNotFound": "Reservation not found",
+                    "reservationError": "Failed to load reservation. Please try again or select a different date.",
+                    "reservationNoAvailability": "No availability found for this teacher on the selected date.",
+                    "expiresIn": "Expires in {time}",
+                    "lastUpdated": "Last updated {time}",
+                    "refresh": "Refresh",
+                    "refreshing": "Refreshing...",
+                    "refreshAvailability": "Refresh availability"
                 },
                 "notes": {
                     "title": "Class Notes",
@@ -505,7 +517,10 @@
                     "classStartDateTime": "Please select a date and time for your class.",
                     "dateTimeRequired": "Please select a date and time for your class.",
                     "teacherRequired": "Please select a teacher to continue.",
-                    "timeSlotRequired": "Please select a time slot to continue."
+                    "timeSlotRequired": "Please select a time slot to continue.",
+                    "refreshAvailability": "Failed to load teacher's availability. Please try again or select a different date.",
+                    "slotNoLongerAvailable": "The selected time slot is no longer available. Please select a different time slot.",
+                    "failedToLoadTeachers": "Failed to load teachers. Please try again later."
                 },
                 "requiredSelections": "Required selections",
                 "validationComplete": "All selections complete",
@@ -632,7 +647,9 @@
             "upgrade": "Upgrade",
             "notifications": "Notifications",
             "loading": "Loading",
-            "accountMenu": "Account Menu"
+            "accountMenu": "Account Menu",
+            "onboarding": "Onboarding",
+            "admin": "Admin"
         },
         "themeToggle": {
             "system": "System Theme",

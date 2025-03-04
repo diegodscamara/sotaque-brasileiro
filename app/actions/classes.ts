@@ -31,9 +31,9 @@ export async function fetchClasses(
 ) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -99,9 +99,9 @@ export async function fetchClasses(
 export async function editClass(classId: string, classData: ClassData) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -198,9 +198,9 @@ export async function editClass(classId: string, classData: ClassData) {
 export async function cancelClass(classId: string) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -302,9 +302,9 @@ export async function cancelClass(classId: string) {
 export async function scheduleClass(classData: ClassData) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
@@ -422,9 +422,9 @@ export async function scheduleOnboardingClass(
 ) {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 

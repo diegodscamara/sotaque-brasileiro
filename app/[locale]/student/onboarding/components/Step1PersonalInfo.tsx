@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info } from "@phosphor-icons/react";
+import { Info, CircleNotch } from "@phosphor-icons/react";
 
 // UI Components
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import { learningGoals } from "@/data/learning-goals";
 
 // Types
 import { OnboardingFormData } from "@/app/[locale]/student/onboarding/types";
+import { getUserTimezone } from "@/libs/utils/timezone";
 
 /**
  * Required field indicator component with tooltip
@@ -157,7 +158,7 @@ const FormField = ({
 
 interface Step1Props {
     formData: OnboardingFormData;
-    errors: Record<string, string>;
+    errors: Record<string, string | undefined>;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSelectChange: (name: string, value: string) => void;
     handleMultiSelectChange: (name: string, values: string[]) => void;
@@ -187,6 +188,41 @@ export default function Step1PersonalInfo({
         personal: true,
         learning: false
     });
+
+    // Add loading state for timezone detection
+    const [isDetectingTimezone, setIsDetectingTimezone] = useState(true);
+    const [timezoneError, setTimezoneError] = useState<string | undefined>(undefined);
+
+    // Detect timezone on component mount
+    React.useEffect(() => {
+        const detectTimezone = async () => {
+            try {
+                const { timezone, error } = await getUserTimezone();
+                if (timezone) {
+                    // Force the timezone update in the form
+                    handleSelectChange("timeZone", timezone);
+                } else if (error) {
+                    setTimezoneError(error);
+                    console.error("Timezone detection error:", error);
+                    
+                    // Fallback: Use a default timezone (UTC) if detection fails
+                    handleSelectChange("timeZone", "Etc/UTC");
+                }
+            } catch (error) {
+                console.error("Failed to detect timezone:", error);
+                setTimezoneError(t("forms.personalDetails.timezoneDetectionError"));
+                
+                // Fallback: Use a default timezone (UTC) if detection fails
+                handleSelectChange("timeZone", "Etc/UTC");
+            } finally {
+                setIsDetectingTimezone(false);
+            }
+        };
+
+        if (isDetectingTimezone && !formData.timeZone) {
+            detectTimezone();
+        }
+    }, [isDetectingTimezone, handleSelectChange, t, formData.timeZone]);
 
     // Activate learning section when personal section is filled
     React.useEffect(() => {
@@ -282,13 +318,14 @@ export default function Step1PersonalInfo({
                     <FormField
                         label={t("forms.personalDetails.timezoneLabel")}
                         id="timezone"
-                        error={errors.timeZone}
+                        error={errors.timeZone || timezoneError}
                         required
                         helpText={t("forms.personalDetails.timezoneHelp")}
                     >
                         <Select
                             value={formData.timeZone}
                             onValueChange={(value) => handleSelectChange("timeZone", value)}
+                            disabled={isDetectingTimezone}
                         >
                             <SelectTrigger
                                 id="timezone"
@@ -296,7 +333,14 @@ export default function Step1PersonalInfo({
                                 aria-errormessage={errors.timeZone ? "timezone-error" : undefined}
                                 className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
                             >
-                                <SelectValue placeholder={t("forms.personalDetails.timezonePlaceholder")} />
+                                {isDetectingTimezone ? (
+                                    <div className="flex items-center gap-2">
+                                        <CircleNotch className="w-4 h-4 animate-spin" />
+                                        <span>{t("forms.personalDetails.detectingTimezone")}</span>
+                                    </div>
+                                ) : (
+                                    <SelectValue placeholder={t("forms.personalDetails.timezonePlaceholder")} />
+                                )}
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
                                 {timezones.map((timezone) => (

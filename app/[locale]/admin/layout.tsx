@@ -22,19 +22,19 @@ export default async function AdminLayout({
   
   // Check if user is authenticated and is an admin
   const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
   
-  if (!session) {
+  if (!user) {
     redirect("/signin");
   }
   
   // Check if user is an admin
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+  const userData = await prisma.user.findUnique({
+    where: { id: user.id },
     select: { role: true }
   });
   
-  if (user?.role !== Role.ADMIN) {
+  if (userData?.role !== Role.ADMIN) {
     redirect("/dashboard");
   }
   

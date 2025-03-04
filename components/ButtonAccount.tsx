@@ -1,11 +1,10 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CreditCard, SignOut, UserCircle } from "@phosphor-icons/react";
+import { CreditCard, SignOut, UserCircle, Gauge, Notebook, ChartLineUp } from "@phosphor-icons/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { JSX, useCallback, useEffect, useMemo, useState } from "react";
 
-import { User as SupabaseUser } from "@supabase/supabase-js";
 import apiClient from "@/libs/api";
 import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
@@ -13,13 +12,8 @@ import { getStudent } from "@/app/actions/students";
 import { getTeacher } from "@/app/actions/teachers";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
-import config from "@/config";
-// Extend the Supabase User type
-interface User extends SupabaseUser {
-  avatarUrl?: string; // Add avatarUrl property
-  firstName?: string; // Add firstName property
-  lastName?: string; // Add lastName property
-}
+import config from "@/config";// Extend the Supabase User type
+import { getUser } from "@/app/actions/users";
 
 interface UserData {
   id: string;
@@ -30,6 +24,7 @@ interface UserData {
   hasAccess?: boolean;
   packageName?: string;
   role?: string;
+  hasCompletedOnboarding?: boolean;
 }
 
 /**
@@ -37,29 +32,72 @@ interface UserData {
  * @component
  * @returns {JSX.Element} Account dropdown with profile, billing, and sign-out options
  */
-const ButtonAccount = () => {
+const ButtonAccount = (): JSX.Element => {
   const supabase = createClient();
   const router = useRouter();
   const t = useTranslations('shared.nav-user');
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserData | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchUser = useCallback(async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    setUser(userData.user);
-
-    if (userData.user?.id) {
-      const studentData = await getStudent(userData.user.id);
-      if (studentData) {
-        setProfile(studentData as unknown as UserData);
-        setHasAccess(studentData.hasAccess || false);
-      } else {
-        const teacherData = await getTeacher(userData.user.id);
-        if (teacherData) {
-          setProfile(teacherData as unknown as UserData);
-        }
+    try {
+      setIsLoading(true);
+      
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        throw new Error(authError.message);
       }
+      
+      if (!authUser?.id) {
+        setIsLoading(false);
+        return;
+      }
+      
+      // Get user data from database
+      const userData = await getUser(authUser.id);
+      if (!userData) {
+        setIsLoading(false);
+        return;
+      }
+      
+      // Check if user is a student
+      const studentData = await getStudent(authUser.id);
+      if (studentData) {
+        setProfile({
+          ...userData, // Use userData for profile info
+          id: studentData.id,
+          role: 'STUDENT',
+          packageName: studentData.packageName ?? undefined,
+          hasAccess: studentData.hasAccess || false,
+          hasCompletedOnboarding: studentData.hasCompletedOnboarding
+        });
+        setHasAccess(studentData.hasAccess || false);
+        setIsLoading(false);
+        return;
+      }
+      
+      // If not a student, check if user is a teacher
+      const teacherData = await getTeacher(userData.id);
+      if (teacherData) {
+        setProfile({
+          ...userData, // Use userData for profile info
+          id: teacherData.id,
+          role: 'TEACHER'
+        });
+      } else {
+        // If neither student nor teacher, just use the user data
+        setProfile({
+          ...userData,
+          role: userData.role || 'USER'
+        });
+      }
+      
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+      setIsLoading(false);
     }
   }, [supabase]);
 
@@ -91,15 +129,15 @@ const ButtonAccount = () => {
         {
           priceId:
             profile?.packageName === "Explorer" ||
-            profile?.packageName === "Enthusiast"
+              profile?.packageName === "Enthusiast"
               ? config.stripe.plans.find(
-                  (plan) => 
-                    plan.name === "Master" && plan.interval === "monthly"
-                )?.priceId
+                (plan) =>
+                  plan.name === "Master" && plan.interval === "monthly"
+              )?.priceId
               : config.stripe.plans.find(
-                  (plan) => 
-                    plan.name === "Enthusiast" && plan.interval === "monthly"
-                )?.priceId,
+                (plan) =>
+                  plan.name === "Enthusiast" && plan.interval === "monthly"
+              )?.priceId,
           successUrl: window.location.href + "/dashboard",
           cancelUrl: window.location.href,
           mode: "subscription",
@@ -112,19 +150,38 @@ const ButtonAccount = () => {
     }
   }, [profile, router]);
 
-  const avatarFallback = useMemo(() => user?.email?.charAt(0).toUpperCase() || "", [user?.email]);
+  // Enhanced avatar fallback with initials
+  const avatarFallback = useMemo(() => {
+    if (profile?.firstName) {
+      if (profile.lastName) {
+        // First letter of first name + first letter of last name
+        return `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase();
+      }
+      // Just first letter of first name if no last name
+      return profile.firstName.charAt(0).toUpperCase();
+    }
+    // First letter of email if no name
+    return profile?.email?.charAt(0).toUpperCase() || "";
+  }, [profile?.firstName, profile?.lastName, profile?.email]);
 
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-200 dark:bg-gray-600 rounded-full w-8 h-8 animate-pulse" 
+           aria-label={t('loading')} />
+    );
+  }
 
   return (
     <DropdownMenu aria-label={t('accountMenu')} aria-busy={false} aria-live="polite" aria-atomic={true}>
       <DropdownMenuTrigger className="rounded-full hover:scale-105 transition-transform duration-200" aria-label={t('accountMenu')} aria-haspopup="dialog" aria-expanded={true} aria-controls="account-menu" role="button" tabIndex={0} aria-busy={false}>
         <Avatar>
           <AvatarImage
-            src={user?.avatarUrl}
-            alt={user?.firstName}
+            src={profile?.avatarUrl}
+            alt={profile?.firstName}
             width={32}
             height={32}
             loading="eager"
@@ -133,24 +190,24 @@ const ButtonAccount = () => {
             sizes="32x32"
             fetchPriority="high"
           />
-          <AvatarFallback className="bg-gray-200 dark:bg-gray-600" aria-hidden="true">{avatarFallback}</AvatarFallback>
+          <AvatarFallback className="bg-gray-200 dark:bg-gray-600 rounded-full" aria-hidden="true">{avatarFallback}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white dark:bg-gray-700 rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56 transition-opacity duration-200" side="bottom" align="end" aria-label={t('accountMenu')} aria-busy={false}>
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
             <Avatar className="rounded-lg w-8 h-8">
-              <AvatarImage src={user?.avatarUrl} alt={user?.firstName} />
-              <AvatarFallback className="rounded-lg">{avatarFallback}</AvatarFallback>
+              <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
+              <AvatarFallback className="bg-gray-200 dark:bg-gray-600 rounded-lg">{avatarFallback}</AvatarFallback>
             </Avatar>
             <div className="flex-1 grid text-sm text-left leading-tight">
-              <span className="font-semibold truncate">{user?.firstName} {user?.lastName}</span>
-              <span className="text-xs truncate">{user?.email}</span>
+              <span className="font-semibold truncate">{profile?.firstName} {profile?.lastName}</span>
+              <span className="text-xs truncate">{profile?.email}</span>
             </div>
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
 
         <DropdownMenuGroup aria-label={t('accountMenu')}>
           {hasAccess && (
@@ -189,7 +246,64 @@ const ButtonAccount = () => {
             {t('profile')}
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+          {profile?.role === 'STUDENT' && profile.hasCompletedOnboarding === false && (
+            <DropdownMenuItem
+              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
+              onClick={() => router.push("/student/onboarding")}
+              aria-label={t('onboarding')}
+              role="menuitem"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push("/student/onboarding");
+                }
+              }}
+            >
+              <Notebook className="w-5 h-5" aria-hidden="true" />
+              {t('onboarding')}
+            </DropdownMenuItem>
+          )}
+
+          {profile?.role === 'STUDENT' && profile.hasCompletedOnboarding === true && hasAccess && (
+            <DropdownMenuItem
+              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
+              onClick={() => router.push("/student/dashboard")}
+              aria-label={t('dashboard')}
+              role="menuitem"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push("/student/dashboard");
+                }
+              }}
+            >
+              <ChartLineUp className="w-5 h-5" aria-hidden="true" />
+              {t('dashboard')}
+            </DropdownMenuItem>
+          )}
+
+          {profile?.role === 'ADMIN' && (
+            <DropdownMenuItem
+              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
+              onClick={() => router.push("/admin")}
+              aria-label={t('admin')}
+              role="menuitem"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push("/admin");
+                }
+              }}
+            >
+              <Gauge className="w-5 h-5" aria-hidden="true" />
+              {t('admin')}
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
 
           <DropdownMenuItem
             className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer"

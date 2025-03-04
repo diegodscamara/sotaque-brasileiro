@@ -29,6 +29,10 @@ export const createCheckout = async ({
   couponId,
 }: CreateCheckoutParams): Promise<string> => {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("Stripe secret key is not configured");
+    }
+
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: "2023-08-16", // TODO: update this when Stripe updates their API
       typescript: true,
@@ -43,7 +47,7 @@ export const createCheckout = async ({
       tax_id_collection?: { enabled: boolean };
     } = {};
 
-    if (user?.customerId) {
+    if (user?.customerId && user.customerId !== 'pending') {
       extraParams.customer = user.customerId;
     } else {
       if (mode === "payment") {
@@ -80,10 +84,14 @@ export const createCheckout = async ({
       ...extraParams,
     });
 
+    if (!stripeSession.url) {
+      throw new Error("Stripe did not return a checkout URL");
+    }
+
     return stripeSession.url;
   } catch (e) {
-    console.error(e);
-    return null;
+    console.error("Stripe checkout error:", e);
+    throw new Error(e instanceof Error ? e.message : "Failed to create checkout session");
   }
 };
 
@@ -92,6 +100,10 @@ export const createCustomerPortal = async ({
   customerId,
   returnUrl,
 }: CreateCustomerPortalParams): Promise<string> => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("Stripe secret key is not configured");
+  }
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2023-08-16", // TODO: update this when Stripe updates their API
     typescript: true,
@@ -102,12 +114,20 @@ export const createCustomerPortal = async ({
     return_url: returnUrl,
   });
 
+  if (!portalSession.url) {
+    throw new Error("Stripe did not return a portal URL");
+  }
+
   return portalSession.url;
 };
 
 // This is used to get the uesr checkout session and populate the data so we get the planId the user subscribed to
 export const findCheckoutSession = async (sessionId: string) => {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("Stripe secret key is not configured");
+    }
+
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: "2023-08-16", // TODO: update this when Stripe updates their API
       typescript: true,
@@ -119,7 +139,7 @@ export const findCheckoutSession = async (sessionId: string) => {
 
     return session;
   } catch (e) {
-    console.error(e);
+    console.error("Error finding checkout session:", e);
     return null;
   }
 };

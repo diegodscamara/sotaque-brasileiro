@@ -15,19 +15,19 @@ export async function createMockTeachers(): Promise<{
 }> {
   try {
     const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       throw new Error("Unauthorized");
     }
 
     // Check if user is an admin
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
       select: { role: true }
     });
 
-    if (user?.role !== Role.ADMIN) {
+    if (userData?.role !== Role.ADMIN) {
       throw new Error("Only admins can create mock data");
     }
 
