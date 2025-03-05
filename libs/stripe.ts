@@ -81,6 +81,9 @@ export const createCheckout = async ({
         : [],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      metadata: clientReferenceId ? {
+        userId: clientReferenceId
+      } : undefined,
       ...extraParams,
     });
 
@@ -134,7 +137,7 @@ export const findCheckoutSession = async (sessionId: string) => {
     });
 
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["line_items"],
+      expand: ["line_items", "customer", "subscription"],
     });
 
     return session;
