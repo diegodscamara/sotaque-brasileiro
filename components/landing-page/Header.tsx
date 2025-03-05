@@ -79,47 +79,6 @@ const Header = () => {
     { href: t("nav.faqLink"), label: t("nav.faq") }
   ];
 
-  /**
-   * Renders the appropriate CTA buttons based on user authentication and role
-   * @returns JSX elements for CTA section
-   */
-  const renderCTAButtons = () => {
-    if (!user) {
-      // Not authenticated - show sign in and CTA buttons
-      return (
-        <>
-          <ButtonSignin />
-          <Button variant="default" asChild>
-            <Link href={t("cta.link")}>{t("cta.primary")}</Link>
-          </Button>
-        </>
-      );
-    } else if (isTeacher) {
-      // Teacher - always show dashboard button
-      return (
-        <>
-          <Button variant="default" asChild>
-            <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
-          </Button>
-          <ButtonSignin />
-        </>
-      );
-    } else if (hasAccess) {
-      // Student with access - show dashboard button
-      return (
-        <>
-          <Button variant="default" asChild>
-            <Link href={t("nav.dashboardLink")}>{t("nav.dashboard")}</Link>
-          </Button>
-          <ButtonSignin />
-        </>
-      );
-    } else {
-      // Student without access - only show sign in button
-      return <ButtonSignin />;
-    }
-  };
-
   return (
     <AnimatePresence>
       <motion.header
@@ -172,7 +131,12 @@ const Header = () => {
           <div className="hidden lg:flex lg:items-center gap-2 md:gap-4">
             <ThemeToggle />
             <LanguageSwitcher />
-            {renderCTAButtons()}
+            <ButtonSignin />
+            {!user && (
+              <Button variant="default" asChild>
+                <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -222,7 +186,12 @@ const Header = () => {
                       </Button>
                     ))}
 
-                    {renderCTAButtons()}
+                    <ButtonSignin />
+                    {!user && (
+                      <Button variant="default" asChild>
+                        <Link href={t("cta.link")}>{t("cta.primary")}</Link>
+                      </Button>
+                    )}
                   </nav>
                 </div>
               </div>
@@ -230,7 +199,7 @@ const Header = () => {
           </Sheet>
         </nav>
       </motion.header>
-    </AnimatePresence>
+    </AnimatePresence >
   );
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CreditCard, SignOut, UserCircle, Gauge, Notebook, ChartLineUp } from "@phosphor-icons/react";
+import { CreditCard, SignOut, UserCircle, Gauge, Notebook, ChartLineUp, ArrowCircleUp } from "@phosphor-icons/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { JSX, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -12,8 +12,9 @@ import { getStudent } from "@/app/actions/students";
 import { getTeacher } from "@/app/actions/teachers";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
-import config from "@/config";// Extend the Supabase User type
+import config from "@/config";
 import { getUser } from "@/app/actions/users";
+import messages from "@/messages/en.json";
 
 interface UserData {
   id: string;
@@ -25,6 +26,7 @@ interface UserData {
   packageName?: string;
   role?: string;
   hasCompletedOnboarding?: boolean;
+  userId?: string;
 }
 
 /**
@@ -71,7 +73,8 @@ const ButtonAccount = (): JSX.Element => {
           role: 'STUDENT',
           packageName: studentData.packageName ?? undefined,
           hasAccess: studentData.hasAccess || false,
-          hasCompletedOnboarding: studentData.hasCompletedOnboarding
+          hasCompletedOnboarding: studentData.hasCompletedOnboarding,
+          userId: authUser.id
         });
         setHasAccess(studentData.hasAccess || false);
         setIsLoading(false);
@@ -150,6 +153,71 @@ const ButtonAccount = (): JSX.Element => {
     }
   }, [profile, router]);
 
+  /**
+   * Determines the next higher plan based on the user's current plan
+   * @returns {string | null} The name of the next higher plan or null if user has the highest plan
+   */
+  const getNextHigherPlan = useMemo(() => {
+    if (!profile?.packageName) return "Enthusiast"; // Default to Enthusiast if no plan
+
+    // Get all plans from the messages file
+    const plans = messages.landing.pricing.plans;
+    
+    // Create an ordered array of plan tiers
+    const planTiers = plans.map(plan => plan.tier);
+    
+    // Find the index of the current plan
+    const currentPlanIndex = planTiers.findIndex(
+      tier => tier === profile.packageName
+    );
+    
+    // If the user has the highest plan or plan not found, return null
+    if (currentPlanIndex === -1 || currentPlanIndex === planTiers.length - 1) {
+      return null;
+    }
+    
+    // Return the next plan in the array
+    return planTiers[currentPlanIndex + 1];
+  }, [profile?.packageName]);
+
+  const handleUpgradePlan = useCallback(async () => {
+    try {
+      if (!getNextHigherPlan) return;
+      
+      // Find the plan details
+      const nextPlan = messages.landing.pricing.plans.find(
+        plan => plan.tier === getNextHigherPlan
+      );
+      
+      if (!nextPlan) return;
+      
+      // Get the monthly variant price ID
+      const monthlyVariant = nextPlan.variants.find(
+        variant => variant.interval === "monthly"
+      );
+      
+      if (!monthlyVariant) return;
+      
+      const priceId = monthlyVariant.priceId.production;
+      
+      // Create checkout session
+      const { url }: { url: string } = await apiClient.post(
+        "/stripe/create-checkout",
+        {
+          priceId,
+          successUrl: `${window.location.origin}/dashboard`,
+          cancelUrl: window.location.href,
+          mode: "subscription",
+          clientReferenceId: profile?.userId || profile?.id
+        }
+      );
+
+      router.push(url);
+    } catch (e) {
+      console.error("Error creating checkout session:", e);
+    }
+  }, [getNextHigherPlan, profile?.id, profile?.userId, router]);
+
   // Enhanced avatar fallback with initials
   const avatarFallback = useMemo(() => {
     if (profile?.firstName) {
@@ -210,6 +278,25 @@ const ButtonAccount = (): JSX.Element => {
         <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
 
         <DropdownMenuGroup aria-label={t('accountMenu')}>
+          {profile?.role === 'STUDENT' && hasAccess && getNextHigherPlan && (
+            <DropdownMenuItem
+              className="hover:bg-gray-200 dark:hover:bg-gray-600 font-medium text-green-600 dark:text-green-400 transition-colors duration-200 cursor-pointer"
+              onClick={handleUpgradePlan}
+              aria-label={`Upgrade to ${getNextHigherPlan}`}
+              role="menuitem"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleUpgradePlan();
+                }
+              }}
+            >
+              <ArrowCircleUp className="w-5 h-5" aria-hidden="true" />
+              {`Upgrade to ${getNextHigherPlan}`}
+            </DropdownMenuItem>
+          )}
+
           {hasAccess && (
             <DropdownMenuItem
               className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
