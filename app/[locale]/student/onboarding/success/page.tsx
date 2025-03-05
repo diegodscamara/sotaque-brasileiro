@@ -44,10 +44,50 @@ export default function OnboardingSuccess() {
           throw new Error("No session ID found");
         }
 
+        // Call our endpoint to update the student record after checkout
+        const updateResponse = await fetch("/api/stripe/update-student-after-checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sessionId }),
+        });
+
+        if (!updateResponse.ok) {
+          const errorData = await updateResponse.json();
+          console.error("Failed to update student record:", errorData);
+          // Continue execution instead of throwing - the webhook might have succeeded
+          // We'll check if the student record exists and has been updated
+        }
+
+        // Wait a moment to allow webhook processing to complete if it hasn't already
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         // Get student data
-        const studentData = await getStudent(user.id);
+        let studentData = await getStudent(user.id);
         if (!studentData) {
           throw new Error("Student not found");
+        }
+
+        // Check if the student record has been properly updated
+        if (!studentData.hasAccess || !studentData.customerId) {
+          console.warn("Student record may not be fully updated. Retrying update...");
+          
+          // Try the update one more time
+          await fetch("/api/stripe/update-student-after-checkout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ sessionId }),
+          });
+          
+          // Fetch the student data again
+          const refreshedStudentData = await getStudent(user.id);
+          if (refreshedStudentData) {
+            console.log("Student data refreshed after retry");
+            studentData = refreshedStudentData;
+          }
         }
 
         // Create a proper Student object with the user property
@@ -76,41 +116,69 @@ export default function OnboardingSuccess() {
         // Get stored form data from localStorage
         const storedFormData = localStorage.getItem("onboardingFormData");
         if (!storedFormData) {
-          throw new Error("No stored form data found");
+          console.warn("No stored form data found, continuing with available data");
+          // Continue with the process even if no localStorage data is found
+          // The webhook might have already processed everything
         }
 
-        // Parse the stored form data and convert date strings to Date objects
-        const parsedData = JSON.parse(storedFormData);
-        const formData: OnboardingFormData = {
-          ...parsedData,
-          classStartDateTime: parsedData.classStartDateTime ? new Date(parsedData.classStartDateTime) : undefined,
-          classEndDateTime: parsedData.classEndDateTime ? new Date(parsedData.classEndDateTime) : undefined,
-          pendingClass: parsedData.pendingClass ? {
-            ...parsedData.pendingClass,
-            startDateTime: new Date(parsedData.pendingClass.startDateTime),
-            endDateTime: new Date(parsedData.pendingClass.endDateTime)
-          } : undefined
-        };
+        let formData: OnboardingFormData | null = null;
         
-        if (!formData.pendingClass) {
-          throw new Error("No pending class found");
+        if (storedFormData) {
+          try {
+            // Parse the stored form data and convert date strings to Date objects
+            const parsedData = JSON.parse(storedFormData);
+            formData = {
+              ...parsedData,
+              classStartDateTime: parsedData.classStartDateTime ? new Date(parsedData.classStartDateTime) : undefined,
+              classEndDateTime: parsedData.classEndDateTime ? new Date(parsedData.classEndDateTime) : undefined,
+              pendingClass: parsedData.pendingClass ? {
+                ...parsedData.pendingClass,
+                startDateTime: new Date(parsedData.pendingClass.startDateTime),
+                endDateTime: new Date(parsedData.pendingClass.endDateTime)
+              } : undefined
+            };
+          } catch (parseError) {
+            console.error("Error parsing stored form data:", parseError);
+          }
         }
-
-        if (!formData.pendingClass.teacherId) {
-          throw new Error("No teacher selected for the class");
+        
+        // Only schedule the class if we have the necessary data
+        if (formData?.pendingClass) {
+          if (!formData.pendingClass.teacherId) {
+            console.warn("No teacher selected for the class");
+          } else {
+            try {
+              console.log("Attempting to schedule class with data:", {
+                teacherId: formData.pendingClass.teacherId,
+                studentId: formData.pendingClass.studentId,
+                startDateTime: formData.pendingClass.startDateTime,
+                endDateTime: formData.pendingClass.endDateTime,
+                duration: formData.pendingClass.duration,
+                notes: formData.pendingClass.notes || ""
+              });
+              
+              // Schedule the class now that payment is confirmed
+              const { teacherId, studentId, startDateTime, endDateTime, duration, notes } = formData.pendingClass;
+              const scheduledClass = await scheduleOnboardingClass({
+                teacherId,
+                studentId,
+                startDateTime,
+                endDateTime,
+                duration,
+                notes: notes || "",
+                status: "SCHEDULED"
+              });
+              
+              console.log("Class scheduled successfully:", scheduledClass);
+            } catch (classError) {
+              console.error("Error scheduling class:", classError);
+              // Continue with the process even if class scheduling fails
+              // We don't want to block the user from completing onboarding
+            }
+          }
+        } else {
+          console.warn("No pending class data found, skipping class scheduling");
         }
-
-        // Schedule the class now that payment is confirmed
-        const { teacherId, studentId, startDateTime, endDateTime, duration, notes } = formData.pendingClass;
-        await scheduleOnboardingClass({
-          teacherId,
-          studentId,
-          startDateTime,
-          endDateTime,
-          duration,
-          notes,
-          status: "SCHEDULED"
-        });
 
         // Update student record to mark onboarding as completed
         await editStudent(user.id, {
@@ -119,7 +187,7 @@ export default function OnboardingSuccess() {
           hasAccess: true
         });
 
-        // Clear stored form data
+        // Always clear stored form data to prevent issues with future onboarding sessions
         localStorage.removeItem("onboardingFormData");
 
         // Redirect to dashboard after a short delay
