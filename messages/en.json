@@ -543,6 +543,16 @@
                     "connection_issue": "Failed to load teachers. Please try again later.",
                     "teacher_schedule_issue": "Failed to load teacher's schedule. Please try again later."
                 }
+            },
+            "success": {
+                "title": "Payment Successful!",
+                "description": "Your payment has been processed successfully. You now have access to our platform and can start scheduling classes with our teachers.",
+                "processing": "Processing your payment...",
+                "pleaseWait": "Please wait while we set up your account.",
+                "goToDashboard": "Go to Dashboard",
+                "classScheduled": "Your first class has been scheduled!",
+                "checkDashboard": "You can view the details in your dashboard.",
+                "enjoyingConfetti": "Enjoy the celebration..."
             }
         },
         "step3": {

@@ -7,6 +7,7 @@ interface CreateCheckoutParams {
   cancelUrl: string;
   couponId?: string | null;
   clientReferenceId?: string;
+  pendingClass?: any;
   user?: {
     customerId?: string;
     email?: string;
@@ -27,6 +28,7 @@ export const createCheckout = async ({
   cancelUrl,
   priceId,
   couponId,
+  pendingClass,
 }: CreateCheckoutParams): Promise<string> => {
   try {
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -62,6 +64,17 @@ export const createCheckout = async ({
       extraParams.tax_id_collection = { enabled: true };
     }
 
+    // Prepare metadata with userId and pendingClass if available
+    const metadata: Record<string, string> = {};
+    
+    if (clientReferenceId) {
+      metadata.userId = clientReferenceId;
+    }
+    
+    if (pendingClass) {
+      metadata.pendingClass = JSON.stringify(pendingClass);
+    }
+
     const stripeSession = await stripe.checkout.sessions.create({
       mode,
       allow_promotion_codes: true,
@@ -81,9 +94,7 @@ export const createCheckout = async ({
         : [],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      metadata: clientReferenceId ? {
-        userId: clientReferenceId
-      } : undefined,
+      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       ...extraParams,
     });
 

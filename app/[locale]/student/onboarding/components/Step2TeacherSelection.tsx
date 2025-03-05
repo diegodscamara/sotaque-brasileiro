@@ -118,7 +118,11 @@ export default function Step2TeacherSelection({
   // Effect to handle restored data from localStorage
   useEffect(() => {
     const handleRestoredData = async () => {
+      // Only use the formData if it's from a valid source (not from browser cache of a different user)
+      // This is determined by the parent component's logic that only sets formData.selectedTeacherId
+      // if it's from the database or valid localStorage data
       if (formData.selectedTeacherId && !selectedTeacher) {
+        console.log("Restoring teacher selection from saved data");
         handleTeacherSelect(formData.selectedTeacherId);
         
         if (formData.classStartDateTime && formData.classEndDateTime) {
@@ -128,9 +132,9 @@ export default function Step2TeacherSelection({
       
       validateStep();
     };
-    
+
     handleRestoredData();
-  }, []);
+  }, [formData.selectedTeacherId, formData.classStartDateTime, formData.classEndDateTime]);
   
   // Effect to ensure selected time slot is properly reflected in the UI and form data
   useEffect(() => {

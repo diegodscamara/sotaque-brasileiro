@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import type { OnboardingFormData } from "../types";
 
 // Import the Pricing component
@@ -28,6 +29,19 @@ interface Step3PricingProps {
  */
 export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX.Element {
   const t = useTranslations("student.onboarding");
+  const params = useParams();
+  const locale = params.locale as string;
+
+  // Extract the pending class data from the form data
+  const pendingClass = formData.pendingClass ? {
+    teacherId: formData.pendingClass.teacherId,
+    studentId: formData.pendingClass.studentId,
+    startDateTime: formData.pendingClass.startDateTime.toISOString(),
+    endDateTime: formData.pendingClass.endDateTime.toISOString(),
+    duration: formData.pendingClass.duration,
+    notes: formData.pendingClass.notes || "",
+    status: "PENDING"
+  } : undefined;
 
   return (
     <motion.div
@@ -43,7 +57,10 @@ export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX
       </div> */}
 
       {/* Pricing Component with success redirect */}
-      <Pricing successUrl="/student/onboarding/success" />
+      <Pricing 
+        successUrl={`/${locale}/student/onboarding/success`}
+        pendingClass={pendingClass}
+      />
     </motion.div>
   );
 } 

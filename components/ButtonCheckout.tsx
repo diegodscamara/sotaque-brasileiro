@@ -16,6 +16,7 @@ interface ButtonCheckoutProps {
   mode?: "payment" | "subscription";
   variant?: "default" | "outline";
   successUrl?: string;
+  pendingClass?: any;
 }
 
 /**
@@ -31,6 +32,7 @@ const ButtonCheckout = ({
   mode = "subscription",
   variant = "default",
   successUrl,
+  pendingClass,
 }: ButtonCheckoutProps): React.JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -52,6 +54,7 @@ const ButtonCheckout = ({
         successUrl: checkoutSuccessUrl,
         cancelUrl: checkoutCancelUrl,
         mode,
+        pendingClass: pendingClass ? 'Present' : 'Not provided',
       });
 
       // Make the API call
@@ -62,6 +65,7 @@ const ButtonCheckout = ({
           successUrl: checkoutSuccessUrl,
           cancelUrl: checkoutCancelUrl,
           mode,
+          pendingClass,
         });
 
         console.log("Checkout response:", response);

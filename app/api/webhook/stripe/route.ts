@@ -115,7 +115,11 @@ export async function POST(req: NextRequest) {
 
         // Get subscription details to set package expiration
         if (session?.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+          const subscriptionId = typeof session.subscription === 'object' && session.subscription !== null && 'id' in session.subscription 
+            ? (session.subscription as { id: string }).id 
+            : session.subscription as string;
+          
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           
           // Store the userId in the subscription metadata if available
           if (userId) {
@@ -290,7 +294,7 @@ export async function POST(req: NextRequest) {
                 subscriptionInfo: JSON.stringify({
                   isUpgradeOrDowngrade,
                   previousSubscriptionId,
-                  currentSubscriptionId: session?.subscription,
+                  currentSubscriptionId: session?.subscription ? typeof session.subscription === 'object' && session.subscription !== null && 'id' in session.subscription ? (session.subscription as { id: string }).id : session.subscription as string : null,
                   planInterval,
                   planUnits: newPlanUnits,
                   lastUpdated: new Date().toISOString()
@@ -298,9 +302,40 @@ export async function POST(req: NextRequest) {
               }
             });
             console.log("✅ Successfully updated student record");
-          } catch (updateError: any) {
-            console.error("Failed to update student record:", updateError);
-            throw updateError;
+            
+            // Check if there's pending class data in the session metadata
+            if (stripeObject.metadata?.pendingClass) {
+              try {
+                console.log("Found pending class data in session metadata:", stripeObject.metadata.pendingClass);
+                const pendingClassData = JSON.parse(stripeObject.metadata.pendingClass);
+                
+                // Import the scheduleOnboardingClass function
+                const { scheduleOnboardingClass } = await import('@/app/actions/classes');
+                
+                // Schedule the class
+                const scheduledClass = await scheduleOnboardingClass({
+                  teacherId: pendingClassData.teacherId,
+                  studentId: pendingClassData.studentId,
+                  startDateTime: new Date(pendingClassData.startDateTime),
+                  endDateTime: new Date(pendingClassData.endDateTime),
+                  duration: pendingClassData.duration,
+                  notes: pendingClassData.notes || "",
+                  status: "SCHEDULED"
+                });
+                
+                console.log("Stripe webhook: Attempting to schedule class with data:", stripeObject.metadata.pendingClass);
+                console.log("Stripe webhook: Class scheduled successfully with ID:", scheduledClass.id);
+              } catch (classError) {
+                console.error("Error scheduling class from webhook:", classError);
+                // Don't throw error here, we don't want to fail the webhook
+                // just because class scheduling failed
+              }
+            } else {
+              console.log("No pending class data found in session metadata");
+            }
+          } catch (dbError: any) {
+            console.error("Failed to update student record:", dbError);
+            throw dbError;
           }
         } else {
           console.error("No user record to update");
