@@ -118,49 +118,67 @@ export default function StudentOnboarding(): React.JSX.Element {
             return;
           }
 
-          // Check for saved onboarding data in localStorage first
+          // Get user and student data from database first
+          const userData = await getUser(user.id);
+          const studentData = await getStudent(user.id);
+
+          // Check if we have existing data in the database
+          const hasExistingData = userData && (
+            userData.firstName || 
+            userData.lastName || 
+            userData.email || 
+            userData.country || 
+            userData.gender
+          );
+
+          // Check for saved onboarding data in localStorage
           const savedFormData = localStorage.getItem("onboardingFormData");
           let parsedFormData: Partial<OnboardingFormData> = {};
+          
+          // Only use localStorage data if we don't have existing data in the database
+          // This prevents browser-cached data from being used for new users
           let shouldRestoreFromLocalStorage = false;
 
-          if (savedFormData) {
+          if (savedFormData && !hasExistingData) {
             try {
               parsedFormData = JSON.parse(savedFormData);
               shouldRestoreFromLocalStorage = true;
               console.log("Restored form data from localStorage:", parsedFormData);
             } catch (parseError) {
               console.error("Error parsing saved form data:", parseError);
+              // Clear invalid localStorage data
+              localStorage.removeItem("onboardingFormData");
             }
+          } else if (savedFormData && hasExistingData) {
+            // If we have existing data in the database, clear localStorage data
+            console.log("Found existing user data in database, ignoring localStorage data");
+            localStorage.removeItem("onboardingFormData");
           }
 
-          // Get user and student data
-          const userData = await getUser(user.id);
-          const studentData = await getStudent(user.id);
-
           if (userData) {
-            // Pre-fill form with existing user data, prioritizing localStorage data if available
+            // Pre-fill form with existing user data, only using localStorage if no database data exists
             setFormData(prev => ({
               ...prev,
-              firstName: shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : userData.firstName || "",
-              lastName: shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : userData.lastName || "",
-              email: shouldRestoreFromLocalStorage ? parsedFormData.email || "" : userData.email || "",
-              country: shouldRestoreFromLocalStorage ? parsedFormData.country || "" : userData.country || prev.country,
-              gender: shouldRestoreFromLocalStorage ? parsedFormData.gender || "" : userData.gender || "",
-              timeZone: shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : studentData?.timeZone || prev.timeZone,
-              portugueseLevel: shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : studentData?.portugueseLevel || "",
-              nativeLanguage: shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : studentData?.nativeLanguage || "",
-              learningGoals: shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : studentData?.learningGoals || [],
-              otherLanguages: shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : studentData?.otherLanguages || [],
+              firstName: userData.firstName || (shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : ""),
+              lastName: userData.lastName || (shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : ""),
+              email: userData.email || (shouldRestoreFromLocalStorage ? parsedFormData.email || "" : ""),
+              country: userData.country || (shouldRestoreFromLocalStorage ? parsedFormData.country || "" : prev.country),
+              gender: userData.gender || (shouldRestoreFromLocalStorage ? parsedFormData.gender || "" : ""),
+              timeZone: studentData?.timeZone || (shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : prev.timeZone),
+              portugueseLevel: studentData?.portugueseLevel || (shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : ""),
+              nativeLanguage: studentData?.nativeLanguage || (shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : ""),
+              learningGoals: studentData?.learningGoals || (shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : []),
+              otherLanguages: studentData?.otherLanguages || (shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : []),
               customerId: studentData?.customerId || "",
               priceId: studentData?.priceId || "",
               packageName: studentData?.packageName || "",
-              // Restore Step 2 data if available
+              // Restore Step 2 data if available and no database data exists
               selectedTeacherId: shouldRestoreFromLocalStorage ? parsedFormData.selectedTeacherId : undefined,
               classNotes: shouldRestoreFromLocalStorage ? parsedFormData.classNotes : undefined,
               classDuration: shouldRestoreFromLocalStorage ? parsedFormData.classDuration : undefined,
             }));
 
-            // Restore date/time objects if they exist in localStorage
+            // Restore date/time objects if they exist in localStorage and no database data exists
             if (shouldRestoreFromLocalStorage) {
               if (parsedFormData.classStartDateTime) {
                 setFormData(prev => ({
@@ -430,6 +448,14 @@ export default function StudentOnboarding(): React.JSX.Element {
           const endTime = new Date(formData.classEndDateTime);
           const durationMs = endTime.getTime() - startTime.getTime();
           const durationMinutes = Math.round(durationMs / (1000 * 60));
+
+          console.log("Creating pendingClass with student data:", {
+            studentId: updatedStudentData.id,
+            teacherId: formData.selectedTeacherId,
+            startTime: startTime.toISOString(),
+            endTime: endTime.toISOString(),
+            durationMinutes
+          });
 
           // Store class details in form data for later use
           const pendingClass = {
