@@ -413,99 +413,124 @@ export async function scheduleClass(classData: ClassData) {
 }
 
 /**
- * Schedules a class during onboarding (before payment)
- * @param {Omit<ClassData, 'id' | 'createdAt' | 'updatedAt' | 'feedback' | 'rating'>} classData - The class data to create
- * @returns {Promise<ClassData>} The created class data
+ * Schedules a class for a student during the onboarding process
+ * This is a special version of scheduleClass that handles onboarding-specific logic
  */
 export async function scheduleOnboardingClass(
   classData: Omit<ClassData, 'id' | 'createdAt' | 'updatedAt' | 'feedback' | 'rating'>
 ) {
   try {
+    console.log("scheduleOnboardingClass called with data:", JSON.stringify(classData, null, 2));
+    
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
+      console.error("scheduleOnboardingClass: User not authenticated");
       throw new Error("Unauthorized");
     }
 
     // Validate class data (without requiring status to be PENDING)
-    const validatedData = classDataSchema.omit({ status: true }).parse({
-      ...classData,
-      status: 'SCHEDULED' // Force status to be SCHEDULED
-    });
+    try {
+      const validatedData = classDataSchema.omit({ status: true }).parse({
+        ...classData,
+        status: 'SCHEDULED' // Force status to be SCHEDULED
+      });
+      
+      console.log("scheduleOnboardingClass: Data validated successfully");
 
-    // Rule: Students can only schedule a class 24 hours in advance
-    const classStartTime = new Date(validatedData.startDateTime);
-    const currentTime = new Date();
-    const timeDifference = classStartTime.getTime() - currentTime.getTime();
+      // Rule: Students can only schedule a class 24 hours in advance
+      const classStartTime = new Date(validatedData.startDateTime);
+      const currentTime = new Date();
+      const timeDifference = classStartTime.getTime() - currentTime.getTime();
 
-    if (timeDifference < 24 * 60 * 60 * 1000) {
-      throw new Error("Class must be scheduled at least 24 hours in advance");
-    }
+      if (timeDifference < 24 * 60 * 60 * 1000) {
+        console.error("scheduleOnboardingClass: Class time is less than 24 hours in advance");
+        throw new Error("Class must be scheduled at least 24 hours in advance");
+      }
 
-    // Validate time conflicts for teacher
-    const conflictingClasses = await prisma.class.findMany({
-      where: {
-        teacherId: validatedData.teacherId,
-        status: { in: ['PENDING', 'CONFIRMED'] },
-        OR: [
-          {
-            startDateTime: {
-              lt: validatedData.endDateTime,
+      // Validate time conflicts for teacher
+      console.log("scheduleOnboardingClass: Checking for teacher conflicts");
+      const conflictingClasses = await prisma.class.findMany({
+        where: {
+          teacherId: validatedData.teacherId,
+          status: { in: ['PENDING', 'CONFIRMED'] },
+          OR: [
+            {
+              startDateTime: {
+                lt: validatedData.endDateTime,
+              },
+              endDateTime: {
+                gt: validatedData.startDateTime,
+              },
             },
-            endDateTime: {
-              gt: validatedData.startDateTime,
-            },
-          },
-        ],
-      },
-    });
+          ],
+        },
+      });
 
-    if (conflictingClasses.length > 0) {
-      throw new Error("Teacher has a scheduling conflict");
-    }
+      if (conflictingClasses.length > 0) {
+        console.error("scheduleOnboardingClass: Teacher has a scheduling conflict", conflictingClasses);
+        throw new Error("Teacher has a scheduling conflict");
+      }
 
-    // Create class directly using Prisma with SCHEDULED status
-    const newClass = await prisma.class.create({
-      data: {
-        teacherId: validatedData.teacherId,
-        studentId: validatedData.studentId,
-        status: 'SCHEDULED' as any, // Set status to SCHEDULED
-        startDateTime: validatedData.startDateTime,
-        endDateTime: validatedData.endDateTime,
-        duration: validatedData.duration,
-        notes: validatedData.notes,
-        recurringGroupId: validatedData.recurringGroupId
-      },
-      include: {
-        teacher: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-                email: true,
-                avatarUrl: true
+      // Verify that the student exists
+      console.log("scheduleOnboardingClass: Verifying student exists with ID:", validatedData.studentId);
+      const student = await prisma.student.findUnique({
+        where: { id: validatedData.studentId }
+      });
+      
+      if (!student) {
+        console.error("scheduleOnboardingClass: Student not found with ID:", validatedData.studentId);
+        throw new Error(`Student not found with ID: ${validatedData.studentId}`);
+      }
+
+      // Create class directly using Prisma with SCHEDULED status
+      console.log("scheduleOnboardingClass: Creating class in database");
+      const newClass = await prisma.class.create({
+        data: {
+          teacherId: validatedData.teacherId,
+          studentId: validatedData.studentId,
+          status: 'SCHEDULED' as any, // Set status to SCHEDULED
+          startDateTime: validatedData.startDateTime,
+          endDateTime: validatedData.endDateTime,
+          duration: validatedData.duration,
+          notes: validatedData.notes || "",
+          recurringGroupId: validatedData.recurringGroupId
+        },
+        include: {
+          teacher: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  avatarUrl: true
+                }
               }
             }
-          }
-        },
-        student: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-                email: true,
-                avatarUrl: true
+          },
+          student: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  avatarUrl: true
+                }
               }
             }
           }
         }
-      }
-    });
+      });
 
-    return newClass;
+      console.log("scheduleOnboardingClass: Class created successfully with ID:", newClass.id);
+      return newClass;
+    } catch (validationError) {
+      console.error("scheduleOnboardingClass: Validation error:", validationError);
+      throw validationError;
+    }
   } catch (error) {
     console.error("Error scheduling onboarding class:", error);
     throw error;
