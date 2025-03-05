@@ -537,6 +537,12 @@
                 "submit": "Submit",
                 "cancel": "Cancel",
                 "loading": "Loading..."
+            },
+            "teacher_selection": {
+                "errors": {
+                    "connection_issue": "Failed to load teachers. Please try again later.",
+                    "teacher_schedule_issue": "Failed to load teacher's schedule. Please try again later."
+                }
             }
         },
         "step3": {
@@ -649,6 +655,7 @@
             "loading": "Loading",
             "accountMenu": "Account Menu",
             "onboarding": "Onboarding",
+            "dashboard": "Dashboard",
             "admin": "Admin"
         },
         "themeToggle": {
