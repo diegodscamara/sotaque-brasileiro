@@ -12,7 +12,6 @@ const CreateCheckoutSchema = z.object({
   mode: z.enum(["payment", "subscription"]),
   successUrl: z.string().url("Invalid success URL"),
   cancelUrl: z.string().url("Invalid cancel URL"),
-  pendingClass: z.any().optional(),
 });
 
 /**
@@ -35,7 +34,7 @@ export async function POST(req: NextRequest) {
   try {
     // Validate and parse request body
     const body = await req.json();
-    const { priceId, mode, successUrl, cancelUrl, pendingClass } = CreateCheckoutSchema.parse(body);
+    const { priceId, mode, successUrl, cancelUrl } = CreateCheckoutSchema.parse(body);
 
     // Fetch user data in parallel
     const [userData, studentData] = await Promise.all([
@@ -65,7 +64,6 @@ export async function POST(req: NextRequest) {
         successUrl,
         cancelUrl,
         clientReferenceId: user.id,
-        pendingClass,
         user: {
           email: userData.data?.email,
           customerId: customerId,
