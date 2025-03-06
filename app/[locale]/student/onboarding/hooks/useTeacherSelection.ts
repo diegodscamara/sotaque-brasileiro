@@ -11,7 +11,13 @@ import { OnboardingFormData } from "../types";
 export function useTeacherSelection(
   formData: OnboardingFormData,
   handleSelectChange: (name: string, value: string) => void
-) {
+): {
+  teachers: any[];
+  selectedTeacher: string | null;
+  loading: boolean;
+  error: string | null;
+  handleTeacherSelect: (teacherId: string) => void;
+} {
   const [selectedTeacher, setSelectedTeacher] = useState<string | null>(formData.selectedTeacherId || null);
   const [teachers, setTeachers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

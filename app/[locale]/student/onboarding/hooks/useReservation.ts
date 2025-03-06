@@ -3,7 +3,7 @@ import {
   createTemporaryReservation, 
   cancelTemporaryReservation 
 } from "@/app/actions/availability";
-import { logTimeConversion, createTimeSlotRepresentation } from "@/app/utils/timezone";
+import {  createTimeSlotRepresentation } from "@/app/utils/timezone";
 
 // Add interface for reservation
 interface Reservation {
@@ -19,7 +19,7 @@ interface Reservation {
  */
 export function useReservation(
   refreshAvailabilityData: () => Promise<void>
-) {
+): object {
   const [currentReservation, setCurrentReservation] = useState<Reservation | null>(null);
   const [reservationExpiry, setReservationExpiry] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);

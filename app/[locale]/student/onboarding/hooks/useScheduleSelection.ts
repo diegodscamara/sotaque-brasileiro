@@ -3,13 +3,11 @@ import { format } from "date-fns";
 import { OnboardingFormData } from "../types";
 import { 
   getTeacherAvailabilityRange, 
-  checkTimeSlotAvailability,
   refreshAvailability
 } from "@/app/actions/availability";
 import { 
   standardizeDate, 
   createTimeSlotId, 
-  logDateInfo, 
   formatDateInTimezone 
 } from "@/app/utils/timezone";
 
@@ -26,15 +24,10 @@ interface TimeSlot {
 }
 
 /**
- * Custom hook for managing schedule selection
- * @param {OnboardingFormData} formData - The form data
- * @param {string | null} selectedTeacher - The selected teacher ID
- * @param {Function} handleDateTimeChange - Function to update date/time in form data
- * @param {Function} handleSelectChange - Function to update form data
- * @param {Function} createReservation - Function to create a reservation
- * @param {Function} cancelReservation - Function to cancel a reservation
- * @param {boolean} hasActiveReservation - Whether there is an active reservation
- * @returns {Object} Schedule selection state and handlers
+ * Custom hook for managing schedule selection in the student onboarding process.
+ * Handles date selection, time slot management, and reservation creation.
+ * 
+ * @returns Schedule selection state and handlers
  */
 export function useScheduleSelection(
   formData: OnboardingFormData,

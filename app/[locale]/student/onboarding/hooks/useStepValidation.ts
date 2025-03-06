@@ -16,7 +16,10 @@ export function useStepValidation(
   selectedTimeSlot: string | null,
   formData: OnboardingFormData,
   setIsStepValid?: (isValid: boolean) => void
-) {
+): {
+  isStepValid: boolean;
+  validateStep: () => boolean;
+} {
   const [isStepValid, setStepValid] = useState(false);
 
   // Validate the step based on required selections
