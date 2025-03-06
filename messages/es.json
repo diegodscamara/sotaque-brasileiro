@@ -594,6 +594,22 @@
                     "cancel": "Cancelar",
                     "loading": "Cargando..."
                 }
+            },
+            "reservation": {
+                "existingPendingClass": "Tienes una clase pendiente",
+                "pendingClassDescription": "Encontramos una clase pendiente existente. Puedes continuar con esta clase o seleccionar un horario/profesor diferente. Si seleccionas una opción diferente, la clase pendiente anterior será cancelada."
+            },
+            "checkout": {
+                "cancelled": {
+                    "title": "Pago Cancelado",
+                    "description": "Tu proceso de pago fue cancelado o encontró un error.",
+                    "message": "Hemos limpiado tu reserva de clase pendiente. Puedes intentarlo de nuevo o seleccionar un horario de clase diferente.",
+                    "loading": "Limpiando tu clase pendiente...",
+                    "pendingClassCancelled": "Clase Pendiente Cancelada",
+                    "pendingClassCancelledDescription": "Tu clase pendiente anterior ha sido cancelada. Puedes seleccionar un nuevo horario o reintentar el pago.",
+                    "goBackToTeacherSelection": "Seleccionar Nuevo Horario",
+                    "retryCheckout": "Reintentar Pago"
+                }
             }
         },
         "step2": {

@@ -1,143 +1,151 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { createClient } from "@/libs/supabase/client";
-import { getStudent } from "@/app/actions/students";
 import { fetchClasses, cancelPendingClass } from "@/app/actions/classes";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Warning } from "@phosphor-icons/react";
+import { Spinner } from "@phosphor-icons/react/dist/ssr";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 /**
- * OnboardingCancelled component handles the case when a student cancels or fails checkout
- * It cleans up any pending classes and provides options to retry or go back
- * @returns {React.JSX.Element} The onboarding cancelled component
+ * Page displayed when a checkout is cancelled
+ * Handles cleanup of pending classes
  */
-export default function OnboardingCancelled() {
-  const t = useTranslations("student.onboarding.cancelled");
+export default function CancelledPage() {
+  const t = useTranslations("student.onboarding");
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [cleanupComplete, setCleanupComplete] = useState(false);
+  const [pendingClass, setPendingClass] = useState<any | null>(null);
 
+  // Clean up pending class on page load
   useEffect(() => {
-    const handleCancellation = async () => {
+    const cleanupPendingClass = async () => {
       try {
+        setIsLoading(true);
+        
+        // Get the current user
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-
+        
         if (!user) {
-          router.push("/signin");
+          setError("User not authenticated");
+          setIsLoading(false);
           return;
         }
-
-        // Get student data
-        const studentData = await getStudent(user.id);
-        if (!studentData) {
-          throw new Error("Student data not found");
-        }
-
-        console.log("Student data retrieved:", studentData);
         
-        // Find and clean up any pending classes
-        try {
-          console.log("Fetching pending classes for student:", studentData.id);
-          const pendingClasses = await fetchClasses({
-            studentId: studentData.id,
-            status: "PENDING"
-          });
+        // Get the student's pending classes
+        const pendingClasses = await fetchClasses({
+          status: "PENDING"
+        });
+        
+        if (pendingClasses && pendingClasses.data && pendingClasses.data.length > 0) {
+          const existingPendingClass = pendingClasses.data[0];
+          console.log(`Found pending class to cancel: ${existingPendingClass.id}`);
           
-          console.log("Found pending classes:", pendingClasses);
+          // Store the pending class for display
+          setPendingClass(existingPendingClass);
           
-          if (pendingClasses && pendingClasses.data && pendingClasses.data.length > 0) {
-            console.log(`Found ${pendingClasses.data.length} pending classes to clean up`);
-            
-            for (const pendingClass of pendingClasses.data) {
-              await cancelPendingClass(pendingClass.id);
-              console.log(`Cancelled pending class with ID: ${pendingClass.id}`);
-            }
-            
-            setCleanupComplete(true);
-          } else {
-            console.log("No pending classes found to clean up");
-            setCleanupComplete(true);
-          }
-        } catch (fetchError) {
-          console.error("Error fetching or cancelling pending classes:", fetchError);
-          setError(`There was an error cleaning up your pending class. Error: ${fetchError instanceof Error ? fetchError.message : 'Unknown error'}`);
+          // Cancel the pending class
+          await cancelPendingClass(existingPendingClass.id);
+          console.log(`Cancelled pending class: ${existingPendingClass.id}`);
+        } else {
+          console.log("No pending classes found to cancel");
         }
-
-        setLoading(false);
-      } catch (error) {
-        console.error("Error in handleCancellation:", error);
-        setError(error instanceof Error ? error.message : "An unknown error occurred");
-        setLoading(false);
+      } catch (err) {
+        console.error("Error cleaning up pending class:", err);
+        setError("Failed to clean up pending class");
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    handleCancellation();
-  }, [router, t]);
-
-  const handleRetry = () => {
-    // Go back to step 3 (pricing)
+    
+    cleanupPendingClass();
+  }, []);
+  
+  // Handle retry checkout
+  const handleRetryCheckout = () => {
+    // Navigate back to step 3
     router.push("/student/onboarding?step=3");
   };
-
-  const handleGoBack = () => {
-    // Go back to step 2 (teacher selection)
+  
+  // Handle go back to teacher selection
+  const handleGoBackToTeacherSelection = () => {
+    // Navigate back to step 2
     router.push("/student/onboarding?step=2");
   };
-
+  
   return (
-    <div className="flex flex-col justify-center items-center px-4 py-8 min-h-[60vh]">
-      <div className="bg-white dark:bg-gray-800 shadow-md p-6 rounded-lg w-full max-w-md">
-        <div className="flex flex-col items-center text-center">
-          <AlertCircle className="mb-4 w-16 h-16 text-red-500" />
-          
-          <h1 className="mb-2 font-bold text-2xl">
-            {t("title")}
-          </h1>
-          
-          <p className="mb-6 text-gray-600 dark:text-gray-300">
-            {t("description")}
-          </p>
-          
-          {loading ? (
-            <div className="flex justify-center items-center space-x-2">
-              <Loader2 className="w-6 h-6 text-primary animate-spin" />
-              <span>{t("cleaningUp")}</span>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mx-auto px-4 py-16 md:py-24 max-w-4xl container"
+    >
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="font-bold text-2xl">
+            {t("checkout.cancelled.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("checkout.cancelled.description")}
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <Spinner className="w-8 h-8 text-gray-500 animate-spin" />
+              <span className="ml-2 text-gray-500">{t("checkout.cancelled.loading")}</span>
             </div>
           ) : error ? (
-            <div className="mb-4 text-red-500">
-              {error}
-            </div>
+            <Alert variant="destructive">
+              <Warning className="w-4 h-4" />
+              <AlertTitle>{t("errors.general")}</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : (
-            <div className="mb-4 text-green-500">
-              {cleanupComplete ? t("cleanupComplete") : ""}
+            <div className="space-y-4">
+              <p>{t("checkout.cancelled.message")}</p>
+              
+              {pendingClass && (
+                <Alert>
+                  <AlertTitle>{t("checkout.cancelled.pendingClassCancelled")}</AlertTitle>
+                  <AlertDescription>
+                    {t("checkout.cancelled.pendingClassCancelledDescription")}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           )}
+        </CardContent>
+        
+        <CardFooter className="flex sm:flex-row flex-col justify-end gap-4">
+          <Button 
+            variant="outline" 
+            onClick={handleGoBackToTeacherSelection}
+            className="w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            <ArrowLeft className="mr-2 w-4 h-4" />
+            {t("checkout.cancelled.goBackToTeacherSelection")}
+          </Button>
           
-          <div className="flex sm:flex-row flex-col gap-4 mt-6 w-full">
-            <Button 
-              variant="outline" 
-              className="flex-1" 
-              onClick={handleGoBack}
-              disabled={loading}
-            >
-              {t("goBack")}
-            </Button>
-            
-            <Button 
-              className="flex-1" 
-              onClick={handleRetry}
-              disabled={loading}
-            >
-              {t("retry")}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Button 
+            onClick={handleRetryCheckout}
+            className="w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            <Spinner className="mr-2 w-4 h-4" />
+            {t("checkout.cancelled.retryCheckout")}
+          </Button>
+        </CardFooter>
+      </Card>
+    </motion.div>
   );
 } 

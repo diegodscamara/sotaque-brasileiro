@@ -112,28 +112,31 @@ export default function StudentOnboarding(): React.JSX.Element {
     if (!hasLoadedUserData.current) {
       const fetchUserData = async () => {
         try {
+          setLoading(true);
+          
+          // Check for step parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const stepParam = urlParams.get('step');
+          
+          // If step parameter exists, set the current step
+          if (stepParam) {
+            const step = parseInt(stepParam, 10);
+            if (!isNaN(step) && step >= 1 && step <= 3) {
+              setCurrentStep(step);
+              // Mark previous steps as completed
+              const completedSteps = [];
+              for (let i = 1; i < step; i++) {
+                completedSteps.push(i);
+              }
+              setCompletedSteps(completedSteps);
+            }
+          }
+          
           const { data: { user } } = await supabase.auth.getUser();
 
           if (!user) {
             router.push("/signin");
             return;
-          }
-
-          // Check URL for step parameter
-          const urlParams = new URLSearchParams(window.location.search);
-          const stepParam = urlParams.get('step');
-          
-          if (stepParam) {
-            const stepNumber = parseInt(stepParam, 10);
-            if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 3) {
-              setCurrentStep(stepNumber);
-              // Mark previous steps as completed
-              const completedStepsArray = [];
-              for (let i = 1; i < stepNumber; i++) {
-                completedStepsArray.push(i);
-              }
-              setCompletedSteps(completedStepsArray);
-            }
           }
 
           // Get user and student data from database first
@@ -265,6 +268,8 @@ export default function StudentOnboarding(): React.JSX.Element {
           hasLoadedUserData.current = true;
         } catch (error) {
           console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
         }
       };
 

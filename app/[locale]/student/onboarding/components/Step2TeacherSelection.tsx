@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
 
 // Components
 import TeacherSelectionTab from "./teacher-selection/TeacherSelectionTab";
@@ -55,14 +54,17 @@ export default function Step2TeacherSelection({
     selectedTeacher,
     loading: teachersLoading,
     error: teachersError,
-    handleTeacherSelect
-  } = useTeacherSelection(formData, handleSelectChange);
+    handleTeacherSelect,
+    pendingClass,
+    pendingClassLoading
+  } = useTeacherSelection(formData, handleSelectChange, handleDateTimeChange);
   
-  // Create a dummy refreshAvailabilityData function for initial hook setup
-  const dummyRefresh = async () => {};
+  // Create a stable refresh function using useRef to avoid dependency cycles
+  const refreshFnRef = useRef<() => Promise<void>>(async () => {
+    console.log("Initial refresh function called - will be replaced");
+  });
   
-  // Set up reservation hook with the dummy refresh function
-  // The actual function will be updated via the useRef in the hook
+  // Set up reservation hook with the ref function
   const {
     currentReservation,
     reservationExpiry,
@@ -71,7 +73,7 @@ export default function Step2TeacherSelection({
     createReservation,
     cancelReservation,
     handleRefreshAvailability
-  } = useReservation(dummyRefresh);
+  } = useReservation(() => refreshFnRef.current());
   
   // Set up schedule selection hook with reservation functions
   const {
@@ -94,15 +96,10 @@ export default function Step2TeacherSelection({
     !!currentReservation
   );
   
-  // Update the reservation hook with the actual refresh function
+  // Update the ref with the actual refresh function
   useEffect(() => {
-    // This will update the ref in the useReservation hook
     if (refreshAvailabilityData) {
-      const refreshFn = async () => {
-        await refreshAvailabilityData();
-      };
-      // Don't call the function here, just update the ref in useReservation
-      // The function will be called by the useReservation hook when needed
+      refreshFnRef.current = refreshAvailabilityData;
     }
   }, [refreshAvailabilityData]);
   
@@ -141,6 +138,23 @@ export default function Step2TeacherSelection({
     validateStep();
   }, [selectedTimeSlot, timeSlots, validateStep]);
 
+  useEffect(() => {
+    // Validate the step whenever relevant data changes
+    const isValid = selectedTeacher && 
+                    formData.classStartDateTime && 
+                    formData.classEndDateTime;
+    
+    if (setIsStepValid) {
+      setIsStepValid(!!isValid);
+    }
+    
+    // If we have a pending class, show a notification or highlight
+    if (pendingClass && !pendingClassLoading) {
+      // Switch to the schedule tab if we have a pending class
+      setActiveTab("schedule");
+    }
+  }, [selectedTeacher, formData.classStartDateTime, formData.classEndDateTime, setIsStepValid, pendingClass, pendingClassLoading]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -156,6 +170,18 @@ export default function Step2TeacherSelection({
         selectedDate={selectedDate}
         selectedTimeSlot={selectedTimeSlot}
       />
+      
+      {/* Display pending class notification if one exists */}
+      {pendingClass && !pendingClassLoading && (
+        <div className="bg-blue-50 mb-4 p-4 border border-blue-200 rounded-md">
+          <h3 className="mb-1 font-medium text-blue-800 text-sm">
+            {t("step2.existingPendingClass")}
+          </h3>
+          <p className="text-blue-700 text-sm">
+            {t("step2.pendingClassDescription")}
+          </p>
+        </div>
+      )}
       
       {/* Reservation indicator */}
       {currentReservation && reservationExpiry && (

@@ -500,8 +500,10 @@
                     "lastUpdated": "Last updated {time}",
                     "refresh": "Refresh",
                     "refreshing": "Refreshing...",
-                    "refreshAvailability": "Refresh availability"
+                    "refreshAvailability": "Refresh Availability"
                 },
+                "existingPendingClass": "You have a pending class",
+                "pendingClassDescription": "We found an existing pending class. You can continue with this class or select a different time/teacher. If you select a different option, the previous pending class will be cancelled.",
                 "notes": {
                     "title": "Class Notes",
                     "placeholder": "Add any notes for your teacher about what you'd like to focus on in this class, your learning preferences, or any questions you have."
@@ -553,6 +555,18 @@
                 "classScheduled": "Your first class has been scheduled!",
                 "checkDashboard": "You can view the details in your dashboard.",
                 "enjoyingConfetti": "Enjoy the celebration..."
+            },
+            "checkout": {
+                "cancelled": {
+                    "title": "Checkout Cancelled",
+                    "description": "Your checkout process was cancelled or encountered an error.",
+                    "message": "We've cleaned up your pending class reservation. You can try again or select a different class time.",
+                    "loading": "Cleaning up your pending class...",
+                    "pendingClassCancelled": "Pending Class Cancelled",
+                    "pendingClassCancelledDescription": "Your previously pending class has been cancelled. You can select a new time or retry checkout.",
+                    "goBackToTeacherSelection": "Select New Time",
+                    "retryCheckout": "Retry Checkout"
+                }
             }
         },
         "step3": {
@@ -693,7 +707,15 @@
         "emailInvalid": "Invalid email",
         "passwordInvalid": "Invalid password",
         "unknownError": "An unknown error occurred",
-        "resetPassword": "Reset Password"
+        "resetPassword": "Reset Password",
+        "failedToCreatePendingClass": "Failed to create pending class. Please try again.",
+        "failedToUpdateUser": "Failed to update user information",
+        "failedToUpdateStudentProfile": "Failed to update student profile",
+        "failedToSavePersonalInfo": "Failed to save personal information",
+        "missingRequiredFields": "Please fill in all required fields",
+        "studentNotFound": "Student not found",
+        "failedToProcessClassSelection": "Failed to process class selection",
+        "failedToSaveFormData": "Failed to save form data"
     },
     "index": {
         "title": "Hello world!"

@@ -1,46 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/libs/prisma";
+import { cancelPendingClass } from "@/app/actions/classes";
+import { logger } from "@/libs/logger";
 
 /**
- * API endpoint to clean up pending classes when a user abandons the site
- * This is called via navigator.sendBeacon when the user leaves the page
+ * API endpoint for cleaning up pending classes
+ * This is used when a user leaves the page during onboarding
+ * @param {NextRequest} request - The request object
+ * @returns {NextResponse} The response object
  */
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const classId = req.nextUrl.searchParams.get("classId");
+    // Get the class ID from the query parameters
+    const classId = request.nextUrl.searchParams.get("classId");
     
     if (!classId) {
-      return NextResponse.json({ error: "Class ID is required" }, { status: 400 });
+      logger.warn("No class ID provided for cleanup");
+      return NextResponse.json({ success: false, error: "No class ID provided" }, { status: 400 });
     }
     
-    // Check if the class exists and is in PENDING status
-    const existingClass = await prisma.class.findUnique({
-      where: { id: classId }
-    });
-    
-    if (!existingClass) {
-      return NextResponse.json({ error: "Class not found" }, { status: 404 });
-    }
-    
-    if (existingClass.status !== 'PENDING') {
-      return NextResponse.json({ 
-        message: "Class is not in PENDING status, no action taken",
-        status: existingClass.status
-      });
-    }
+    logger.info(`Cleaning up pending class: ${classId}`);
     
     // Cancel the pending class
-    await prisma.class.update({
-      where: { id: classId },
-      data: { status: 'CANCELLED' }
-    });
+    await cancelPendingClass(classId);
     
-    return NextResponse.json({ 
-      message: "Successfully cancelled pending class",
-      classId
-    });
+    logger.info(`Successfully cleaned up pending class: ${classId}`);
+    
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error cleaning up pending class:", error);
-    return NextResponse.json({ error: "Failed to clean up pending class" }, { status: 500 });
+    logger.error("Error cleaning up pending class:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to clean up pending class" },
+      { status: 500 }
+    );
   }
 } 

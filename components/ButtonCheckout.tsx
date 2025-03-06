@@ -76,23 +76,23 @@ const ButtonCheckout = ({
           window.location.href = response.url as string;
         } else {
           // Handle case where URL is missing
-          const errorMessage = response && typeof response === 'object' && 'error' in response 
+          const errorMessage = response && typeof response === 'object' && 'error' in response
             ? response.error as string
             : "Failed to create checkout session. Please check your Stripe configuration.";
           throw new Error(errorMessage);
         }
       } catch (apiError: unknown) {
         console.error("API error:", apiError);
-        
+
         // Extract the error message
         let errorMessage = "Failed to create checkout session. Please try again.";
-        
+
         if (apiError instanceof Error) {
           errorMessage = apiError.message;
         } else if (typeof apiError === 'object' && apiError && 'message' in apiError) {
           errorMessage = String(apiError.message);
         }
-        
+
         throw new Error(errorMessage);
       }
     } catch (error) {

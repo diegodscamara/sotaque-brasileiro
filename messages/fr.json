@@ -596,7 +596,23 @@
         "step2": {
             "step": "Étape 2",
             "title": "Choisissez votre offre",
-            "subtitle": "Sélectionnez l'offre qui correspond le mieux à vos objectifs et à votre emploi du temps."
+            "subtitle": "Sélectionnez l'offre qui correspond le mieux à vos objectifs et à votre emploi du temps.",
+            "reservation": {
+                "existingPendingClass": "Vous avez un cours en attente",
+                "pendingClassDescription": "Nous avons trouvé un cours en attente existant. Vous pouvez continuer avec ce cours ou sélectionner un horaire/professeur différent. Si vous sélectionnez une option différente, le cours en attente précédent sera annulé."
+            },
+            "checkout": {
+                "cancelled": {
+                    "title": "Paiement Annulé",
+                    "description": "Votre processus de paiement a été annulé ou a rencontré une erreur.",
+                    "message": "Nous avons nettoyé votre réservation de cours en attente. Vous pouvez réessayer ou sélectionner un horaire de cours différent.",
+                    "loading": "Nettoyage de votre cours en attente...",
+                    "pendingClassCancelled": "Cours en Attente Annulé",
+                    "pendingClassCancelledDescription": "Votre cours en attente précédent a été annulé. Vous pouvez sélectionner un nouvel horaire ou réessayer le paiement.",
+                    "goBackToTeacherSelection": "Sélectionner un Nouvel Horaire",
+                    "retryCheckout": "Réessayer le Paiement"
+                }
+            }
         },
         "step3": {
             "step": "Étape 3",
