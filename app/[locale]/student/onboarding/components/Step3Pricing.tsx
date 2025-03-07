@@ -43,8 +43,9 @@ export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX
     status: "PENDING"
   } : undefined;
 
-  // Ensure the success URL is absolute to prevent any navigation issues
-  const successUrl = `${window.location.origin}/${locale}/student/onboarding/success`;
+  // Format the success URL correctly - it should be a relative path without the origin
+  // The ButtonCheckout component will prepend the origin
+  const successUrl = `/${locale}/student/onboarding/success`;
   
   console.log("Setting success URL for checkout:", successUrl);
   console.log("Pending class data:", pendingClass);
