@@ -399,23 +399,41 @@ export async function scheduleClass(
 
     // Check if a class is already scheduled to avoid duplicates (for onboarding)
     if (options.isOnboarding) {
-      const existingClasses = await prisma.class.findMany({
-        where: {
-          studentId: validatedData.studentId,
-          teacherId: validatedData.teacherId,
-          startDateTime: {
-            gte: new Date(validatedData.startDateTime.getTime() - 60 * 1000), // 1 minute buffer
-            lte: new Date(validatedData.startDateTime.getTime() + 60 * 1000), // 1 minute buffer
+      console.log(`Checking for existing pending classes for student ID ${validatedData.studentId}`);
+      
+      try {
+        // Explicitly filter by the current student's ID to avoid finding classes for other students
+        const existingClasses = await prisma.class.findMany({
+          where: {
+            studentId: validatedData.studentId, // Ensure we only find classes for this specific student
+            status: 'PENDING',
+            startDateTime: {
+              gte: new Date(validatedData.startDateTime.getTime() - 60 * 1000), // 1 minute buffer
+              lte: new Date(validatedData.startDateTime.getTime() + 60 * 1000), // 1 minute buffer
+            },
           },
-        },
-      });
+          take: 1, // Only need one result to check existence
+        });
 
-      if (existingClasses.length > 0) {
-        return existingClasses[0];
+        if (existingClasses.length > 0) {
+          // Double-check that this class belongs to the current student
+          if (existingClasses[0].studentId === validatedData.studentId) {
+            console.log(`Found existing pending class with ID ${existingClasses[0].id} for student ID ${validatedData.studentId}, returning it instead of creating a new one`);
+            return existingClasses[0];
+          } else {
+            console.log(`Found pending class ID ${existingClasses[0].id} but it belongs to student ID ${existingClasses[0].studentId}, not current student ID ${validatedData.studentId}`);
+          }
+        } else {
+          console.log(`No existing pending classes found for student ID ${validatedData.studentId}, creating a new one`);
+        }
+      } catch (error) {
+        // If there's an error checking for existing classes, log it but continue with creating a new class
+        console.error("Error checking for existing classes:", error);
+        console.log("Continuing with creating a new class");
       }
     }
 
-    // Create class directly using Prisma
+    // Create class with minimal includes to improve performance
     const newClass = await prisma.class.create({
       data: {
         teacherId: validatedData.teacherId,
@@ -427,7 +445,27 @@ export async function scheduleClass(
         notes: validatedData.notes,
         recurringGroupId: validatedData.recurringGroupId
       },
-      include: {
+      // Only include essential relations for onboarding to improve performance
+      include: options.isOnboarding ? {
+        teacher: {
+          select: {
+            id: true,
+            userId: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        },
+        student: {
+          select: {
+            id: true,
+            userId: true
+          }
+        }
+      } : {
         teacher: {
           include: {
             user: {
@@ -454,23 +492,6 @@ export async function scheduleClass(
         }
       }
     });
-
-    // Deduct credits from student if they don't have unlimited access
-    // Skip during onboarding since payment hasn't been processed yet
-    if (!options.isOnboarding) {
-      const student = await prisma.student.findFirst({
-        where: { id: validatedData.studentId }
-      });
-      
-      if (student && !student.hasAccess) {
-        await prisma.student.update({
-          where: { id: student.id },
-          data: {
-            credits: student.credits - validatedData.duration
-          }
-        });
-      }
-    }
 
     return newClass;
   } catch (error) {
