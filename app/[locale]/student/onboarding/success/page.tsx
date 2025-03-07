@@ -13,8 +13,9 @@ import { Confetti } from "@/components/ui/confetti";
 
 // Utils and API
 import { createClient } from "@/libs/supabase/client";
-import { getStudent } from "@/app/actions/students";
+import { getStudent, editStudent } from "@/app/actions/students";
 import { editClass, fetchClasses } from "@/app/actions/classes";
+import { prisma } from "@/libs/prisma";
 
 /**
  * Success page after Stripe checkout
@@ -26,6 +27,7 @@ export default function OnboardingSuccess() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [classScheduled, setClassScheduled] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
 
   // Prevent automatic redirection - let the user click the button instead
   const [canNavigate, setCanNavigate] = useState(false);
@@ -33,6 +35,8 @@ export default function OnboardingSuccess() {
   useEffect(() => {
     const handleSuccess = async () => {
       try {
+        setLoading(true);
+        
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -41,11 +45,15 @@ export default function OnboardingSuccess() {
           return;
         }
 
+        console.log("Processing checkout success for user:", user.id);
+
         // Get student data
         const studentData = await getStudent(user.id);
         if (!studentData) {
           throw new Error("Student data not found");
         }
+
+        console.log("Found student data:", studentData.id);
 
         // Find pending class for this student
         try {
@@ -54,9 +62,12 @@ export default function OnboardingSuccess() {
             status: "PENDING"
           });
 
+          console.log(`Found ${pendingClasses?.data?.length || 0} pending classes for student`);
+
           if (pendingClasses && pendingClasses.data && pendingClasses.data.length > 0) {
             // Use the most recently created pending class
             const pendingClass = pendingClasses.data[0];
+            console.log("Processing pending class:", pendingClass.id);
 
             try {
               // Update the class status to SCHEDULED
@@ -76,7 +87,33 @@ export default function OnboardingSuccess() {
                 status: 'SCHEDULED'
               });
 
+              console.log("Class status updated to SCHEDULED");
               setClassScheduled(true);
+
+              // Deduct credits from student
+              if (!studentData.hasAccess) {
+                // Only deduct credits if the student doesn't have unlimited access
+                // Deduct exactly 1 credit per class, regardless of duration
+                
+                // Make sure student has enough credits
+                if (studentData.credits >= 1) {
+                  // Update student credits - deduct exactly 1 credit
+                  const updatedStudent = await prisma.student.update({
+                    where: { id: studentData.id },
+                    data: {
+                      credits: studentData.credits - 1
+                    }
+                  });
+                  
+                  console.log(`Deducted 1 credit from student. New balance: ${updatedStudent.credits}`);
+                  setCreditsDeducted(true);
+                } else {
+                  console.warn("Student doesn't have enough credits, but class was scheduled anyway");
+                }
+              } else {
+                console.log("Student has unlimited access, no credits deducted");
+                setCreditsDeducted(true);
+              }
             } catch (updateError) {
               console.error("Error updating pending class status:", updateError);
               setError(`Note: Your class was found but could not be scheduled automatically. Please contact support or try scheduling a class from your dashboard. Error: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`);
@@ -102,11 +139,11 @@ export default function OnboardingSuccess() {
   }, [router, t]);
 
   useEffect(() => {
-    // Allow navigation after 3 seconds to ensure the user sees the success message
+    // Allow navigation after 5 seconds to ensure the user sees the success message
     if (!loading && !error) {
       const timer = setTimeout(() => {
         setCanNavigate(true);
-      }, 3000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }
