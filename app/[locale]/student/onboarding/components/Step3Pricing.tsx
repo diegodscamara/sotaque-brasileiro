@@ -43,6 +43,12 @@ export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX
     status: "PENDING"
   } : undefined;
 
+  // Ensure the success URL is absolute to prevent any navigation issues
+  const successUrl = `${window.location.origin}/${locale}/student/onboarding/success`;
+  
+  console.log("Setting success URL for checkout:", successUrl);
+  console.log("Pending class data:", pendingClass);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -51,14 +57,17 @@ export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX
       className="w-full"
     >
       {/* Step Title */}
-      {/* <div className="mb-6">
+      <div className="mb-6">
         <h1 className="font-semibold text-2xl">{t("step3.title")}</h1>
         <p className="mt-2 text-gray-500 dark:text-gray-400">{t("step3.subtitle")}</p>
-      </div> */}
+        <p className="mt-2 text-blue-600 dark:text-blue-400 text-sm">
+          {t("step3.successNote")}
+        </p>
+      </div>
 
       {/* Pricing Component with success redirect */}
       <Pricing 
-        successUrl={`/${locale}/student/onboarding/success`}
+        successUrl={successUrl}
         pendingClass={pendingClass}
       />
     </motion.div>
