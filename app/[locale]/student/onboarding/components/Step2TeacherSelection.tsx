@@ -23,6 +23,18 @@ import { useStepValidation } from "../hooks/useStepValidation";
 import { OnboardingFormData } from "../types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Import TimeSlot interface from ScheduleTab
+interface TimeSlot {
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
+  id: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  displayStartTime: string;
+  displayEndTime: string;
+}
+
 interface Step2TeacherSelectionProps {
   formData: OnboardingFormData;
   errors: Record<string, string | undefined>;
@@ -98,63 +110,98 @@ export default function Step2TeacherSelection({
   
   // Update the ref with the actual refresh function
   useEffect(() => {
-    if (refreshAvailabilityData) {
-      refreshFnRef.current = refreshAvailabilityData;
-    }
+    refreshFnRef.current = refreshAvailabilityData;
   }, [refreshAvailabilityData]);
   
-  // Validate the step
+  // Use step validation hook to determine if the step is valid
   const { isStepValid, validateStep } = useStepValidation(
+    formData,
     selectedTeacher,
     selectedDate,
     selectedTimeSlot,
-    formData,
-    setIsStepValid
+    errors
   );
   
-  // Effect to handle restored data from localStorage
+  // Update parent component with step validity
+  useEffect(() => {
+    if (setIsStepValid) {
+      setIsStepValid(isStepValid);
+    }
+  }, [isStepValid, setIsStepValid]);
+  
+  // Handle restored data from localStorage or database
+  const hasRestoredDataRef = useRef(false);
+
   useEffect(() => {
     const handleRestoredData = async () => {
-      // Only use the formData if it's from a valid source (not from browser cache of a different user)
-      // This is determined by the parent component's logic that only sets formData.selectedTeacherId
-      // if it's from the database or valid localStorage data
-      if (formData.selectedTeacherId && !selectedTeacher) {
-        console.log("Restoring teacher selection from saved data");
-        handleTeacherSelect(formData.selectedTeacherId);
-        
-        if (formData.classStartDateTime && formData.classEndDateTime) {
-          await fetchAvailabilityForDate(formData.classStartDateTime, formData.selectedTeacherId);
-        }
+      // If we've already restored data, don't do it again
+      if (hasRestoredDataRef.current) {
+        return;
       }
       
-      validateStep();
+      // Mark that we've restored data
+      hasRestoredDataRef.current = true;
+      
+      // If we have a teacher ID from restored data, select it
+      if (formData.selectedTeacherId && !selectedTeacher) {
+        console.log(`Restoring teacher selection: ${formData.selectedTeacherId}`);
+        handleTeacherSelect(formData.selectedTeacherId);
+      }
+      
+      // If we have a class start date from restored data, select it
+      if (formData.classStartDateTime && !selectedDate) {
+        console.log(`Restoring date selection: ${formData.classStartDateTime}`);
+        const date = new Date(formData.classStartDateTime);
+        await handleDateSelect(date);
+      }
     };
-
-    handleRestoredData();
-  }, [formData.selectedTeacherId, formData.classStartDateTime, formData.classEndDateTime]);
+    
+    // Only run once when component mounts and not loading
+    if (!pendingClassLoading) {
+      handleRestoredData();
+    }
+  }, [
+    formData.selectedTeacherId,
+    formData.classStartDateTime,
+    selectedTeacher,
+    selectedDate,
+    handleTeacherSelect,
+    handleDateSelect,
+    pendingClassLoading
+  ]);
   
-  // Effect to ensure selected time slot is properly reflected in the UI and form data
+  // Debounce validation to avoid excessive re-renders
   useEffect(() => {
-    validateStep();
-  }, [selectedTimeSlot, timeSlots, validateStep]);
-
-  useEffect(() => {
-    // Validate the step whenever relevant data changes
-    const isValid = selectedTeacher && 
-                    formData.classStartDateTime && 
-                    formData.classEndDateTime;
+    const timer = setTimeout(() => {
+      validateStep();
+    }, 300);
     
-    if (setIsStepValid) {
-      setIsStepValid(!!isValid);
+    return () => clearTimeout(timer);
+  }, [selectedTeacher, selectedDate, selectedTimeSlot, validateStep]);
+  
+  // Create wrapper functions to match the expected types
+  const handleDateSelectWrapper = useCallback((date: Date | undefined) => {
+    if (date) {
+      return handleDateSelect(date);
     }
-    
-    // If we have a pending class, show a notification or highlight
-    if (pendingClass && !pendingClassLoading) {
-      // Switch to the schedule tab if we have a pending class
-      setActiveTab("schedule");
-    }
-  }, [selectedTeacher, formData.classStartDateTime, formData.classEndDateTime, setIsStepValid, pendingClass, pendingClassLoading]);
+    return Promise.resolve();
+  }, [handleDateSelect]);
 
+  const handleTimeSlotSelectWrapper = useCallback((slot: TimeSlot) => {
+    return handleTimeSlotSelect(slot.id);
+  }, [handleTimeSlotSelect]);
+
+  // Handle tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+  
+  // Determine if we should show the schedule tab
+  const shouldShowScheduleTab = !!selectedTeacher;
+  
+  // Determine if we should show the reservation indicator
+  const shouldShowReservationIndicator = !!currentReservation && !!reservationExpiry;
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -184,13 +231,13 @@ export default function Step2TeacherSelection({
       )}
       
       {/* Reservation indicator */}
-      {currentReservation && reservationExpiry && (
-        <ReservationIndicator
+      {shouldShowReservationIndicator && (
+        <ReservationIndicator 
           t={t}
-          reservationExpiry={reservationExpiry}
+          reservationExpiry={reservationExpiry!}
+          refreshAvailabilityData={handleRefreshAvailability}
           isRefreshing={isRefreshing}
           lastRefreshTime={lastRefreshTime}
-          refreshAvailabilityData={refreshAvailabilityData}
           timeZone={formData.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone}
         />
       )}
@@ -204,49 +251,57 @@ export default function Step2TeacherSelection({
       />
 
       {/* Tabs for the two-step process: 1) Select Teacher, 2) Schedule Class */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 mb-6 w-full">
-          <TabsTrigger value="teachers" disabled={false}>
+      <Tabs 
+        defaultValue="teachers" 
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
+        <TabsList className="grid grid-cols-2 w-full">
+          <TabsTrigger value="teachers" data-testid="teachers-tab">
             {t("step2.tabs.teachers")}
           </TabsTrigger>
-          <TabsTrigger value="schedule" disabled={!selectedTeacher}>
+          <TabsTrigger 
+            value="schedule" 
+            disabled={!shouldShowScheduleTab}
+            data-testid="schedule-tab"
+          >
             {t("step2.tabs.schedule")}
           </TabsTrigger>
         </TabsList>
-
+        
         {/* Teacher Selection Tab */}
         <TabsContent value="teachers" className="space-y-4">
           <TeacherSelectionTab
             teachers={teachers}
             selectedTeacher={selectedTeacher}
             loading={teachersLoading}
-            handleTeacherSelect={(teacherId) => {
+            errors={errors}
+            handleTeacherSelect={(teacherId: string) => {
               handleTeacherSelect(teacherId);
+              // Automatically switch to schedule tab when teacher is selected
               setActiveTab("schedule");
             }}
-            errors={errors}
             t={t}
           />
         </TabsContent>
-
+        
         {/* Schedule Class Tab */}
-        <TabsContent value="schedule">
-          {selectedTeacher && (
-            <ScheduleTab
-              t={t}
-              formData={formData}
-              errors={errors}
-              selectedTeacher={selectedTeacher}
-              selectedDate={selectedDate}
-              selectedTimeSlot={selectedTimeSlot}
-              timeSlots={timeSlots}
-              isLoadingTimeSlots={isLoadingTimeSlots}
-              teachers={teachers}
-              handleDateSelect={handleDateSelect}
-              handleTimeSlotSelect={handleTimeSlotSelect}
-              handleInputChange={handleInputChange}
-            />
-          )}
+        <TabsContent value="schedule" className="space-y-4">
+          <ScheduleTab
+            t={t}
+            formData={formData}
+            errors={errors}
+            selectedTeacher={selectedTeacher}
+            selectedDate={selectedDate}
+            selectedTimeSlot={selectedTimeSlot}
+            timeSlots={timeSlots}
+            isLoadingTimeSlots={isLoadingTimeSlots}
+            teachers={teachers}
+            handleDateSelect={handleDateSelectWrapper}
+            handleTimeSlotSelect={handleTimeSlotSelectWrapper}
+            handleInputChange={handleInputChange}
+          />
         </TabsContent>
       </Tabs>
 
