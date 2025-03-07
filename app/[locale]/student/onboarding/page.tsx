@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
+import { prisma } from "@/libs/prisma";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -114,6 +115,9 @@ export default function StudentOnboarding(): React.JSX.Element {
         try {
           setLoading(true);
           
+          // Set the flag to prevent multiple calls
+          hasLoadedUserData.current = true;
+          
           // Check for step parameter in URL
           const urlParams = new URLSearchParams(window.location.search);
           const stepParam = urlParams.get('step');
@@ -139,10 +143,15 @@ export default function StudentOnboarding(): React.JSX.Element {
             return;
           }
 
+          console.log(`Fetching user data for user ID: ${user.id}`);
+          
           // Get user and student data from database first
           const userData = await getUser(user.id);
           const studentData = await getStudent(user.id);
 
+          console.log(`Fetched user data: ${userData ? 'found' : 'not found'}`);
+          console.log(`Fetched student data: ${studentData ? 'found' : 'not found'}`);
+          
           // Check if we have existing data in the database
           const hasExistingData = userData && (
             userData.firstName || 
@@ -264,8 +273,6 @@ export default function StudentOnboarding(): React.JSX.Element {
               router.push("/dashboard");
             }
           }
-
-          hasLoadedUserData.current = true;
         } catch (error) {
           console.error("Error fetching user data:", error);
         } finally {
@@ -460,35 +467,111 @@ export default function StudentOnboarding(): React.JSX.Element {
 
         try {
           // Get the latest student data
-          const updatedStudentData = await getStudent(user.id);
+          let updatedStudentData = await getStudent(user.id);
           
           if (!updatedStudentData) {
-            throw new Error(tErrors("studentNotFound"));
+            console.log("No student record found yet. This is normal during onboarding. Creating a new student record.");
+            
+            // Create a new student record with minimal data
+            try {
+              // Create a partial student object with only the fields we want to update
+              const newStudentData = {
+                userId: user.id,
+                timeZone: formData.timeZone || "Etc/UTC", // Ensure we have a fallback timezone
+                portugueseLevel: formData.portugueseLevel,
+                nativeLanguage: formData.nativeLanguage,
+                learningGoals: formData.learningGoals,
+                otherLanguages: formData.otherLanguages,
+                // Add placeholder values for required package fields
+                customerId: "pending",
+                priceId: "pending",
+                packageName: "pending",
+                // Set default values
+                credits: 0,
+                hasAccess: false,
+                // We'll set this to true after all steps are completed
+                hasCompletedOnboarding: false
+              };
+
+              // Create the student record
+              const newStudent = await prisma.student.create({
+                data: newStudentData
+              });
+              
+              if (!newStudent) {
+                throw new Error(tErrors("failedToCreateStudentProfile"));
+              }
+              
+              // Use the newly created student data
+              updatedStudentData = newStudent;
+            } catch (createStudentError) {
+              console.error("Error creating student data:", createStudentError);
+              throw new Error(
+                createStudentError instanceof Error 
+                  ? createStudentError.message 
+                  : tErrors("failedToCreateStudentProfile")
+              );
+            }
           }
 
-          // Delete any existing pending classes for this student
-          // This ensures that if a user goes back to step 2 and selects a different class,
-          // we don't end up with multiple pending classes in the database
+          // Store the current pending class ID before potentially cancelling it
+          let existingPendingClassId = null;
+          
+          // Only cancel existing pending classes if we're creating a new one with different details
           try {
-            // Fetch all pending classes for this student
+            // Fetch all pending classes for this specific student
             const existingPendingClasses = await fetchClasses({
-              studentId: updatedStudentData.id,
+              studentId: updatedStudentData.id, // Explicitly filter by the current student's ID
               status: "PENDING"
             });
             
-            // Cancel each pending class
+            // Check if we have existing pending classes
             if (existingPendingClasses && existingPendingClasses.data && existingPendingClasses.data.length > 0) {
-              console.log(`Found ${existingPendingClasses.data.length} existing pending classes to cancel`);
+              console.log(`Found ${existingPendingClasses.data.length} existing pending classes for student ID ${updatedStudentData.id}`);
               
-              for (const pendingClass of existingPendingClasses.data) {
-                await cancelPendingClass(pendingClass.id);
-                console.log(`Cancelled pending class with ID: ${pendingClass.id}`);
+              // Check if we're selecting the same class details
+              const pendingClass = existingPendingClasses.data[0];
+              
+              // Double-check that this class belongs to the current student
+              if (pendingClass.studentId === updatedStudentData.id) {
+                existingPendingClassId = pendingClass.id;
+                
+                // Only cancel if we're selecting a different teacher or time
+                const isSameTeacher = pendingClass.teacherId === formData.selectedTeacherId;
+                const pendingStartTime = new Date(pendingClass.startDateTime).getTime();
+                const selectedStartTime = new Date(formData.classStartDateTime).getTime();
+                const isSameTime = Math.abs(pendingStartTime - selectedStartTime) < 60000; // Within 1 minute
+                
+                if (!isSameTeacher || !isSameTime) {
+                  console.log(`Cancelling existing pending class ID ${pendingClass.id} as user selected different teacher/time`);
+                  await cancelPendingClass(pendingClass.id);
+                  existingPendingClassId = null;
+                } else {
+                  console.log(`User selected the same teacher and time, keeping existing pending class ID ${pendingClass.id}`);
+                }
+              } else {
+                console.log(`Found pending class ID ${pendingClass.id} but it belongs to student ID ${pendingClass.studentId}, not current student ID ${updatedStudentData.id}`);
               }
+            } else {
+              console.log(`No existing pending classes found for student ID ${updatedStudentData.id}`);
             }
           } catch (cancelError) {
-            console.error("Error cancelling existing pending classes:", cancelError);
+            console.error("Error handling existing pending classes:", cancelError);
             // Continue with the process even if cancellation fails
-            // We don't want to block the user from scheduling a new class
+          }
+
+          // If we already have a valid pending class with the same details, use it
+          if (existingPendingClassId) {
+            // Store the pending class ID in the ref for cleanup if needed
+            pendingClassRef.current = existingPendingClassId;
+            
+            // Mark this step as completed
+            setCompletedSteps(prev => [...prev, currentStep]);
+            
+            // Move to the next step
+            setCurrentStep(prev => prev + 1);
+            setLoading(false);
+            return;
           }
 
           // Calculate class duration in minutes (for validation)
@@ -694,10 +777,15 @@ export default function StudentOnboarding(): React.JSX.Element {
         // Only attempt cleanup if we're on step 3 (after class creation, before checkout)
         const classId = pendingClassRef.current;
         
-        // Use navigator.sendBeacon for a non-blocking request that will complete even as the page unloads
-        navigator.sendBeacon(`/api/cleanup-pending-class?classId=${classId}`);
-        
-        console.log(`Sent cleanup request for class: ${classId}`);
+        try {
+          // Use navigator.sendBeacon for a non-blocking request that will complete even as the page unloads
+          const endpoint = `/api/cleanup-pending-class?classId=${classId}`;
+          const success = navigator.sendBeacon(endpoint);
+          
+          console.log(`Sent cleanup request for class: ${classId}, success: ${success}`);
+        } catch (error) {
+          console.error("Error sending cleanup request:", error);
+        }
       }
     };
 

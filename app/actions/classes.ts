@@ -240,13 +240,15 @@ export async function cancelClass(classId: string) {
       });
 
       if (student && !student.hasAccess) {
-        // Refund credits based on class duration
+        // Refund exactly 1 credit, regardless of class duration
         await prisma.student.update({
           where: { id: student.id },
           data: {
-            credits: student.credits + existingClass.duration
+            credits: student.credits + 1
           }
         });
+        
+        console.log(`Refunded 1 credit to student ${student.id}. New balance: ${student.credits + 1}`);
       }
     }
 
@@ -392,7 +394,7 @@ export async function scheduleClass(
         throw new Error("Student not found");
       }
 
-      if (!student.hasAccess && student.credits < validatedData.duration) {
+      if (!student.hasAccess && student.credits < 1) {
         throw new Error("Student doesn't have enough credits");
       }
     }
