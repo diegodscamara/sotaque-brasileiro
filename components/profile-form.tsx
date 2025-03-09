@@ -143,36 +143,34 @@ export function ProfileForm(): React.JSX.Element {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8" aria-label="Profile form">
-        <Tabs defaultValue="personal" className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Profile form">
+        <Tabs defaultValue="personal" className="flex flex-row md:flex-col gap-4 w-full">
           {/* Tabs navigation at the top */}
-          <div className="mb-6 border-b">
-            <TabsList className="flex justify-start bg-transparent p-0 w-full h-auto">
-              <TabsTrigger 
-                value="personal" 
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-b-none"
+          <TabsList className="flex justify-start gap-2 bg-transparent p-0 w-fit h-auto">
+            <TabsTrigger
+              value="personal"
+              className="flex items-center gap-2 data-[state=active]:bg-green-600 dark:data-[state=active]:bg-green-400 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+            >
+              <User className="w-4 h-4" />
+              <span>{t("tabs.personal")}</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="preferences"
+              className="flex items-center gap-2 data-[state=active]:bg-green-600 dark:data-[state=active]:bg-green-400 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+            >
+              <GraduationCap className="w-4 h-4" />
+              <span>{t("tabs.preferences")}</span>
+            </TabsTrigger>
+            {profile?.role === "teacher" && (
+              <TabsTrigger
+                value="teacher"
+                className="flex items-center gap-2 data-[state=active]:bg-green-600 dark:data-[state=active]:bg-green-400 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
               >
-                <User className="w-4 h-4" />
-                <span>{t("tabs.personal")}</span>
+                <BookOpen className="w-4 h-4" />
+                <span>{t("tabs.teacher")}</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="preferences" 
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-b-none"
-              >
-                <GraduationCap className="w-4 h-4" />
-                <span>{t("tabs.preferences")}</span>
-              </TabsTrigger>
-              {profile?.role === "teacher" && (
-                <TabsTrigger 
-                  value="teacher" 
-                  className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:border-primary data-[state=active]:border-b-2 rounded-b-none"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span>{t("tabs.teacher")}</span>
-                </TabsTrigger>
-              )}
-            </TabsList>
-          </div>
+            )}
+          </TabsList>
 
           {/* Tab content */}
           <TabsContent value="personal" className="mt-0 p-0">
@@ -243,10 +241,10 @@ export function ProfileForm(): React.JSX.Element {
                                 {field.value ? (
                                   <div className="flex items-center gap-2">
                                     {field.value && (
-                                      <CircleFlag 
-                                        countryCode={field.value.toLowerCase()} 
-                                        height="16" 
-                                        width="16" 
+                                      <CircleFlag
+                                        countryCode={field.value.toLowerCase()}
+                                        height="16"
+                                        width="16"
                                       />
                                     )}
                                     {countries.find((country) => country.code === field.value)?.name || t("personal.countryPlaceholder")}
@@ -320,7 +318,7 @@ export function ProfileForm(): React.JSX.Element {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="preferences" className="mt-0 p-0">
             <Card>
               <CardHeader>
@@ -354,7 +352,7 @@ export function ProfileForm(): React.JSX.Element {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="nativeLanguage"
@@ -380,7 +378,7 @@ export function ProfileForm(): React.JSX.Element {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="otherLanguages"
@@ -395,7 +393,7 @@ export function ProfileForm(): React.JSX.Element {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="learningGoals"
@@ -403,10 +401,10 @@ export function ProfileForm(): React.JSX.Element {
                         <FormItem>
                           <FormLabel>{t("preferences.learningGoals")}</FormLabel>
                           <FormControl>
-                            <Textarea 
-                              placeholder={t("preferences.learningGoalsPlaceholder")} 
-                              className="min-h-[100px]" 
-                              {...field} 
+                            <Textarea
+                              placeholder={t("preferences.learningGoalsPlaceholder")}
+                              className="min-h-[100px]"
+                              {...field}
                             />
                           </FormControl>
                           <FormDescription>{t("preferences.learningGoalsDescription")}</FormDescription>
@@ -414,7 +412,7 @@ export function ProfileForm(): React.JSX.Element {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="timeZone"
@@ -433,7 +431,7 @@ export function ProfileForm(): React.JSX.Element {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           {profile?.role === "teacher" && (
             <TabsContent value="teacher" className="mt-0 p-0">
               <Card>
@@ -449,10 +447,10 @@ export function ProfileForm(): React.JSX.Element {
                       <FormItem>
                         <FormLabel>{t("teacher.biography")}</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder={t("teacher.biographyPlaceholder")} 
-                            className="min-h-[150px]" 
-                            {...field} 
+                          <Textarea
+                            placeholder={t("teacher.biographyPlaceholder")}
+                            className="min-h-[150px]"
+                            {...field}
                           />
                         </FormControl>
                         <FormDescription>{t("teacher.biographyDescription")}</FormDescription>
@@ -460,7 +458,7 @@ export function ProfileForm(): React.JSX.Element {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="specialties"
@@ -475,7 +473,7 @@ export function ProfileForm(): React.JSX.Element {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="languages"
@@ -495,7 +493,7 @@ export function ProfileForm(): React.JSX.Element {
             </TabsContent>
           )}
         </Tabs>
-        
+
         {/* Save button below the form */}
         <div className="flex justify-end">
           <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
