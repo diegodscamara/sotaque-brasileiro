@@ -149,14 +149,14 @@ export function ProfileForm(): React.JSX.Element {
           <TabsList className="flex justify-start gap-2 bg-transparent p-0 w-fit h-auto">
             <TabsTrigger
               value="personal"
-              className="flex items-center gap-2 data-[state=active]:bg-green-600 dark:data-[state=active]:bg-green-400 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+              className="flex items-center gap-2 data-[state=active]:bg-green-700 dark:data-[state=active]:bg-green-500 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
             >
               <User className="w-4 h-4" />
               <span>{t("tabs.personal")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
-              className="flex items-center gap-2 data-[state=active]:bg-green-600 dark:data-[state=active]:bg-green-400 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+              className="flex items-center gap-2 data-[state=active]:bg-green-700 dark:data-[state=active]:bg-green-500 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
             >
               <GraduationCap className="w-4 h-4" />
               <span>{t("tabs.preferences")}</span>
@@ -164,7 +164,7 @@ export function ProfileForm(): React.JSX.Element {
             {profile?.role === "teacher" && (
               <TabsTrigger
                 value="teacher"
-                className="flex items-center gap-2 data-[state=active]:bg-green-600 dark:data-[state=active]:bg-green-400 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+                className="flex items-center gap-2 data-[state=active]:bg-green-700 dark:data-[state=active]:bg-green-500 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
               >
                 <BookOpen className="w-4 h-4" />
                 <span>{t("tabs.teacher")}</span>
@@ -227,7 +227,7 @@ export function ProfileForm(): React.JSX.Element {
                     control={form.control}
                     name="country"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem className="flex flex-col justify-end">
                         <FormLabel>{t("personal.country")}</FormLabel>
                         <Popover open={countrySearchOpen} onOpenChange={setCountrySearchOpen}>
                           <PopoverTrigger asChild>
@@ -236,7 +236,7 @@ export function ProfileForm(): React.JSX.Element {
                                 variant="outline"
                                 role="combobox"
                                 aria-expanded={countrySearchOpen}
-                                className="justify-between w-full"
+                                className="justify-between bg-transparent dark:bg-transparent border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 w-full"
                               >
                                 {field.value ? (
                                   <div className="flex items-center gap-2">
@@ -264,7 +264,7 @@ export function ProfileForm(): React.JSX.Element {
                                 {countries.map((country) => (
                                   <CommandItem
                                     key={country.code}
-                                    value={country.code}
+                                    value={`${country.code} ${country.name}`}
                                     onSelect={() => {
                                       form.setValue("country", country.code);
                                       setCountrySearchOpen(false);
