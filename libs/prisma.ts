@@ -31,6 +31,13 @@ logEnvironment();
 // Create a singleton instance of PrismaClient
 export const prisma = global.prisma || new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  datasources: process.env.DATABASE_URL 
+    ? undefined 
+    : {
+        db: {
+          url: "postgresql://postgres:postgres@localhost:54322/postgres"
+        }
+      }
 });
 
 // In development, attach the instance to the global object to prevent multiple instances
