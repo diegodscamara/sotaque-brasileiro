@@ -91,3 +91,10 @@ progress::-webkit-progress-value {
     }
   }
   
+@layer components {
+  /* Add your component styles here */
+  .sidebar-expanded-only {
+    @apply group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden;
+  }
+}
+  
