@@ -144,7 +144,7 @@ export function ProfileForm(): React.JSX.Element {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Profile form">
-        <Tabs defaultValue="personal" className="flex flex-row md:flex-col gap-4 w-full">
+        <Tabs defaultValue="personal" className="flex flex-col gap-4 w-full">
           {/* Tabs navigation at the top */}
           <TabsList className="flex justify-start gap-2 bg-transparent p-0 w-fit h-auto">
             <TabsTrigger
