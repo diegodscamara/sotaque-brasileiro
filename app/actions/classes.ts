@@ -41,7 +41,39 @@ export async function fetchClasses(
     const skip = (pagination.page - 1) * pagination.limit;
 
     // Build where clause from filters
-    const where = { ...filters };
+    const where: Record<string, any> = { ...filters };
+
+    // Get the current user's role and ID
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, role: true }
+    });
+
+    if (!dbUser) {
+      throw new Error("User not found");
+    }
+
+    // If the user is a student, only show their classes
+    if (dbUser.role === 'STUDENT') {
+      const student = await prisma.student.findFirst({
+        where: { userId: user.id }
+      });
+      
+      if (student) {
+        where.studentId = student.id;
+      }
+    }
+    
+    // If the user is a teacher, only show their classes
+    if (dbUser.role === 'TEACHER') {
+      const teacher = await prisma.teacher.findFirst({
+        where: { userId: user.id }
+      });
+      
+      if (teacher) {
+        where.teacherId = teacher.id;
+      }
+    }
 
     // Query classes directly using Prisma with related data
     const [classes, total] = await Promise.all([

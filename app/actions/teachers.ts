@@ -3,6 +3,7 @@
 import { createClient } from "@/libs/supabase/server";
 import { prisma } from "@/libs/prisma";
 import { z } from "zod";
+import { cache } from "react";
 
 import { type Teacher } from "@/types";
 
@@ -14,17 +15,23 @@ const teacherSchema = z.object({
 });
 
 /**
- * Fetches a single teacher by ID
+ * Fetches a single teacher by ID with caching
  * @param {string} teacherId - The ID of the teacher to fetch
  * @returns {Promise<Teacher | null>} The teacher data or null if not found
  */
-export async function getTeacher(teacherId: string) {
+export const getTeacher = cache(async (teacherId: string) => {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       throw new Error("Unauthorized");
+    }
+
+    // Validate teacherId is a valid UUID
+    if (!teacherId || teacherId.length < 32) {
+      console.warn(`Invalid teacherId format: ${teacherId}`);
+      return null;
     }
 
     // Find the teacher by userId
@@ -44,12 +51,20 @@ export async function getTeacher(teacherId: string) {
       }
     });
 
-    return teacher;
+    if (teacher) {
+      return {
+        ...teacher,
+        specialties: teacher.specialties || [],
+        languages: teacher.languages || [],
+      };
+    }
+
+    return null;
   } catch (error) {
     console.error("Error fetching teacher:", error);
-    throw error;
+    return null;
   }
-}
+});
 
 /**
  * Fetches all teachers
@@ -188,6 +203,55 @@ export async function deleteTeacher(teacherId: string) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting teacher:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates a teacher's profile
+ * @param {string} teacherId - The ID of the teacher to update
+ * @param {Partial<Teacher>} teacherData - The teacher data to update
+ * @returns {Promise<Teacher | null>} The updated teacher data or null if not found
+ */
+export async function updateTeacher(teacherId: string, teacherData: Partial<any>): Promise<any> {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Find the teacher by ID
+    const teacher = await prisma.teacher.findFirst({
+      where: {
+        id: teacherId
+      }
+    });
+
+    if (!teacher) {
+      throw new Error("Teacher not found");
+    }
+
+    // Update teacher data
+    const updatedTeacher = await prisma.teacher.update({
+      where: {
+        id: teacherId
+      },
+      data: {
+        biography: teacherData.biography,
+        specialties: teacherData.specialties,
+        languages: teacherData.languages,
+      }
+    });
+
+    return {
+      ...updatedTeacher,
+      specialties: updatedTeacher.specialties || [],
+      languages: updatedTeacher.languages || [],
+    };
+  } catch (error) {
+    console.error("Error updating teacher:", error);
     throw error;
   }
 }
