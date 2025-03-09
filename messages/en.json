@@ -660,17 +660,11 @@
         "appName": "Sotaque Brasileiro",
         "appUrl": "https://sotaquebrasileiro.com",
         "buttons": {
-            "save": "Save Changes",
-            "saveChanges": "Save Changes",
-            "saving": "Saving...",
+            "save": "Save",
             "cancel": "Cancel",
             "delete": "Delete",
             "sign-in": "Sign In",
-            "sign-up": "Sign Up",
-            "loading": "Loading...",
-            "back": "Back",
-            "continue": "Continue",
-            "finish": "Finish"
+            "sign-up": "Sign Up"
         },
         "nav-user": {
             "profile": "Profile",
@@ -691,7 +685,8 @@
         },
         "errors": {
             "general": "Something went wrong"
-        }
+        },
+        "platform": "Platform"
     },
     "errors": {
         "general": "Something went wrong",
@@ -789,6 +784,7 @@
             "memberSince": "Member since",
             "credits": "Credits",
             "package": "Package",
+            "profileHeader": "Profile",
             "tabs": {
                 "personalInfo": "Personal Information",
                 "personalInfoShort": "Personal",
@@ -826,12 +822,17 @@
     },
     "profile": {
         "title": "Profile",
-        "memberSince": "Member Since {date}",
-        "memberSinceLabel": "Member Since",
+        "memberSince": "Member since {date}",
+        "memberSinceLabel": "Member since",
         "userDetails": "User Details",
         "unknownUser": "Unknown User",
         "activeSubscription": "Active Subscription",
         "level": "Level",
+        "avatarAlt": "{name}'s profile picture",
+        "error": {
+            "title": "Error Loading Profile",
+            "description": "There was a problem loading your profile data. Please try refreshing the page."
+        },
         "credits": {
             "title": "Credits",
             "description": "Available credits for booking classes"
@@ -840,6 +841,11 @@
             "title": "Package",
             "description": "Your current subscription package",
             "none": "No package"
+        },
+        "subscription": {
+            "title": "Subscription Status",
+            "active": "Active",
+            "inactive": "Inactive"
         },
         "tabs": {
             "personal": "Personal",
@@ -923,7 +929,9 @@
             "save": "Save Changes",
             "saveChanges": "Save Changes",
             "saving": "Saving...",
-            "cancel": "Cancel"
+            "cancel": "Cancel",
+            "refresh": "Refresh Data",
+            "refreshing": "Refreshing..."
         }
     },
     "dashboard": {

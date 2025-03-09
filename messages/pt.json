@@ -496,16 +496,16 @@
             "cancel": "Cancelar",
             "delete": "Excluir",
             "sign-in": "Entrar",
-            "sign-up": "Inscrever-se"
+            "sign-up": "Cadastrar"
         },
         "nav-user": {
             "profile": "Perfil",
             "billing": "Faturamento",
             "sign-out": "Sair",
-            "upgrade": "Atualizar",
+            "upgrade": "Melhorar",
             "notifications": "Notificações",
             "loading": "Carregando",
-            "accountMenu": "Menu da conta",
+            "accountMenu": "Menu da Conta",
             "onboarding": "Integração",
             "dashboard": "Painel",
             "admin": "Administrador"
@@ -517,7 +517,8 @@
         },
         "errors": {
             "general": "Algo deu errado"
-        }
+        },
+        "platform": "Plataforma"
     },
     "errors": {
         "general": "Algo deu errado",
@@ -650,12 +651,14 @@
     },
     "profile": {
         "title": "Perfil",
+        "profileHeader": "Perfil",
         "memberSince": "Membro desde {date}",
         "memberSinceLabel": "Membro desde",
         "userDetails": "Detalhes do Usuário",
         "unknownUser": "Usuário Desconhecido",
         "activeSubscription": "Assinatura Ativa",
         "level": "Nível",
+        "avatarAlt": "Foto de perfil de {name}",
         "credits": {
             "title": "Créditos",
             "description": "Créditos disponíveis para agendar aulas"
@@ -664,6 +667,11 @@
             "title": "Pacote",
             "description": "Seu pacote de assinatura atual",
             "none": "Sem pacote"
+        },
+        "subscription": {
+            "title": "Status da Assinatura",
+            "active": "Ativa",
+            "inactive": "Inativa"
         },
         "tabs": {
             "personal": "Pessoal",
@@ -747,7 +755,13 @@
             "save": "Salvar Alterações",
             "saveChanges": "Salvar Alterações",
             "saving": "Salvando...",
-            "cancel": "Cancelar"
+            "cancel": "Cancelar",
+            "refresh": "Atualizar Dados",
+            "refreshing": "Atualizando..."
+        },
+        "error": {
+            "title": "Erro ao Carregar Perfil",
+            "description": "Ocorreu um problema ao carregar os dados do seu perfil. Por favor, tente atualizar a página."
         }
     }
 }

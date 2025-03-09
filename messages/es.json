@@ -495,19 +495,19 @@
             "save": "Guardar",
             "cancel": "Cancelar",
             "delete": "Eliminar",
-            "sign-in": "Iniciar sesión",
-            "sign-up": "Regístrate"
+            "sign-in": "Iniciar Sesión",
+            "sign-up": "Registrarse"
         },
         "nav-user": {
             "profile": "Perfil",
             "billing": "Facturación",
-            "sign-out": "Cerrar sesión",
+            "sign-out": "Cerrar Sesión",
             "upgrade": "Mejorar",
             "notifications": "Notificaciones",
             "loading": "Cargando",
-            "accountMenu": "Menú de cuenta",
+            "accountMenu": "Menú de Cuenta",
             "onboarding": "Incorporación",
-            "dashboard": "Panel",
+            "dashboard": "Panel de Control",
             "admin": "Administrador"
         },
         "themeToggle": {
@@ -517,7 +517,8 @@
         },
         "errors": {
             "general": "Algo salió mal"
-        }
+        },
+        "platform": "Plataforma"
     },
     "errors": {
         "general": "Algo salió mal",
@@ -653,8 +654,14 @@
         "memberSinceLabel": "Miembro desde",
         "userDetails": "Detalles del Usuario",
         "unknownUser": "Usuario Desconocido",
+        "profileHeader": "Perfil",
         "activeSubscription": "Suscripción Activa",
         "level": "Nivel",
+        "avatarAlt": "Foto de perfil de {name}",
+        "error": {
+            "title": "Error al Cargar el Perfil",
+            "description": "Hubo un problema al cargar los datos de tu perfil. Por favor, intenta refrescar la página."
+        },
         "credits": {
             "title": "Créditos",
             "description": "Créditos disponibles para reservar clases"
@@ -663,6 +670,11 @@
             "title": "Paquete",
             "description": "Tu paquete de suscripción actual",
             "none": "Sin paquete"
+        },
+        "subscription": {
+            "title": "Estado de Suscripción",
+            "active": "Activa",
+            "inactive": "Inactiva"
         },
         "tabs": {
             "personal": "Personal",
@@ -746,7 +758,9 @@
             "save": "Guardar Cambios",
             "saveChanges": "Guardar Cambios",
             "saving": "Guardando...",
-            "cancel": "Cancelar"
+            "cancel": "Cancelar",
+            "refresh": "Actualizar Datos",
+            "refreshing": "Actualizando..."
         }
     }
 }
