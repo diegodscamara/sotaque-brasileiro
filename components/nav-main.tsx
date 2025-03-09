@@ -2,6 +2,7 @@
 
 import { type LucideIcon } from "lucide-react"
 import { cn } from "@/libs/utils"
+import { useTranslations } from "next-intl"
 
 import {
   Collapsible,
@@ -14,6 +15,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+
 export function NavMain({
   items,
 }: {
@@ -28,9 +30,11 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const t = useTranslations('shared');
+  
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('platform')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
