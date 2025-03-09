@@ -23,12 +23,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Class } from "@/types/class";
 import { formatDateTime } from '@/libs/utils/dateUtils'
-import { getTeacher } from '@/app/actions/teachers'
 import { z } from 'zod';
 
 /**
@@ -57,24 +56,6 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
     const [sortColumn, setSortColumn] = useState<keyof Class>('start_time');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [teacherName, setTeacherName] = useState<string>('');
-
-    useEffect(() => {
-        const fetchTeacher = async () => {
-            try {
-                // This is a placeholder - in a real app, you'd fetch the specific teacher
-                const teacher = await getTeacher("1");
-                if (teacher) {
-                    setTeacherName(`${teacher.user.firstName || ''} ${teacher.user.lastName || ''}`.trim() || 'Unknown Teacher');
-                }
-            } catch (error) {
-                console.error("Error fetching teacher:", error);
-                setTeacherName('Unknown Teacher');
-            }
-        };
-
-        fetchTeacher();
-    }, []);
 
     const handleSort = (column: keyof Class) => {
         if (sortColumn === column) {
@@ -169,7 +150,7 @@ export function ClassListTable({ classes, handleCancel, handleEdit }: {
                                 <TableCell>
                                     {formatDateTime(class_.start_time)}
                                 </TableCell>
-                                <TableCell>{teacherName}</TableCell>
+                                <TableCell>{class_.teacherName || 'Unknown Teacher'}</TableCell>
                                 <TableCell>
                                     <span className={`capitalize px-2 py-1 rounded-full text-xs ${
                                         class_.status === 'scheduled' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
