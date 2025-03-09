@@ -394,7 +394,25 @@
             "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, agenda flexível"
         }
     },
-    "dashboard": {},
+    "dashboard": {
+        "title": "Painel",
+        "bookClass": "Agendar Aula"
+    },
+    "classes": {
+        "title": "Aulas",
+        "description": "Visualize e gerencie suas aulas agendadas",
+        "comingSoon": "A página de aulas estará disponível em breve. Aqui você poderá visualizar suas aulas futuras e passadas."
+    },
+    "teachers": {
+        "title": "Professores",
+        "description": "Explore e conecte-se com nossos professores qualificados",
+        "comingSoon": "A página de professores estará disponível em breve. Aqui você poderá explorar e se conectar com nossos professores qualificados."
+    },
+    "settings": {
+        "title": "Configurações",
+        "description": "Gerencie as configurações e preferências da sua conta",
+        "comingSoon": "A página de configurações estará disponível em breve. Aqui você poderá gerenciar as configurações e preferências da sua conta."
+    },
     "auth": {
         "sign-in": {
             "title": "Bem-vindo de volta",
@@ -482,14 +500,14 @@
         },
         "nav-user": {
             "profile": "Perfil",
-            "billing": "Cobrança",
+            "billing": "Faturamento",
             "sign-out": "Sair",
             "upgrade": "Atualizar",
             "notifications": "Notificações",
             "loading": "Carregando",
-            "accountMenu": "Menu da Conta",
-            "dashboard": "Painel de Controle",
+            "accountMenu": "Menu da conta",
             "onboarding": "Integração",
+            "dashboard": "Painel",
             "admin": "Administrador"
         },
         "themeToggle": {
@@ -628,6 +646,108 @@
             "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
             "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, horário flexível",
             "ogImageAlt": "Sotaque Brasileiro - Aprenda português com instrutores nativos"
+        }
+    },
+    "profile": {
+        "title": "Perfil",
+        "memberSince": "Membro desde {date}",
+        "memberSinceLabel": "Membro desde",
+        "userDetails": "Detalhes do Usuário",
+        "unknownUser": "Usuário Desconhecido",
+        "activeSubscription": "Assinatura Ativa",
+        "level": "Nível",
+        "credits": {
+            "title": "Créditos",
+            "description": "Créditos disponíveis para agendar aulas"
+        },
+        "package": {
+            "title": "Pacote",
+            "description": "Seu pacote de assinatura atual",
+            "none": "Sem pacote"
+        },
+        "tabs": {
+            "personal": "Pessoal",
+            "preferences": "Preferências",
+            "teacher": "Perfil de Professor"
+        },
+        "personal": {
+            "title": "Informações Pessoais",
+            "description": "Atualize suas informações pessoais",
+            "firstName": "Nome",
+            "firstNamePlaceholder": "Digite seu nome",
+            "lastName": "Sobrenome",
+            "lastNamePlaceholder": "Digite seu sobrenome",
+            "email": "Email",
+            "emailPlaceholder": "Digite seu email",
+            "emailDescription": "Seu email não pode ser alterado",
+            "gender": "Gênero",
+            "genderPlaceholder": "Selecione um gênero",
+            "genderOptions": {
+                "male": "Masculino",
+                "female": "Feminino",
+                "other": "Outro",
+                "preferNotToSay": "Prefiro não dizer"
+            },
+            "country": "País",
+            "countryPlaceholder": "Selecione um país",
+            "countrySearchPlaceholder": "Buscar países...",
+            "noCountriesFound": "Nenhum país encontrado"
+        },
+        "preferences": {
+            "title": "Preferências de Aprendizado",
+            "description": "Configure suas preferências de aprendizado de idiomas",
+            "portugueseLevel": "Nível de português",
+            "portugueseLevelPlaceholder": "Selecione seu nível",
+            "portugueseLevelOptions": {
+                "beginner": "Iniciante",
+                "elementary": "Elementar",
+                "intermediate": "Intermediário",
+                "upper_intermediate": "Intermediário Avançado",
+                "advanced": "Avançado",
+                "proficient": "Proficiente",
+                "native": "Nativo",
+                "unknown": "Desconhecido"
+            },
+            "nativeLanguage": "Idioma nativo",
+            "nativeLanguagePlaceholder": "Selecione seu idioma nativo",
+            "nativeLanguageDescription": "Seu idioma principal ou língua materna",
+            "otherLanguages": "Outros idiomas",
+            "otherLanguagesPlaceholder": "Digite os idiomas que você fala (separados por vírgula)",
+            "otherLanguagesDescription": "Liste os idiomas que você fala além do seu idioma nativo",
+            "learningGoals": "Objetivos de aprendizado",
+            "learningGoalsPlaceholder": "Digite seus objetivos de aprendizado (separados por vírgula)",
+            "learningGoalsDescription": "O que você espera alcançar ao aprender português?",
+            "timeZone": "Fuso horário",
+            "timeZonePlaceholder": "Selecione seu fuso horário"
+        },
+        "teacher": {
+            "title": "Perfil de Professor",
+            "description": "Configure as informações do seu perfil de professor",
+            "biography": "Biografia",
+            "biographyPlaceholder": "Conte-nos sobre você e sua experiência como professor",
+            "biographyDescription": "Compartilhe sua formação, experiência e abordagem de ensino",
+            "specialties": "Especialidades",
+            "specialtiesPlaceholder": "Digite suas especialidades de ensino (separadas por vírgula)",
+            "specialtiesDescription": "Em quais áreas do idioma português ou cultura brasileira você se especializa?",
+            "languages": "Idiomas",
+            "languagesPlaceholder": "Digite os idiomas que você fala (separados por vírgula)",
+            "languagesDescription": "Liste todos os idiomas que você fala fluentemente ou em nível avançado"
+        },
+        "toast": {
+            "success": {
+                "title": "Perfil atualizado",
+                "description": "Seu perfil foi atualizado com sucesso"
+            },
+            "error": {
+                "title": "Falha na atualização",
+                "description": "Ocorreu um erro ao atualizar seu perfil"
+            }
+        },
+        "buttons": {
+            "save": "Salvar Alterações",
+            "saveChanges": "Salvar Alterações",
+            "saving": "Salvando...",
+            "cancel": "Cancelar"
         }
     }
 }

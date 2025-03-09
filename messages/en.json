@@ -660,7 +660,9 @@
         "appName": "Sotaque Brasileiro",
         "appUrl": "https://sotaquebrasileiro.com",
         "buttons": {
-            "save": "Save",
+            "save": "Save Changes",
+            "saveChanges": "Save Changes",
+            "saving": "Saving...",
             "cancel": "Cancel",
             "delete": "Delete",
             "sign-in": "Sign In",
@@ -782,6 +784,165 @@
                 "deleting": "Deleting...",
                 "cancel": "Cancel"
             }
+        },
+        "profile": {
+            "memberSince": "Member since",
+            "credits": "Credits",
+            "package": "Package",
+            "tabs": {
+                "personalInfo": "Personal Information",
+                "personalInfoShort": "Personal",
+                "languageLearning": "Language Learning",
+                "languageLearningShort": "Language"
+            },
+            "personalInfo": {
+                "title": "Personal Information"
+            },
+            "languageLearning": {
+                "title": "Language Learning"
+            },
+            "buttons": {
+                "cancel": "Cancel",
+                "saveChanges": "Save Changes"
+            },
+            "toasts": {
+                "updateSuccess": "Profile updated successfully",
+                "updateSuccessDescription": "Your profile information has been updated.",
+                "updateError": "Failed to update profile",
+                "updateErrorDescription": "Please try again later."
+            },
+            "errors": {
+                "loadingTitle": "Error loading profile",
+                "noProfileTitle": "No profile found",
+                "noProfileDescription": "We couldn't find your profile information. Please try again.",
+                "retry": "Retry"
+            }
+        },
+        "themeToggle": {
+            "system": "System Theme",
+            "light": "Light Theme",
+            "dark": "Dark Theme"
         }
+    },
+    "profile": {
+        "title": "Profile",
+        "memberSince": "Member Since {date}",
+        "memberSinceLabel": "Member Since",
+        "userDetails": "User Details",
+        "unknownUser": "Unknown User",
+        "activeSubscription": "Active Subscription",
+        "level": "Level",
+        "credits": {
+            "title": "Credits",
+            "description": "Available credits for booking classes"
+        },
+        "package": {
+            "title": "Package",
+            "description": "Your current subscription package",
+            "none": "No package"
+        },
+        "tabs": {
+            "personal": "Personal",
+            "preferences": "Preferences",
+            "teacher": "Teacher Profile"
+        },
+        "personal": {
+            "title": "Personal Information",
+            "description": "Update your personal information",
+            "firstName": "First Name",
+            "firstNamePlaceholder": "Enter your first name",
+            "lastName": "Last Name",
+            "lastNamePlaceholder": "Enter your last name",
+            "email": "Email",
+            "emailPlaceholder": "Enter your email",
+            "emailDescription": "Your email cannot be changed",
+            "gender": "Gender",
+            "genderPlaceholder": "Select gender",
+            "genderOptions": {
+                "male": "Male",
+                "female": "Female",
+                "other": "Other",
+                "preferNotToSay": "Prefer not to say"
+            },
+            "country": "Country",
+            "countryPlaceholder": "Select country",
+            "countrySearchPlaceholder": "Search countries...",
+            "noCountriesFound": "No countries found"
+        },
+        "preferences": {
+            "title": "Learning Preferences",
+            "description": "Configure your language learning preferences",
+            "portugueseLevel": "Portuguese Level",
+            "portugueseLevelPlaceholder": "Select your level",
+            "portugueseLevelOptions": {
+                "beginner": "Beginner",
+                "elementary": "Elementary",
+                "intermediate": "Intermediate",
+                "upper_intermediate": "Upper Intermediate",
+                "advanced": "Advanced",
+                "proficient": "Proficient",
+                "native": "Native",
+                "unknown": "Unknown"
+            },
+            "nativeLanguage": "Native Language",
+            "nativeLanguagePlaceholder": "Enter your native language",
+            "nativeLanguageDescription": "Your primary language or mother tongue",
+            "otherLanguages": "Other Languages",
+            "otherLanguagesPlaceholder": "Enter languages you speak (comma separated)",
+            "otherLanguagesDescription": "List languages you speak other than your native language",
+            "learningGoals": "Learning Goals",
+            "learningGoalsPlaceholder": "Enter your learning goals (comma separated)",
+            "learningGoalsDescription": "What do you hope to achieve by learning Portuguese?",
+            "timeZone": "Time Zone",
+            "timeZonePlaceholder": "Select your time zone"
+        },
+        "teacher": {
+            "title": "Teacher Profile",
+            "description": "Configure your teacher profile information",
+            "biography": "Biography",
+            "biographyPlaceholder": "Tell us about yourself and your teaching experience",
+            "biographyDescription": "Share your teaching background, experience, and approach to teaching",
+            "specialties": "Specialties",
+            "specialtiesPlaceholder": "Enter your teaching specialties (comma separated)",
+            "specialtiesDescription": "What areas of Portuguese language or Brazilian culture do you specialize in?",
+            "languages": "Languages",
+            "languagesPlaceholder": "Enter languages you speak (comma separated)",
+            "languagesDescription": "List all languages you speak fluently or at an advanced level"
+        },
+        "toast": {
+            "success": {
+                "title": "Profile updated",
+                "description": "Your profile has been updated successfully"
+            },
+            "error": {
+                "title": "Update failed",
+                "description": "There was an error updating your profile"
+            }
+        },
+        "buttons": {
+            "save": "Save Changes",
+            "saveChanges": "Save Changes",
+            "saving": "Saving...",
+            "cancel": "Cancel"
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "bookClass": "Book Class"
+    },
+    "classes": {
+        "title": "Classes",
+        "description": "View and manage your scheduled classes",
+        "comingSoon": "The classes page is coming soon. You'll be able to view your upcoming and past classes here."
+    },
+    "teachers": {
+        "title": "Teachers",
+        "description": "Browse and connect with our qualified teachers",
+        "comingSoon": "The teachers page is coming soon. You'll be able to browse and connect with our qualified teachers here."
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your account settings and preferences",
+        "comingSoon": "The settings page is coming soon. You'll be able to manage your account settings and preferences here."
     }
 }
