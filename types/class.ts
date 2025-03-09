@@ -12,4 +12,5 @@ export interface Class {
   updated_at: Date;
   teacher_id: string;
   student_id: string;
+  teacherName?: string;
 } 
