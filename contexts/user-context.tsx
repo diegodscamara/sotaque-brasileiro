@@ -39,6 +39,7 @@ interface UserContextType {
   profile: UserData | null;
   hasAccess: boolean;
   isLoading: boolean;
+  error: Error | null;
   refetchUserData: () => Promise<void>;
 }
 
@@ -47,8 +48,22 @@ const UserContext = createContext<UserContextType>({
   profile: null,
   hasAccess: false,
   isLoading: true,
+  error: null,
   refetchUserData: async () => {},
 });
+
+// Helper function to ensure dates are converted to strings
+const formatDateToString = (date: Date | string | null | undefined): string | undefined => {
+  if (!date) return undefined;
+  if (date instanceof Date) return date.toISOString();
+  return String(date);
+};
+
+// Helper function to normalize role names
+const normalizeRole = (role: string | undefined): string | undefined => {
+  if (!role) return undefined;
+  return role.toLowerCase();
+};
 
 /**
  * UserProvider component that manages global user state
@@ -58,92 +73,67 @@ const UserContext = createContext<UserContextType>({
  * @returns {JSX.Element} Provider component with user state
  */
 export function UserProvider({ children }: { children: ReactNode }): JSX.Element {
-  const supabase = createClient();
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<UserData | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchUserData = async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      setIsLoading(true);
-      const { data: userData } = await supabase.auth.getUser();
-      setUser(userData.user);
+      const supabase = createClient();
+      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
 
-      if (userData.user?.id) {
-        // Get user data from database
-        const userDbData = await getUser(userData.user.id);
-        
-        const studentData = await getStudent(userData.user.id);
-        if (studentData) {
-          // Extract relevant profile data
-          setProfile({
-            id: studentData.id,
-            email: userData.user.email,
-            firstName: userData.user.user_metadata?.firstName || userDbData?.firstName,
-            lastName: userData.user.user_metadata?.lastName || userDbData?.lastName,
-            avatarUrl: userData.user.user_metadata?.avatarUrl || userDbData?.avatarUrl,
-            hasAccess: studentData.hasAccess,
-            packageName: studentData.packageName || undefined,
-            role: 'student',
-            hasCompletedOnboarding: studentData.hasCompletedOnboarding,
-            userId: userData.user.id,
-            createdAt: studentData.createdAt ? studentData.createdAt.toISOString() : undefined,
-            credits: studentData.credits,
-            portugueseLevel: studentData.portugueseLevel as "beginner" | "intermediate" | "advanced" | "native" | "unknown" | undefined,
-            nativeLanguage: studentData.nativeLanguage || undefined,
-            otherLanguages: studentData.otherLanguages || [],
-            learningGoals: studentData.learningGoals || [],
-            timeZone: studentData.timeZone || undefined,
-            country: userDbData?.country || undefined,
-            gender: userDbData?.gender as "male" | "female" | "other" | "prefer_not_to_say" | undefined
-          });
-          setHasAccess(studentData.hasAccess);
-        } else {
-          const teacherData = await getTeacher(userData.user.id);
-          if (teacherData) {
-            // Extract relevant profile data
-            setProfile({
-              id: teacherData.id,
-              email: userData.user.email,
-              firstName: userDbData?.firstName || userData.user.user_metadata?.firstName,
-              lastName: userDbData?.lastName || userData.user.user_metadata?.lastName,
-              avatarUrl: userDbData?.avatarUrl || userData.user.user_metadata?.avatarUrl,
-              role: 'teacher',
-              userId: userData.user.id,
-              createdAt: teacherData.createdAt ? teacherData.createdAt.toISOString() : undefined,
-              biography: teacherData.biography || undefined,
-              specialties: teacherData.specialties || [],
-              languages: teacherData.languages || [],
-              country: userDbData?.country || undefined,
-              gender: userDbData?.gender as "male" | "female" | "other" | "prefer_not_to_say" | undefined
-            });
-          } else if (userDbData) {
-            // If neither student nor teacher, just use the user data
-            setProfile({
-              ...userDbData,
-              email: userData.user.email,
-              role: userDbData.role?.toLowerCase() || 'user',
-              userId: userData.user.id,
-              createdAt: userDbData.createdAt ? userDbData.createdAt.toISOString() : undefined,
-              firstName: userDbData.firstName || undefined,
-              lastName: userDbData.lastName || undefined,
-              avatarUrl: userDbData.avatarUrl || undefined,
-              country: userDbData.country || undefined,
-              gender: userDbData.gender as "male" | "female" | "other" | "prefer_not_to_say" | undefined
-            });
-          }
-        }
+      if (!supabaseUser) {
+        setUser(null);
+        setProfile(null);
+        setHasAccess(false);
+        return;
       }
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+
+      // Get user data
+      const userData = await getUser(supabaseUser.id);
+      setUser(userData);
+
+      // Get role-specific data
+      let profileData: any = null;
+      const normalizedRole = normalizeRole(userData?.role);
+      
+      if (userData && normalizedRole === "student") {
+        profileData = await getStudent(userData.id);
+      } else if (userData && normalizedRole === "teacher") {
+        profileData = await getTeacher(userData.id);
+      }
+
+      // Merge user data with role-specific data and ensure proper types
+      const mergedProfile: UserData = {
+        ...userData,
+        ...(profileData || {}),
+        createdAt: formatDateToString(profileData?.createdAt || userData?.createdAt),
+        // Convert other potential Date objects
+        updatedAt: undefined, // Exclude updatedAt from UserData
+        // Ensure packageName is string or undefined, not null
+        packageName: profileData?.packageName || undefined,
+        // Normalize role
+        role: normalizedRole
+      };
+
+      setProfile(mergedProfile);
+      setHasAccess(!!mergedProfile?.hasAccess);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      setError(err instanceof Error ? err : new Error("Failed to fetch user data"));
+    } finally {
       setIsLoading(false);
     }
   };
 
   // Listen for auth state changes
   useEffect(() => {
+    const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       fetchUserData();
     });
@@ -157,12 +147,13 @@ export function UserProvider({ children }: { children: ReactNode }): JSX.Element
   }, []);
 
   return (
-    <UserContext.Provider 
-      value={{ 
-        user, 
-        profile, 
+    <UserContext.Provider
+      value={{
+        user,
+        profile,
         hasAccess, 
         isLoading,
+        error,
         refetchUserData: fetchUserData
       }}
     >
