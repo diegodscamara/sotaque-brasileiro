@@ -10,6 +10,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
+import LanguageSwitcher from "@/components/lang-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface AuthenticatedClientLayoutProps {
   children: ReactNode;
@@ -28,10 +30,10 @@ export default function AuthenticatedClientLayout({
 }: AuthenticatedClientLayoutProps) {
   const pathname = usePathname();
   const locale = useLocale();
-  
+
   // Filter out the locale segment from the path
   const pathSegments = pathname.split("/").filter(segment => segment !== locale && segment !== "");
-  
+
   // Get the current page title from the last path segment or use the provided pageTitle
   const currentPageTitle = pageTitle || (pathSegments.length > 0 ? capitalizeFirstLetter(pathSegments[pathSegments.length - 1]) : "Dashboard");
 
@@ -50,6 +52,10 @@ export default function AuthenticatedClientLayout({
                   {actions}
                 </div>
               )}
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher />
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </header>
