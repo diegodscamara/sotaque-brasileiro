@@ -5,6 +5,7 @@ import { createContext, useEffect, useState } from "react";
 
 import React from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { UserProvider } from "@/contexts/user-context";
 
 type SupabaseContext = {
   supabase: SupabaseClient;
@@ -43,7 +44,9 @@ export default function SupabaseProvider({
 
   return (
     <SupabaseContext.Provider value={{ supabase, session }}>
-      {children}
+      <UserProvider>
+        {children}
+      </UserProvider>
     </SupabaseContext.Provider>
   );
 } 
