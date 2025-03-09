@@ -43,7 +43,9 @@ const ClassList = () => {
         created_at: classData.createdAt,
         updated_at: classData.updatedAt,
         teacher_id: classData.teacherId,
-        student_id: classData.studentId
+        student_id: classData.studentId,
+        // Add teacher information
+        teacherName: `${classData.teacher.user.firstName || ''} ${classData.teacher.user.lastName || ''}`.trim() || 'Unknown Teacher'
       }));
       
       setClasses(formattedClasses);
