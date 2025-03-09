@@ -24,40 +24,41 @@ import { NavUser } from "@/components/nav-user"
 import config from "@/config"
 import logo from "@/app/icon.png";
 import { usePathname } from "next/navigation"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations();
   
   // Navigation items with active state based on current path
   const navItems = [
     {
-      title: "Dashboard",
+      title: t('dashboard.title'),
       url: `/${locale}/dashboard`,
       icon: Home,
       isActive: pathname.includes('/dashboard'),
     },
     {
-      title: "Classes",
+      title: t('classes.title'),
       url: `/${locale}/classes`,
       icon: GraduationCap,
       isActive: pathname.includes('/classes'),
     },
     {
-      title: "Teachers",
+      title: t('teachers.title'),
       url: `/${locale}/teachers`,
       icon: Users,
       isActive: pathname.includes('/teachers'),
     },
     {
-      title: "Profile",
+      title: t('profile.title'),
       url: `/${locale}/profile`,
       icon: UserCircle,
       isActive: pathname.includes('/profile'),
     },
     {
-      title: "Settings",
+      title: t('settings.title'),
       url: `/${locale}/settings`,
       icon: Settings2,
       isActive: pathname.includes('/settings'),
