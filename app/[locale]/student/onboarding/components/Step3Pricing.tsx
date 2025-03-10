@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import type { OnboardingFormData } from "../types";
 
 // Import the Pricing component
@@ -28,6 +29,26 @@ interface Step3PricingProps {
  */
 export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX.Element {
   const t = useTranslations("student.onboarding");
+  const params = useParams();
+  const locale = params.locale as string;
+
+  // Extract the pending class data from the form data
+  const pendingClass = formData.pendingClass ? {
+    teacherId: formData.pendingClass.teacherId,
+    studentId: formData.pendingClass.studentId,
+    startDateTime: formData.pendingClass.startDateTime.toISOString(),
+    endDateTime: formData.pendingClass.endDateTime.toISOString(),
+    duration: formData.pendingClass.duration,
+    notes: formData.pendingClass.notes || "",
+    status: "PENDING"
+  } : undefined;
+
+  // Format the success URL correctly - it should be a relative path without the origin
+  // The ButtonCheckout component will prepend the origin
+  const successUrl = `/${locale}/student/onboarding/success`;
+  
+  console.log("Setting success URL for checkout:", successUrl);
+  console.log("Pending class data:", pendingClass);
 
   return (
     <motion.div
@@ -37,13 +58,19 @@ export default function Step3Pricing({ formData }: Step3PricingProps): React.JSX
       className="w-full"
     >
       {/* Step Title */}
-      {/* <div className="mb-6">
+      <div className="mb-6">
         <h1 className="font-semibold text-2xl">{t("step3.title")}</h1>
         <p className="mt-2 text-gray-500 dark:text-gray-400">{t("step3.subtitle")}</p>
-      </div> */}
+        <p className="mt-2 text-blue-600 dark:text-blue-400 text-sm">
+          {t("step3.successNote")}
+        </p>
+      </div>
 
       {/* Pricing Component with success redirect */}
-      <Pricing successUrl="/student/onboarding/success" />
+      <Pricing 
+        successUrl={successUrl}
+        pendingClass={pendingClass}
+      />
     </motion.div>
   );
 } 

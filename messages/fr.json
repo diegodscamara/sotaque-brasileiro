@@ -394,7 +394,25 @@
             "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible"
         }
     },
-    "dashboard": {},
+    "dashboard": {
+        "title": "Tableau de Bord",
+        "bookClass": "Réserver un Cours"
+    },
+    "classes": {
+        "title": "Cours",
+        "description": "Voir et gérer vos cours programmés",
+        "comingSoon": "La page des cours sera bientôt disponible. Vous pourrez y voir vos cours à venir et passés."
+    },
+    "teachers": {
+        "title": "Professeurs",
+        "description": "Parcourir et se connecter avec nos professeurs qualifiés",
+        "comingSoon": "La page des professeurs sera bientôt disponible. Vous pourrez y parcourir et vous connecter avec nos professeurs qualifiés."
+    },
+    "settings": {
+        "title": "Paramètres",
+        "description": "Gérer les paramètres et préférences de votre compte",
+        "comingSoon": "La page des paramètres sera bientôt disponible. Vous pourrez y gérer les paramètres et préférences de votre compte."
+    },
     "auth": {
         "sign-in": {
             "title": "Bienvenue de nouveau",
@@ -483,12 +501,13 @@
         "nav-user": {
             "profile": "Profil",
             "billing": "Facturation",
-            "sign-out": "Se déconnecter",
-            "upgrade": "Mettre à niveau",
+            "sign-out": "Déconnexion",
+            "upgrade": "Améliorer",
             "notifications": "Notifications",
             "loading": "Chargement",
-            "accountMenu": "Menu de Compte",
+            "accountMenu": "Menu du compte",
             "onboarding": "Intégration",
+            "dashboard": "Tableau de bord",
             "admin": "Administrateur"
         },
         "themeToggle": {
@@ -498,7 +517,8 @@
         },
         "errors": {
             "general": "Quelque chose a mal tourné"
-        }
+        },
+        "platform": "Plateforme"
     },
     "errors": {
         "general": "Quelque chose a mal tourné",
@@ -595,7 +615,23 @@
         "step2": {
             "step": "Étape 2",
             "title": "Choisissez votre offre",
-            "subtitle": "Sélectionnez l'offre qui correspond le mieux à vos objectifs et à votre emploi du temps."
+            "subtitle": "Sélectionnez l'offre qui correspond le mieux à vos objectifs et à votre emploi du temps.",
+            "reservation": {
+                "existingPendingClass": "Vous avez un cours en attente",
+                "pendingClassDescription": "Nous avons trouvé un cours en attente existant. Vous pouvez continuer avec ce cours ou sélectionner un horaire/professeur différent. Si vous sélectionnez une option différente, le cours en attente précédent sera annulé."
+            },
+            "checkout": {
+                "cancelled": {
+                    "title": "Paiement Annulé",
+                    "description": "Votre processus de paiement a été annulé ou a rencontré une erreur.",
+                    "message": "Nous avons nettoyé votre réservation de cours en attente. Vous pouvez réessayer ou sélectionner un horaire de cours différent.",
+                    "loading": "Nettoyage de votre cours en attente...",
+                    "pendingClassCancelled": "Cours en Attente Annulé",
+                    "pendingClassCancelledDescription": "Votre cours en attente précédent a été annulé. Vous pouvez sélectionner un nouvel horaire ou réessayer le paiement.",
+                    "goBackToTeacherSelection": "Sélectionner un Nouvel Horaire",
+                    "retryCheckout": "Réessayer le Paiement"
+                }
+            }
         },
         "step3": {
             "step": "Étape 3",
@@ -607,6 +643,121 @@
             "seoDescription": "Transformez votre portugais avec des classes personnalisées et culturellement immersives adaptées à votre emploi du temps et à vos objectifs, dispensées par des instructeurs brésiliens natifs.",
             "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible",
             "ogImageAlt": "Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs"
+        }
+    },
+    "profile": {
+        "title": "Profil",
+        "memberSince": "Membre depuis {date}",
+        "memberSinceLabel": "Membre depuis",
+        "userDetails": "Détails de l'Utilisateur",
+        "profileHeader": "Profil",
+        "unknownUser": "Utilisateur Inconnu",
+        "activeSubscription": "Abonnement Actif",
+        "level": "Niveau",
+        "avatarAlt": "Photo de profil de {name}",
+        "error": {
+            "title": "Erreur de Chargement du Profil",
+            "description": "Un problème est survenu lors du chargement des données de votre profil. Veuillez essayer de rafraîchir la page."
+        },
+        "credits": {
+            "title": "Crédits",
+            "description": "Crédits disponibles pour réserver des cours"
+        },
+        "package": {
+            "title": "Forfait",
+            "description": "Votre forfait d'abonnement actuel",
+            "none": "Pas de forfait"
+        },
+        "subscription": {
+            "title": "Statut d'Abonnement",
+            "active": "Actif",
+            "inactive": "Inactif"
+        },
+        "tabs": {
+            "personal": "Personnel",
+            "preferences": "Préférences",
+            "teacher": "Profil d'Enseignant"
+        },
+        "personal": {
+            "title": "Informations Personnelles",
+            "description": "Mettez à jour vos informations personnelles",
+            "firstName": "Prénom",
+            "firstNamePlaceholder": "Entrez votre prénom",
+            "lastName": "Nom",
+            "lastNamePlaceholder": "Entrez votre nom",
+            "email": "Email",
+            "emailPlaceholder": "Entrez votre email",
+            "emailDescription": "Votre email ne peut pas être modifié",
+            "gender": "Genre",
+            "genderPlaceholder": "Sélectionnez un genre",
+            "genderOptions": {
+                "male": "Masculin",
+                "female": "Féminin",
+                "other": "Autre",
+                "preferNotToSay": "Préfère ne pas dire"
+            },
+            "country": "Pays",
+            "countryPlaceholder": "Sélectionnez un pays",
+            "countrySearchPlaceholder": "Rechercher des pays...",
+            "noCountriesFound": "Aucun pays trouvé"
+        },
+        "preferences": {
+            "title": "Préférences d'Apprentissage",
+            "description": "Configurez vos préférences d'apprentissage des langues",
+            "portugueseLevel": "Niveau de portugais",
+            "portugueseLevelPlaceholder": "Sélectionnez votre niveau",
+            "portugueseLevelOptions": {
+                "beginner": "Débutant",
+                "elementary": "Élémentaire",
+                "intermediate": "Intermédiaire",
+                "upper_intermediate": "Intermédiaire Supérieur",
+                "advanced": "Avancé",
+                "proficient": "Maîtrise",
+                "native": "Natif",
+                "unknown": "Inconnu"
+            },
+            "nativeLanguage": "Langue maternelle",
+            "nativeLanguagePlaceholder": "Sélectionnez votre langue maternelle",
+            "nativeLanguageDescription": "Votre langue principale ou langue maternelle",
+            "otherLanguages": "Autres langues",
+            "otherLanguagesPlaceholder": "Entrez les langues que vous parlez (séparées par des virgules)",
+            "otherLanguagesDescription": "Listez les langues que vous parlez en plus de votre langue maternelle",
+            "learningGoals": "Objectifs d'apprentissage",
+            "learningGoalsPlaceholder": "Entrez vos objectifs d'apprentissage (séparés par des virgules)",
+            "learningGoalsDescription": "Qu'espérez-vous accomplir en apprenant le portugais?",
+            "timeZone": "Fuseau horaire",
+            "timeZonePlaceholder": "Sélectionnez votre fuseau horaire"
+        },
+        "teacher": {
+            "title": "Profil d'Enseignant",
+            "description": "Configurez les informations de votre profil d'enseignant",
+            "biography": "Biographie",
+            "biographyPlaceholder": "Parlez-nous de vous et de votre expérience d'enseignement",
+            "biographyDescription": "Partagez votre formation, votre expérience et votre approche d'enseignement",
+            "specialties": "Spécialités",
+            "specialtiesPlaceholder": "Entrez vos spécialités d'enseignement (séparées par des virgules)",
+            "specialtiesDescription": "Dans quels domaines du portugais ou de la culture brésilienne vous spécialisez-vous?",
+            "languages": "Langues",
+            "languagesPlaceholder": "Entrez les langues que vous parlez (séparées par des virgules)",
+            "languagesDescription": "Listez toutes les langues que vous parlez couramment ou à un niveau avancé"
+        },
+        "toast": {
+            "success": {
+                "title": "Profil mis à jour",
+                "description": "Votre profil a été mis à jour avec succès"
+            },
+            "error": {
+                "title": "Échec de la mise à jour",
+                "description": "Une erreur est survenue lors de la mise à jour de votre profil"
+            }
+        },
+        "buttons": {
+            "save": "Enregistrer les Modifications",
+            "saveChanges": "Enregistrer les Modifications",
+            "saving": "Enregistrement...",
+            "cancel": "Annuler",
+            "refresh": "Actualiser les Données",
+            "refreshing": "Actualisation..."
         }
     }
 }

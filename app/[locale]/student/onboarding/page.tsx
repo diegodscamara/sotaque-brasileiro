@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
+import { prisma } from "@/libs/prisma";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import { createClient } from "@/libs/supabase/client";
 import { getStudent } from "@/app/actions/students";
 import { getUser, updateUser } from "@/app/actions/users";
 import { editStudent } from "@/app/actions/students";
-import { scheduleOnboardingClass } from "@/app/actions/classes";
+import { scheduleClass, fetchClasses, cancelPendingClass } from "@/app/actions/classes";
 import { validateEmail } from "@/libs/utils/validation";
 
 // Types
@@ -77,6 +78,7 @@ export default function StudentOnboarding(): React.JSX.Element {
   // Refs to track initialization
   const hasSetCountry = useRef(false);
   const hasLoadedUserData = useRef(false);
+  const pendingClassRef = useRef<string | null>(null);
 
   /**
    * Detects user's country from geolocation when component mounts
@@ -111,6 +113,29 @@ export default function StudentOnboarding(): React.JSX.Element {
     if (!hasLoadedUserData.current) {
       const fetchUserData = async () => {
         try {
+          setLoading(true);
+          
+          // Set the flag to prevent multiple calls
+          hasLoadedUserData.current = true;
+          
+          // Check for step parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const stepParam = urlParams.get('step');
+          
+          // If step parameter exists, set the current step
+          if (stepParam) {
+            const step = parseInt(stepParam, 10);
+            if (!isNaN(step) && step >= 1 && step <= 3) {
+              setCurrentStep(step);
+              // Mark previous steps as completed
+              const completedSteps = [];
+              for (let i = 1; i < step; i++) {
+                completedSteps.push(i);
+              }
+              setCompletedSteps(completedSteps);
+            }
+          }
+          
           const { data: { user } } = await supabase.auth.getUser();
 
           if (!user) {
@@ -118,49 +143,72 @@ export default function StudentOnboarding(): React.JSX.Element {
             return;
           }
 
-          // Check for saved onboarding data in localStorage first
+          console.log(`Fetching user data for user ID: ${user.id}`);
+          
+          // Get user and student data from database first
+          const userData = await getUser(user.id);
+          const studentData = await getStudent(user.id);
+
+          console.log(`Fetched user data: ${userData ? 'found' : 'not found'}`);
+          console.log(`Fetched student data: ${studentData ? 'found' : 'not found'}`);
+          
+          // Check if we have existing data in the database
+          const hasExistingData = userData && (
+            userData.firstName || 
+            userData.lastName || 
+            userData.email || 
+            userData.country || 
+            userData.gender
+          );
+
+          // Check for saved onboarding data in localStorage
           const savedFormData = localStorage.getItem("onboardingFormData");
           let parsedFormData: Partial<OnboardingFormData> = {};
+          
+          // Only use localStorage data if we don't have existing data in the database
+          // This prevents browser-cached data from being used for new users
           let shouldRestoreFromLocalStorage = false;
 
-          if (savedFormData) {
+          if (savedFormData && !hasExistingData) {
             try {
               parsedFormData = JSON.parse(savedFormData);
               shouldRestoreFromLocalStorage = true;
               console.log("Restored form data from localStorage:", parsedFormData);
             } catch (parseError) {
               console.error("Error parsing saved form data:", parseError);
+              // Clear invalid localStorage data
+              localStorage.removeItem("onboardingFormData");
             }
+          } else if (savedFormData && hasExistingData) {
+            // If we have existing data in the database, clear localStorage data
+            console.log("Found existing user data in database, ignoring localStorage data");
+            localStorage.removeItem("onboardingFormData");
           }
 
-          // Get user and student data
-          const userData = await getUser(user.id);
-          const studentData = await getStudent(user.id);
-
           if (userData) {
-            // Pre-fill form with existing user data, prioritizing localStorage data if available
+            // Pre-fill form with existing user data, only using localStorage if no database data exists
             setFormData(prev => ({
               ...prev,
-              firstName: shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : userData.firstName || "",
-              lastName: shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : userData.lastName || "",
-              email: shouldRestoreFromLocalStorage ? parsedFormData.email || "" : userData.email || "",
-              country: shouldRestoreFromLocalStorage ? parsedFormData.country || "" : userData.country || prev.country,
-              gender: shouldRestoreFromLocalStorage ? parsedFormData.gender || "" : userData.gender || "",
-              timeZone: shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : studentData?.timeZone || prev.timeZone,
-              portugueseLevel: shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : studentData?.portugueseLevel || "",
-              nativeLanguage: shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : studentData?.nativeLanguage || "",
-              learningGoals: shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : studentData?.learningGoals || [],
-              otherLanguages: shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : studentData?.otherLanguages || [],
+              firstName: userData.firstName || (shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : ""),
+              lastName: userData.lastName || (shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : ""),
+              email: userData.email || (shouldRestoreFromLocalStorage ? parsedFormData.email || "" : ""),
+              country: userData.country || (shouldRestoreFromLocalStorage ? parsedFormData.country || "" : prev.country),
+              gender: userData.gender || (shouldRestoreFromLocalStorage ? parsedFormData.gender || "" : ""),
+              timeZone: studentData?.timeZone || (shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : prev.timeZone),
+              portugueseLevel: studentData?.portugueseLevel || (shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : ""),
+              nativeLanguage: studentData?.nativeLanguage || (shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : ""),
+              learningGoals: studentData?.learningGoals || (shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : []),
+              otherLanguages: studentData?.otherLanguages || (shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : []),
               customerId: studentData?.customerId || "",
               priceId: studentData?.priceId || "",
               packageName: studentData?.packageName || "",
-              // Restore Step 2 data if available
+              // Restore Step 2 data if available and no database data exists
               selectedTeacherId: shouldRestoreFromLocalStorage ? parsedFormData.selectedTeacherId : undefined,
               classNotes: shouldRestoreFromLocalStorage ? parsedFormData.classNotes : undefined,
               classDuration: shouldRestoreFromLocalStorage ? parsedFormData.classDuration : undefined,
             }));
 
-            // Restore date/time objects if they exist in localStorage
+            // Restore date/time objects if they exist in localStorage and no database data exists
             if (shouldRestoreFromLocalStorage) {
               if (parsedFormData.classStartDateTime) {
                 setFormData(prev => ({
@@ -225,10 +273,10 @@ export default function StudentOnboarding(): React.JSX.Element {
               router.push("/dashboard");
             }
           }
-
-          hasLoadedUserData.current = true;
         } catch (error) {
           console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -407,7 +455,7 @@ export default function StudentOnboarding(): React.JSX.Element {
           return;
         }
       } 
-      // If this is the second step, validate class selection
+      // If this is the second step, save class selection with PENDING status
       else if (currentStep === 2) {
         if (!formData.selectedTeacherId || !formData.classStartDateTime || !formData.classEndDateTime) {
           setErrors({
@@ -419,10 +467,111 @@ export default function StudentOnboarding(): React.JSX.Element {
 
         try {
           // Get the latest student data
-          const updatedStudentData = await getStudent(user.id);
+          let updatedStudentData = await getStudent(user.id);
           
           if (!updatedStudentData) {
-            throw new Error(tErrors("studentNotFound"));
+            console.log("No student record found yet. This is normal during onboarding. Creating a new student record.");
+            
+            // Create a new student record with minimal data
+            try {
+              // Create a partial student object with only the fields we want to update
+              const newStudentData = {
+                userId: user.id,
+                timeZone: formData.timeZone || "Etc/UTC", // Ensure we have a fallback timezone
+                portugueseLevel: formData.portugueseLevel,
+                nativeLanguage: formData.nativeLanguage,
+                learningGoals: formData.learningGoals,
+                otherLanguages: formData.otherLanguages,
+                // Add placeholder values for required package fields
+                customerId: "pending",
+                priceId: "pending",
+                packageName: "pending",
+                // Set default values
+                credits: 0,
+                hasAccess: false,
+                // We'll set this to true after all steps are completed
+                hasCompletedOnboarding: false
+              };
+
+              // Create the student record
+              const newStudent = await prisma.student.create({
+                data: newStudentData
+              });
+              
+              if (!newStudent) {
+                throw new Error(tErrors("failedToCreateStudentProfile"));
+              }
+              
+              // Use the newly created student data
+              updatedStudentData = newStudent;
+            } catch (createStudentError) {
+              console.error("Error creating student data:", createStudentError);
+              throw new Error(
+                createStudentError instanceof Error 
+                  ? createStudentError.message 
+                  : tErrors("failedToCreateStudentProfile")
+              );
+            }
+          }
+
+          // Store the current pending class ID before potentially cancelling it
+          let existingPendingClassId = null;
+          
+          // Only cancel existing pending classes if we're creating a new one with different details
+          try {
+            // Fetch all pending classes for this specific student
+            const existingPendingClasses = await fetchClasses({
+              studentId: updatedStudentData.id, // Explicitly filter by the current student's ID
+              status: "PENDING"
+            });
+            
+            // Check if we have existing pending classes
+            if (existingPendingClasses && existingPendingClasses.data && existingPendingClasses.data.length > 0) {
+              console.log(`Found ${existingPendingClasses.data.length} existing pending classes for student ID ${updatedStudentData.id}`);
+              
+              // Check if we're selecting the same class details
+              const pendingClass = existingPendingClasses.data[0];
+              
+              // Double-check that this class belongs to the current student
+              if (pendingClass.studentId === updatedStudentData.id) {
+                existingPendingClassId = pendingClass.id;
+                
+                // Only cancel if we're selecting a different teacher or time
+                const isSameTeacher = pendingClass.teacherId === formData.selectedTeacherId;
+                const pendingStartTime = new Date(pendingClass.startDateTime).getTime();
+                const selectedStartTime = new Date(formData.classStartDateTime).getTime();
+                const isSameTime = Math.abs(pendingStartTime - selectedStartTime) < 60000; // Within 1 minute
+                
+                if (!isSameTeacher || !isSameTime) {
+                  console.log(`Cancelling existing pending class ID ${pendingClass.id} as user selected different teacher/time`);
+                  await cancelPendingClass(pendingClass.id);
+                  existingPendingClassId = null;
+                } else {
+                  console.log(`User selected the same teacher and time, keeping existing pending class ID ${pendingClass.id}`);
+                }
+              } else {
+                console.log(`Found pending class ID ${pendingClass.id} but it belongs to student ID ${pendingClass.studentId}, not current student ID ${updatedStudentData.id}`);
+              }
+            } else {
+              console.log(`No existing pending classes found for student ID ${updatedStudentData.id}`);
+            }
+          } catch (cancelError) {
+            console.error("Error handling existing pending classes:", cancelError);
+            // Continue with the process even if cancellation fails
+          }
+
+          // If we already have a valid pending class with the same details, use it
+          if (existingPendingClassId) {
+            // Store the pending class ID in the ref for cleanup if needed
+            pendingClassRef.current = existingPendingClassId;
+            
+            // Mark this step as completed
+            setCompletedSteps(prev => [...prev, currentStep]);
+            
+            // Move to the next step
+            setCurrentStep(prev => prev + 1);
+            setLoading(false);
+            return;
           }
 
           // Calculate class duration in minutes (for validation)
@@ -431,20 +580,45 @@ export default function StudentOnboarding(): React.JSX.Element {
           const durationMs = endTime.getTime() - startTime.getTime();
           const durationMinutes = Math.round(durationMs / (1000 * 60));
 
-          // Store class details in form data for later use
-          const pendingClass = {
+          // Create the class data for saving to the database
+          const classData = {
+            id: '', // Will be generated by the database
             teacherId: formData.selectedTeacherId,
             studentId: updatedStudentData.id,
             startDateTime: startTime,
             endDateTime: endTime,
             duration: durationMinutes,
             notes: formData.classNotes || "",
-            status: "PENDING" as const // Will be scheduled after payment
+            status: "PENDING" as const, // Explicitly set status to PENDING
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            feedback: undefined,
+            rating: undefined,
+            recurringGroupId: undefined
           };
 
+          // Save the class to the database with PENDING status
+          const pendingClass = await scheduleClass(classData, { isOnboarding: true });
+          
+          if (!pendingClass) {
+            throw new Error(tErrors("failedToCreatePendingClass"));
+          }
+
+          // Store the pending class ID in the ref for cleanup if needed
+          pendingClassRef.current = pendingClass.id;
+
+          // Store class details in form data for later use
           setFormData(prev => ({
             ...prev,
-            pendingClass
+            pendingClass: {
+              teacherId: formData.selectedTeacherId,
+              studentId: updatedStudentData.id,
+              startDateTime: startTime,
+              endDateTime: endTime,
+              duration: durationMinutes,
+              notes: formData.classNotes || "",
+              status: "PENDING" as const
+            }
           }));
 
           // Mark this step as completed
@@ -577,6 +751,58 @@ export default function StudentOnboarding(): React.JSX.Element {
       </div>
     );
   };
+
+  /**
+   * Cleanup pending class when user leaves the page
+   */
+  useEffect(() => {
+    // Function to clean up pending class
+    const cleanupPendingClass = async () => {
+      if (pendingClassRef.current) {
+        try {
+          console.log(`Attempting to clean up pending class: ${pendingClassRef.current}`);
+          await cancelPendingClass(pendingClassRef.current);
+          console.log(`Successfully cleaned up pending class: ${pendingClassRef.current}`);
+        } catch (error) {
+          console.error("Failed to clean up pending class:", error);
+        }
+      }
+    };
+
+    // Handle beforeunload event
+    const handleBeforeUnload = () => {
+      // We can't use async functions directly with beforeunload
+      // So we'll make a synchronous request to a cleanup endpoint
+      if (pendingClassRef.current && currentStep === 3) {
+        // Only attempt cleanup if we're on step 3 (after class creation, before checkout)
+        const classId = pendingClassRef.current;
+        
+        try {
+          // Use navigator.sendBeacon for a non-blocking request that will complete even as the page unloads
+          const endpoint = `/api/cleanup-pending-class?classId=${classId}`;
+          const success = navigator.sendBeacon(endpoint);
+          
+          console.log(`Sent cleanup request for class: ${classId}, success: ${success}`);
+        } catch (error) {
+          console.error("Error sending cleanup request:", error);
+        }
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // If the component unmounts normally (not from page unload),
+      // we can run the async cleanup directly
+      if (currentStep === 3) {
+        cleanupPendingClass();
+      }
+    };
+  }, [currentStep]);
 
   return (
     <motion.section

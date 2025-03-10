@@ -5,20 +5,15 @@ import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
 import { getCurrentUser } from "@/app/actions/users";
 import { getStudent } from "@/app/actions/students";
-// This is a server-side component to ensure the user is logged in.
-// If not, it will redirect to the login page.
-// It's applied to all subpages of /dashboard in /app/dashboard/*** pages
-// You can also add custom static UI elements like a Navbar, Sidebar, Footer, etc..
-// See https://sotaquebrasileiro.com/docs/tutorials/private-page
 
 /**
- * Private layout component that protects dashboard routes
+ * Authenticated layout component that protects routes for logged-in users
  * Ensures users are authenticated and students have completed onboarding
  * @param {Object} props - Component props
  * @param {ReactNode} props.children - Child components to render
  * @returns {ReactNode} The protected layout with children
  */
-export default async function LayoutPrivate({
+export default async function AuthenticatedLayout({
   children,
 }: {
   children: ReactNode;
@@ -54,9 +49,15 @@ export default async function LayoutPrivate({
 
     // If student hasn't completed onboarding or doesn't have access, redirect to onboarding
     if (!student.hasCompletedOnboarding || !student.hasAccess) {
+      console.log("Redirecting to onboarding:", {
+        hasCompletedOnboarding: student.hasCompletedOnboarding,
+        hasAccess: student.hasAccess,
+        studentId: student.id,
+        userId: student.userId
+      });
       redirect("/student/onboarding");
     }
   }
 
   return children;
-}
+} 

@@ -1,6 +1,8 @@
 "use client"
 
 import { type LucideIcon } from "lucide-react"
+import { cn } from "@/libs/utils"
+import { useTranslations } from "next-intl"
 
 import {
   Collapsible,
@@ -13,6 +15,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+
 export function NavMain({
   items,
 }: {
@@ -27,9 +30,11 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const t = useTranslations('shared');
+  
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('platform')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -40,7 +45,13 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <Link href={item.url} className="w-full">
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton 
+                  tooltip={item.title}
+                  className={cn(
+                    "transition-colors hover:bg-accent hover:text-accent-foreground",
+                    item.isActive && "bg-accent/50 text-green-700 dark:text-green-500 font-bold"
+                  )}
+                >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>

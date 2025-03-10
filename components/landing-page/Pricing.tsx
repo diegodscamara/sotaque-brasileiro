@@ -30,6 +30,7 @@ interface Plan {
 
 interface Props {
   successUrl?: string;
+  pendingClass?: any;
 }
 
 /**
@@ -37,7 +38,7 @@ interface Props {
  * @param {Props} props - Component props
  * @returns {JSX.Element} - Rendered pricing section with interactive plan selection
  */
-const Pricing = ({ successUrl }: Props): JSX.Element => {
+const Pricing = ({ successUrl, pendingClass }: Props): JSX.Element => {
   const t = useTranslations("landing.pricing");
   const plans = t.raw("plans") as Plan[];
 
@@ -171,6 +172,7 @@ const Pricing = ({ successUrl }: Props): JSX.Element => {
                       variant={plan.isFeatured ? "default" : "outline"}
                       aria-label={`Subscribe to ${plan.tier} plan`}
                       successUrl={successUrl}
+                      pendingClass={pendingClass}
                     />
 
                     {plan.features && (

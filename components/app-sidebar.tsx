@@ -4,9 +4,11 @@ import * as React from "react"
 
 import {
   GraduationCap,
-  Settings2
+  Settings2,
+  Home,
+  Users,
+  UserCircle
 } from "lucide-react"
-import { HourglassMedium, Student } from "@phosphor-icons/react"
 import {
   Sidebar,
   SidebarContent,
@@ -21,45 +23,58 @@ import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import config from "@/config"
 import logo from "@/app/icon.png";
-
-// This is sample data.
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: HourglassMedium,
-      isActive: true,
-    },
-    {
-      title: "Classes",
-      url: "/classes",
-      icon: GraduationCap,
-    },
-    {
-      title: "Students",
-      url: "/students",
-      icon: Student,
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-    },
-  ],
-}
+import { usePathname } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations();
+  
+  // Navigation items with active state based on current path
+  const navItems = [
+    {
+      title: t('dashboard.title'),
+      url: `/${locale}/dashboard`,
+      icon: Home,
+      isActive: pathname.includes('/dashboard'),
+    },
+    {
+      title: t('classes.title'),
+      url: `/${locale}/classes`,
+      icon: GraduationCap,
+      isActive: pathname.includes('/classes'),
+    },
+    {
+      title: t('teachers.title'),
+      url: `/${locale}/teachers`,
+      icon: Users,
+      isActive: pathname.includes('/teachers'),
+    },
+    {
+      title: t('profile.title'),
+      url: `/${locale}/profile`,
+      icon: UserCircle,
+      isActive: pathname.includes('/profile'),
+    },
+    {
+      title: t('settings.title'),
+      url: `/${locale}/settings`,
+      icon: Settings2,
+      isActive: pathname.includes('/settings'),
+    },
+  ];
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <Link href="/" className="flex items-center gap-2 px-2">
+        <Link href={`/${locale}/dashboard`} className="flex items-center gap-2 px-2">
           <Image src={logo} alt={config.appName} width={16} height={16} /> 
-          <span className="font-bold text-sm">{config.appName}</span>
+          <span className="font-bold text-sm sidebar-expanded-only">{config.appName}</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

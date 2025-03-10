@@ -6,6 +6,7 @@ import { createServerClient } from "@supabase/ssr";
 import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import { cache } from "react";
 
 import { type User } from "@/types";
 
@@ -66,11 +67,21 @@ export async function getCurrentUser(): Promise<User | null> {
     const userId = authUser.id;
 
     // Query user directly using Prisma
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { id: userId },
     });
 
-    return user;
+    if (!dbUser) return null;
+
+    // Map null values to undefined to match User type
+    return {
+      ...dbUser,
+      firstName: dbUser.firstName || undefined,
+      lastName: dbUser.lastName || undefined,
+      avatarUrl: dbUser.avatarUrl || undefined,
+      country: dbUser.country || undefined,
+      gender: dbUser.gender || undefined,
+    };
   } catch (error) {
     console.error("Error getting current user:", error);
     throw error;
@@ -78,11 +89,11 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 /**
- * Gets a user by ID
- * @param {string} userId - The ID of the user to get
+ * Fetches a user by ID with caching
+ * @param {string} userId - The ID of the user to fetch
  * @returns {Promise<User | null>} The user data or null if not found
  */
-export async function getUser(userId: string): Promise<User | null> {
+export const getUser = cache(async (userId: string): Promise<User | null> => {
   try {
     const supabase = createClient();
     
@@ -94,20 +105,28 @@ export async function getUser(userId: string): Promise<User | null> {
     }
 
     // Query user directly using Prisma
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { id: userId },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return null;
     }
 
-    return user;
+    // Map null values to undefined to match User type
+    return {
+      ...dbUser,
+      firstName: dbUser.firstName || undefined,
+      lastName: dbUser.lastName || undefined,
+      avatarUrl: dbUser.avatarUrl || undefined,
+      country: dbUser.country || undefined,
+      gender: dbUser.gender || undefined,
+    };
   } catch (error) {
     console.error("Error getting user:", error);
-    throw error;
+    return null;
   }
-}
+});
 
 /**
  * Updates a user's profile
@@ -126,23 +145,21 @@ export async function updateUser(userId: string, userData: Partial<User>): Promi
       throw new Error("Unauthorized");
     }
 
-    // Ensure the user can only update their own profile unless they're an admin
-    const currentUser = await prisma.user.findUnique({
-      where: { id: authUser.id },
-    });
-
-    if (currentUser?.id !== userId && currentUser?.role !== "ADMIN") {
-      throw new Error("Unauthorized to update this user");
-    }
-
-    // Validate user data
-    const validatedData = userSchema.partial().parse(userData);
-
-    // Update user directly using Prisma
-    const updatedUser = await prisma.user.update({
+    // Update user in database
+    const updatedDbUser = await prisma.user.update({
       where: { id: userId },
-      data: validatedData,
+      data: userData,
     });
+
+    // Map null values to undefined to match User type
+    const updatedUser: User = {
+      ...updatedDbUser,
+      firstName: updatedDbUser.firstName || undefined,
+      lastName: updatedDbUser.lastName || undefined,
+      avatarUrl: updatedDbUser.avatarUrl || undefined,
+      country: updatedDbUser.country || undefined,
+      gender: updatedDbUser.gender || undefined,
+    };
 
     return updatedUser;
   } catch (error) {
@@ -162,40 +179,29 @@ export async function getUsers(
   pagination: { page: number; limit: number } = { page: 1, limit: 10 }
 ): Promise<{ data: User[]; total: number; }> {
   try {
-    const supabase = createClient();
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
     
-    // Use getUser instead of getSession for better security
-    const { data: { user: authUser }, error } = await supabase.auth.getUser();
-    
-    if (error || !authUser) {
-      throw new Error("Unauthorized");
-    }
-
-    // Check if user is admin
-    const currentUser = await prisma.user.findUnique({
-      where: { id: authUser.id },
-    });
-
-    if (currentUser?.role !== "ADMIN") {
-      throw new Error("Unauthorized to view all users");
-    }
-
-    // Calculate skip for pagination
-    const skip = (pagination.page - 1) * pagination.limit;
-
-    // Build where clause from filters
-    const where = { ...filters };
-
-    // Query users directly using Prisma
-    const [users, total] = await Promise.all([
+    // Query users with pagination
+    const [dbUsers, total] = await Promise.all([
       prisma.user.findMany({
-        where,
+        where: filters,
         skip,
-        take: pagination.limit,
+        take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.user.count({ where }),
+      prisma.user.count({ where: filters }),
     ]);
+
+    // Map null values to undefined for each user
+    const users: User[] = dbUsers.map(dbUser => ({
+      ...dbUser,
+      firstName: dbUser.firstName || undefined,
+      lastName: dbUser.lastName || undefined,
+      avatarUrl: dbUser.avatarUrl || undefined,
+      country: dbUser.country || undefined,
+      gender: dbUser.gender || undefined,
+    }));
 
     return {
       data: users,
@@ -287,20 +293,29 @@ export async function createUser(userData: Partial<User>): Promise<User | null> 
         data: {
           id: newAuthUser.user.id,
           email: validatedData.email,
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName,
-          avatarUrl: validatedData.avatarUrl || null,
-          role: validatedData.role,
+          firstName: validatedData.firstName || null,
+          lastName: validatedData.lastName || null,
+          role: validatedData.role || "STUDENT",
           country: validatedData.country || null,
           gender: validatedData.gender || null,
         },
       });
 
+      // Map null values to undefined to match User type
+      const mappedUser: User = {
+        ...newUser,
+        firstName: newUser.firstName || undefined,
+        lastName: newUser.lastName || undefined,
+        avatarUrl: newUser.avatarUrl || undefined,
+        country: newUser.country || undefined,
+        gender: newUser.gender || undefined,
+      };
+
       // If the user is a student, create a student record
       if (validatedData.role === "STUDENT") {
         await prisma.student.create({
           data: {
-            userId: newUser.id,
+            userId: mappedUser.id,
             credits: 0,
             hasAccess: false,
             learningGoals: [],
@@ -313,14 +328,14 @@ export async function createUser(userData: Partial<User>): Promise<User | null> 
       if (validatedData.role === "TEACHER") {
         await prisma.teacher.create({
           data: {
-            userId: newUser.id,
+            userId: mappedUser.id,
             specialties: [],
             languages: [],
           }
         });
       }
 
-      return newUser;
+      return mappedUser;
     } catch (dbError) {
       // If database creation fails, delete the auth user to maintain consistency
       console.error("Error creating user in database:", dbError);

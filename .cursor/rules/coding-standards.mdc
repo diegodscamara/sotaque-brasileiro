@@ -1,0 +1,504 @@
+---
+description: Comprehensive coding standards for Sotaque Brasileiro, covering security, maintainability, scalability, accessibility, and best practices for React, TypeScript, and Next.js development. These standards ensure high-quality, secure, and accessible code throughout the project.
+globs: \.(tsx|ts|js|jsx)$
+alwaysApply: true
+---
+ ---
+description: Comprehensive coding standards for Sotaque Brasileiro, covering security, maintainability, scalability, accessibility, and best practices for React, TypeScript, and Next.js development. These standards ensure high-quality, secure, and accessible code throughout the project.
+globs: \.(tsx|ts|js|jsx)$
+alwaysApply: true
+---
+# Sotaque Brasileiro - Coding Standards
+
+## Core Principles
+- **SOLID**: Single responsibility, Open-closed, Liskov substitution, Interface segregation, Dependency inversion
+- **DRY**: Don't Repeat Yourself - extract reusable code into components, hooks, or utilities
+- **KISS**: Keep It Simple, Stupid - favor simplicity over complexity
+- **YAGNI**: You Aren't Gonna Need It - avoid speculative features
+- **TDA**: Tell, Don't Ask - objects should tell other objects what to do, not ask for data
+- **Functional Programming**: Prefer pure functions, immutability, and declarative code
+
+## 1. Security
+
+### Input Validation
+```typescript
+// ✅ GOOD: Validate inputs with Zod
+const formSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  birthDate: z.date().refine(date => date < new Date(), "Birth date must be in the past")
+});
+
+// ✅ GOOD: Sanitize user input
+import { sanitize } from "some-sanitizer-library";
+const safeHtml = sanitize(userProvidedHtml);
+```
+
+### Error Handling
+```typescript
+// ✅ GOOD: Centralized error handling
+export function ErrorBoundary({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundaryProvider
+      fallback={(error) => <ErrorDisplay error={error} />}
+    >
+      {children}
+    </ErrorBoundaryProvider>
+  );
+}
+
+// ✅ GOOD: Actionable error messages
+try {
+  await updateProfile(data);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    toast.error("Please check your input and try again");
+  } else if (error instanceof NetworkError) {
+    toast.error("Connection issue. Please check your internet and try again");
+  } else {
+    toast.error("Something went wrong. Please try again later");
+    // Log the actual error for debugging
+    logger.error("Profile update failed", { userId, error });
+  }
+}
+```
+
+### Logging
+```typescript
+// ✅ GOOD: Structured logging without sensitive data
+logger.info("User profile updated", { 
+  userId: user.id,
+  updatedFields: Object.keys(data),
+  timestamp: new Date().toISOString()
+});
+
+// ❌ BAD: Logging sensitive data
+console.log("User data:", user.email, user.password);
+```
+
+## 2. Maintainability
+
+### Component Structure
+```typescript
+// ✅ GOOD: Single responsibility components
+function UserProfile() {
+  return (
+    <div>
+      <ProfileHeader />
+      <ProfileDetails />
+      <ProfileActions />
+    </div>
+  );
+}
+
+// ✅ GOOD: Custom hooks for complex logic
+function useProfileForm(userId: string) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
+  const updateProfile = useCallback(async (data: ProfileData) => {
+    setIsLoading(true);
+    try {
+      await updateUserProfile(userId, data);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
+  
+  return { isLoading, error, updateProfile };
+}
+```
+
+### Naming Conventions
+```typescript
+// ✅ GOOD: Clear, descriptive names
+function calculateTotalLessonCredits(lessons: Lesson[]): number {
+  return lessons.reduce((total, lesson) => total + lesson.credits, 0);
+}
+
+// ✅ GOOD: React naming conventions
+function UserProfileCard({ user, isEditable }: UserProfileCardProps) {
+  // PascalCase for components
+  const handleEditClick = () => {
+    // camelCase for functions and variables
+  };
+}
+
+// ❌ BAD: Unclear names
+function calc(l: any[]): number {
+  return l.reduce((t, i) => t + i.c, 0);
+}
+```
+
+## 3. Scalability
+
+### Modularization
+```typescript
+// ✅ GOOD: Modular component structure
+// components/profile/ProfileHeader.tsx
+export function ProfileHeader({ user }: ProfileHeaderProps) {
+  return <header>{/* ... */}</header>;
+}
+
+// ✅ GOOD: Context for shared state
+export const UserContext = createContext<UserContextType | undefined>(undefined);
+
+export function UserProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  // Other state and functions...
+  
+  return (
+    <UserContext.Provider value={{ user, setUser, /* other values */ }}>
+      {children}
+    </UserContext.Provider>
+  );
+}
+```
+
+### Performance Optimization
+```typescript
+// ✅ GOOD: Memoization for expensive calculations
+const memoizedValue = useMemo(() => {
+  return expensiveCalculation(dependency1, dependency2);
+}, [dependency1, dependency2]);
+
+// ✅ GOOD: Callback memoization
+const handleSubmit = useCallback((data: FormData) => {
+  submitForm(data);
+}, [submitForm]);
+
+// ✅ GOOD: Component memoization
+const MemoizedComponent = memo(ExpensiveComponent);
+```
+
+## 4. Documentation
+
+### JSDoc Comments
+```typescript
+/**
+ * Calculates the total credits available to a user based on their subscription plan
+ * and any bonus credits they've earned.
+ *
+ * @param {User} user - The user object containing subscription information
+ * @param {Bonus[]} bonuses - Array of bonus credit objects
+ * @returns {number} The total credits available
+ * @throws {Error} If the user has no active subscription
+ */
+function calculateAvailableCredits(user: User, bonuses: Bonus[]): number {
+  if (!user.hasActiveSubscription) {
+    throw new Error("User has no active subscription");
+  }
+  
+  const subscriptionCredits = user.subscription?.credits || 0;
+  const bonusCredits = bonuses.reduce((total, bonus) => total + bonus.credits, 0);
+  
+  return subscriptionCredits + bonusCredits;
+}
+```
+
+### Component Documentation
+```typescript
+/**
+ * ProfileForm component for editing user profile information
+ * Uses form validation with react-hook-form and zod
+ * Handles submission state and error display
+ *
+ * @component
+ * @param {ProfileFormProps} props - Component props
+ * @param {User} props.user - User data to populate the form
+ * @param {(data: ProfileFormData) => Promise<void>} props.onSubmit - Form submission handler
+ * @returns {React.JSX.Element} Rendered form component
+ */
+export function ProfileForm({ user, onSubmit }: ProfileFormProps): React.JSX.Element {
+  // Implementation...
+}
+```
+
+## 5. Web Accessibility
+
+### Semantic HTML
+```typescript
+// ✅ GOOD: Semantic HTML
+<article className="profile-card">
+  <header>
+    <h2>{user.name}</h2>
+  </header>
+  <section className="profile-details">
+    {/* Content */}
+  </section>
+  <footer>
+    <button type="button" onClick={handleEdit}>Edit</button>
+  </footer>
+</article>
+
+// ❌ BAD: Non-semantic HTML
+<div className="profile-card">
+  <div className="profile-header">
+    <div className="profile-title">{user.name}</div>
+  </div>
+  <div className="profile-details">
+    {/* Content */}
+  </div>
+  <div className="profile-footer">
+    <div className="profile-button" onClick={handleEdit}>Edit</div>
+  </div>
+</div>
+```
+
+### ARIA Attributes
+```typescript
+// ✅ GOOD: Proper ARIA usage
+<button 
+  aria-label="Edit profile"
+  aria-pressed={isEditing}
+  onClick={toggleEdit}
+>
+  <PencilIcon aria-hidden="true" />
+</button>
+
+// ✅ GOOD: Form accessibility
+<div role="alert" aria-live="assertive">
+  {error && <p className="text-red-500">{error}</p>}
+</div>
+
+<label htmlFor="email">Email</label>
+<input 
+  id="email"
+  type="email"
+  aria-required="true"
+  aria-invalid={!!errors.email}
+  aria-describedby="email-error"
+/>
+{errors.email && (
+  <p id="email-error" className="text-red-500">
+    {errors.email.message}
+  </p>
+)}
+```
+
+### Keyboard Navigation
+```typescript
+// ✅ GOOD: Keyboard navigation
+function KeyboardNavigableMenu() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      setActiveIndex(prev => Math.min(prev + 1, menuItems.length - 1));
+    } else if (e.key === "ArrowUp") {
+      setActiveIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter") {
+      selectMenuItem(menuItems[activeIndex]);
+    }
+  };
+  
+  return (
+    <ul role="menu" onKeyDown={handleKeyDown}>
+      {menuItems.map((item, index) => (
+        <li
+          key={item.id}
+          role="menuitem"
+          tabIndex={index === activeIndex ? 0 : -1}
+          aria-selected={index === activeIndex}
+        >
+          {item.label}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## 6. Styling and Components
+
+### Tailwind CSS
+```typescript
+// ✅ GOOD: Consistent Tailwind usage
+<button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:ring-2 focus:ring-primary-light focus:outline-none">
+  Submit
+</button>
+
+// ✅ GOOD: Responsive design with Tailwind
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {items.map(item => (
+    <Card key={item.id} item={item} />
+  ))}
+</div>
+```
+
+### shadcn Components
+```typescript
+// ✅ GOOD: shadcn components with proper accessibility
+<Dialog>
+  <DialogTrigger asChild>
+    <Button variant="outline">Edit Profile</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit Profile</DialogTitle>
+      <DialogDescription>
+        Make changes to your profile here.
+      </DialogDescription>
+    </DialogHeader>
+    <ProfileForm />
+  </DialogContent>
+</Dialog>
+```
+
+### Phosphor Icons
+```typescript
+// ✅ GOOD: Accessible icon usage
+import { User, GraduationCap, BookOpen } from "@phosphor-icons/react";
+
+<button aria-label="View profile">
+  <User className="w-5 h-5" aria-hidden="true" />
+</button>
+```
+
+## 7. Testing
+
+### Test-Driven Development
+```typescript
+// ✅ GOOD: Test first approach
+// 1. Write the test
+test('should validate email format', () => {
+  const { result } = renderHook(() => useEmailValidation());
+  
+  // Invalid email
+  act(() => {
+    result.current.validateEmail('invalid-email');
+  });
+  expect(result.current.error).toBe('Please enter a valid email address');
+  
+  // Valid email
+  act(() => {
+    result.current.validateEmail('user@example.com');
+  });
+  expect(result.current.error).toBeNull();
+});
+
+// 2. Implement the code to pass the test
+function useEmailValidation() {
+  const [error, setError] = useState<string | null>(null);
+  
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+    } else {
+      setError(null);
+    }
+  };
+  
+  return { error, validateEmail };
+}
+```
+
+### Behavior-Driven Development
+```typescript
+// ✅ GOOD: BDD style tests
+describe('Login Form', () => {
+  // Given
+  it('should show error message when invalid credentials are provided', async () => {
+    render(<LoginForm />);
+    
+    // When
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'user@example.com' }
+    });
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: 'wrongpassword' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    
+    // Then
+    expect(await screen.findByText(/invalid email or password/i)).toBeInTheDocument();
+  });
+});
+```
+
+## 8. Database and API
+
+### Prisma Usage
+```typescript
+// ✅ GOOD: Type-safe Prisma queries in server actions
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+const updateProfileSchema = z.object({
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  bio: z.string().optional(),
+});
+
+export async function updateUserProfile(userId: string, data: unknown) {
+  // Validate input
+  const validatedData = updateProfileSchema.parse(data);
+  
+  // Update in database
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: validatedData,
+    });
+    
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    return { success: false, error: "Failed to update profile" };
+  }
+}
+```
+
+### Supabase Integration
+```typescript
+// ✅ GOOD: Secure Supabase usage
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+export async function getAuthenticatedUser() {
+  const cookieStore = cookies();
+  
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+  
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error || !user) {
+    return null;
+  }
+  
+  return user;
+}
+```
+
+## Example Files
+
+### Component Example
+@components/profile-form.tsx
+@components/profile-header.tsx
+
+### Server Action Example
+@app/actions/users.ts
+@app/actions/students.ts
+
+### Test Example
+@__tests__/components/profile-form.test.tsx
+
+## Auto-attach Regex
+```regex
+\.(tsx|ts|js|jsx)$
+```

@@ -394,7 +394,25 @@
             "keywords": "aprendizaje de portugués, portugués brasileño, cursos de idiomas, clases en línea, instructores nativos, inmersión cultural, educación en idiomas, cultura brasileña, aprendizaje personalizado, horario flexible"
         }
     },
-    "dashboard": {},
+    "dashboard": {
+        "title": "Panel",
+        "bookClass": "Reservar Clase"
+    },
+    "classes": {
+        "title": "Clases",
+        "description": "Ver y gestionar tus clases programadas",
+        "comingSoon": "La página de clases estará disponible pronto. Aquí podrás ver tus clases próximas y pasadas."
+    },
+    "teachers": {
+        "title": "Profesores",
+        "description": "Explora y conéctate con nuestros profesores cualificados",
+        "comingSoon": "La página de profesores estará disponible pronto. Aquí podrás explorar y conectarte con nuestros profesores cualificados."
+    },
+    "settings": {
+        "title": "Configuración",
+        "description": "Gestiona la configuración y preferencias de tu cuenta",
+        "comingSoon": "La página de configuración estará disponible pronto. Aquí podrás gestionar la configuración y preferencias de tu cuenta."
+    },
     "auth": {
         "sign-in": {
             "title": "Bienvenido de nuevo",
@@ -477,18 +495,19 @@
             "save": "Guardar",
             "cancel": "Cancelar",
             "delete": "Eliminar",
-            "sign-in": "Iniciar sesión",
-            "sign-up": "Regístrate"
+            "sign-in": "Iniciar Sesión",
+            "sign-up": "Registrarse"
         },
         "nav-user": {
             "profile": "Perfil",
             "billing": "Facturación",
-            "sign-out": "Cerrar sesión",
-            "upgrade": "Actualizar",
+            "sign-out": "Cerrar Sesión",
+            "upgrade": "Mejorar",
             "notifications": "Notificaciones",
             "loading": "Cargando",
             "accountMenu": "Menú de Cuenta",
             "onboarding": "Incorporación",
+            "dashboard": "Panel de Control",
             "admin": "Administrador"
         },
         "themeToggle": {
@@ -498,7 +517,8 @@
         },
         "errors": {
             "general": "Algo salió mal"
-        }
+        },
+        "platform": "Plataforma"
     },
     "errors": {
         "general": "Algo salió mal",
@@ -563,7 +583,7 @@
                     },
                     "learningPreferences": {
                         "title": "Preferencias de Aprendizaje",
-                        "subtitle": "Ayúdanos a entender tus objetivos de aprendizaje y tu背景",
+                        "subtitle": "Ayúdanos a entender tus objetivos de aprendizaje y tu background",
                         "portugueseLevelLabel": "Nivel de Portugués",
                         "portugueseLevelPlaceholder": "Selecciona tu nivel actual",
                         "portugueseLevelHelp": "Sé honesto sobre tu nivel actual para que podamos emparejarte con las clases adecuadas",
@@ -593,6 +613,22 @@
                     "cancel": "Cancelar",
                     "loading": "Cargando..."
                 }
+            },
+            "reservation": {
+                "existingPendingClass": "Tienes una clase pendiente",
+                "pendingClassDescription": "Encontramos una clase pendiente existente. Puedes continuar con esta clase o seleccionar un horario/profesor diferente. Si seleccionas una opción diferente, la clase pendiente anterior será cancelada."
+            },
+            "checkout": {
+                "cancelled": {
+                    "title": "Pago Cancelado",
+                    "description": "Tu proceso de pago fue cancelado o encontró un error.",
+                    "message": "Hemos limpiado tu reserva de clase pendiente. Puedes intentarlo de nuevo o seleccionar un horario de clase diferente.",
+                    "loading": "Limpiando tu clase pendiente...",
+                    "pendingClassCancelled": "Clase Pendiente Cancelada",
+                    "pendingClassCancelledDescription": "Tu clase pendiente anterior ha sido cancelada. Puedes seleccionar un nuevo horario o reintentar el pago.",
+                    "goBackToTeacherSelection": "Seleccionar Nuevo Horario",
+                    "retryCheckout": "Reintentar Pago"
+                }
             }
         },
         "step2": {
@@ -610,6 +646,121 @@
             "seoDescription": "Transforma tu portugués con clases personalizadas y culturalmente inmersivas adaptadas a tu horario y objetivos, impartidas por instructores brasileños nativos.",
             "keywords": "aprendizaje de portugués, portugués brasileño, cursos de idiomas, clases en línea, instructores nativos, inmersión cultural, educación en idiomas, cultura brasileña, aprendizaje personalizado, horario flexible",
             "ogImageAlt": "Sotaque Brasileiro - Aprende portugués con instructores nativos"
+        }
+    },
+    "profile": {
+        "title": "Perfil",
+        "memberSince": "Miembro desde {date}",
+        "memberSinceLabel": "Miembro desde",
+        "userDetails": "Detalles del Usuario",
+        "unknownUser": "Usuario Desconocido",
+        "profileHeader": "Perfil",
+        "activeSubscription": "Suscripción Activa",
+        "level": "Nivel",
+        "avatarAlt": "Foto de perfil de {name}",
+        "error": {
+            "title": "Error al Cargar el Perfil",
+            "description": "Hubo un problema al cargar los datos de tu perfil. Por favor, intenta refrescar la página."
+        },
+        "credits": {
+            "title": "Créditos",
+            "description": "Créditos disponibles para reservar clases"
+        },
+        "package": {
+            "title": "Paquete",
+            "description": "Tu paquete de suscripción actual",
+            "none": "Sin paquete"
+        },
+        "subscription": {
+            "title": "Estado de Suscripción",
+            "active": "Activa",
+            "inactive": "Inactiva"
+        },
+        "tabs": {
+            "personal": "Personal",
+            "preferences": "Preferencias",
+            "teacher": "Perfil de Profesor"
+        },
+        "personal": {
+            "title": "Información Personal",
+            "description": "Actualiza tu información personal",
+            "firstName": "Nombre",
+            "firstNamePlaceholder": "Ingresa tu nombre",
+            "lastName": "Apellido",
+            "lastNamePlaceholder": "Ingresa tu apellido",
+            "email": "Correo electrónico",
+            "emailPlaceholder": "Ingresa tu correo electrónico",
+            "emailDescription": "Tu correo electrónico no se puede cambiar",
+            "gender": "Género",
+            "genderPlaceholder": "Selecciona género",
+            "genderOptions": {
+                "male": "Masculino",
+                "female": "Femenino",
+                "other": "Otro",
+                "preferNotToSay": "Prefiero no decirlo"
+            },
+            "country": "País",
+            "countryPlaceholder": "Selecciona país",
+            "countrySearchPlaceholder": "Buscar países...",
+            "noCountriesFound": "No se encontraron países"
+        },
+        "preferences": {
+            "title": "Preferencias de Aprendizaje",
+            "description": "Configura tus preferencias de aprendizaje de idiomas",
+            "portugueseLevel": "Nivel de portugués",
+            "portugueseLevelPlaceholder": "Selecciona tu nivel",
+            "portugueseLevelOptions": {
+                "beginner": "Principiante",
+                "elementary": "Elemental",
+                "intermediate": "Intermedio",
+                "upper_intermediate": "Intermedio Alto",
+                "advanced": "Avanzado",
+                "proficient": "Competente",
+                "native": "Nativo",
+                "unknown": "Desconocido"
+            },
+            "nativeLanguage": "Idioma nativo",
+            "nativeLanguagePlaceholder": "Selecciona tu idioma nativo",
+            "nativeLanguageDescription": "Tu idioma principal o lengua materna",
+            "otherLanguages": "Otros idiomas",
+            "otherLanguagesPlaceholder": "Ingresa idiomas que hablas (separados por comas)",
+            "otherLanguagesDescription": "Lista los idiomas que hablas además de tu idioma nativo",
+            "learningGoals": "Objetivos de aprendizaje",
+            "learningGoalsPlaceholder": "Ingresa tus objetivos de aprendizaje (separados por comas)",
+            "learningGoalsDescription": "¿Qué esperas lograr al aprender portugués?",
+            "timeZone": "Zona horaria",
+            "timeZonePlaceholder": "Selecciona tu zona horaria"
+        },
+        "teacher": {
+            "title": "Perfil de Profesor",
+            "description": "Configura la información de tu perfil de profesor",
+            "biography": "Biografía",
+            "biographyPlaceholder": "Cuéntanos sobre ti y tu experiencia como profesor",
+            "biographyDescription": "Comparte tu formación, experiencia y enfoque de enseñanza",
+            "specialties": "Especialidades",
+            "specialtiesPlaceholder": "Ingresa tus especialidades de enseñanza (separadas por comas)",
+            "specialtiesDescription": "¿En qué áreas del idioma portugués o cultura brasileña te especializas?",
+            "languages": "Idiomas",
+            "languagesPlaceholder": "Ingresa idiomas que hablas (separados por comas)",
+            "languagesDescription": "Lista todos los idiomas que hablas con fluidez o a nivel avanzado"
+        },
+        "toast": {
+            "success": {
+                "title": "Perfil actualizado",
+                "description": "Tu perfil ha sido actualizado exitosamente"
+            },
+            "error": {
+                "title": "Error al actualizar",
+                "description": "Hubo un error al actualizar tu perfil"
+            }
+        },
+        "buttons": {
+            "save": "Guardar Cambios",
+            "saveChanges": "Guardar Cambios",
+            "saving": "Guardando...",
+            "cancel": "Cancelar",
+            "refresh": "Actualizar Datos",
+            "refreshing": "Actualizando..."
         }
     }
 }

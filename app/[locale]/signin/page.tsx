@@ -194,7 +194,7 @@ export default function SignIn(): JSX.Element {
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
       >
-        <Card className="bg-gray-100 dark:bg-gray-700 rounded-lg w-full max-w-md">
+        <Card className="rounded-lg w-full max-w-md">
           <CardHeader className="items-center">
             <CardTitle className="font-semibold text-lg text-center leading-8">{t("title")}</CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-300 text-sm text-center leading-none">

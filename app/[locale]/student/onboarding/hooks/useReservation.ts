@@ -3,7 +3,7 @@ import {
   createTemporaryReservation, 
   cancelTemporaryReservation 
 } from "@/app/actions/availability";
-import { logTimeConversion, createTimeSlotRepresentation } from "@/app/utils/timezone";
+import {  createTimeSlotRepresentation } from "@/app/utils/timezone";
 
 // Add interface for reservation
 interface Reservation {
@@ -13,13 +13,27 @@ interface Reservation {
 }
 
 /**
+ * Return type for the useReservation hook
+ */
+interface UseReservationReturn {
+  currentReservation: Reservation | null;
+  reservationExpiry: Date | null;
+  isRefreshing: boolean;
+  lastRefreshTime: Date;
+  createReservation: (teacherId: string, startDateTime: Date, endDateTime: Date, studentId: string) => Promise<string | null>;
+  cancelReservation: () => Promise<void>;
+  refreshReservation: (teacherId: string, startDateTime: Date, endDateTime: Date, studentId: string) => Promise<void>;
+  handleRefreshAvailability: () => Promise<void>;
+}
+
+/**
  * Custom hook for managing temporary reservations
  * @param {Function} refreshAvailabilityData - Function to refresh availability data
- * @returns {Object} Reservation state and handlers
+ * @returns {UseReservationReturn} Reservation state and handlers
  */
 export function useReservation(
   refreshAvailabilityData: () => Promise<void>
-) {
+): UseReservationReturn {
   const [currentReservation, setCurrentReservation] = useState<Reservation | null>(null);
   const [reservationExpiry, setReservationExpiry] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -193,14 +207,14 @@ export function useReservation(
   const handleRefreshAvailability = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await refreshAvailabilityData();
+      await refreshAvailabilityRef.current();
       setLastRefreshTime(new Date());
     } catch (error) {
       console.error("Error refreshing availability:", error);
     } finally {
       setIsRefreshing(false);
     }
-  }, [refreshAvailabilityData]);
+  }, []);
 
   return {
     currentReservation,

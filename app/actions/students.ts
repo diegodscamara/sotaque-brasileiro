@@ -3,6 +3,7 @@
 import { createClient } from "@/libs/supabase/server";
 import { prisma } from "@/libs/prisma";
 import { z } from "zod";
+import { cache } from "react";
 
 import { type Student } from "@/types";
 
@@ -23,11 +24,11 @@ const studentSchema = z.object({
 });
 
 /**
- * Fetches a single student by ID
+ * Fetches a single student by ID with caching
  * @param {string} studentId - The ID of the student to fetch
  * @returns {Promise<Student | null>} The student data or null if not found
  */
-export async function getStudent(studentId: string) {
+export const getStudent = cache(async (studentId: string) => {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -43,12 +44,23 @@ export async function getStudent(studentId: string) {
       }
     });
 
-    return student;
+    if (student) {
+      // Ensure boolean fields are properly returned as booleans
+      return {
+        ...student,
+        hasCompletedOnboarding: Boolean(student.hasCompletedOnboarding),
+        hasAccess: Boolean(student.hasAccess),
+        learningGoals: student.learningGoals || [],
+        otherLanguages: student.otherLanguages || [],
+      };
+    }
+
+    return null;
   } catch (error) {
     console.error("Error fetching student:", error);
-    throw error;
+    return null;
   }
-}
+});
 
 /**
  * Fetches all students
@@ -148,6 +160,59 @@ export async function deleteStudent(studentId: string) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting student:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates a student's profile
+ * @param {string} studentId - The ID of the student to update
+ * @param {Partial<Student>} studentData - The student data to update
+ * @returns {Promise<Student | null>} The updated student data or null if not found
+ */
+export async function updateStudent(studentId: string, studentData: Partial<any>): Promise<any> {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Find the student by ID
+    const student = await prisma.student.findFirst({
+      where: {
+        id: studentId
+      }
+    });
+
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    // Update student data
+    const updatedStudent = await prisma.student.update({
+      where: {
+        id: studentId
+      },
+      data: {
+        portugueseLevel: studentData.portugueseLevel,
+        nativeLanguage: studentData.nativeLanguage,
+        otherLanguages: studentData.otherLanguages,
+        learningGoals: studentData.learningGoals,
+        timeZone: studentData.timeZone,
+      }
+    });
+
+    return {
+      ...updatedStudent,
+      hasCompletedOnboarding: Boolean(updatedStudent.hasCompletedOnboarding),
+      hasAccess: Boolean(updatedStudent.hasAccess),
+      learningGoals: updatedStudent.learningGoals || [],
+      otherLanguages: updatedStudent.otherLanguages || [],
+    };
+  } catch (error) {
+    console.error("Error updating student:", error);
     throw error;
   }
 }

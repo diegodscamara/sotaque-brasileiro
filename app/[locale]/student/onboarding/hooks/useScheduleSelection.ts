@@ -3,13 +3,11 @@ import { format } from "date-fns";
 import { OnboardingFormData } from "../types";
 import { 
   getTeacherAvailabilityRange, 
-  checkTimeSlotAvailability,
   refreshAvailability
 } from "@/app/actions/availability";
 import { 
   standardizeDate, 
   createTimeSlotId, 
-  logDateInfo, 
   formatDateInTimezone 
 } from "@/app/utils/timezone";
 
@@ -26,15 +24,10 @@ interface TimeSlot {
 }
 
 /**
- * Custom hook for managing schedule selection
- * @param {OnboardingFormData} formData - The form data
- * @param {string | null} selectedTeacher - The selected teacher ID
- * @param {Function} handleDateTimeChange - Function to update date/time in form data
- * @param {Function} handleSelectChange - Function to update form data
- * @param {Function} createReservation - Function to create a reservation
- * @param {Function} cancelReservation - Function to cancel a reservation
- * @param {boolean} hasActiveReservation - Whether there is an active reservation
- * @returns {Object} Schedule selection state and handlers
+ * Custom hook for managing schedule selection in the student onboarding process.
+ * Handles date selection, time slot management, and reservation creation.
+ * 
+ * @returns Schedule selection state and handlers
  */
 export function useScheduleSelection(
   formData: OnboardingFormData,
@@ -146,6 +139,18 @@ export function useScheduleSelection(
   const fetchAvailabilityForDate = useCallback(async (date: Date, teacherId: string) => {
     if (!date || !teacherId) return;
     
+    // Create a unique key for this date and teacher to prevent duplicate fetches
+    const fetchKey = `${teacherId}-${format(date, 'yyyy-MM-dd')}`;
+    
+    // Check if we've already fetched this data recently (within the last 5 seconds)
+    const now = new Date();
+    const timeSinceLastFetchMs = now.getTime() - lastRefreshTime.getTime();
+    
+    if (timeSinceLastFetchMs < 5000 && timeSlots.length > 0) { // 5 seconds and we have data
+      console.log(`Skipping fetch - last fetch was less than 5 seconds ago for ${fetchKey}`);
+      return;
+    }
+    
     try {
       setIsLoadingTimeSlots(true);
       
@@ -204,12 +209,19 @@ export function useScheduleSelection(
               const standardizedStartDateTime = standardizeDate(matchingSlot.startDateTime);
               const standardizedEndDateTime = standardizeDate(matchingSlot.endDateTime);
               
-              createReservation(
-                teacherId,
-                standardizedStartDateTime,
-                standardizedEndDateTime,
-                formData.pendingClass.studentId
-              );
+              try {
+                await createReservation(
+                  teacherId,
+                  standardizedStartDateTime,
+                  standardizedEndDateTime,
+                  formData.pendingClass.studentId
+                );
+              } catch (error) {
+                console.log("Error creating reservation during data restoration (normal during onboarding):", error);
+                // Continue with the process even if reservation creation fails
+              }
+            } else if (createReservation) {
+              console.log("Student ID not available yet (normal during onboarding). Skipping reservation creation.");
             }
           }
           
@@ -228,7 +240,7 @@ export function useScheduleSelection(
     } finally {
       setIsLoadingTimeSlots(false);
     }
-  }, [formData, restoredDataChecked, processAvailabilityIntoTimeSlots, updateFormWithTimeSlot, createReservation]);
+  }, [formData, restoredDataChecked, processAvailabilityIntoTimeSlots, updateFormWithTimeSlot, createReservation, lastRefreshTime, timeSlots.length]);
 
   // Function to refresh availability data
   const refreshAvailabilityData = useCallback(async () => {
@@ -310,125 +322,106 @@ export function useScheduleSelection(
     } finally {
       setIsRefreshing(false);
     }
-  }, [selectedTeacher, selectedDate, selectedTimeSlot, timeSlots, isRefreshing, processAvailabilityIntoTimeSlots, updateFormWithTimeSlot, handleDateTimeChange, cancelReservation, userJustSelectedTimeSlot, lastRefreshTime]);
+  }, [
+    selectedTeacher, 
+    selectedDate, 
+    selectedTimeSlot, 
+    timeSlots, 
+    isRefreshing, 
+    processAvailabilityIntoTimeSlots, 
+    updateFormWithTimeSlot, 
+    handleDateTimeChange, 
+    cancelReservation, 
+    userJustSelectedTimeSlot, 
+    lastRefreshTime
+  ]);
 
-  // Handle date selection
-  const handleDateSelect = useCallback(async (date: Date | undefined) => {
-    if (!date || !selectedTeacher) return;
-
-    // Only update if the date has actually changed
-    if (!selectedDate || date.toDateString() !== selectedDate.toDateString()) {
-      setSelectedDate(date);
-      setSelectedTimeSlot(null); // Reset time slot when date changes
-      setIsLoadingTimeSlots(true); // Show loading state immediately
-      // Clear any existing error
-      setAvailabilityError(null);
-
-      try {
-        // Standardize the date to ensure consistent time zone handling
-        const standardizedDate = standardizeDate(date);
-        
-        // We need to set a default time (noon) to avoid time zone issues
-        const dateWithDefaultTime = new Date(standardizedDate);
-        dateWithDefaultTime.setUTCHours(12, 0, 0, 0);
-
-        // Get the student's timezone for logging
-        const studentTimezone = formData.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-        
-        console.log(`Selected date: ${format(date, 'yyyy-MM-dd')}`);
-        console.log(`  - Original date: ${date.toISOString()}`);
-        console.log(`  - Standardized date: ${standardizedDate.toISOString()}`);
-        console.log(`  - With default time: ${dateWithDefaultTime.toISOString()}`);
-        console.log(`  - Student timezone: ${studentTimezone}`);
-
-        // Update form data with the selected date
-        handleDateTimeChange("classStartDateTime", dateWithDefaultTime);
-        
-        // Cancel any existing reservation when date changes
-        if (cancelReservation) {
-          await cancelReservation();
-        }
-
-        // Fetch availability for the new date
-        await fetchAvailabilityForDate(date, selectedTeacher);
-      } catch (error) {
-        console.error("Error fetching availability for selected date:", error);
-        setAvailabilityError("Error fetching availability. Please try again.");
-      } finally {
-        setIsLoadingTimeSlots(false);
-      }
+  // Function to handle time slot selection
+  const handleTimeSlotSelect = useCallback(async (slotId: string) => {
+    // If the user selects the same slot, do nothing
+    if (slotId === selectedTimeSlot) {
+      return;
     }
-  }, [selectedDate, selectedTeacher, handleDateTimeChange, cancelReservation, fetchAvailabilityForDate, formData.timeZone]);
-
-  // Handle time slot selection
-  const handleTimeSlotSelect = useCallback(async (slot: TimeSlot) => {
-    if (!slot.isAvailable || !selectedTeacher) return;
     
-    try {
-      // Set loading state but keep the selection visible
-      setIsLoadingTimeSlots(true);
-      
-      // Set selected time slot ID immediately to provide visual feedback
-      setSelectedTimeSlot(slot.id);
-      
-      // Mark that the user just selected this time slot
-      setUserJustSelectedTimeSlot(true);
-      
-      // Clear any existing error
-      setAvailabilityError(null);
-      
-      // Standardize dates to ensure consistent time zone handling
-      const standardizedStartDateTime = standardizeDate(slot.startDateTime);
-      const standardizedEndDateTime = standardizeDate(slot.endDateTime);
-      
-      // Update form data with the selected time slot
-      updateFormWithTimeSlot(slot);
-      
-      // Get the student's timezone for logging
-      const studentTimezone = formData.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
-      console.log(`Selected time slot: ${slot.id}, student local time: ${slot.startTime}-${slot.endTime}`);
-      console.log(`  - UTC startDateTime: ${standardizedStartDateTime.toISOString()}`);
-      console.log(`  - UTC endDateTime: ${standardizedEndDateTime.toISOString()}`);
-      console.log(`  - Student timezone: ${studentTimezone}`);
-      
-      // Create a temporary reservation if we have a student ID
-      if (createReservation && formData.pendingClass?.studentId) {
-        try {
-          console.log(`Attempting to create reservation for student ${formData.pendingClass.studentId}`);
-          console.log(`  - Teacher: ${selectedTeacher}`);
-          console.log(`  - UTC start: ${standardizedStartDateTime.toISOString()}`);
-          console.log(`  - UTC end: ${standardizedEndDateTime.toISOString()}`);
-          console.log(`  - Student local time: ${slot.startTime}-${slot.endTime}`);
-          
-          const reservationId = await createReservation(
-            selectedTeacher,
-            standardizedStartDateTime,
-            standardizedEndDateTime,
-            formData.pendingClass.studentId
-          );
-          
-          if (reservationId) {
-            console.log(`Successfully created reservation: ${reservationId}`);
-            console.log(`  - Student local time: ${slot.startTime}-${slot.endTime}`);
-            console.log(`  - UTC time: ${standardizedStartDateTime.toISOString()} to ${standardizedEndDateTime.toISOString()}`);
-          } else {
-            console.log('Failed to create reservation, but not showing error to user');
-            // Don't refresh availability here - the user just selected this slot
-          }
-        } catch (error) {
-          console.error("Error creating reservation:", error);
-          // Don't show an error to the user here - they just selected this slot
-          // and we don't want to confuse them
-        }
-      }
-    } catch (error) {
-      console.error("Error selecting time slot:", error);
-      setAvailabilityError("Error selecting time slot. Please try again.");
-    } finally {
-      setIsLoadingTimeSlots(false);
+    // Find the selected slot
+    const selectedSlot = timeSlots.find(slot => slot.id === slotId);
+    
+    if (!selectedSlot) {
+      console.error(`Time slot with ID ${slotId} not found`);
+      return;
     }
-  }, [selectedTeacher, updateFormWithTimeSlot, createReservation, formData.pendingClass?.studentId, formData.timeZone]);
+    
+    // Set the selected time slot
+    setSelectedTimeSlot(slotId);
+    setUserJustSelectedTimeSlot(true);
+    
+    // Update form data with the selected time slot
+    updateFormWithTimeSlot(selectedSlot);
+    
+    // If we have a teacher ID and createReservation function, try to create a reservation
+    if (selectedTeacher && createReservation) {
+      try {
+        // Get the student ID from the form data
+        const studentId = formData.pendingClass?.studentId;
+        
+        // During onboarding, the student ID might not be available yet
+        // In this case, we'll skip creating a reservation and just update the form data
+        if (!studentId) {
+          console.log("Student ID not available yet (normal during onboarding). Skipping reservation creation.");
+          // We'll still continue with the time slot selection
+        } else {
+          // Cancel any existing reservation first
+          if (cancelReservation && hasActiveReservation) {
+            await cancelReservation();
+          }
+          
+          // Create a new reservation
+          await createReservation(
+            selectedTeacher,
+            selectedSlot.startDateTime,
+            selectedSlot.endDateTime,
+            studentId
+          );
+        }
+      } catch (error) {
+        console.error("Error creating reservation:", error);
+        // Don't show error to user here, as it's handled in the useReservation hook
+      } finally {
+        // Reset the user selection flag after a short delay
+        setTimeout(() => {
+          setUserJustSelectedTimeSlot(false);
+        }, 1000);
+      }
+    }
+  }, [
+    selectedTimeSlot, 
+    timeSlots, 
+    updateFormWithTimeSlot, 
+    selectedTeacher, 
+    createReservation, 
+    formData.pendingClass?.studentId,
+    cancelReservation,
+    hasActiveReservation
+  ]);
+
+  // Function to handle date selection
+  const handleDateSelect = useCallback(async (date: Date) => {
+    // If the user selects the same date, do nothing
+    if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+      return;
+    }
+    
+    // Reset selected time slot when date changes
+    setSelectedTimeSlot(null);
+    
+    // Set the selected date
+    setSelectedDate(date);
+    
+    // If we have a teacher ID, fetch availability for the selected date
+    if (selectedTeacher) {
+      await fetchAvailabilityForDate(date, selectedTeacher);
+    }
+  }, [selectedDate, selectedTeacher, fetchAvailabilityForDate]);
 
   // Effect to refresh availability data periodically
   useEffect(() => {

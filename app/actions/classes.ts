@@ -41,7 +41,39 @@ export async function fetchClasses(
     const skip = (pagination.page - 1) * pagination.limit;
 
     // Build where clause from filters
-    const where = { ...filters };
+    const where: Record<string, any> = { ...filters };
+
+    // Get the current user's role and ID
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, role: true }
+    });
+
+    if (!dbUser) {
+      throw new Error("User not found");
+    }
+
+    // If the user is a student, only show their classes
+    if (dbUser.role === 'STUDENT') {
+      const student = await prisma.student.findFirst({
+        where: { userId: user.id }
+      });
+      
+      if (student) {
+        where.studentId = student.id;
+      }
+    }
+    
+    // If the user is a teacher, only show their classes
+    if (dbUser.role === 'TEACHER') {
+      const teacher = await prisma.teacher.findFirst({
+        where: { userId: user.id }
+      });
+      
+      if (teacher) {
+        where.teacherId = teacher.id;
+      }
+    }
 
     // Query classes directly using Prisma with related data
     const [classes, total] = await Promise.all([
@@ -240,13 +272,15 @@ export async function cancelClass(classId: string) {
       });
 
       if (student && !student.hasAccess) {
-        // Refund credits based on class duration
+        // Refund exactly 1 credit, regardless of class duration
         await prisma.student.update({
           where: { id: student.id },
           data: {
-            credits: student.credits + existingClass.duration
+            credits: student.credits + 1
           }
         });
+        
+        console.log(`Refunded 1 credit to student ${student.id}. New balance: ${student.credits + 1}`);
       }
     }
 
@@ -289,7 +323,42 @@ export async function cancelClass(classId: string) {
 
     return cancelledClass;
   } catch (error) {
-    console.error("Error canceling class:", error);
+    console.error("Error cancelling class:", error);
+    throw error;
+  }
+}
+
+/**
+ * Cancels a pending class during the onboarding process
+ * This is a simplified version of cancelClass that skips certain validations
+ * @param {string} classId - The ID of the class to cancel
+ * @returns {Promise<ClassData>} The cancelled class data
+ */
+export async function cancelPendingClass(classId: string) {
+  try {
+    // Ensure the class exists
+    const existingClass = await prisma.class.findUnique({
+      where: { id: classId }
+    });
+
+    if (!existingClass) {
+      throw new Error("Class not found");
+    }
+
+    // Only cancel if the class is in PENDING status
+    if (existingClass.status !== 'PENDING') {
+      throw new Error("Only pending classes can be cancelled with this function");
+    }
+
+    // Update class status to CANCELLED using Prisma
+    const cancelledClass = await prisma.class.update({
+      where: { id: classId },
+      data: { status: 'CANCELLED' }
+    });
+
+    return cancelledClass;
+  } catch (error) {
+    console.error("Error cancelling pending class:", error);
     throw error;
   }
 }
@@ -297,9 +366,13 @@ export async function cancelClass(classId: string) {
 /**
  * Schedules a new class
  * @param {ClassData} classData - The class data to create
+ * @param {object} options - Additional options for scheduling
  * @returns {Promise<ClassData>} The created class data
  */
-export async function scheduleClass(classData: ClassData) {
+export async function scheduleClass(
+  classData: ClassData, 
+  options: { isOnboarding?: boolean } = {}
+) {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -311,51 +384,90 @@ export async function scheduleClass(classData: ClassData) {
     // Validate class data
     const validatedData = classDataSchema.parse(classData);
 
-    // Rule: Students can only schedule a class 24 hours in advance
-    const classStartTime = new Date(validatedData.startDateTime);
-    const currentTime = new Date();
-    const timeDifference = classStartTime.getTime() - currentTime.getTime();
+    // Skip certain validations during onboarding
+    if (!options.isOnboarding) {
+      // Rule: Students can only schedule a class 24 hours in advance
+      const classStartTime = new Date(validatedData.startDateTime);
+      const currentTime = new Date();
+      const timeDifference = classStartTime.getTime() - currentTime.getTime();
 
-    if (timeDifference < 24 * 60 * 60 * 1000) {
-      throw new Error("Class must be scheduled at least 24 hours in advance");
+      if (timeDifference < 24 * 60 * 60 * 1000) {
+        throw new Error("Class must be scheduled at least 24 hours in advance");
+      }
+
+      // Validate time conflicts for teacher
+      const conflictingClasses = await prisma.class.findMany({
+        where: {
+          teacherId: validatedData.teacherId,
+          status: { not: 'CANCELLED' },
+          OR: [
+            {
+              startDateTime: {
+                lt: validatedData.endDateTime,
+              },
+              endDateTime: {
+                gt: validatedData.startDateTime,
+              },
+            },
+          ],
+        },
+      });
+
+      if (conflictingClasses.length > 0) {
+        throw new Error("Teacher has a scheduling conflict");
+      }
+
+      // Check if student has enough credits
+      const student = await prisma.student.findFirst({
+        where: { id: validatedData.studentId }
+      });
+
+      if (!student) {
+        throw new Error("Student not found");
+      }
+
+      if (!student.hasAccess && student.credits < 1) {
+        throw new Error("Student doesn't have enough credits");
+      }
     }
 
-    // Validate time conflicts for teacher
-    const conflictingClasses = await prisma.class.findMany({
-      where: {
-        teacherId: validatedData.teacherId,
-        status: { not: 'CANCELLED' },
-        OR: [
-          {
+    // Check if a class is already scheduled to avoid duplicates (for onboarding)
+    if (options.isOnboarding) {
+      console.log(`Checking for existing pending classes for student ID ${validatedData.studentId}`);
+      
+      try {
+        // Explicitly filter by the current student's ID to avoid finding classes for other students
+        const existingClasses = await prisma.class.findMany({
+          where: {
+            studentId: validatedData.studentId, // Ensure we only find classes for this specific student
+            status: 'PENDING',
             startDateTime: {
-              lt: validatedData.endDateTime,
-            },
-            endDateTime: {
-              gt: validatedData.startDateTime,
+              gte: new Date(validatedData.startDateTime.getTime() - 60 * 1000), // 1 minute buffer
+              lte: new Date(validatedData.startDateTime.getTime() + 60 * 1000), // 1 minute buffer
             },
           },
-        ],
-      },
-    });
+          take: 1, // Only need one result to check existence
+        });
 
-    if (conflictingClasses.length > 0) {
-      throw new Error("Teacher has a scheduling conflict");
+        if (existingClasses.length > 0) {
+          // Double-check that this class belongs to the current student
+          if (existingClasses[0].studentId === validatedData.studentId) {
+            console.log(`Found existing pending class with ID ${existingClasses[0].id} for student ID ${validatedData.studentId}, returning it instead of creating a new one`);
+            return existingClasses[0];
+          } else {
+            console.log(`Found pending class ID ${existingClasses[0].id} but it belongs to student ID ${existingClasses[0].studentId}, not current student ID ${validatedData.studentId}`);
+          }
+        } else {
+          console.log(`No existing pending classes found for student ID ${validatedData.studentId}, creating a new one`);
+        }
+      } catch (error) {
+        // If there's an error checking for existing classes, log it but continue with creating a new class
+        console.error("Error checking for existing classes:", error);
+        console.log("Continuing with creating a new class");
+      }
     }
 
-    // Check if student has enough credits
-    const student = await prisma.student.findFirst({
-      where: { id: validatedData.studentId }
-    });
-
-    if (!student) {
-      throw new Error("Student not found");
-    }
-
-    if (!student.hasAccess && student.credits < validatedData.duration) {
-      throw new Error("Student doesn't have enough credits");
-    }
-
-    // Create class directly using Prisma
+    // Create class with minimal includes to improve performance
     const newClass = await prisma.class.create({
       data: {
         teacherId: validatedData.teacherId,
@@ -367,7 +479,27 @@ export async function scheduleClass(classData: ClassData) {
         notes: validatedData.notes,
         recurringGroupId: validatedData.recurringGroupId
       },
-      include: {
+      // Only include essential relations for onboarding to improve performance
+      include: options.isOnboarding ? {
+        teacher: {
+          select: {
+            id: true,
+            userId: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        },
+        student: {
+          select: {
+            id: true,
+            userId: true
+          }
+        }
+      } : {
         teacher: {
           include: {
             user: {
@@ -394,120 +526,10 @@ export async function scheduleClass(classData: ClassData) {
         }
       }
     });
-
-    // Deduct credits from student if they don't have unlimited access
-    if (!student.hasAccess) {
-      await prisma.student.update({
-        where: { id: student.id },
-        data: {
-          credits: student.credits - validatedData.duration
-        }
-      });
-    }
 
     return newClass;
   } catch (error) {
     console.error("Error scheduling class:", error);
-    throw error;
-  }
-}
-
-/**
- * Schedules a class during onboarding (before payment)
- * @param {Omit<ClassData, 'id' | 'createdAt' | 'updatedAt' | 'feedback' | 'rating'>} classData - The class data to create
- * @returns {Promise<ClassData>} The created class data
- */
-export async function scheduleOnboardingClass(
-  classData: Omit<ClassData, 'id' | 'createdAt' | 'updatedAt' | 'feedback' | 'rating'>
-) {
-  try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Validate class data (without requiring status to be PENDING)
-    const validatedData = classDataSchema.omit({ status: true }).parse({
-      ...classData,
-      status: 'SCHEDULED' // Force status to be SCHEDULED
-    });
-
-    // Rule: Students can only schedule a class 24 hours in advance
-    const classStartTime = new Date(validatedData.startDateTime);
-    const currentTime = new Date();
-    const timeDifference = classStartTime.getTime() - currentTime.getTime();
-
-    if (timeDifference < 24 * 60 * 60 * 1000) {
-      throw new Error("Class must be scheduled at least 24 hours in advance");
-    }
-
-    // Validate time conflicts for teacher
-    const conflictingClasses = await prisma.class.findMany({
-      where: {
-        teacherId: validatedData.teacherId,
-        status: { in: ['PENDING', 'CONFIRMED'] },
-        OR: [
-          {
-            startDateTime: {
-              lt: validatedData.endDateTime,
-            },
-            endDateTime: {
-              gt: validatedData.startDateTime,
-            },
-          },
-        ],
-      },
-    });
-
-    if (conflictingClasses.length > 0) {
-      throw new Error("Teacher has a scheduling conflict");
-    }
-
-    // Create class directly using Prisma with SCHEDULED status
-    const newClass = await prisma.class.create({
-      data: {
-        teacherId: validatedData.teacherId,
-        studentId: validatedData.studentId,
-        status: 'SCHEDULED' as any, // Set status to SCHEDULED
-        startDateTime: validatedData.startDateTime,
-        endDateTime: validatedData.endDateTime,
-        duration: validatedData.duration,
-        notes: validatedData.notes,
-        recurringGroupId: validatedData.recurringGroupId
-      },
-      include: {
-        teacher: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-                email: true,
-                avatarUrl: true
-              }
-            }
-          }
-        },
-        student: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-                email: true,
-                avatarUrl: true
-              }
-            }
-          }
-        }
-      }
-    });
-
-    return newClass;
-  } catch (error) {
-    console.error("Error scheduling onboarding class:", error);
     throw error;
   }
 }

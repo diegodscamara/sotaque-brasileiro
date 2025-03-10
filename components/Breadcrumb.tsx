@@ -12,6 +12,7 @@ import {
 import { House } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 
 const capitalizeFirstLetter = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -19,11 +20,15 @@ const capitalizeFirstLetter = (str: string) => {
 
 const BreadcrumbComponent = () => {
   const pathname = usePathname();
-  const pathSegments = pathname.split("/").filter(Boolean);
+  const locale = useLocale();
+  
+  // Filter out the locale segment from the path
+  const pathSegments = pathname.split("/").filter(segment => segment !== locale && segment !== "");
 
   const renderBreadcrumbs = () => {
     return pathSegments.map((segment, index) => {
-      const href = "/" + pathSegments.slice(0, index + 1).join("/");
+      // Reconstruct the href with the locale
+      const href = `/${locale}/${pathSegments.slice(0, index + 1).join("/")}`;
       const isLast = index === pathSegments.length - 1;
 
       return (
@@ -45,13 +50,13 @@ const BreadcrumbComponent = () => {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/" className="flex items-center gap-2">
+            <Link href={`/${locale}`} className="flex items-center gap-2">
               <House className="w-4 h-4" />
               Home
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
+        {pathSegments.length > 0 && <BreadcrumbSeparator />}
         {renderBreadcrumbs()}
       </BreadcrumbList>
     </Breadcrumb>

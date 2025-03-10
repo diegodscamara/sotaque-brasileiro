@@ -500,8 +500,10 @@
                     "lastUpdated": "Last updated {time}",
                     "refresh": "Refresh",
                     "refreshing": "Refreshing...",
-                    "refreshAvailability": "Refresh availability"
+                    "refreshAvailability": "Refresh Availability"
                 },
+                "existingPendingClass": "You have a pending class",
+                "pendingClassDescription": "We found an existing pending class. You can continue with this class or select a different time/teacher. If you select a different option, the previous pending class will be cancelled.",
                 "notes": {
                     "title": "Class Notes",
                     "placeholder": "Add any notes for your teacher about what you'd like to focus on in this class, your learning preferences, or any questions you have."
@@ -537,6 +539,34 @@
                 "submit": "Submit",
                 "cancel": "Cancel",
                 "loading": "Loading..."
+            },
+            "teacher_selection": {
+                "errors": {
+                    "connection_issue": "Failed to load teachers. Please try again later.",
+                    "teacher_schedule_issue": "Failed to load teacher's schedule. Please try again later."
+                }
+            },
+            "success": {
+                "title": "Payment Successful!",
+                "description": "Your payment has been processed successfully. You now have access to our platform and can start scheduling classes with our teachers.",
+                "processing": "Processing your payment...",
+                "pleaseWait": "Please wait while we set up your account.",
+                "goToDashboard": "Go to Dashboard",
+                "classScheduled": "Your first class has been scheduled!",
+                "checkDashboard": "You can view the details in your dashboard.",
+                "enjoyingConfetti": "Enjoy the celebration..."
+            },
+            "checkout": {
+                "cancelled": {
+                    "title": "Checkout Cancelled",
+                    "description": "Your checkout process was cancelled or encountered an error.",
+                    "message": "We've cleaned up your pending class reservation. You can try again or select a different class time.",
+                    "loading": "Cleaning up your pending class...",
+                    "pendingClassCancelled": "Pending Class Cancelled",
+                    "pendingClassCancelledDescription": "Your previously pending class has been cancelled. You can select a new time or retry checkout.",
+                    "goBackToTeacherSelection": "Select New Time",
+                    "retryCheckout": "Retry Checkout"
+                }
             }
         },
         "step3": {
@@ -634,11 +664,7 @@
             "cancel": "Cancel",
             "delete": "Delete",
             "sign-in": "Sign In",
-            "sign-up": "Sign Up",
-            "loading": "Loading...",
-            "back": "Back",
-            "continue": "Continue",
-            "finish": "Finish"
+            "sign-up": "Sign Up"
         },
         "nav-user": {
             "profile": "Profile",
@@ -649,6 +675,7 @@
             "loading": "Loading",
             "accountMenu": "Account Menu",
             "onboarding": "Onboarding",
+            "dashboard": "Dashboard",
             "admin": "Admin"
         },
         "themeToggle": {
@@ -658,7 +685,8 @@
         },
         "errors": {
             "general": "Something went wrong"
-        }
+        },
+        "platform": "Platform"
     },
     "errors": {
         "general": "Something went wrong",
@@ -676,7 +704,15 @@
         "emailInvalid": "Invalid email",
         "passwordInvalid": "Invalid password",
         "unknownError": "An unknown error occurred",
-        "resetPassword": "Reset Password"
+        "resetPassword": "Reset Password",
+        "failedToCreatePendingClass": "Failed to create pending class. Please try again.",
+        "failedToUpdateUser": "Failed to update user information",
+        "failedToUpdateStudentProfile": "Failed to update student profile",
+        "failedToSavePersonalInfo": "Failed to save personal information",
+        "missingRequiredFields": "Please fill in all required fields",
+        "studentNotFound": "Student not found",
+        "failedToProcessClassSelection": "Failed to process class selection",
+        "failedToSaveFormData": "Failed to save form data"
     },
     "index": {
         "title": "Hello world!"
@@ -743,6 +779,178 @@
                 "deleting": "Deleting...",
                 "cancel": "Cancel"
             }
+        },
+        "profile": {
+            "memberSince": "Member since",
+            "credits": "Credits",
+            "package": "Package",
+            "profileHeader": "Profile",
+            "tabs": {
+                "personalInfo": "Personal Information",
+                "personalInfoShort": "Personal",
+                "languageLearning": "Language Learning",
+                "languageLearningShort": "Language"
+            },
+            "personalInfo": {
+                "title": "Personal Information"
+            },
+            "languageLearning": {
+                "title": "Language Learning"
+            },
+            "buttons": {
+                "cancel": "Cancel",
+                "saveChanges": "Save Changes"
+            },
+            "toasts": {
+                "updateSuccess": "Profile updated successfully",
+                "updateSuccessDescription": "Your profile information has been updated.",
+                "updateError": "Failed to update profile",
+                "updateErrorDescription": "Please try again later."
+            },
+            "errors": {
+                "loadingTitle": "Error loading profile",
+                "noProfileTitle": "No profile found",
+                "noProfileDescription": "We couldn't find your profile information. Please try again.",
+                "retry": "Retry"
+            }
+        },
+        "themeToggle": {
+            "system": "System Theme",
+            "light": "Light Theme",
+            "dark": "Dark Theme"
         }
+    },
+    "profile": {
+        "title": "Profile",
+        "memberSince": "Member since {date}",
+        "memberSinceLabel": "Member since",
+        "userDetails": "User Details",
+        "unknownUser": "Unknown User",
+        "activeSubscription": "Active Subscription",
+        "level": "Level",
+        "avatarAlt": "{name}'s profile picture",
+        "error": {
+            "title": "Error Loading Profile",
+            "description": "There was a problem loading your profile data. Please try refreshing the page."
+        },
+        "credits": {
+            "title": "Credits",
+            "description": "Available credits for booking classes"
+        },
+        "package": {
+            "title": "Package",
+            "description": "Your current subscription package",
+            "none": "No package"
+        },
+        "subscription": {
+            "title": "Subscription Status",
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "tabs": {
+            "personal": "Personal",
+            "preferences": "Preferences",
+            "teacher": "Teacher Profile"
+        },
+        "personal": {
+            "title": "Personal Information",
+            "description": "Update your personal information",
+            "firstName": "First Name",
+            "firstNamePlaceholder": "Enter your first name",
+            "lastName": "Last Name",
+            "lastNamePlaceholder": "Enter your last name",
+            "email": "Email",
+            "emailPlaceholder": "Enter your email",
+            "emailDescription": "Your email cannot be changed",
+            "gender": "Gender",
+            "genderPlaceholder": "Select gender",
+            "genderOptions": {
+                "male": "Male",
+                "female": "Female",
+                "other": "Other",
+                "preferNotToSay": "Prefer not to say"
+            },
+            "country": "Country",
+            "countryPlaceholder": "Select country",
+            "countrySearchPlaceholder": "Search countries...",
+            "noCountriesFound": "No countries found"
+        },
+        "preferences": {
+            "title": "Learning Preferences",
+            "description": "Configure your language learning preferences",
+            "portugueseLevel": "Portuguese Level",
+            "portugueseLevelPlaceholder": "Select your level",
+            "portugueseLevelOptions": {
+                "beginner": "Beginner",
+                "elementary": "Elementary",
+                "intermediate": "Intermediate",
+                "upper_intermediate": "Upper Intermediate",
+                "advanced": "Advanced",
+                "proficient": "Proficient",
+                "native": "Native",
+                "unknown": "Unknown"
+            },
+            "nativeLanguage": "Native Language",
+            "nativeLanguagePlaceholder": "Enter your native language",
+            "nativeLanguageDescription": "Your primary language or mother tongue",
+            "otherLanguages": "Other Languages",
+            "otherLanguagesPlaceholder": "Enter languages you speak (comma separated)",
+            "otherLanguagesDescription": "List languages you speak other than your native language",
+            "learningGoals": "Learning Goals",
+            "learningGoalsPlaceholder": "Enter your learning goals (comma separated)",
+            "learningGoalsDescription": "What do you hope to achieve by learning Portuguese?",
+            "timeZone": "Time Zone",
+            "timeZonePlaceholder": "Select your time zone"
+        },
+        "teacher": {
+            "title": "Teacher Profile",
+            "description": "Configure your teacher profile information",
+            "biography": "Biography",
+            "biographyPlaceholder": "Tell us about yourself and your teaching experience",
+            "biographyDescription": "Share your teaching background, experience, and approach to teaching",
+            "specialties": "Specialties",
+            "specialtiesPlaceholder": "Enter your teaching specialties (comma separated)",
+            "specialtiesDescription": "What areas of Portuguese language or Brazilian culture do you specialize in?",
+            "languages": "Languages",
+            "languagesPlaceholder": "Enter languages you speak (comma separated)",
+            "languagesDescription": "List all languages you speak fluently or at an advanced level"
+        },
+        "toast": {
+            "success": {
+                "title": "Profile updated",
+                "description": "Your profile has been updated successfully"
+            },
+            "error": {
+                "title": "Update failed",
+                "description": "There was an error updating your profile"
+            }
+        },
+        "buttons": {
+            "save": "Save Changes",
+            "saveChanges": "Save Changes",
+            "saving": "Saving...",
+            "cancel": "Cancel",
+            "refresh": "Refresh Data",
+            "refreshing": "Refreshing..."
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "bookClass": "Book Class"
+    },
+    "classes": {
+        "title": "Classes",
+        "description": "View and manage your scheduled classes",
+        "comingSoon": "The classes page is coming soon. You'll be able to view your upcoming and past classes here."
+    },
+    "teachers": {
+        "title": "Teachers",
+        "description": "Browse and connect with our qualified teachers",
+        "comingSoon": "The teachers page is coming soon. You'll be able to browse and connect with our qualified teachers here."
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your account settings and preferences",
+        "comingSoon": "The settings page is coming soon. You'll be able to manage your account settings and preferences here."
     }
 }

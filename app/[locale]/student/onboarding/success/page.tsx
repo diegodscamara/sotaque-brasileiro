@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { CheckCircle } from "@phosphor-icons/react";
@@ -9,12 +9,13 @@ import { CheckCircle } from "@phosphor-icons/react";
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { Confetti } from "@/components/ui/confetti";
 
 // Utils and API
 import { createClient } from "@/libs/supabase/client";
 import { getStudent, editStudent } from "@/app/actions/students";
-import { scheduleOnboardingClass } from "@/app/actions/classes";
-import { OnboardingFormData } from "../types";
+import { editClass, fetchClasses } from "@/app/actions/classes";
+import { prisma } from "@/libs/prisma";
 
 /**
  * Success page after Stripe checkout
@@ -23,13 +24,19 @@ import { OnboardingFormData } from "../types";
 export default function OnboardingSuccess() {
   const t = useTranslations("student.onboarding.success");
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [classScheduled, setClassScheduled] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
+
+  // Prevent automatic redirection - let the user click the button instead
+  const [canNavigate, setCanNavigate] = useState(false);
 
   useEffect(() => {
     const handleSuccess = async () => {
       try {
+        setLoading(true);
+        
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -38,104 +45,116 @@ export default function OnboardingSuccess() {
           return;
         }
 
-        // Get the session ID from URL params
-        const sessionId = searchParams.get("session_id");
-        if (!sessionId) {
-          throw new Error("No session ID found");
-        }
+        console.log("Processing checkout success for user:", user.id);
 
         // Get student data
         const studentData = await getStudent(user.id);
         if (!studentData) {
-          throw new Error("Student not found");
+          throw new Error("Student data not found");
         }
 
-        // Create a proper Student object with the user property
-        const studentWithUser = {
-          ...studentData,
-          // Convert null values to undefined to match the Student interface
-          customerId: studentData.customerId || undefined,
-          priceId: studentData.priceId || undefined,
-          packageName: studentData.packageName || undefined,
-          packageExpiration: studentData.packageExpiration || undefined,
-          portugueseLevel: studentData.portugueseLevel || undefined,
-          nativeLanguage: studentData.nativeLanguage || undefined,
-          timeZone: studentData.timeZone || undefined,
-          // Ensure arrays are properly handled
-          learningGoals: Array.isArray(studentData.learningGoals) ? studentData.learningGoals : [],
-          otherLanguages: Array.isArray(studentData.otherLanguages) ? studentData.otherLanguages : [],
-          user: {
-            id: user.id,
-            email: user.email || "",
-            createdAt: new Date(user.created_at || Date.now()),
-            updatedAt: new Date(),
-            role: "STUDENT" as const
+        console.log("Found student data:", studentData.id);
+
+        // Find pending class for this student
+        try {
+          const pendingClasses = await fetchClasses({
+            studentId: studentData.id,
+            status: "PENDING"
+          });
+
+          console.log(`Found ${pendingClasses?.data?.length || 0} pending classes for student`);
+
+          if (pendingClasses && pendingClasses.data && pendingClasses.data.length > 0) {
+            // Use the most recently created pending class
+            const pendingClass = pendingClasses.data[0];
+            console.log("Processing pending class:", pendingClass.id);
+
+            try {
+              // Update the class status to SCHEDULED
+              await editClass(pendingClass.id, {
+                id: pendingClass.id,
+                teacherId: pendingClass.teacherId,
+                studentId: pendingClass.studentId,
+                createdAt: pendingClass.createdAt,
+                updatedAt: new Date(),
+                startDateTime: pendingClass.startDateTime,
+                endDateTime: pendingClass.endDateTime,
+                duration: pendingClass.duration,
+                notes: pendingClass.notes || "",
+                feedback: undefined,
+                rating: undefined,
+                recurringGroupId: undefined,
+                status: 'SCHEDULED'
+              });
+
+              console.log("Class status updated to SCHEDULED");
+              setClassScheduled(true);
+
+              // Deduct credits from student
+              if (!studentData.hasAccess) {
+                // Only deduct credits if the student doesn't have unlimited access
+                // Deduct exactly 1 credit per class, regardless of duration
+                
+                // Make sure student has enough credits
+                if (studentData.credits >= 1) {
+                  // Update student credits - deduct exactly 1 credit
+                  const updatedStudent = await prisma.student.update({
+                    where: { id: studentData.id },
+                    data: {
+                      credits: studentData.credits - 1
+                    }
+                  });
+                  
+                  console.log(`Deducted 1 credit from student. New balance: ${updatedStudent.credits}`);
+                  setCreditsDeducted(true);
+                } else {
+                  console.warn("Student doesn't have enough credits, but class was scheduled anyway");
+                }
+              } else {
+                console.log("Student has unlimited access, no credits deducted");
+                setCreditsDeducted(true);
+              }
+            } catch (updateError) {
+              console.error("Error updating pending class status:", updateError);
+              setError(`Note: Your class was found but could not be scheduled automatically. Please contact support or try scheduling a class from your dashboard. Error: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`);
+            }
+          } else {
+            console.warn("No pending classes found for this student");
+            setError("Note: No pending class was found. Please schedule a class from your dashboard.");
           }
-        };
-
-        // Get stored form data from localStorage
-        const storedFormData = localStorage.getItem("onboardingFormData");
-        if (!storedFormData) {
-          throw new Error("No stored form data found");
+        } catch (fetchError) {
+          console.error("Error fetching pending classes:", fetchError);
+          setError(`Note: There was an error finding your pending class. Please contact support or try scheduling a class from your dashboard. Error: ${fetchError instanceof Error ? fetchError.message : 'Unknown error'}`);
         }
 
-        // Parse the stored form data and convert date strings to Date objects
-        const parsedData = JSON.parse(storedFormData);
-        const formData: OnboardingFormData = {
-          ...parsedData,
-          classStartDateTime: parsedData.classStartDateTime ? new Date(parsedData.classStartDateTime) : undefined,
-          classEndDateTime: parsedData.classEndDateTime ? new Date(parsedData.classEndDateTime) : undefined,
-          pendingClass: parsedData.pendingClass ? {
-            ...parsedData.pendingClass,
-            startDateTime: new Date(parsedData.pendingClass.startDateTime),
-            endDateTime: new Date(parsedData.pendingClass.endDateTime)
-          } : undefined
-        };
-        
-        if (!formData.pendingClass) {
-          throw new Error("No pending class found");
-        }
-
-        if (!formData.pendingClass.teacherId) {
-          throw new Error("No teacher selected for the class");
-        }
-
-        // Schedule the class now that payment is confirmed
-        const { teacherId, studentId, startDateTime, endDateTime, duration, notes } = formData.pendingClass;
-        await scheduleOnboardingClass({
-          teacherId,
-          studentId,
-          startDateTime,
-          endDateTime,
-          duration,
-          notes,
-          status: "SCHEDULED"
-        });
-
-        // Update student record to mark onboarding as completed
-        await editStudent(user.id, {
-          ...studentWithUser,
-          hasCompletedOnboarding: true,
-          hasAccess: true
-        });
-
-        // Clear stored form data
-        localStorage.removeItem("onboardingFormData");
-
-        // Redirect to dashboard after a short delay
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 3000);
+        setLoading(false);
       } catch (error) {
-        console.error("Error processing success:", error);
+        console.error("Error in handleSuccess:", error);
         setError(error instanceof Error ? error.message : "An unknown error occurred");
-      } finally {
         setLoading(false);
       }
     };
 
     handleSuccess();
-  }, [router, searchParams]);
+  }, [router, t]);
+
+  useEffect(() => {
+    // Allow navigation after 5 seconds to ensure the user sees the success message
+    if (!loading && !error) {
+      const timer = setTimeout(() => {
+        setCanNavigate(true);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, error]);
+
+  // Prevent automatic redirection - let the user click the button instead
+  const handleGoToDashboard = () => {
+    if (canNavigate) {
+      router.push("/dashboard");
+    }
+  };
 
   return (
     <motion.div
@@ -159,19 +178,35 @@ export default function OnboardingSuccess() {
           <div className="bg-red-100 mb-4 p-4 rounded-lg text-red-800">
             <p>{error}</p>
           </div>
-          <Button onClick={() => router.push("/dashboard")}>
+          <Button onClick={handleGoToDashboard}>
             {t("goToDashboard")}
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col items-center text-center">
-          <CheckCircle className="w-16 h-16 text-green-500" weight="fill" />
-          <h1 className="mt-4 font-semibold text-gray-900 dark:text-gray-100 text-2xl">
-            {t("success")}
+        <div className="flex flex-col items-center max-w-md text-center">
+          <Confetti />
+          <div className="bg-green-100 mb-6 p-4 rounded-full">
+            <CheckCircle size={48} weight="fill" className="text-green-600" />
+          </div>
+          <h1 className="mb-4 font-bold text-gray-900 dark:text-gray-100 text-3xl">
+            {t("title")}
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            {t("redirecting")}
+          <p className="mb-8 text-gray-600 dark:text-gray-400">
+            {t("description")}
           </p>
+          {classScheduled && (
+            <div className="bg-blue-50 mb-6 p-4 rounded-lg text-blue-800">
+              <p className="font-medium">{t("classScheduled")}</p>
+              <p className="text-sm">{t("checkDashboard")}</p>
+            </div>
+          )}
+          <Button
+            onClick={handleGoToDashboard}
+            className="w-full md:w-auto"
+            disabled={!canNavigate}
+          >
+            {canNavigate ? t("goToDashboard") : t("enjoyingConfetti")}
+          </Button>
         </div>
       )}
     </motion.div>
