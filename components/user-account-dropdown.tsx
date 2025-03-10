@@ -25,7 +25,7 @@ import {
   SidebarMenuButton,
   useSidebar
 } from "@/components/ui/sidebar";
-import { JSX, useMemo } from "react";
+import { JSX, useMemo, useState, useEffect } from "react";
 
 import apiClient from "@/libs/api";
 import { useRouter } from "next/navigation";
@@ -37,6 +37,7 @@ import { useLocale } from "next-intl";
 import Link from "next/link";
 import messages from "@/messages/en.json";
 import { useUser } from "@/contexts/user-context";
+import { Button } from "./ui/button";
 
 interface UserAccountDropdownProps {
   variant?: 'sidebar' | 'header';
@@ -56,8 +57,37 @@ export function UserAccountDropdown({
   const router = useRouter();
   const t = useTranslations('shared.nav-user');
   const locale = useLocale();
-  const { isMobile } = useSidebar();
   const { user, profile, hasAccess, isLoading } = useUser();
+  
+  // Safely use the sidebar hook with a fallback for when it's used outside a SidebarProvider
+  const [isMobileSafe, setIsMobileSafe] = useState(false);
+  
+  useEffect(() => {
+    // Check if window is defined (client-side)
+    if (typeof window !== 'undefined') {
+      // Use media query to determine if mobile
+      const mediaQuery = window.matchMedia('(max-width: 768px)');
+      setIsMobileSafe(mediaQuery.matches);
+      
+      // Add listener for screen size changes
+      const handleResize = (e: MediaQueryListEvent) => setIsMobileSafe(e.matches);
+      mediaQuery.addEventListener('change', handleResize);
+      
+      return () => mediaQuery.removeEventListener('change', handleResize);
+    }
+    
+    // Return empty function for when window is undefined
+    return () => {};
+  }, []);
+  
+  // Try to use the sidebar context, but fall back to our safe value if not available
+  let isMobile = isMobileSafe;
+  try {
+    const sidebarContext = useSidebar();
+    isMobile = sidebarContext.isMobile;
+  } catch (error) {
+    // If useSidebar fails, we already have a fallback value
+  }
 
   const handleBilling = async () => {
     try {
@@ -188,135 +218,140 @@ export function UserAccountDropdown({
 
   // Sidebar variant
   if (variant === 'sidebar') {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-            size="lg"
-            className={cn(
-              "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
-              "transition-colors hover:bg-primary/20 hover:text-accent-foreground"
-            )}
-          >
-            <Avatar className="w-8 h-8">
-              <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
-              <AvatarFallback>{avatarFallback}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 grid text-sm text-left leading-tight sidebar-expanded-only">
-              <span className="font-semibold truncate">{profile?.firstName || t('loading')}</span>
-            </div>
-            <ChevronsUpDown className="ml-auto size-4 sidebar-expanded-only" />
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className="bg-popover rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
-          side={isMobile ? "bottom" : "right"}
-          align="end"
-          sideOffset={4}
-        >
-          <DropdownMenuLabel className="p-0 font-normal">
-            <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
+    // For sidebar variant, we need SidebarMenuButton which requires SidebarProvider
+    try {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className={cn(
+                "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+                "transition-colors hover:bg-primary/20 hover:text-accent-foreground"
+              )}
+            >
               <Avatar className="w-8 h-8">
                 <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
-              <div className="flex-1 grid text-sm text-left leading-tight">
-                <span className="font-semibold truncate">{profile?.firstName} {profile?.lastName}</span>
-                <span className="text-gray-500 dark:text-gray-400 text-xs truncate">{user?.email}</span>
+              <div className="flex-1 grid text-sm text-left leading-tight sidebar-expanded-only">
+                <span className="font-semibold truncate">{profile?.firstName || t('loading')}</span>
               </div>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {profile?.role === 'student' && hasAccess && getNextHigherPlan && (
-              <DropdownMenuItem
-                className="font-medium"
-                onClick={handleUpgradePlan}
-              >
-                <Sparkles className="w-5 h-5" />
-                {`Upgrade to ${getNextHigherPlan}`}
-              </DropdownMenuItem>
-            )}
-
-            {profile && hasAccess && (
-              <DropdownMenuItem
-                onClick={handleBilling}
-              >
-                <CreditCard className="w-5 h-5" />
-                {t('billing')}
-              </DropdownMenuItem>
-            )}
-
-            <DropdownMenuItem>
-              <UserCircle className="w-5 h-5" />
-              <Link href={`/${locale}/profile`} className="w-full">
-                {t('profile')}
-              </Link>
-            </DropdownMenuItem>
-
-            {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
-              <DropdownMenuItem
-                onClick={() => router.push(`/${locale}/student/onboarding`)}
-              >
-                <BookOpen className="w-5 h-5" />
-                {t('onboarding')}
-              </DropdownMenuItem>
-            )}
-
-            {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
-              <DropdownMenuItem
-                onClick={() => router.push(`/${locale}/student/dashboard`)}
-              >
-                <LayoutDashboard className="w-5 h-5" />
-                {t('dashboard')}
-              </DropdownMenuItem>
-            )}
-
-            {profile?.role === 'admin' && (
-              <DropdownMenuItem
-                onClick={() => router.push(`/${locale}/admin`)}
-              >
-                <Settings className="w-5 h-5" />
-                {t('admin')}
-              </DropdownMenuItem>
-            )}
-
-            <DropdownMenuItem >
-              <Bell className="w-5 h-5" />
-              {t('notifications')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleSignOut}
+              <ChevronsUpDown className="ml-auto size-4 sidebar-expanded-only" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="bg-popover rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
+            side={isMobile ? "bottom" : "right"}
+            align="end"
+            sideOffset={4}
           >
-            <LogOut className="w-5 h-5" />
-            {t('sign-out')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
+                  <AvatarFallback>{avatarFallback}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 grid text-sm text-left leading-tight">
+                  <span className="font-semibold truncate">{profile?.firstName} {profile?.lastName}</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-xs truncate">{user?.email}</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              {profile?.role === 'student' && hasAccess && getNextHigherPlan && (
+                <DropdownMenuItem
+                  className="font-medium"
+                  onClick={handleUpgradePlan}
+                >
+                  <Sparkles className="w-5 h-5" />
+                  {`Upgrade to ${getNextHigherPlan}`}
+                </DropdownMenuItem>
+              )}
+
+              {profile && hasAccess && (
+                <DropdownMenuItem
+                  onClick={handleBilling}
+                >
+                  <CreditCard className="w-5 h-5" />
+                  {t('billing')}
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuItem>
+                <UserCircle className="w-5 h-5" />
+                <Link href={`/${locale}/profile`} className="w-full">
+                  {t('profile')}
+                </Link>
+              </DropdownMenuItem>
+
+              {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/${locale}/student/onboarding`)}
+                >
+                  <BookOpen className="w-5 h-5" />
+                  {t('onboarding')}
+                </DropdownMenuItem>
+              )}
+
+              {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/${locale}/student/dashboard`)}
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  {t('dashboard')}
+                </DropdownMenuItem>
+              )}
+
+              {profile?.role === 'admin' && (
+                <DropdownMenuItem
+                  onClick={() => router.push(`/${locale}/admin`)}
+                >
+                  <Settings className="w-5 h-5" />
+                  {t('admin')}
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuItem >
+                <Bell className="w-5 h-5" />
+                {t('notifications')}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleSignOut}
+            >
+              <LogOut className="w-5 h-5" />
+              {t('sign-out')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    } catch (error) {
+      // Fallback to header variant if SidebarProvider is not available
+      console.warn("SidebarProvider not found, falling back to header variant");
+      variant = 'header';
+    }
   }
 
   // Header variant (default)
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full hover:scale-105 transition-transform duration-200">
-        <Avatar>
-          <AvatarImage
-            src={profile?.avatarUrl}
-            alt={profile?.firstName}
-            width={32}
-            height={32}
-            className="rounded-full"
-          />
-          <AvatarFallback>{avatarFallback}</AvatarFallback>
-        </Avatar>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <Avatar className="rounded-full w-8 h-8">
+            <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
+          </Avatar>
+          <span className="sr-only">User account menu</span>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="bg-popover w-[--radix-dropdown-menu-trigger-width] min-w-56 transition-opacity duration-200"
-        side="bottom"
+        className="bg-popover rounded-lg w-56"
+        side={isMobile ? "bottom" : "bottom"}
         align="end"
+        sideOffset={4}
       >
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
@@ -334,6 +369,7 @@ export function UserAccountDropdown({
         <DropdownMenuGroup>
           {profile?.role === 'student' && hasAccess && getNextHigherPlan && (
             <DropdownMenuItem
+              className="font-medium"
               onClick={handleUpgradePlan}
             >
               <Sparkles className="w-5 h-5" />
@@ -350,49 +386,42 @@ export function UserAccountDropdown({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem>
-            <UserCircle className="w-5 h-5" />
-            <Link href={`/${locale}/profile`} className="w-full">
+          <DropdownMenuItem asChild>
+            <Link href={`/${locale}/dashboard`}>
+              <LayoutDashboard className="w-5 h-5" />
+              {t('dashboard')}
+            </Link>
+          </DropdownMenuItem>
+
+          {profile?.role === 'student' && (
+            <DropdownMenuItem asChild>
+              <Link href={`/${locale}/classes`}>
+                <BookOpen className="w-5 h-5" />
+                Classes
+              </Link>
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuItem asChild>
+            <Link href={`/${locale}/profile`}>
+              <UserCircle className="w-5 h-5" />
               {t('profile')}
             </Link>
           </DropdownMenuItem>
 
-          {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
-            <DropdownMenuItem
-              onClick={() => router.push(`/${locale}/student/onboarding`)}
-            >
-              <BookOpen className="w-5 h-5" />
-              {t('onboarding')}
-            </DropdownMenuItem>
-          )}
-
-          {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
-            <DropdownMenuItem
-              onClick={() => router.push(`/${locale}/student/dashboard`)}
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              {t('dashboard')}
-            </DropdownMenuItem>
-          )}
-
-          {profile?.role === 'admin' && (
-            <DropdownMenuItem
-              onClick={() => router.push(`/${locale}/admin`)}
-            >
+          <DropdownMenuItem asChild>
+            <Link href={`/${locale}/settings`}>
               <Settings className="w-5 h-5" />
-              {t('admin')}
-            </DropdownMenuItem>
-          )}
-
-          <DropdownMenuItem>
-            <Bell className="w-5 h-5" />
-            {t('notifications')}
+              Settings
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem
+          onClick={handleSignOut}
+        >
           <LogOut className="w-5 h-5" />
-          {t('sign-out')}
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
