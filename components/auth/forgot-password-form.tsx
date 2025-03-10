@@ -52,7 +52,7 @@ export default function ForgotPasswordForm(): JSX.Element {
     };
 
     return (
-        <Card className="bg-gray-100 dark:bg-gray-700 rounded-lg w-full max-w-md">
+        <Card className="rounded-lg w-full max-w-md">
             <CardHeader>
                 <CardTitle className="font-semibold text-lg text-center leading-8">
                     {t("title")}

@@ -182,7 +182,7 @@ export default function Stepper({
       </div>
 
       {/* Progress bar for mobile */}
-      <div className="md:hidden bg-gray-200 dark:bg-gray-700 mt-2 rounded-full w-full h-1.5 overflow-hidden">
+      <div className="md:hidden bg-popover mt-2 rounded-full w-full h-1.5 overflow-hidden">
         <motion.div 
           className="bg-green-700 dark:bg-green-500 rounded-full h-1.5"
           initial={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}

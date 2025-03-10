@@ -116,7 +116,7 @@ export default function SignUpForm({ role, onSuccess }: SignUpFormProps): JSX.El
     };
 
     return (
-        <Card className="bg-gray-100 dark:bg-gray-700 rounded-lg w-full max-w-md">
+        <Card className="rounded-lg w-full max-w-md">
             <CardHeader className="items-center">
                 <CardTitle className="font-semibold text-lg text-center leading-8">
                     {t("title")}
