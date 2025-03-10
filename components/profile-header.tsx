@@ -117,16 +117,15 @@ export function ProfileHeader(): React.JSX.Element {
             {/* Left column - Avatar and name */}
             <div className="flex flex-col justify-center items-center gap-3 bg-muted/20 p-6 md:w-1/4">
               <Avatar
-                className="border-4 border-primary/10 rounded-full w-16 h-16"
+                className="w-16 h-16"
                 aria-label={t("avatarAlt", { name: fullName })}
               >
                 <AvatarImage
-                  className="rounded-lg object-cover"
                   src={profile?.avatarUrl || ""}
                   alt=""
                   loading="lazy"
                 />
-                <AvatarFallback className="bg-primary/10 rounded-lg font-semibold text-primary text-2xl">
+                <AvatarFallback className="text-2xl">
                   {initials}
                 </AvatarFallback>
               </Avatar>
