@@ -146,17 +146,17 @@ export function ProfileForm(): React.JSX.Element {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Profile form">
         <Tabs defaultValue="personal" className="flex flex-col gap-4 w-full">
           {/* Tabs navigation at the top */}
-          <TabsList className="flex justify-start gap-2 bg-transparent p-0 w-fit h-auto">
+          <TabsList className="flex justify-start gap-2 w-fit">
             <TabsTrigger
               value="personal"
-              className="flex items-center gap-2 data-[state=active]:bg-green-700 dark:data-[state=active]:bg-green-500 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+              className="flex items-center gap-2"
             >
               <User className="w-4 h-4" />
               <span>{t("tabs.personal")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
-              className="flex items-center gap-2 data-[state=active]:bg-green-700 dark:data-[state=active]:bg-green-500 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+              className="flex items-center gap-2"
             >
               <GraduationCap className="w-4 h-4" />
               <span>{t("tabs.preferences")}</span>
@@ -164,7 +164,7 @@ export function ProfileForm(): React.JSX.Element {
             {profile?.role === "teacher" && (
               <TabsTrigger
                 value="teacher"
-                className="flex items-center gap-2 data-[state=active]:bg-green-700 dark:data-[state=active]:bg-green-500 data-[state=active]:text-gray-100 dark:data-[state=active]:text-gray-900"
+                className="flex items-center gap-2"
               >
                 <BookOpen className="w-4 h-4" />
                 <span>{t("tabs.teacher")}</span>
@@ -236,7 +236,7 @@ export function ProfileForm(): React.JSX.Element {
                                 variant="outline"
                                 role="combobox"
                                 aria-expanded={countrySearchOpen}
-                                className="justify-between bg-transparent dark:bg-transparent border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 w-full"
+                                className="justify-between bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 w-full"
                               >
                                 {field.value ? (
                                   <div className="flex items-center gap-2">
