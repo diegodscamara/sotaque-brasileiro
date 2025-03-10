@@ -38,9 +38,9 @@ export default function AuthenticatedClientLayout({
   const currentPageTitle = pageTitle || (pathSegments.length > 0 ? capitalizeFirstLetter(pathSegments[pathSegments.length - 1]) : "Dashboard");
 
   return (
-    <SidebarProvider className="bg-gray-100 dark:bg-gray-700">
+    <SidebarProvider className="bg-sidebar">
       <AppSidebar />
-      <SidebarInset className="bg-gray-50 dark:bg-gray-800">
+      <SidebarInset className="bg-background">
         <header className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 flex items-center gap-2 h-16 transition-[width,height] ease-linear shrink-0">
           <div className="flex items-center gap-2 px-4 w-full">
             <SidebarTrigger className="-ml-1" />
