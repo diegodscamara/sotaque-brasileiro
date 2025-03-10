@@ -15,7 +15,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground dark:bg-gray-800 dark:text-gray-200",
+      "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground dark:text-gray-200",
       className
     )}
     {...props}
@@ -26,7 +26,7 @@ Command.displayName = CommandPrimitive.displayName
 const CommandDialog = ({ children, ...props }: DialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent className="bg-gray-100 dark:bg-gray-800 p-0 overflow-hidden">
+      <DialogContent className="bg-popover p-0 overflow-hidden">
         <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:text-gray-800 dark:[&_[cmdk-group-heading]]:text-gray-200 [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 bg-gray-100 dark:bg-gray-700 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]_svg]:w-5 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-group-heading]]:font-medium">
           {children}
         </Command>
@@ -44,7 +44,7 @@ const CommandInput = React.forwardRef<
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-gray-300 dark:placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 focus:ring-0 focus:ring-offset-0 focus:border-green-700 dark:focus:border-green-500 border-gray-300 dark:border-gray-500",
+        "flex h-10 w-full rounded-md bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 py-3 text-sm outline-none placeholder:text-gray-300 dark:placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 focus:ring-0 focus:ring-offset-0 focus:border-green-700 dark:focus:border-green-500 border-gray-300 dark:border-gray-500",
         className
       )}
       {...props}

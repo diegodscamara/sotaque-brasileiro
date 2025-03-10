@@ -80,7 +80,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           aria-label={ariaLabel || placeholder}
-          className={cn("justify-between w-full bg-transparent hover:bg-gray-100 hover:text-gray-800 dark:bg-transparent hover:dark:bg-gray-800", className)}
+          className={cn("justify-between w-full bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0", className)}
         >
           <div className="flex items-center gap-2 truncate">
             {showFlags && selectedOption && (
