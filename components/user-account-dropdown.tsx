@@ -1,27 +1,27 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  CreditCard, 
-  LogOut, 
-  UserCircle, 
-  Bell, 
+import {
+  CreditCard,
+  LogOut,
+  UserCircle,
+  Bell,
   Sparkles,
   ChevronsUpDown,
   LayoutDashboard,
   BookOpen,
   Settings
 } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuGroup, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { 
+import {
   SidebarMenuButton,
   useSidebar
 } from "@/components/ui/sidebar";
@@ -50,8 +50,8 @@ interface UserAccountDropdownProps {
  * @param {('sidebar'|'header')} [props.variant='header'] - Display variant
  * @returns {JSX.Element} Account dropdown with profile, billing, and sign-out options
  */
-export function UserAccountDropdown({ 
-  variant = 'header' 
+export function UserAccountDropdown({
+  variant = 'header'
 }: UserAccountDropdownProps): JSX.Element {
   const router = useRouter();
   const t = useTranslations('shared.nav-user');
@@ -109,20 +109,20 @@ export function UserAccountDropdown({
 
     // Get all plans from the messages file
     const plans = messages.landing.pricing.plans;
-    
+
     // Create an ordered array of plan tiers
     const planTiers = plans.map(plan => plan.tier);
-    
+
     // Find the index of the current plan
     const currentPlanIndex = planTiers.findIndex(
       tier => tier === profile.packageName
     );
-    
+
     // If the user has the highest plan or plan not found, return null
     if (currentPlanIndex === -1 || currentPlanIndex === planTiers.length - 1) {
       return null;
     }
-    
+
     // Return the next plan in the array
     return planTiers[currentPlanIndex + 1];
   }, [profile?.packageName]);
@@ -130,23 +130,23 @@ export function UserAccountDropdown({
   const handleUpgradePlan = async () => {
     try {
       if (!getNextHigherPlan) return;
-      
+
       // Find the plan details
       const nextPlan = messages.landing.pricing.plans.find(
         plan => plan.tier === getNextHigherPlan
       );
-      
+
       if (!nextPlan) return;
-      
+
       // Get the monthly variant price ID
       const monthlyVariant = nextPlan.variants.find(
         variant => variant.interval === "monthly"
       );
-      
+
       if (!monthlyVariant) return;
-      
+
       const priceId = monthlyVariant.priceId.production;
-      
+
       // Create checkout session
       const { url }: { url: string } = await apiClient.post(
         "/stripe/create-checkout",
@@ -181,8 +181,8 @@ export function UserAccountDropdown({
 
   if (isLoading) {
     return (
-      <div className="bg-gray-200 dark:bg-gray-600 rounded-full w-8 h-8 animate-pulse" 
-           aria-label={t('loading')} />
+      <div className="bg-gray-200 dark:bg-gray-600 rounded-full w-8 h-8 animate-pulse"
+        aria-label={t('loading')} />
     );
   }
 
@@ -195,12 +195,12 @@ export function UserAccountDropdown({
             size="lg"
             className={cn(
               "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
-              "transition-colors hover:bg-accent hover:text-accent-foreground"
+              "transition-colors hover:bg-primary/20 hover:text-accent-foreground"
             )}
           >
-            <Avatar className="rounded-lg w-8 h-8">
+            <Avatar className="w-8 h-8">
               <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
-              <AvatarFallback className="rounded-lg">{avatarFallback}</AvatarFallback>
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
             <div className="flex-1 grid text-sm text-left leading-tight sidebar-expanded-only">
               <span className="font-semibold truncate">{profile?.firstName || t('loading')}</span>
@@ -209,90 +209,85 @@ export function UserAccountDropdown({
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="bg-white dark:bg-gray-700 rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
+          className="bg-popover rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
           side={isMobile ? "bottom" : "right"}
           align="end"
           sideOffset={4}
         >
           <DropdownMenuLabel className="p-0 font-normal">
             <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
-              <Avatar className="rounded-lg w-8 h-8">
+              <Avatar className="w-8 h-8">
                 <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
-                <AvatarFallback className="rounded-lg">{avatarFallback}</AvatarFallback>
+                <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
               <div className="flex-1 grid text-sm text-left leading-tight">
                 <span className="font-semibold truncate">{profile?.firstName} {profile?.lastName}</span>
-                <span className="text-xs truncate">{user?.email}</span>
+                <span className="text-gray-500 dark:text-gray-400 text-xs truncate">{user?.email}</span>
               </div>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+          <DropdownMenuSeparator />
           <DropdownMenuGroup>
             {profile?.role === 'student' && hasAccess && getNextHigherPlan && (
-              <DropdownMenuItem 
-                className="hover:bg-gray-200 dark:hover:bg-gray-600 font-medium text-green-600 dark:text-green-400 transition-colors cursor-pointer" 
+              <DropdownMenuItem
+                className="font-medium"
                 onClick={handleUpgradePlan}
               >
                 <Sparkles className="w-5 h-5" />
                 {`Upgrade to ${getNextHigherPlan}`}
               </DropdownMenuItem>
             )}
-            
+
             {profile && hasAccess && (
-              <DropdownMenuItem 
-                className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer" 
+              <DropdownMenuItem
                 onClick={handleBilling}
               >
                 <CreditCard className="w-5 h-5" />
                 {t('billing')}
               </DropdownMenuItem>
             )}
-            
-            <DropdownMenuItem className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+
+            <DropdownMenuItem>
               <UserCircle className="w-5 h-5" />
               <Link href={`/${locale}/profile`} className="w-full">
                 {t('profile')}
               </Link>
             </DropdownMenuItem>
-            
+
             {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
-              <DropdownMenuItem 
-                className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+              <DropdownMenuItem
                 onClick={() => router.push(`/${locale}/student/onboarding`)}
               >
                 <BookOpen className="w-5 h-5" />
                 {t('onboarding')}
               </DropdownMenuItem>
             )}
-            
+
             {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
-              <DropdownMenuItem 
-                className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+              <DropdownMenuItem
                 onClick={() => router.push(`/${locale}/student/dashboard`)}
               >
                 <LayoutDashboard className="w-5 h-5" />
                 {t('dashboard')}
               </DropdownMenuItem>
             )}
-            
+
             {profile?.role === 'admin' && (
-              <DropdownMenuItem 
-                className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+              <DropdownMenuItem
                 onClick={() => router.push(`/${locale}/admin`)}
               >
                 <Settings className="w-5 h-5" />
                 {t('admin')}
               </DropdownMenuItem>
             )}
-            
-            <DropdownMenuItem className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+
+            <DropdownMenuItem >
               <Bell className="w-5 h-5" />
               {t('notifications')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
-          <DropdownMenuItem 
-            className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer" 
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
             onClick={handleSignOut}
           >
             <LogOut className="w-5 h-5" />
@@ -315,95 +310,87 @@ export function UserAccountDropdown({
             height={32}
             className="rounded-full"
           />
-          <AvatarFallback className="bg-gray-200 dark:bg-gray-600 rounded-full">{avatarFallback}</AvatarFallback>
+          <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="bg-white dark:bg-gray-700 rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56 transition-opacity duration-200" 
-        side="bottom" 
+      <DropdownMenuContent
+        className="bg-popover w-[--radix-dropdown-menu-trigger-width] min-w-56 transition-opacity duration-200"
+        side="bottom"
         align="end"
       >
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
-            <Avatar className="rounded-lg w-8 h-8">
+            <Avatar className="w-8 h-8">
               <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
-              <AvatarFallback className="bg-gray-200 dark:bg-gray-600 rounded-lg">{avatarFallback}</AvatarFallback>
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
             <div className="flex-1 grid text-sm text-left leading-tight">
               <span className="font-semibold truncate">{profile?.firstName} {profile?.lastName}</span>
-              <span className="text-xs truncate">{user?.email}</span>
+              <span className="text-gray-500 dark:text-gray-400 text-xs truncate">{user?.email}</span>
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {profile?.role === 'student' && hasAccess && getNextHigherPlan && (
-            <DropdownMenuItem 
-              className="hover:bg-gray-200 dark:hover:bg-gray-600 font-medium text-green-600 dark:text-green-400 transition-colors cursor-pointer" 
+            <DropdownMenuItem
               onClick={handleUpgradePlan}
             >
               <Sparkles className="w-5 h-5" />
               {`Upgrade to ${getNextHigherPlan}`}
             </DropdownMenuItem>
           )}
-          
+
           {profile && hasAccess && (
-            <DropdownMenuItem 
-              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer" 
+            <DropdownMenuItem
               onClick={handleBilling}
             >
               <CreditCard className="w-5 h-5" />
               {t('billing')}
             </DropdownMenuItem>
           )}
-          
-          <DropdownMenuItem className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+
+          <DropdownMenuItem>
             <UserCircle className="w-5 h-5" />
             <Link href={`/${locale}/profile`} className="w-full">
               {t('profile')}
             </Link>
           </DropdownMenuItem>
-          
+
           {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
-            <DropdownMenuItem 
-              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+            <DropdownMenuItem
               onClick={() => router.push(`/${locale}/student/onboarding`)}
             >
               <BookOpen className="w-5 h-5" />
               {t('onboarding')}
             </DropdownMenuItem>
           )}
-          
+
           {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
-            <DropdownMenuItem 
-              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+            <DropdownMenuItem
               onClick={() => router.push(`/${locale}/student/dashboard`)}
             >
               <LayoutDashboard className="w-5 h-5" />
               {t('dashboard')}
             </DropdownMenuItem>
           )}
-          
+
           {profile?.role === 'admin' && (
-            <DropdownMenuItem 
-              className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+            <DropdownMenuItem
               onClick={() => router.push(`/${locale}/admin`)}
             >
               <Settings className="w-5 h-5" />
               {t('admin')}
             </DropdownMenuItem>
           )}
-          
-          <DropdownMenuItem className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+
+          <DropdownMenuItem>
             <Bell className="w-5 h-5" />
             {t('notifications')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
-        <DropdownMenuItem 
-          className="hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer" 
-          onClick={handleSignOut}
-        >
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="w-5 h-5" />
           {t('sign-out')}
         </DropdownMenuItem>
