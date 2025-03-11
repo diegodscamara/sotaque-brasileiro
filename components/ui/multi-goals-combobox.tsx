@@ -99,22 +99,29 @@ export function MultiGoalsCombobox({
             className
           )}
         >
-          <div className="flex flex-wrap gap-1 max-w-[90%]">
+          <div className="flex flex-wrap items-center gap-2 max-w-[90%]">
             {selectedGoals.length > 0 ? (
               selectedGoals.map(goal => (
                 <Badge 
                   key={goal.id} 
                   variant="default"
-                  className="mr-1 mb-1"
                 >
                   {goal.name}
-                  <button
-                    className="ml-1 rounded-full outline-none focus:ring-2 focus:ring-offset-1"
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className="ml-1 rounded-full outline-none focus:ring-2 focus:ring-offset-1 cursor-pointer"
                     onClick={(e) => removeGoal(e, goal.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        removeGoal(e as any, goal.id);
+                      }
+                    }}
                   >
                     <X className="w-3 h-3" />
                     <span className="sr-only">Remove {goal.name}</span>
-                  </button>
+                  </span>
                 </Badge>
               ))
             ) : (

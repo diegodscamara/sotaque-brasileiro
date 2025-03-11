@@ -77,32 +77,39 @@ export function MultiLanguageCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild className="items-center">
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between bg-popover hover:bg-popover dark:hover:bg-popover border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 min-h-10",
+            "w-full justify-between bg-popover hover:bg-popover dark:hover:bg-popover border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 min-h-10 items-center",
             className
           )}
         >
-          <div className="flex flex-wrap gap-1 max-w-[90%]">
+          <div className="flex flex-wrap items-center gap-2 max-w-[90%]">
             {selectedLanguages.length > 0 ? (
               selectedLanguages.map(language => (
                 <Badge 
                   key={language.id} 
-                  variant="secondary"
-                  className="mr-1 mb-1"
+                  variant="default"
                 >
                   {language.name}
-                  <button
-                    className="ml-1 rounded-full outline-none focus:ring-2 focus:ring-offset-1"
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className="ml-1 rounded-full outline-none focus:ring-2 focus:ring-offset-1 cursor-pointer"
                     onClick={(e) => removeLanguage(e, language.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        removeLanguage(e as any, language.id);
+                      }
+                    }}
                   >
                     <X className="w-3 h-3" />
                     <span className="sr-only">Remove {language.name}</span>
-                  </button>
+                  </span>
                 </Badge>
               ))
             ) : (

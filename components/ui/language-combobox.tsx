@@ -60,7 +60,7 @@ export function LanguageCombobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between bg-popover hover:bg-transparent dark:hover:bg-transparent border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0",
+            "w-full justify-between bg-popover hover:bg-popover dark:hover:bg-popover border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0",
             className
           )}
         >
