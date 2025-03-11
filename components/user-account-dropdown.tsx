@@ -210,7 +210,7 @@ export function UserAccountDropdown({
                 "transition-colors hover:bg-primary/20 hover:text-accent-foreground"
               )}
             >
-              <Avatar className="rounded-full w-10 h-10">
+              <Avatar className="rounded-full w-8 h-8">
                 <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
@@ -228,7 +228,7 @@ export function UserAccountDropdown({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
-                <Avatar className="w-10 h-10">
+                <Avatar className="w-8 h-8">
                   <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>

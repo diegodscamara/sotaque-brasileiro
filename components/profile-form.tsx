@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Info, GraduationCap, BookOpen } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,18 +18,20 @@ import { useUser } from "@/contexts/user-context";
 import { updateUser } from "@/app/actions/users";
 import { updateStudent } from "@/app/actions/students";
 import { updateTeacher } from "@/app/actions/teachers";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { countries } from "@/data/countries";
 import { genders } from "@/data/genders";
 import { portugueseLevels } from "@/data/portuguese-levels";
 import { languages } from "@/data/languages";
 import React from "react";
-import { CircleFlag } from "react-circle-flags";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { User, GraduationCap, BookOpen } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
+import { LanguageCombobox } from "./ui/language-combobox";
+import { MultiLanguageCombobox } from "./ui/multi-language-combobox";
+import { MultiGoalsCombobox } from "./ui/multi-goals-combobox";
+import { timezones } from "@/data/timezones";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Loader2 } from "lucide-react";
 
 // Define the form schema with Zod
 const profileFormSchema = z.object({
@@ -36,22 +39,178 @@ const profileFormSchema = z.object({
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   country: z.string().min(1, { message: "Please select a country." }),
-  gender: z.enum(["male", "female", "other", "prefer_not_to_say", "non_binary"], {
-    required_error: "Please select a gender.",
-  }),
+  gender: z.enum(["male", "female", "other", "prefer_not_to_say", "non_binary"]).optional(),
   portugueseLevel: z.enum(["beginner", "elementary", "intermediate", "upper_intermediate", "advanced", "proficient", "native", "unknown"], {
     required_error: "Please select your Portuguese level.",
   }),
-  nativeLanguage: z.string().min(1, { message: "Please enter your native language." }),
-  otherLanguages: z.string().optional(),
-  learningGoals: z.string().optional(),
-  timeZone: z.string().optional(),
+  nativeLanguage: z.string().min(1, { message: "Please select your native language." }),
+  otherLanguages: z.array(z.string()).default([]),
+  learningGoals: z.array(z.string()).default([]),
+  timeZone: z.string().min(1, { message: "Please select your time zone." }),
   biography: z.string().optional(),
-  specialties: z.string().optional(),
-  languages: z.string().optional(),
+  specialties: z.array(z.string()).default([]),
+  languages: z.array(z.string()).default([]),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+/**
+ * Required field indicator component with tooltip
+ * 
+ * @returns {React.JSX.Element} A red asterisk for required fields with tooltip
+ */
+const RequiredFieldIndicator = (): React.JSX.Element => {
+  const t = useTranslations("profile");
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <span className="inline-flex ml-1 text-red-500" aria-hidden="true">*</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-xs">{t("requiredField")}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+/**
+ * Field help tooltip component
+ * 
+ * @param {string} content - The tooltip content
+ * @returns {React.JSX.Element} An info icon with tooltip
+ */
+const FieldHelp = ({ content }: { content: string }): React.JSX.Element => (
+  <TooltipProvider>
+    <Tooltip delayDuration={300}>
+      <TooltipTrigger asChild>
+        <span className="inline-flex items-center ml-1.5 text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:text-gray-400 transition-colors">
+          <Info size={14} className="w-4 h-4" aria-hidden="true" />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="bg-green-600 dark:bg-green-500 text-gray-200 dark:text-gray-800">
+        <p className="text-xs">{content}</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+);
+
+/**
+ * Custom hook for timezone detection
+ * 
+ * @param {any} form - The form instance
+ * @param {Object} profile - The user profile
+ * @param {Function} t - The translation function
+ * @returns {Object} The timezone detection state
+ */
+const useTimezoneDetection = (form: any, profile: any, t: any) => {
+  return { isDetecting: false, error: null };
+};
+
+/**
+ * Custom hook for form submission
+ * 
+ * @param {Object} options - Hook options
+ * @param {Function} options.updateProfile - Function to update the profile
+ * @param {Function} options.refetchUserData - Function to refresh user data
+ * @param {Function} options.t - Translation function
+ * @param {Function} options.toast - Toast function
+ * @returns {Object} Form submission state and handler
+ */
+const useProfileSubmission = ({ 
+  updateProfile, 
+  refetchUserData, 
+  t, 
+  toast 
+}: { 
+  updateProfile: (values: z.infer<typeof profileFormSchema>) => Promise<any>;
+  refetchUserData?: () => Promise<void>;
+  t: any;
+  toast: any;
+}) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const result = await updateProfile(values);
+      
+      if (result.error) {
+        setSubmitError(result.error);
+        toast({
+          title: t("updateError"),
+          description: result.error,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: t("updateSuccess"),
+          description: t("updateSuccessDescription"),
+        });
+        
+        // Refresh user data if needed
+        if (refetchUserData) {
+          await refetchUserData();
+        }
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setSubmitError(
+        error instanceof Error 
+          ? error.message 
+          : t("unknownError")
+      );
+      toast({
+        title: t("updateError"),
+        description: error instanceof Error 
+          ? error.message 
+          : t("unknownError"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return { isSubmitting, submitError, handleSubmit };
+};
+
+/**
+ * Custom FormSelect component that correctly implements the Select component with FormControl
+ */
+const FormSelect = React.forwardRef<
+  HTMLButtonElement,
+  {
+    options: { id: string; name: string | Record<string, string> }[];
+    placeholder: string;
+    onChange?: (value: string) => void;
+    value?: string;
+    disabled?: boolean;
+    locale?: string;
+    className?: string;
+    isLoading?: boolean;
+    loadingText?: string;
+  }
+>(({ options, placeholder, onChange, value, disabled, locale = 'en', className, isLoading, loadingText }, ref) => {
+  return (
+    <SelectTrigger ref={ref} className={cn("focus:ring-2 focus:ring-primary/20 w-full transition-shadow", className)}>
+      {isLoading ? (
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span>{loadingText}</span>
+        </div>
+      ) : (
+        <SelectValue placeholder={placeholder} />
+      )}
+    </SelectTrigger>
+  );
+});
+FormSelect.displayName = "FormSelect";
 
 /**
  * ProfileForm component for editing user profile information
@@ -64,86 +223,131 @@ export function ProfileForm(): React.JSX.Element {
   const t = useTranslations("profile");
   const locale = useLocale() as "en" | "es" | "fr" | "pt";
   const { profile, user, refetchUserData } = useUser();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countrySearchOpen, setCountrySearchOpen] = useState(false);
-
-  // Default form values from user context
-  const defaultValues: Partial<ProfileFormValues> = {
-    firstName: profile?.firstName || "",
-    lastName: profile?.lastName || "",
-    email: profile?.email || "",
-    gender: (profile?.gender as any) || "prefer_not_to_say",
-    country: profile?.country || "",
-    portugueseLevel: (profile?.portugueseLevel as any) || "unknown",
-    nativeLanguage: profile?.nativeLanguage || "",
-    otherLanguages: profile?.otherLanguages?.join(", ") || "",
-    learningGoals: profile?.learningGoals?.join(", ") || "",
-    timeZone: profile?.timeZone || "",
-    biography: profile?.biography || "",
-    specialties: profile?.specialties?.join(", ") || "",
-    languages: profile?.languages?.join(", ") || "",
-  };
-
+  
   // Initialize the form
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
+    defaultValues: {
+      firstName: profile?.firstName || "",
+      lastName: profile?.lastName || "",
+      email: profile?.email || user?.email || "",
+      gender: (profile?.gender as any) || "prefer_not_to_say",
+      country: profile?.country || "",
+      timeZone: profile?.timeZone || "",
+      portugueseLevel: (profile?.portugueseLevel as any) || "unknown",
+      nativeLanguage: profile?.nativeLanguage || "",
+      otherLanguages: Array.isArray(profile?.otherLanguages) 
+        ? profile.otherLanguages 
+        : [],
+      learningGoals: Array.isArray(profile?.learningGoals) 
+        ? profile.learningGoals 
+        : [],
+      biography: profile?.biography || "",
+      specialties: Array.isArray(profile?.specialties) 
+        ? profile.specialties 
+        : [],
+      languages: Array.isArray(profile?.languages) 
+        ? profile.languages 
+        : [],
+    },
     mode: "onChange",
   });
 
-  // Handle form submission
-  async function onSubmit(data: ProfileFormValues) {
-    try {
-      setIsSubmitting(true);
+  // Reset form when profile changes
+  useEffect(() => {
+    if (profile) {
+      form.reset({
+        firstName: profile.firstName || "",
+        lastName: profile.lastName || "",
+        email: profile.email || user?.email || "",
+        gender: (profile.gender as any) || "prefer_not_to_say",
+        country: profile.country || "",
+        timeZone: profile.timeZone || "",
+        portugueseLevel: (profile.portugueseLevel as any) || "unknown",
+        nativeLanguage: profile.nativeLanguage || "",
+        otherLanguages: Array.isArray(profile.otherLanguages) 
+          ? profile.otherLanguages 
+          : [],
+        learningGoals: Array.isArray(profile.learningGoals) 
+          ? profile.learningGoals 
+          : [],
+        biography: profile.biography || "",
+        specialties: Array.isArray(profile.specialties) 
+          ? profile.specialties 
+          : [],
+        languages: Array.isArray(profile.languages) 
+          ? profile.languages 
+          : [],
+      });
+    }
+  }, [profile, user?.email, form]);
 
+  // State for timezone detection
+  const { isDetecting: isDetectingTimezone, error: timezoneError } = useTimezoneDetection(form, profile, t);
+
+  // Ensure the form is updated when the profile changes
+  useEffect(() => {
+    if (profile?.timeZone) {
+      form.setValue("timeZone", profile.timeZone);
+    }
+  }, [profile?.timeZone, form]);
+
+  // Format data for combobox components
+  const formattedLanguages = useMemo(() => languages.map(lang => ({
+    id: lang.id,
+    name: lang.name
+  })), []);
+
+  // Function to update profile
+  const updateProfile = async (values: z.infer<typeof profileFormSchema>) => {
+    try {
       // Update user data
       await updateUser(user?.id, {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        country: data.country,
-        gender: data.gender,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        country: values.country,
+        gender: values.gender,
       });
 
-      // Update role-specific data
+      // Update student or teacher data
       if (profile?.role === "student") {
         await updateStudent(profile.id as string, {
-          portugueseLevel: data.portugueseLevel,
-          nativeLanguage: data.nativeLanguage,
-          otherLanguages: data.otherLanguages ? data.otherLanguages.split(",").map(lang => lang.trim()) : [],
-          learningGoals: data.learningGoals ? data.learningGoals.split(",").map(goal => goal.trim()) : [],
-          timeZone: data.timeZone,
+          portugueseLevel: values.portugueseLevel,
+          nativeLanguage: values.nativeLanguage,
+          otherLanguages: values.otherLanguages,
+          learningGoals: values.learningGoals,
+          timeZone: values.timeZone,
         });
       } else if (profile?.role === "teacher") {
         await updateTeacher(profile.id as string, {
-          biography: data.biography,
-          specialties: data.specialties ? data.specialties.split(",").map(spec => spec.trim()) : [],
-          languages: data.languages ? data.languages.split(",").map(lang => lang.trim()) : [],
+          biography: values.biography,
+          specialties: values.specialties,
+          languages: values.languages,
         });
       }
 
-      // Refresh user data
-      await refetchUserData();
-
-      // Show success toast
-      toast({
-        title: t("toast.success.title"),
-        description: t("toast.success.description"),
-      });
+      return { success: true };
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast({
-        title: t("toast.error.title"),
-        description: t("toast.error.description"),
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+      console.error("Error in updateProfile:", error);
+      return { 
+        error: error instanceof Error 
+          ? error.message 
+          : "An unknown error occurred" 
+      };
     }
-  }
+  };
+
+  // Form submission handler
+  const { isSubmitting, submitError, handleSubmit } = useProfileSubmission({
+    updateProfile,
+    refetchUserData,
+    t,
+    toast,
+  });
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Profile form">
+      <form onSubmit={form.handleSubmit((values) => handleSubmit(values))} className="space-y-4" aria-label="Profile form">
         <Tabs defaultValue="personal" className="flex flex-col gap-4 w-full">
           {/* Tabs navigation at the top */}
           <TabsList className="flex justify-start gap-2 w-fit">
@@ -163,11 +367,11 @@ export function ProfileForm(): React.JSX.Element {
             </TabsTrigger>
             {profile?.role === "teacher" && (
               <TabsTrigger
-                value="teacher"
+                value="biography"
                 className="flex items-center gap-2"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>{t("tabs.teacher")}</span>
+                <span>{t("tabs.biography")}</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -179,138 +383,128 @@ export function ProfileForm(): React.JSX.Element {
                 <CardTitle>{t("personal.title")}</CardTitle>
                 <CardDescription>{t("personal.description")}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+              <CardContent>
+                <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("personal.firstName")}</FormLabel>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("personal.firstName")}
+                          <RequiredFieldIndicator />
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder={t("personal.firstNamePlaceholder")} {...field} />
+                          <Input
+                            placeholder={t("personal.firstNamePlaceholder")}
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                            {...field}
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("personal.lastName")}</FormLabel>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("personal.lastName")}
+                          <RequiredFieldIndicator />
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder={t("personal.lastNamePlaceholder")} {...field} />
+                          <Input 
+                            placeholder={t("personal.lastNamePlaceholder")} 
+                            {...field} 
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("personal.email")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("personal.emailPlaceholder")} {...field} disabled />
-                      </FormControl>
-                      <FormDescription>{t("personal.emailDescription")}</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+
                   <FormField
                     control={form.control}
-                    name="country"
+                    name="email"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col justify-end">
-                        <FormLabel>{t("personal.country")}</FormLabel>
-                        <Popover open={countrySearchOpen} onOpenChange={setCountrySearchOpen}>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={countrySearchOpen}
-                                className="justify-between bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 w-full"
-                              >
-                                {field.value ? (
-                                  <div className="flex items-center gap-2">
-                                    {field.value && (
-                                      <CircleFlag
-                                        countryCode={field.value.toLowerCase()}
-                                        height="16"
-                                        width="16"
-                                      />
-                                    )}
-                                    {countries.find((country) => country.code === field.value)?.name || t("personal.countryPlaceholder")}
-                                  </div>
-                                ) : (
-                                  t("personal.countryPlaceholder")
-                                )}
-                                <ChevronsUpDown className="opacity-50 ml-2 w-4 h-4 shrink-0" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="p-0 w-full">
-                            <Command>
-                              <CommandInput placeholder={t("personal.countrySearchPlaceholder")} />
-                              <CommandEmpty>{t("personal.noCountriesFound")}</CommandEmpty>
-                              <CommandGroup className="max-h-[300px] overflow-auto">
-                                {countries.map((country) => (
-                                  <CommandItem
-                                    key={country.code}
-                                    value={`${country.code} ${country.name}`}
-                                    onSelect={() => {
-                                      form.setValue("country", country.code);
-                                      setCountrySearchOpen(false);
-                                    }}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <CircleFlag countryCode={country.code.toLowerCase()} height="16" width="16" />
-                                      {country.name}
-                                    </div>
-                                    <Check
-                                      className={cn(
-                                        "ml-auto h-4 w-4",
-                                        field.value === country.code ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("personal.email")}
+                          <RequiredFieldIndicator />
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder={t("personal.emailPlaceholder")} 
+                            {...field} 
+                            disabled 
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("personal.gender")}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("personal.gender")}
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isDetectingTimezone}
+                        >
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("personal.genderPlaceholder")} />
-                            </SelectTrigger>
+                            <FormSelect
+                              options={genders}
+                              placeholder={t("personal.genderPlaceholder")}
+                              locale={locale}
+                              className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                            />
                           </FormControl>
                           <SelectContent>
-                            {genders.map((gender) => (
-                              <SelectItem key={gender.id} value={gender.id}>
-                                {gender.name[locale]}
+                            {genders.map((option) => (
+                              <SelectItem key={option.id} value={option.id}>
+                                {typeof option.name === 'string' ? option.name : option.name[locale]}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("personal.country")}
+                          <RequiredFieldIndicator />
+                        </FormLabel>
+                        <FormControl>
+                          <Combobox
+                            options={countries}
+                            value={field.value}
+                            onChange={(value) => field.onChange(value)}
+                            placeholder={t("personal.countryPlaceholder")}
+                            ariaLabel={t("personal.country")}
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                            showFlags={true}
+                            useNameAsValue={false}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
@@ -325,169 +519,201 @@ export function ProfileForm(): React.JSX.Element {
                 <CardTitle>{t("preferences.title")}</CardTitle>
                 <CardDescription>{t("preferences.description")}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {profile?.role === "student" && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="portugueseLevel"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("preferences.portugueseLevel")}</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={t("preferences.portugueseLevelPlaceholder")} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {portugueseLevels.map((level) => (
-                                <SelectItem key={level.id} value={level.id}>
-                                  {level.name[locale]}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="nativeLanguage"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("preferences.nativeLanguage")}</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={t("preferences.nativeLanguagePlaceholder")} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="max-h-[300px]">
-                              {languages.map((language) => (
-                                <SelectItem key={language.id} value={language.id}>
-                                  {language.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>{t("preferences.nativeLanguageDescription")}</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="otherLanguages"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("preferences.otherLanguages")}</FormLabel>
+              <CardContent>
+                <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="timeZone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("preferences.timeZone")}
+                          <RequiredFieldIndicator />
+                          <FieldHelp content={t("preferences.timeZoneHelp")} />
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <FormControl>
-                            <Input placeholder={t("preferences.otherLanguagesPlaceholder")} {...field} />
+                            <SelectTrigger
+                              className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                            >
+                              <SelectValue placeholder={t("preferences.timeZonePlaceholder")} />
+                            </SelectTrigger>
                           </FormControl>
-                          <FormDescription>{t("preferences.otherLanguagesDescription")}</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          <SelectContent className="max-h-[300px]">
+                            {timezones.map((timezone) => (
+                              <SelectItem key={timezone.id} value={timezone.id}>
+                                {timezone.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="learningGoals"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("preferences.learningGoals")}</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="portugueseLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("preferences.portugueseLevel")}
+                          <RequiredFieldIndicator />
+                          <FieldHelp content={t("preferences.portugueseLevelHelp")} />
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <FormControl>
-                            <Textarea
-                              placeholder={t("preferences.learningGoalsPlaceholder")}
-                              className="min-h-[100px]"
-                              {...field}
+                            <FormSelect
+                              options={portugueseLevels}
+                              placeholder={t("preferences.portugueseLevelPlaceholder")}
+                              locale={locale}
+                              className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
                             />
                           </FormControl>
-                          <FormDescription>{t("preferences.learningGoalsDescription")}</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          <SelectContent>
+                            {portugueseLevels.map((option) => (
+                              <SelectItem key={option.id} value={option.id}>
+                                {typeof option.name === 'string' ? option.name : option.name[locale]}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="timeZone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("preferences.timeZone")}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t("preferences.timeZonePlaceholder")} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
+                  <FormField
+                    control={form.control}
+                    name="nativeLanguage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("preferences.nativeLanguage")}
+                          <RequiredFieldIndicator />
+                        </FormLabel>
+                        <FormControl>
+                          <LanguageCombobox
+                            languages={formattedLanguages}
+                            value={field.value}
+                            onChange={(value) => field.onChange(value)}
+                            placeholder={t("preferences.nativeLanguagePlaceholder")}
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="otherLanguages"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("preferences.otherLanguages")}
+                          <FieldHelp content={t("preferences.otherLanguagesHelp")} />
+                        </FormLabel>
+                        <div className="relative">
+                          <MultiLanguageCombobox
+                            languages={languages}
+                            values={field.value}
+                            onChange={(values) => field.onChange(values)}
+                            placeholder={t("preferences.otherLanguagesPlaceholder")}
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                          />
+                        </div>
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="learningGoals"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                          {t("preferences.learningGoals")}
+                          <FieldHelp content={t("preferences.learningGoalsHelp")} />
+                        </FormLabel>
+                        <div className="relative">
+                          <MultiGoalsCombobox
+                            values={field.value}
+                            onChange={(values) => field.onChange(values)}
+                            placeholder={t("preferences.learningGoalsPlaceholder")}
+                            className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                          />
+                        </div>
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           {profile?.role === "teacher" && (
-            <TabsContent value="teacher" className="mt-0 p-0">
+            <TabsContent value="biography" className="mt-0 p-0">
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("teacher.title")}</CardTitle>
-                  <CardDescription>{t("teacher.description")}</CardDescription>
+                  <CardTitle>{t("teacher.biography.title")}</CardTitle>
+                  <CardDescription>{t("teacher.biography.description")}</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="biography"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("teacher.biography")}</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder={t("teacher.biographyPlaceholder")}
-                            className="min-h-[150px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>{t("teacher.biographyDescription")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <CardContent>
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="biography"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                            {t("teacher.biography.biography")}
+                            <RequiredFieldIndicator />
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder={t("teacher.biography.biographyPlaceholder")}
+                              className="focus:ring-2 focus:ring-primary/20 w-full min-h-[200px] transition-shadow"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="specialties"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("teacher.specialties")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("teacher.specialtiesPlaceholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("teacher.specialtiesDescription")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="languages"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("teacher.languages")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("teacher.languagesPlaceholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("teacher.languagesDescription")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="specialties"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center font-medium text-gray-900 dark:text-gray-100 text-sm">
+                            {t("teacher.biography.specialties")}
+                          </FormLabel>
+                          <div className="relative">
+                            <MultiLanguageCombobox
+                              languages={languages}
+                              values={field.value}
+                              onChange={(values) => field.onChange(values)}
+                              placeholder={t("teacher.specialtiesPlaceholder")}
+                              className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
+                            />
+                          </div>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -495,12 +721,39 @@ export function ProfileForm(): React.JSX.Element {
         </Tabs>
 
         {/* Save button below the form */}
-        <div className="flex justify-end">
-          <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
-            {isSubmitting ? t("buttons.saving") : t("buttons.saveChanges")}
+        <div className="flex justify-end gap-2 mt-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => form.reset()}
+            disabled={isSubmitting}
+            className="focus:ring-2 focus:ring-primary/20 transition-shadow"
+          >
+            {t("buttons.cancel")}
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="focus:ring-2 focus:ring-primary/20 transition-shadow"
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{t("buttons.saving")}</span>
+              </div>
+            ) : (
+              t("buttons.save")
+            )}
           </Button>
         </div>
+        
+        {submitError && (
+          <div className="bg-red-50 dark:bg-red-900/20 mt-4 p-3 border border-red-200 dark:border-red-800 rounded-md text-red-600 dark:text-red-400 text-sm">
+            <p className="font-medium">{t("error.title")}</p>
+            <p>{submitError}</p>
+          </div>
+        )}
       </form>
     </Form>
   );
-} 
+}

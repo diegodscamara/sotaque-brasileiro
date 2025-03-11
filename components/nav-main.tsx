@@ -48,8 +48,8 @@ export function NavMain({
                 <SidebarMenuButton 
                   tooltip={item.title}
                   className={cn(
-                    "transition-colors hover:bg-accent hover:text-accent-foreground",
-                    item.isActive && "bg-accent/50 text-green-700 dark:text-green-500 font-bold"
+                    "transition-colors hover:bg-popover hover:text-accent-foreground",
+                    item.isActive && "bg-popover text-green-700 dark:text-green-500 font-bold"
                   )}
                 >
                   {item.icon && <item.icon />}
