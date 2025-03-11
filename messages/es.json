@@ -729,7 +729,13 @@
             "learningGoalsPlaceholder": "Ingresa tus objetivos de aprendizaje (separados por comas)",
             "learningGoalsDescription": "¿Qué esperas lograr al aprender portugués?",
             "timeZone": "Zona horaria",
-            "timeZonePlaceholder": "Selecciona tu zona horaria"
+            "timeZonePlaceholder": "Selecciona tu zona horaria",
+            "timeZoneHelp": "Tu zona horaria se utiliza para programar clases y mostrar horarios correctamente.",
+            "detectingTimeZone": "Detectando zona horaria...",
+            "timeZoneDetectionFailed": "No se pudo detectar tu zona horaria. Por favor, selecciona manualmente.",
+            "otherLanguagesHelp": "Idiomas que hablas además de tu idioma nativo",
+            "learningGoalsHelp": "Lo que esperas lograr al aprender portugués",
+            "portugueseLevelHelp": "Tu nivel actual de competencia en portugués"
         },
         "teacher": {
             "title": "Perfil de Profesor",
@@ -761,6 +767,17 @@
             "cancel": "Cancelar",
             "refresh": "Actualizar Datos",
             "refreshing": "Actualizando..."
-        }
+        },
+        "updateError": "Error al actualizar el perfil",
+        "updateSuccess": "Perfil actualizado",
+        "updateSuccessDescription": "Tu perfil ha sido actualizado con éxito.",
+        "unknownError": "Ha ocurrido un error desconocido",
+        "requiredField": "Este campo es obligatorio"
+    },
+    "common": {
+        "saving": "Guardando...",
+        "save": "Guardar Cambios",
+        "error": "Error",
+        "unknownError": "Ha ocurrido un error desconocido"
     }
 }
