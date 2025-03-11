@@ -50,16 +50,12 @@ export function Combobox({
   // Filter options based on the search term
   const filteredOptions = React.useMemo(() => {
     if (!searchTerm) return options;
-
+    
     const lowerSearchTerm = searchTerm.toLowerCase();
-    return options.filter((option) => {
-      // Search by name (case insensitive)
-      const nameMatch = option.name.toLowerCase().includes(lowerSearchTerm);
-      // Search by code (case insensitive)
-      const codeMatch = option.code.toLowerCase().includes(lowerSearchTerm);
-
-      return nameMatch || codeMatch;
-    });
+    return options.filter((option) => 
+      option.name.toLowerCase().includes(lowerSearchTerm) || 
+      option.code.toLowerCase().includes(lowerSearchTerm)
+    );
   }, [options, searchTerm]);
 
   // Find the selected option based on value
@@ -80,7 +76,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           aria-label={ariaLabel || placeholder}
-          className={cn("justify-between w-full bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0", className)}
+          className={cn("justify-between hover:bg-transparent dark:hover:bg-transparent w-full bg-popover border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0", className)}
         >
           <div className="flex items-center gap-2 truncate">
             {showFlags && selectedOption && (
@@ -105,6 +101,7 @@ export function Combobox({
             placeholder="Search by name or code..."
             value={searchTerm}
             onValueChange={(term) => setSearchTerm(term)} // Update search term
+            className="border-none focus:ring-0"
           />
           <CommandList>
             {filteredOptions.length === 0 ? (
@@ -114,12 +111,10 @@ export function Combobox({
                 {filteredOptions.map((option) => (
                   <CommandItem
                     key={option.code}
-                    value={option.name} // Use name for search matching
+                    value={`${option.code} ${option.name}`}
                     onSelect={() => {
-                      const valueToUse = useNameAsValue ? option.name : option.code;
-                      onChange(valueToUse, option);
+                      onChange(useNameAsValue ? option.name : option.code, option);
                       setOpen(false);
-                      setSearchTerm(""); // Clear search term after selection
                     }}
                     className="flex items-center gap-2"
                   >

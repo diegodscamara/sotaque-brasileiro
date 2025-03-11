@@ -50,7 +50,7 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
           role="combobox"
           aria-expanded={open}
           aria-label={ariaLabel || placeholder}
-          className="justify-between bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 w-full h-10 truncate text-wrap whitespace-break-spaces"
+          className="justify-between bg-popover border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 w-full h-10 truncate text-wrap whitespace-break-spaces"
         >
           {selectedOptions.length > 0
             ? selectedOptions.map(o => o.name).join(", ")
@@ -60,7 +60,7 @@ export function MultiCombobox({ options, values, onChange, placeholder = "Select
       </PopoverTrigger>
       <PopoverContent className="p-0 w-full max-h-96 overflow-y-auto">
         <Command>
-          <CommandInput className="bg-popover hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 text-sm leading-none" placeholder="Search..." value={searchTerm} onValueChange={setSearchTerm} />
+          <CommandInput className="bg-popover border-gray-300 focus:border-green-700 dark:focus:border-green-500 dark:border-gray-500 focus:ring-0 focus:ring-offset-0 text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 text-sm leading-none" placeholder="Search..." value={searchTerm} onValueChange={setSearchTerm} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
