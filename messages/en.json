@@ -784,12 +784,13 @@
             "memberSince": "Member since",
             "credits": "Credits",
             "package": "Package",
-            "profileHeader": "Profile",
+            "profileHeader": "User Profile",
             "tabs": {
                 "personalInfo": "Personal Information",
                 "personalInfoShort": "Personal",
                 "languageLearning": "Language Learning",
-                "languageLearningShort": "Language"
+                "languageLearningShort": "Language",
+                "biography": "Biography"
             },
             "personalInfo": {
                 "title": "Personal Information"
@@ -829,6 +830,7 @@
         "activeSubscription": "Active Subscription",
         "level": "Level",
         "avatarAlt": "{name}'s profile picture",
+        "profileHeader": "User Profile",
         "error": {
             "title": "Error Loading Profile",
             "description": "There was a problem loading your profile data. Please try refreshing the page."
@@ -850,28 +852,44 @@
         "tabs": {
             "personal": "Personal",
             "preferences": "Preferences",
-            "teacher": "Teacher Profile"
+            "teacher": "Teacher Profile",
+            "biography": "Biography"
+        },
+        "biography": {
+            "title": "Biography",
+            "description": "Share your background and interests",
+            "biography": "Biography",
+            "biographyPlaceholder": "Tell us about yourself",
+            "biographyDescription": "Share information about your background, interests, and why you're learning Portuguese",
+            "specialties": "Specialties",
+            "specialtiesPlaceholder": "Enter your specialties or areas of interest",
+            "specialtiesDescription": "List any areas you specialize in or are particularly interested in"
         },
         "personal": {
             "title": "Personal Information",
             "description": "Update your personal information",
             "firstName": "First Name",
             "firstNamePlaceholder": "Enter your first name",
+            "firstNameDescription": "Your first name as it will appear to teachers and in your profile",
             "lastName": "Last Name",
             "lastNamePlaceholder": "Enter your last name",
+            "lastNameDescription": "Your last name as it will appear to teachers and in your profile",
             "email": "Email",
             "emailPlaceholder": "Enter your email",
             "emailDescription": "Your email cannot be changed",
             "gender": "Gender",
             "genderPlaceholder": "Select gender",
+            "genderDescription": "This information helps us personalize your experience",
             "genderOptions": {
                 "male": "Male",
                 "female": "Female",
                 "other": "Other",
-                "preferNotToSay": "Prefer not to say"
+                "non_binary": "Non-binary",
+                "prefer_not_to_say": "Prefer not to say"
             },
             "country": "Country",
             "countryPlaceholder": "Select country",
+            "countryDescription": "Your country helps us provide relevant content and services",
             "countrySearchPlaceholder": "Search countries...",
             "noCountriesFound": "No countries found"
         },
@@ -900,7 +918,13 @@
             "learningGoalsPlaceholder": "Enter your learning goals (comma separated)",
             "learningGoalsDescription": "What do you hope to achieve by learning Portuguese?",
             "timeZone": "Time Zone",
-            "timeZonePlaceholder": "Select your time zone"
+            "timeZonePlaceholder": "Select your time zone",
+            "timeZoneHelp": "Your timezone is used to schedule classes and display times correctly.",
+            "detectingTimeZone": "Detecting timezone...",
+            "timeZoneDetectionFailed": "Could not detect your timezone. Please select manually.",
+            "otherLanguagesHelp": "Languages you speak other than your native language",
+            "learningGoalsHelp": "What you hope to achieve by learning Portuguese",
+            "portugueseLevelHelp": "Your current level of Portuguese proficiency"
         },
         "teacher": {
             "title": "Teacher Profile",
@@ -932,7 +956,12 @@
             "cancel": "Cancel",
             "refresh": "Refresh Data",
             "refreshing": "Refreshing..."
-        }
+        },
+        "updateError": "Error updating profile",
+        "updateSuccess": "Profile updated",
+        "updateSuccessDescription": "Your profile has been successfully updated.",
+        "unknownError": "An unknown error occurred",
+        "requiredField": "This field is required"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -952,5 +981,11 @@
         "title": "Settings",
         "description": "Manage your account settings and preferences",
         "comingSoon": "The settings page is coming soon. You'll be able to manage your account settings and preferences here."
+    },
+    "common": {
+        "saving": "Saving...",
+        "save": "Save Changes",
+        "error": "Error",
+        "unknownError": "An unknown error occurred"
     }
 }

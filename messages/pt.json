@@ -726,7 +726,13 @@
             "learningGoalsPlaceholder": "Digite seus objetivos de aprendizado (separados por vírgula)",
             "learningGoalsDescription": "O que você espera alcançar ao aprender português?",
             "timeZone": "Fuso horário",
-            "timeZonePlaceholder": "Selecione seu fuso horário"
+            "timeZonePlaceholder": "Selecione seu fuso horário",
+            "timeZoneHelp": "Seu fuso horário é usado para agendar aulas e exibir horários corretamente.",
+            "detectingTimeZone": "Detectando fuso horário...",
+            "timeZoneDetectionFailed": "Não foi possível detectar seu fuso horário. Por favor, selecione manualmente.",
+            "otherLanguagesHelp": "Idiomas que você fala além do seu idioma nativo",
+            "learningGoalsHelp": "O que você espera alcançar ao aprender português",
+            "portugueseLevelHelp": "Seu nível atual de proficiência em português"
         },
         "teacher": {
             "title": "Perfil de Professor",
@@ -762,6 +768,16 @@
         "error": {
             "title": "Erro ao Carregar Perfil",
             "description": "Ocorreu um problema ao carregar os dados do seu perfil. Por favor, tente atualizar a página."
-        }
+        },
+        "updateError": "Erro ao atualizar perfil",
+        "updateSuccess": "Perfil atualizado",
+        "updateSuccessDescription": "Seu perfil foi atualizado com sucesso.",
+        "unknownError": "Ocorreu um erro desconhecido",
+        "requiredField": "Este campo é obrigatório"
+    },
+    "common": {
+        "saving": "Salvando...",
+        "save": "Salvar Alterações",
+        "error": "Erro"
     }
 }

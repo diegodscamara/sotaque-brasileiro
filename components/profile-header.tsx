@@ -115,7 +115,7 @@ export function ProfileHeader(): React.JSX.Element {
         <CardContent className="p-0">
           <div className="flex md:flex-row flex-col">
             {/* Left column - Avatar and name */}
-            <div className="flex flex-col justify-center items-center gap-3 bg-muted/20 p-6 md:w-1/4">
+            <div className="flex flex-col justify-center items-center gap-3 bg-popover/50 p-6 md:w-1/4">
               <Avatar
                 className="w-16 h-16"
                 aria-label={t("avatarAlt", { name: fullName })}

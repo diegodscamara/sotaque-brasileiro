@@ -17,7 +17,7 @@ export default async function AuthenticatedLayout({
   children,
 }: {
   children: ReactNode;
-}) {
+}): Promise<ReactNode> {
   const supabase = createClient();
 
   const {

@@ -726,7 +726,13 @@
             "learningGoalsPlaceholder": "Entrez vos objectifs d'apprentissage (séparés par des virgules)",
             "learningGoalsDescription": "Qu'espérez-vous accomplir en apprenant le portugais?",
             "timeZone": "Fuseau horaire",
-            "timeZonePlaceholder": "Sélectionnez votre fuseau horaire"
+            "timeZonePlaceholder": "Sélectionnez votre fuseau horaire",
+            "timeZoneHelp": "Votre fuseau horaire est utilisé pour planifier des cours et afficher correctement les heures.",
+            "detectingTimeZone": "Détection du fuseau horaire...",
+            "timeZoneDetectionFailed": "Impossible de détecter votre fuseau horaire. Veuillez le sélectionner manuellement.",
+            "otherLanguagesHelp": "Langues que vous parlez autres que votre langue maternelle",
+            "learningGoalsHelp": "Ce que vous espérez accomplir en apprenant le portugais",
+            "portugueseLevelHelp": "Votre niveau actuel de compétence en portugais"
         },
         "teacher": {
             "title": "Profil d'Enseignant",
@@ -758,6 +764,17 @@
             "cancel": "Annuler",
             "refresh": "Actualiser les Données",
             "refreshing": "Actualisation..."
-        }
+        },
+        "updateError": "Erreur lors de la mise à jour du profil",
+        "updateSuccess": "Profil mis à jour",
+        "updateSuccessDescription": "Votre profil a été mis à jour avec succès.",
+        "unknownError": "Une erreur inconnue s'est produite",
+        "requiredField": "Ce champ est obligatoire"
+    },
+    "common": {
+        "saving": "Enregistrement...",
+        "save": "Enregistrer les modifications",
+        "error": "Erreur",
+        "unknownError": "Une erreur inconnue s'est produite"
     }
 }

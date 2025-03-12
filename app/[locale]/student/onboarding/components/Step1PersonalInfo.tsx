@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Info, CircleNotch } from "@phosphor-icons/react";
 
@@ -179,6 +179,7 @@ export default function Step1PersonalInfo({
 }: Step1Props): React.JSX.Element {
     // Translations
     const t = useTranslations("student.onboarding.step1");
+    const locale = useLocale() as "en" | "es" | "fr" | "pt";
 
     // Track which sections have been interacted with for progressive disclosure
     const [activeSections, setActiveSections] = useState<{
@@ -400,7 +401,7 @@ export default function Step1PersonalInfo({
                             <SelectContent>
                                 {genders.map((gender) => (
                                     <SelectItem key={gender.id} value={gender.id}>
-                                        {gender.name}
+                                        {typeof gender.name === 'string' ? gender.name : gender.name[locale as keyof typeof gender.name]}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -440,7 +441,7 @@ export default function Step1PersonalInfo({
                                     <SelectContent>
                                         {portugueseLevels.map((level) => (
                                             <SelectItem key={level.id} value={level.id}>
-                                                {level.name}
+                                                {typeof level.name === 'string' ? level.name : level.name[locale as keyof typeof level.name]}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -484,7 +485,10 @@ export default function Step1PersonalInfo({
                             helpText={t("forms.learningPreferences.learningGoalsHelp")}
                         >
                             <MultiCombobox
-                                options={learningGoals}
+                                options={learningGoals.map(goal => ({
+                                    id: goal.id,
+                                    name: typeof goal.name === 'string' ? goal.name : goal.name[locale as keyof typeof goal.name]
+                                }))}
                                 values={formData.learningGoals}
                                 onChange={(values) => handleMultiSelectChange("learningGoals", values)}
                                 placeholder={t("forms.learningPreferences.learningGoalsPlaceholder")}

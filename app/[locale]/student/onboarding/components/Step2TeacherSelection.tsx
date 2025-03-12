@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 // Components
 import TeacherSelectionTab from "./teacher-selection/TeacherSelectionTab";
 import ScheduleTab from "./teacher-selection/ScheduleTab";
-import ValidationSummary from "./teacher-selection/ValidationSummary";
 import StepHeader from "./teacher-selection/StepHeader";
 import { ErrorDisplay } from "./teacher-selection/ErrorDisplay";
 import ReservationIndicator from "./teacher-selection/ReservationIndicator";
@@ -96,8 +95,7 @@ export default function Step2TeacherSelection({
     availabilityError,
     handleDateSelect,
     handleTimeSlotSelect,
-    refreshAvailabilityData,
-    fetchAvailabilityForDate
+    refreshAvailabilityData
   } = useScheduleSelection(
     formData,
     selectedTeacher,
@@ -304,15 +302,6 @@ export default function Step2TeacherSelection({
           />
         </TabsContent>
       </Tabs>
-
-      {/* Validation Summary */}
-      <ValidationSummary 
-        isStepValid={isStepValid}
-        selectedTeacher={selectedTeacher}
-        selectedDate={selectedDate}
-        selectedTimeSlot={selectedTimeSlot}
-        t={t}
-      />
     </motion.div>
   );
 }

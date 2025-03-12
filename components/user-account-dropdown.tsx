@@ -58,28 +58,28 @@ export function UserAccountDropdown({
   const t = useTranslations('shared.nav-user');
   const locale = useLocale();
   const { user, profile, hasAccess, isLoading } = useUser();
-  
+
   // Safely use the sidebar hook with a fallback for when it's used outside a SidebarProvider
   const [isMobileSafe, setIsMobileSafe] = useState(false);
-  
+
   useEffect(() => {
     // Check if window is defined (client-side)
     if (typeof window !== 'undefined') {
       // Use media query to determine if mobile
       const mediaQuery = window.matchMedia('(max-width: 768px)');
       setIsMobileSafe(mediaQuery.matches);
-      
+
       // Add listener for screen size changes
       const handleResize = (e: MediaQueryListEvent) => setIsMobileSafe(e.matches);
       mediaQuery.addEventListener('change', handleResize);
-      
+
       return () => mediaQuery.removeEventListener('change', handleResize);
     }
-    
+
     // Return empty function for when window is undefined
-    return () => {};
+    return () => { };
   }, []);
-  
+
   // Try to use the sidebar context, but fall back to our safe value if not available
   let isMobile = isMobileSafe;
   try {
@@ -108,26 +108,6 @@ export function UserAccountDropdown({
     await signOut();
     // Force a page reload to clear any cached state
     window.location.href = '/';
-  };
-
-  const handleUpgrade = async () => {
-    try {
-      const { url }: { url: string } = await apiClient.post(
-        "/stripe/create-checkout",
-        {
-          priceId: profile?.packageName === "Explorer" || profile?.packageName === "Enthusiast"
-            ? config.stripe.plans.find(plan => plan.name === "Master" && plan.interval === "monthly")?.priceId
-            : config.stripe.plans.find(plan => plan.name === "Enthusiast" && plan.interval === "monthly")?.priceId,
-          successUrl: window.location.href + "/dashboard",
-          cancelUrl: window.location.href,
-          mode: "subscription",
-        }
-      );
-
-      router.push(url);
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   /**
@@ -230,7 +210,7 @@ export function UserAccountDropdown({
                 "transition-colors hover:bg-primary/20 hover:text-accent-foreground"
               )}
             >
-              <Avatar className="w-8 h-8">
+              <Avatar className="rounded-full w-8 h-8">
                 <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
@@ -279,21 +259,21 @@ export function UserAccountDropdown({
                 </DropdownMenuItem>
               )}
 
+              {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
+                <DropdownMenuItem asChild>
+                  <Link href={`/${locale}/student/onboarding`}>
+                    <BookOpen className="w-5 h-5" />
+                    Get Started with a Plan
+                  </Link>
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuItem>
                 <UserCircle className="w-5 h-5" />
                 <Link href={`/${locale}/profile`} className="w-full">
                   {t('profile')}
                 </Link>
               </DropdownMenuItem>
-
-              {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
-                <DropdownMenuItem
-                  onClick={() => router.push(`/${locale}/student/onboarding`)}
-                >
-                  <BookOpen className="w-5 h-5" />
-                  {t('onboarding')}
-                </DropdownMenuItem>
-              )}
 
               {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
                 <DropdownMenuItem
@@ -340,7 +320,7 @@ export function UserAccountDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
-          <Avatar className="rounded-full w-8 h-8">
+          <Avatar className="rounded-full w-10 h-10">
             <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
@@ -355,7 +335,7 @@ export function UserAccountDropdown({
       >
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-sm text-left">
-            <Avatar className="w-8 h-8">
+            <Avatar className="w-10 h-10">
               <AvatarImage src={profile?.avatarUrl} alt={profile?.firstName} />
               <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
@@ -386,35 +366,47 @@ export function UserAccountDropdown({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem asChild>
-            <Link href={`/${locale}/dashboard`}>
-              <LayoutDashboard className="w-5 h-5" />
-              {t('dashboard')}
-            </Link>
-          </DropdownMenuItem>
-
-          {profile?.role === 'student' && (
+          {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
             <DropdownMenuItem asChild>
-              <Link href={`/${locale}/classes`}>
+              <Link href={`/${locale}/student/onboarding`}>
                 <BookOpen className="w-5 h-5" />
-                Classes
+                Get Started with a Plan
               </Link>
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem asChild>
-            <Link href={`/${locale}/profile`}>
-              <UserCircle className="w-5 h-5" />
-              {t('profile')}
-            </Link>
-          </DropdownMenuItem>
+          {profile?.role === 'student' && profile.hasCompletedOnboarding === true && hasAccess && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link href={`/${locale}/dashboard`}>
+                  <LayoutDashboard className="w-5 h-5" />
+                  {t('dashboard')}
+                </Link>
+              </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link href={`/${locale}/settings`}>
-              <Settings className="w-5 h-5" />
-              Settings
-            </Link>
-          </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/${locale}/classes`}>
+                  <BookOpen className="w-5 h-5" />
+                  Classes
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link href={`/${locale}/profile`}>
+                  <UserCircle className="w-5 h-5" />
+                  {t('profile')}
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link href={`/${locale}/settings`}>
+                  <Settings className="w-5 h-5" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
+
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
