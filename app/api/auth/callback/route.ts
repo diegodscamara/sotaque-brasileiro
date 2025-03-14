@@ -100,9 +100,9 @@ export async function GET(request: Request): Promise<NextResponse> {
       })
       
       if (student && !student.hasCompletedOnboarding && !student.hasAccess) {
-        redirectUrl = '/student/onboarding'
+        redirectUrl = '/onboarding/student'
       } else if (student && student.hasAccess && !student.hasCompletedOnboarding) {
-        redirectUrl = '/student/onboarding'
+        redirectUrl = '/onboarding/student'
       } else if (student && student.hasAccess && student.hasCompletedOnboarding) {
         redirectUrl = '/dashboard'
       }
@@ -160,9 +160,9 @@ export async function POST(request: Request): Promise<NextResponse> {
         })
         
         if (student && !student.hasCompletedOnboarding && !student.hasAccess) {
-          redirectUrl = '/student/onboarding'
+          redirectUrl = '/onboarding/student'
         } else if (student && student.hasAccess && !student.hasCompletedOnboarding) {
-          redirectUrl = '/student/onboarding'
+          redirectUrl = '/onboarding/student'
         } else if (student && student.hasAccess && student.hasCompletedOnboarding) {
           redirectUrl = '/dashboard'
         }
@@ -238,7 +238,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
 
       // Determine redirect URL based on role
-      const redirectUrl = role === Role.STUDENT ? '/student/onboarding' : '/dashboard'
+      const redirectUrl = role === Role.STUDENT ? '/onboarding/student' : '/dashboard'
       return NextResponse.json({ 
         success: true, 
         redirectUrl 
