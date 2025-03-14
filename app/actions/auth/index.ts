@@ -66,9 +66,9 @@ export async function signIn(email: string, password: string): Promise<{ success
       });
       
       if (student && !student.hasCompletedOnboarding && !student.hasAccess) {
-        redirectUrl = "/student/onboarding";
+        redirectUrl = "/onboarding/student";
       } else if (student && student.hasAccess && !student.hasCompletedOnboarding) {
-        redirectUrl = "/student/onboarding";
+        redirectUrl = "/onboarding/student";
       } else if (student && student.hasAccess && student.hasCompletedOnboarding) {
         redirectUrl = "/dashboard";
       }
@@ -179,7 +179,7 @@ export async function signUp(
     }
 
     // Determine redirect URL based on role
-    const redirectUrl = role === "STUDENT" ? "/student/onboarding" : "/dashboard";
+    const redirectUrl = role === "STUDENT" ? "/onboarding/student" : "/dashboard";
     return { success: true, data: { redirectUrl } };
   } catch (error) {
     console.error("Error in signUp:", error);

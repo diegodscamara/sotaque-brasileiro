@@ -47,7 +47,7 @@ export default function SignUp() {
                         if (studentData.hasCompletedOnboarding) {
                             router.push("/dashboard");
                         } else {
-                            router.push("/student/onboarding");
+                            router.push("/onboarding/student");
                         }
                         break;
                     }

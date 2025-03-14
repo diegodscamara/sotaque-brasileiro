@@ -106,7 +106,7 @@ export default function SignUpForm({ role, onSuccess }: SignUpFormProps): JSX.El
             if (!response.ok) {
                 setError(data.error || tErrors("unknownError"));
             } else {
-                onSuccess(data.redirectUrl || (role === "STUDENT" ? "/student/onboarding" : "/dashboard"));
+                onSuccess(data.redirectUrl || (role === "STUDENT" ? "/onboarding/student" : "/dashboard"));
             }
         } catch (error) {
             setError(error instanceof Error ? error.message : tErrors("unknownError"));

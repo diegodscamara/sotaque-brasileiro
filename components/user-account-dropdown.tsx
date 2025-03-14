@@ -261,7 +261,7 @@ export function UserAccountDropdown({
 
               {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
                 <DropdownMenuItem asChild>
-                  <Link href={`/${locale}/student/onboarding`}>
+                  <Link href={`/${locale}/onboarding/student`}>
                     <BookOpen className="w-5 h-5" />
                     Get Started with a Plan
                   </Link>
@@ -368,7 +368,7 @@ export function UserAccountDropdown({
 
           {profile?.role === 'student' && profile.hasCompletedOnboarding === false && (
             <DropdownMenuItem asChild>
-              <Link href={`/${locale}/student/onboarding`}>
+              <Link href={`/${locale}/onboarding/student`}>
                 <BookOpen className="w-5 h-5" />
                 Get Started with a Plan
               </Link>

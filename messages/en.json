@@ -472,7 +472,7 @@
             "step2": {
                 "step": "STEP 2",
                 "title": "Book Your First Class",
-                "subtitle": "Choose a teacher and schedule your first class to start your learning journey.",
+                "description": "Choose a teacher and schedule your first class to start your learning journey.",
                 "tabs": {
                     "teachers": "Select a Teacher",
                     "schedule": "Schedule a Class"

@@ -119,7 +119,7 @@ Sotaque Brasileiro is a SaaS platform for language learning, focusing on Brazili
 
 ### Layout Protection Example
 @app/[locale]/dashboard/layout.tsx
-@app/[locale]/student/onboarding/layout.tsx
+@app/[locale]/onboarding/student/layout.tsx
 
 ### Component Example
 @components/auth/signup-form.tsx 
