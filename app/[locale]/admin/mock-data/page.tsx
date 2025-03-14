@@ -70,7 +70,7 @@ export default function AdminMockDataPage(): React.JSX.Element {
    * Navigates to the student onboarding page
    */
   const navigateToOnboarding = () => {
-    router.push(`/${locale}/student/onboarding`);
+    router.push(`/${locale}/onboarding/student`);
   };
   
   /**
