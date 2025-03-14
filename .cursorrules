@@ -1,0 +1,125 @@
+# Sotaque Brasileiro - Project Rules
+
+## Description
+Sotaque Brasileiro is a SaaS platform for language learning, focusing on Brazilian Portuguese. The application connects students with native-speaking teachers for personalized lessons. Built with Next.js 14, TypeScript, Tailwind CSS, shadcn/ui components, and Supabase for authentication and database (via Prisma). The project follows a structured approach with internationalization support, server actions for data management, and strong emphasis on accessibility and security.
+
+## Architecture & Structure
+
+- Use the `/app/[locale]/` directory structure for all pages
+- Keep page components minimal, delegating logic to server actions and UI to components
+- Implement layouts for shared UI elements and route protection
+- Mark client components with `"use client";` at the top
+- Use server components for data fetching and initial rendering
+- Use client components for interactive UI elements
+
+## Internationalization
+
+- Use `next-intl` for all user-facing text
+- Access translations with `useTranslations` hook in client components
+- Access translations with `getTranslations` in server components
+- Organize translation keys in a hierarchical structure (e.g., `namespace.section.key`)
+
+## Database & Data Management
+
+- Never query the database directly from components or pages
+- Always use server actions for database interactions
+- Use Prisma for type-safe database queries
+- Use Supabase for authentication and storage
+- Place all server actions in the `/app/actions/` directory
+- Organize actions by entity (e.g., `users.ts`, `students.ts`)
+- Mark server actions with `"use server";` at the top
+- Implement proper error handling and validation in all actions
+- Use Zod for input validation in server actions
+
+## Components & UI
+
+- Use functional components with TypeScript interfaces for props
+- Implement proper JSDoc comments for all components
+- Use shadcn/ui components as the foundation for UI elements
+- Use Tailwind CSS for styling with utility-first approach
+- Implement responsive design for all components
+- Use dark mode compatible classes with `dark:` prefix
+- Ensure all interactive elements are keyboard navigable
+- Use semantic HTML elements
+- Implement proper ARIA attributes
+- Ensure sufficient color contrast
+- Provide alt text for images
+- Use proper form labels and error messages
+- Use Phosphor Icons from `@phosphor-icons/react`
+
+## State Management & Forms
+
+- Use controlled components for form inputs
+- Implement client-side validation with clear error messages
+- Show loading states during form submission
+- Handle errors gracefully with user-friendly messages
+- Use React hooks for local state (`useState`, `useReducer`)
+- Use React Context for shared state when needed
+
+## Authentication & Authorization
+
+- Use Supabase Auth for authentication
+- Implement proper redirection after authentication
+- Check authentication status in layout components for protected routes
+- Use server actions to verify authentication before database operations
+- Check user roles for access to specific routes and features
+- Implement route protection in layout components
+
+## Error Handling & Logging
+
+- Implement try/catch blocks in all server actions
+- Log errors with sufficient context for debugging
+- Show user-friendly error messages
+- Use error boundaries for client-side error handling
+
+## Code Quality & Best Practices
+
+- Use TypeScript for all components and functions
+- Define interfaces for all props and data structures
+- Use proper type annotations for function parameters and return values
+- Use JSDoc comments for all components, hooks, and functions
+- Include parameter descriptions and return value types
+- Document complex logic with inline comments
+- Use React.memo for expensive components
+- Implement proper dependency arrays in useEffect and useMemo
+- Use server components where possible to reduce client-side JavaScript
+- Optimize images with Next.js Image component
+
+## Security
+
+- Validate all user inputs on both client and server
+- Sanitize user-generated content to prevent XSS
+- Use parameterized queries to prevent SQL injection
+- Implement proper session management
+- Verify authorization for all sensitive operations
+- Protect sensitive routes with authentication checks
+
+## Specific Patterns
+
+- Implement route protection in layout components
+- Use server actions to check authentication and authorization
+- Redirect unauthenticated or unauthorized users to appropriate pages
+- Check onboarding status for students
+- Redirect students to appropriate pages based on onboarding status
+- Save onboarding progress incrementally
+- Show loading state during form submission
+- Disable submit button during submission
+- Show success/error messages after submission
+
+## Example Files
+
+### Server Action Example
+@app/actions/students.ts
+@app/actions/users.ts
+
+### Layout Protection Example
+@app/[locale]/dashboard/layout.tsx
+@app/[locale]/onboarding/student/layout.tsx
+
+### Component Example
+@components/auth/signup-form.tsx 
+
+## Auto-attach Regex
+```regex
+\.(tsx|ts|js|jsx)$
+``` 
