@@ -1,0 +1,15 @@
+---
+description: 
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+name: nextjs-best-practices.mdc
+description: Best practices for Next.js applications and routing
+globs: **/*.{ts,tsx}
+
+- Leverage React Server Components (RSC) for improved performance and SEO.
+- Use dynamic imports with `next/dynamic` for code splitting and lazy loading.
+- Implement proper error boundaries using `error.js` in the App Router.
+- Utilize `next/image` for optimized image loading and lazy loading.
+- Use `next/font` for font optimization and better performance.
+- Implement internationalization with `next-intl` for seamless multi-language support.

@@ -1,7 +1,7 @@
 ---
-description: Sotaque Brasileiro is a SaaS platform for language learning, focusing on Brazilian Portuguese. The application connects students with native-speaking teachers for personalized lessons. Built with Next.js 14, TypeScript, Tailwind CSS, shadcn/ui components, and Supabase for authentication and database (via Prisma). The project follows a structured approach with internationalization support, server actions for data management, and strong emphasis on accessibility and security.
+description: 
 globs: \.(tsx|ts|js|jsx)$
-alwaysApply: true
+alwaysApply: false
 ---
 # Sotaque Brasileiro - Project Rules
 
