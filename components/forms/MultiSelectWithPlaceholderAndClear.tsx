@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import MultipleSelector, { Option } from "@/components/forms/MultiSelector";
 import { cn } from "@/libs/utils";
+import { useMemo } from "react";
 
 interface MultiSelectWithPlaceholderAndClearProps {
   options: Option[];
@@ -21,18 +22,27 @@ export default function MultiSelectWithPlaceholderAndClear({
     label,
     className = "",
     disabled = false,
-    values,
+    values = [],
     onChange,
     ariaLabel,
 }: MultiSelectWithPlaceholderAndClearProps) {
+  // Convert string[] values to Option[] for the MultipleSelector
+  const selectedOptions = useMemo(() => 
+    values.map(value => options.find(opt => opt.value === value))
+      .filter((opt): opt is Option => opt !== undefined),
+    [values, options]
+  );
+
   return (
     <div className={cn("*:not-first:mt-2", className)}>
       {label && <Label>{label}</Label>}
       <MultipleSelector
         commandProps={{
-          label,
+          label: ariaLabel || label,
         }}
         defaultOptions={options}
+        value={selectedOptions}
+        onChange={(selected) => onChange(selected.map(opt => opt.value))}
         placeholder={placeholder}
         emptyIndicator={emptyIndicator}
         disabled={disabled}

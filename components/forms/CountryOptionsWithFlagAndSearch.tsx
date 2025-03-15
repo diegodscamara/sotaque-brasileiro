@@ -69,7 +69,7 @@ export default function CountryOptionsWithFlagAndSearch({
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="p-0 border-input w-full min-w-[var(--radix-popper-anchor-width)]"
+                    className="p-0 border-input w-full min-w-[var(--radix-popover-trigger-width)]"
                     align="start"
                 >
                     <Command>
