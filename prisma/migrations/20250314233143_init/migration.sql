@@ -2,12 +2,13 @@
 CREATE TYPE "Role" AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
 
 -- CreateEnum
-CREATE TYPE "ClassStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED');
+CREATE TYPE "ClassStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'SCHEDULED');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "email" TEXT NOT NULL,
+    "phone" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "firstName" TEXT,
@@ -15,6 +16,7 @@ CREATE TABLE "User" (
     "avatarUrl" TEXT,
     "role" "Role" NOT NULL DEFAULT 'STUDENT',
     "country" TEXT,
+    "timezone" TEXT,
     "gender" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -34,13 +36,11 @@ CREATE TABLE "Student" (
     "packageExpiration" TIMESTAMP(3),
     "portugueseLevel" TEXT,
     "learningGoals" TEXT[],
-    "preferredSchedule" TEXT[],
     "nativeLanguage" TEXT,
     "otherLanguages" TEXT[],
     "timeZone" TEXT,
-    "professionalBackground" TEXT,
-    "motivationForLearning" TEXT,
     "hasCompletedOnboarding" BOOLEAN NOT NULL DEFAULT false,
+    "subscriptionInfo" TEXT,
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("id")
 );
@@ -139,6 +139,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE INDEX "User_email_idx" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
+
+-- CreateIndex
 CREATE INDEX "Student_userId_idx" ON "Student"("userId");
 
 -- CreateIndex
@@ -169,13 +172,13 @@ ALTER TABLE "Teacher" ADD CONSTRAINT "Teacher_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "TeacherAvailability" ADD CONSTRAINT "TeacherAvailability_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "Teacher"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Class" ADD CONSTRAINT "Class_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "Teacher"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Class" ADD CONSTRAINT "Class_recurringGroupId_fkey" FOREIGN KEY ("recurringGroupId") REFERENCES "RecurringGroup"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Class" ADD CONSTRAINT "Class_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Class" ADD CONSTRAINT "Class_recurringGroupId_fkey" FOREIGN KEY ("recurringGroupId") REFERENCES "RecurringGroup"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Class" ADD CONSTRAINT "Class_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "Teacher"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
