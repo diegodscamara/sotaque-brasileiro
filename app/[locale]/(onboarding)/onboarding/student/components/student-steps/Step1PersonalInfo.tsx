@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 "use client";
 
-import React from "react";
+import React, { useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 
@@ -35,6 +35,7 @@ interface Step1PersonalInfoProps {
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     handleSelectChange: (name: string, value: string) => void;
     handleMultiSelectChange: (name: string, values: string[]) => void;
+    setErrors?: React.Dispatch<React.SetStateAction<Record<string, string | undefined>>>;
 }
 
 /**
@@ -48,11 +49,41 @@ export default function Step1PersonalInfo({
     errors,
     handleInputChange,
     handleSelectChange,
-    handleMultiSelectChange
+    handleMultiSelectChange,
+    setErrors
 }: Step1PersonalInfoProps): React.JSX.Element {
     // Translations
     const t = useTranslations("student.onboarding.step1");
     const locale = useLocale() as "en" | "es" | "fr" | "pt";
+
+    // Memoize the timezone initialization function
+    const initializeTimezone = useCallback(() => {
+        const supportedTimezones = Intl.supportedValuesOf("timeZone");
+        
+        // If there's already a valid timezone in formData, don't override it
+        if (formData.timeZone && supportedTimezones.includes(formData.timeZone)) {
+            return;
+        }
+
+        // Try to get the user's timezone
+        try {
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (supportedTimezones.includes(userTimeZone)) {
+                handleSelectChange("timeZone", userTimeZone);
+                return;
+            }
+        } catch (e) {
+            console.error("Failed to get user timezone:", e);
+        }
+
+        // Default to America/Toronto if nothing else works
+        handleSelectChange("timeZone", "America/Toronto");
+    }, [formData.timeZone, handleSelectChange]);
+
+    // Initialize timezone only once when component mounts
+    useEffect(() => {
+        initializeTimezone();
+    }, [initializeTimezone]);
 
     // Animation variants
     const containerVariants = {
@@ -146,7 +177,7 @@ export default function Step1PersonalInfo({
                         helpText={t("forms.personalDetails.timezoneHelp")}
                     >
                         <TimeZoneSelectWithSearch
-                            value={formData.timeZone || "America/Toronto"}
+                            value={formData.timeZone || ""}
                             onChange={(value) => handleSelectChange("timeZone", value)}
                             placeholder={t("forms.personalDetails.timezonePlaceholder")}
                         />
@@ -161,8 +192,18 @@ export default function Step1PersonalInfo({
                         error={errors.country}
                     >
                         <CountryOptionsWithFlagAndSearch
-                            value={formData.country}
-                            options={countries.map((country) => ({ label: typeof country.name === 'string' ? country.name : country.name[locale as keyof typeof country.name], value: country.code }))}
+                            value={(() => {
+                                // If there's a country in formData and it exists in our countries list, use it
+                                if (formData.country && countries.some(c => c.name === formData.country)) {
+                                    return formData.country;
+                                }
+                                // Otherwise default to Canada
+                                return "Canada";
+                            })()}
+                            options={countries.map((country) => ({
+                                label: typeof country.name === 'string' ? country.name : country.name[locale as keyof typeof country.name],
+                                value: country.code
+                            }))}
                             onChange={(value) => handleSelectChange("country", value)}
                             placeholder={t("forms.personalDetails.countryPlaceholder")}
                         />
@@ -231,39 +272,43 @@ export default function Step1PersonalInfo({
                     </FormField>
                 </div>
 
-                {/* Learning Goals */}
-                <FormField
-                    label={t("forms.learningPreferences.learningGoalsLabel")}
-                    id="learningGoals"
-                    error={errors.learningGoals}
-                    helpText={t("forms.learningPreferences.learningGoalsHelp")}
-                >
-                    <MultiSelectWithPlaceholderAndClear
-                        options={learningGoals.map(goal => ({
-                            value: goal.id,
-                            label: typeof goal.name === 'string' ? goal.name : goal.name[locale as keyof typeof goal.name]
-                        }))}
-                        values={formData.learningGoals}
-                        onChange={(values) => handleMultiSelectChange("learningGoals", values as LearningGoal[])}
-                        placeholder={t("forms.learningPreferences.learningGoalsPlaceholder")}
-                        ariaLabel={t("forms.learningPreferences.learningGoalsLabel")}
-                    />
-                </FormField>
+                {/* Learning Goals and Other Languages */}
+                <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
+                    {/* Learning Goals */}
+                    <FormField
+                        label={t("forms.learningPreferences.learningGoalsLabel")}
+                        id="learningGoals"
+                        error={errors.learningGoals}
+                        helpText={t("forms.learningPreferences.learningGoalsHelp")}
+                        required
+                    >
+                        <MultiSelectWithPlaceholderAndClear
+                            options={learningGoals.map(goal => ({
+                                value: goal.id,
+                                label: typeof goal.name === 'string' ? goal.name : goal.name[locale as keyof typeof goal.name]
+                            }))}
+                            values={formData.learningGoals || []}
+                            onChange={(values) => handleMultiSelectChange("learningGoals", values as LearningGoal[])}
+                            placeholder={t("forms.learningPreferences.learningGoalsPlaceholder")}
+                            ariaLabel={t("forms.learningPreferences.learningGoalsLabel")}
+                        />
+                    </FormField>
 
-                {/* Other Languages */}
-                <FormField
-                    label={t("forms.learningPreferences.otherLanguagesLabel")}
-                    id="otherLanguages"
-                    helpText={t("forms.learningPreferences.otherLanguagesHelp")}
-                >
-                    <MultiCombobox
-                        options={languages}
-                        values={formData.otherLanguages}
-                        onChange={(values) => handleMultiSelectChange("otherLanguages", values)}
-                        placeholder={t("forms.learningPreferences.otherLanguagesPlaceholder")}
-                        ariaLabel={t("forms.learningPreferences.otherLanguagesLabel")}
-                    />
-                </FormField>
+                    {/* Other Languages */}
+                    <FormField
+                        label={t("forms.learningPreferences.otherLanguagesLabel")}
+                        id="otherLanguages"
+                        helpText={t("forms.learningPreferences.otherLanguagesHelp")}
+                    >
+                        <MultiCombobox
+                            options={languages}
+                            values={formData.otherLanguages}
+                            onChange={(values) => handleMultiSelectChange("otherLanguages", values)}
+                            placeholder={t("forms.learningPreferences.otherLanguagesPlaceholder")}
+                            ariaLabel={t("forms.learningPreferences.otherLanguagesLabel")}
+                        />
+                    </FormField>
+                </div>
             </FormSection>
         </motion.div>
     );
