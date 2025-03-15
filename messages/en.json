@@ -445,6 +445,8 @@
                         "portugueseLevelError": "Portuguese level is required",
                         "nativeLanguageLabel": "Native Language",
                         "nativeLanguagePlaceholder": "Select your native language",
+                        "nativeLanguageHelp": "This helps us understand your language learning background",
+                        "nativeLanguageNonFoundMessage": "We couldn't find your native language. Please select another language.",
                         "nativeLanguageError": "Native language is required",
                         "learningGoalsLabel": "Learning Goals",
                         "learningGoalsError": "Learning goals are required",
