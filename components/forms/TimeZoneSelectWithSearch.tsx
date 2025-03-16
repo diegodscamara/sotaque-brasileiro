@@ -62,11 +62,10 @@ export default function TimeZoneSelectWithSearch({
                 <PopoverTrigger asChild>
                     <Button
                         id={id}
-                        variant="outline"
+                        variant="trigger"
                         role="combobox"
                         aria-expanded={open}
                         disabled={disabled}
-                        className="justify-between bg-background hover:bg-background px-3 border-input outline-none focus-visible:outline-[3px] outline-offset-0 w-full font-normal"
                     >
                         <span className={cn("truncate", !value && "text-muted-foreground")}>
                             {value
@@ -91,7 +90,7 @@ export default function TimeZoneSelectWithSearch({
                             return normalizedValue.includes(normalizedSearch) ? 1 : 0;
                         }}
                     >
-                        <CommandInput placeholder="Search timezone..." />
+                        <CommandInput placeholder={placeholder} />
                         <CommandList>
                             <CommandEmpty>No timezone found.</CommandEmpty>
                             <CommandGroup>
