@@ -59,7 +59,7 @@ export default function Step1PersonalInfo({
     // Memoize the timezone initialization function
     const initializeTimezone = useCallback(() => {
         const supportedTimezones = Intl.supportedValuesOf("timeZone");
-        
+
         // If there's already a valid timezone in formData, don't override it
         if (formData.timeZone && supportedTimezones.includes(formData.timeZone)) {
             return;
@@ -300,8 +300,11 @@ export default function Step1PersonalInfo({
                         id="otherLanguages"
                         helpText={t("forms.learningPreferences.otherLanguagesHelp")}
                     >
-                        <MultiCombobox
-                            options={languages}
+                        <MultiSelectWithPlaceholderAndClear
+                            options={languages.map(lang => ({
+                                value: lang.id,
+                                label: lang.name
+                            }))}
                             values={formData.otherLanguages}
                             onChange={(values) => handleMultiSelectChange("otherLanguages", values)}
                             placeholder={t("forms.learningPreferences.otherLanguagesPlaceholder")}
