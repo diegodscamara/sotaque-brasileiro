@@ -8,6 +8,7 @@ import { forwardRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/libs/utils';
+import { Button } from '../ui/button';
 
 export interface Option {
   value: string;
@@ -440,7 +441,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
       >
         <div
           className={cn(
-            'min-h-10 rounded-md border border-input text-base md:text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+            'min-h-10 rounded-md border border-gray-300 dark:border-gray-500 text-base md:text-sm focus:border-none focus-visible:ring-primary-600 focus:outline-none focus:ring-green-700 dark:focus:ring-green-500 focus:border-green-700 dark:focus:border-green-500',
             {
               'px-3 py-2': selected.length !== 0,
               'cursor-text': !disabled && selected.length !== 0,
@@ -459,16 +460,21 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                   key={option.value}
                   className={cn(
                     'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
-                    'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                    'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground shadow-sm',
                     badgeClassName,
                   )}
                   data-fixed={option.fixed}
                   data-disabled={disabled || undefined}
                 >
                   {option.label}
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={disabled || option.fixed}
+                    title="Remove"
+                    aria-label="Remove"
                     className={cn(
-                      'ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                      'ml-1 p-0 h-4 w-4',
                       (disabled || option.fixed) && 'hidden',
                     )}
                     onKeyDown={(e) => {
@@ -482,8 +488,8 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     }}
                     onClick={() => handleUnselect(option)}
                   >
-                    <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-                  </button>
+                    <X />
+                  </Button>
                 </Badge>
               );
             })}
@@ -509,17 +515,22 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
               }}
               placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
               className={cn(
-                'flex-1 bg-transparent outline-none placeholder:text-muted-foreground',
+                'flex-1 border-none rounded-md bg-transparent focus-visible:ring-0 focus:ring-0 focus:border-none px-3 py-1 placeholder:text-gray-500 dark:placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                 {
                   'w-full': hidePlaceholderWhenSelected,
-                  'px-3 py-2': selected.length === 0,
-                  'ml-1': selected.length !== 0,
+                  'px-3 py-2 text-base': selected.length === 0,
+                  'ml-1 p-0.5 text-sm min-w-full': selected.length !== 0,
                 },
                 inputProps?.className,
               )}
             />
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              disabled={disabled}
+              title="Clear all"
+              aria-label="Clear all"
               onClick={() => {
                 setSelected(selected.filter((s) => s.fixed));
                 onChange?.(selected.filter((s) => s.fixed));
@@ -530,17 +541,17 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                   disabled ||
                   selected.length < 1 ||
                   selected.filter((s) => s.fixed).length === selected.length) &&
-                  'hidden',
+                'hidden',
               )}
             >
               <X />
-            </button>
+            </Button>
           </div>
         </div>
         <div className="relative">
           {open && (
             <CommandList
-              className="top-1 z-10 absolute bg-popover shadow-md border rounded-md outline-none w-full text-popover-foreground animate-in"
+              className="top-1 z-10 absolute bg-popover shadow-md border border-gray-300 dark:border-gray-500 rounded-md outline-none w-full text-popover-foreground animate-in"
               onMouseLeave={() => {
                 setOnScrollbar(false);
               }}
