@@ -7,8 +7,6 @@ import { motion } from "framer-motion";
 
 // UI Components
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MultiCombobox } from "@/components/ui/multi-combobox";
 import TimeZoneSelectWithSearch from "@/components/forms/TimeZoneSelectWithSearch";
 import CountryOptionsWithFlagAndSearch from "@/components/forms/CountryOptionsWithFlagAndSearch";
 import FormField from "@/components/forms/FormField";
@@ -44,14 +42,14 @@ interface Step1PersonalInfoProps {
  * @param {Step1PersonalInfoProps} props - Component props
  * @returns {React.JSX.Element} The personal information form
  */
-export default function Step1PersonalInfo({
+const Step1PersonalInfo = ({
     formData,
     errors,
     handleInputChange,
     handleSelectChange,
     handleMultiSelectChange,
     setErrors
-}: Step1PersonalInfoProps): React.JSX.Element {
+}: Step1PersonalInfoProps): React.JSX.Element => {
     // Translations
     const t = useTranslations("student.onboarding.step1");
     const locale = useLocale() as "en" | "es" | "fr" | "pt";
@@ -315,4 +313,6 @@ export default function Step1PersonalInfo({
             </FormSection>
         </motion.div>
     );
-} 
+};
+
+export default Step1PersonalInfo; 
