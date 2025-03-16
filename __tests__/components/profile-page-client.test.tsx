@@ -2,8 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Mock the components and context before importing anything
-jest.mock('@/app/[locale]/(authenticated)/profile/page-client', () => ({
-  ProfilePageClient: () => {
+jest.mock('@/app/[locale]/(portal)/profile/page-client', () => ({
+  __esModule: true,
+  default: () => {
     const [isLoading, setIsLoading] = React.useState(true);
     
     // Get the current context
@@ -74,12 +75,21 @@ jest.mock('@/contexts/user-context', () => {
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
+  useLocale: () => 'en',
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Now import the components after mocking
-const { ProfilePageClient } = require('@/app/[locale]/(authenticated)/profile/page-client');
-const { useUser, mockUserContext, mockRefetchUserData } = require('@/contexts/user-context');
+const ProfilePageClient = require('@/app/[locale]/(portal)/profile/page-client').default;
+const { useUser } = require('@/contexts/user-context');
+const mockUserContext = {
+  user: { id: 'user-123' },
+  profile: { id: 'profile-123' },
+  isLoading: false,
+  hasAccess: true,
+  error: null,
+  refetchUserData: jest.fn().mockResolvedValue(undefined),
+};
 
 describe('ProfilePageClient', () => {
   beforeEach(() => {
@@ -90,7 +100,7 @@ describe('ProfilePageClient', () => {
     // Override the useUser mock for this specific test
     if (Object.keys(userContextOverrides).length > 0) {
       const updatedContext = { ...mockUserContext, ...userContextOverrides };
-      useUser.mockReturnValue(updatedContext);
+      (useUser as jest.Mock).mockReturnValue(updatedContext);
     }
     
     return render(<ProfilePageClient />);
