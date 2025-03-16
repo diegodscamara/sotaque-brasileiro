@@ -47,10 +47,9 @@ export default function SelectWithSearch({
                 <PopoverTrigger asChild>
                     <Button
                         id={id}
-                        variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="justify-between bg-background hover:bg-background px-3 border-input outline-none focus-visible:outline-[3px] outline-offset-0 w-full font-normal"
+                        variant="trigger"
                     >
                         <span className={cn("truncate", !value && "text-muted-foreground")}>
                             {value
