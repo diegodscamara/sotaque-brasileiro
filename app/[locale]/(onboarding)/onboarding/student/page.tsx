@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { prisma } from "@/libs/prisma";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -19,16 +18,14 @@ import Step3Pricing from "./components/student-steps/Step3Pricing";
 import Stepper from "./components/Stepper";
 
 // Utils and API
-import { createClient } from "@/libs/supabase/client";
-import { getStudent } from "@/app/actions/students";
-import { getUser, updateUser } from "@/app/actions/users";
-import { editStudent } from "@/app/actions/students";
 import { scheduleClass, fetchClasses, cancelPendingClass } from "@/app/actions/classes";
 import { validateEmail } from "@/libs/utils/validation";
+import { updateUser } from "@/app/actions/users";
+import { updateStudent } from "@/app/actions/students";
 
 // Types
-import { OnboardingFormData, UserGender, Step1FormData, Step2FormData, ClassData } from "./types";
-import { Student } from "@/types";
+import { OnboardingFormData, UserGender, ClassData } from "./types";
+import { useUser } from "@/contexts/user-context";
 
 /**
  * StudentOnboarding component handles the student onboarding process with multiple steps
@@ -40,246 +37,213 @@ export default function StudentOnboarding(): React.JSX.Element {
   const tErrors = useTranslations("errors");
   const tFormActions = useTranslations("student.onboarding.step1.formActions");
 
-  // Form state
-  const [formData, setFormData] = useState<OnboardingFormData>({
+  // Get user data from context
+  const { profile, isLoading: isUserLoading, refetchUserData } = useUser();
+
+  // Form state - memoize initial state
+  const initialFormState = useMemo(() => ({
     // Personal details
-    firstName: "",
-    lastName: "",
-    email: "",
-    country: "",
-    gender: "prefer_not_to_say",
-    timeZone: "",
+    firstName: profile?.firstName || "",
+    lastName: profile?.lastName || "",
+    email: profile?.email || "",
+    country: profile?.country || "",
+    gender: profile?.gender || "prefer_not_to_say",
+    timeZone: profile?.timeZone || "",
 
     // Learning preferences
-    portugueseLevel: "",
-    nativeLanguage: "",
-    learningGoals: [],
-    otherLanguages: [],
+    portugueseLevel: profile?.portugueseLevel || "",
+    nativeLanguage: profile?.nativeLanguage || "",
+    learningGoals: profile?.learningGoals || [],
+    otherLanguages: profile?.otherLanguages || [],
 
     // Package details
-    customerId: "",
-    priceId: "",
-    packageName: "",
+    customerId: profile?.customerId || "",
+    priceId: profile?.priceId || "",
+    packageName: profile?.packageName || "",
 
     // Teacher selection and class scheduling
     selectedTeacher: null,
     selectedTimeSlot: null,
     notes: ""
-  });
+  }), [profile]);
+
+  // Form state
+  const [formData, setFormData] = useState<OnboardingFormData>(initialFormState);
 
   // UI state
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
-  const [studentData, setStudentData] = useState<Student | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   // Hooks
   const router = useRouter();
-  const supabase = createClient();
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true });
 
   // Refs to track initialization
-  const hasSetCountry = useRef(false);
   const hasLoadedUserData = useRef(false);
   const pendingClassRef = useRef<string | null>(null);
 
   /**
-   * Detects user's country from geolocation when component mounts
+   * Pre-fills form with user data from context and handles step navigation
    */
   useEffect(() => {
-    if (!hasSetCountry.current && !formData.country) {
-      // Try to get user's country from geolocation
-      const detectCountry = async () => {
-        try {
-          const response = await fetch('https://ipapi.co/json/');
-          const data = await response.json();
-          if (data.country) {
-            setFormData((prev: OnboardingFormData) => ({
-              ...prev,
-              country: data.country
-            }));
-            hasSetCountry.current = true;
+    if (!hasLoadedUserData.current && profile) {
+      try {
+        // Set the flag to prevent multiple calls
+        hasLoadedUserData.current = true;
+
+        // Check for step parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const stepParam = urlParams.get('step');
+
+        // If step parameter exists, set the current step
+        if (stepParam) {
+          const step = parseInt(stepParam, 10);
+          if (!isNaN(step) && step >= 1 && step <= 3) {
+            setCurrentStep(step);
+            // Mark previous steps as completed
+            const completedSteps = [];
+            for (let i = 1; i < step; i++) {
+              completedSteps.push(i);
+            }
+            setCompletedSteps(completedSteps);
+            // Save completed steps to localStorage
+            localStorage.setItem("onboardingCompletedSteps", JSON.stringify(completedSteps));
           }
-        } catch (error) {
-          console.error("Error detecting country:", error);
-        }
-      };
+        } else {
+          // Check localStorage for saved step and completed steps
+          const savedStep = localStorage.getItem("onboardingCurrentStep");
+          const savedCompletedSteps = localStorage.getItem("onboardingCompletedSteps");
 
-      detectCountry();
-    }
-  }, [formData.country]);
-
-  /**
-   * Fetches user data and pre-fills the form
-   */
-  useEffect(() => {
-    if (!hasLoadedUserData.current) {
-      const fetchUserData = async () => {
-        try {
-          setLoading(true);
-
-          // Set the flag to prevent multiple calls
-          hasLoadedUserData.current = true;
-
-          // Check for step parameter in URL
-          const urlParams = new URLSearchParams(window.location.search);
-          const stepParam = urlParams.get('step');
-
-          // If step parameter exists, set the current step
-          if (stepParam) {
-            const step = parseInt(stepParam, 10);
+          if (savedStep) {
+            const step = parseInt(savedStep, 10);
             if (!isNaN(step) && step >= 1 && step <= 3) {
-              setCurrentStep(step);
-              // Mark previous steps as completed
-              const completedSteps = [];
-              for (let i = 1; i < step; i++) {
-                completedSteps.push(i);
+              // Only set the step if we have completed steps data
+              if (savedCompletedSteps) {
+                try {
+                  const parsedCompletedSteps = JSON.parse(savedCompletedSteps);
+                  setCompletedSteps(parsedCompletedSteps);
+                  setCurrentStep(step);
+                } catch (error) {
+                  console.error("Error parsing completed steps:", error);
+                  // If there's an error parsing completed steps, reset to step 1
+                  setCurrentStep(1);
+                  setCompletedSteps([]);
+                  localStorage.setItem("onboardingCurrentStep", "1");
+                  localStorage.setItem("onboardingCompletedSteps", "[]");
+                }
+              } else {
+                // If no completed steps saved, reset to step 1
+                setCurrentStep(1);
+                setCompletedSteps([]);
+                localStorage.setItem("onboardingCurrentStep", "1");
+                localStorage.setItem("onboardingCompletedSteps", "[]");
               }
-              setCompletedSteps(completedSteps);
             }
           }
+        }
 
-          const { data: { user } } = await supabase.auth.getUser();
+        // Check for saved onboarding data in localStorage
+        const savedFormData = localStorage.getItem("onboardingFormData");
+        if (savedFormData) {
+          try {
+            const parsedFormData = JSON.parse(savedFormData);
+            
+            // Only use localStorage data for steps 2 and 3
+            // For step 1, always use profile data
+            const step1Data = {
+              firstName: profile.firstName || "",
+              lastName: profile.lastName || "",
+              email: profile.email || "",
+              country: profile.country || "",
+              gender: profile.gender || "prefer_not_to_say",
+              timeZone: profile.timeZone || "",
+              portugueseLevel: profile.portugueseLevel || "",
+              nativeLanguage: profile.nativeLanguage || "",
+              learningGoals: profile.learningGoals || [],
+              otherLanguages: profile.otherLanguages || []
+            };
 
-          if (!user) {
-            router.push("/signin");
-            return;
-          }
-
-          // Get user and student data from database first
-          const userData = await getUser(user.id);
-          const studentData = await getStudent(user.id);
-
-          // Check if we have existing data in the database
-          const hasExistingData = userData && (
-            userData.firstName ||
-            userData.lastName ||
-            userData.email ||
-            userData.country ||
-            userData.gender
-          );
-
-          // Check for saved onboarding data in localStorage
-          const savedFormData = localStorage.getItem("onboardingFormData");
-          let parsedFormData: Partial<OnboardingFormData> = {};
-
-          // Only use localStorage data if we don't have existing data in the database
-          // This prevents browser-cached data from being used for new users
-          let shouldRestoreFromLocalStorage = false;
-
-          if (savedFormData && !hasExistingData) {
-            try {
-              parsedFormData = JSON.parse(savedFormData);
-              shouldRestoreFromLocalStorage = true;
-            } catch (parseError) {
-              console.error("Error parsing saved form data:", parseError);
-              // Clear invalid localStorage data
-              localStorage.removeItem("onboardingFormData");
-            }
-          } else if (savedFormData && hasExistingData) {
-            // If we have existing data in the database, clear localStorage data
-            localStorage.removeItem("onboardingFormData");
-          }
-
-          if (userData) {
-            // Pre-fill form with existing user data, only using localStorage if no database data exists
-            setFormData((prev: OnboardingFormData) => ({
+            // Merge step 1 data with localStorage data for steps 2 and 3
+            setFormData(prev => ({
               ...prev,
-              firstName: userData.firstName || (shouldRestoreFromLocalStorage ? parsedFormData.firstName || "" : ""),
-              lastName: userData.lastName || (shouldRestoreFromLocalStorage ? parsedFormData.lastName || "" : ""),
-              email: userData.email || (shouldRestoreFromLocalStorage ? parsedFormData.email || "" : ""),
-              country: userData.country || (shouldRestoreFromLocalStorage ? parsedFormData.country || "" : prev.country),
-              gender: (userData.gender || (shouldRestoreFromLocalStorage ? parsedFormData.gender || "prefer_not_to_say" : "prefer_not_to_say")) as UserGender,
-              timeZone: studentData?.timeZone || (shouldRestoreFromLocalStorage ? parsedFormData.timeZone || "" : prev.timeZone),
-              portugueseLevel: studentData?.portugueseLevel || (shouldRestoreFromLocalStorage ? parsedFormData.portugueseLevel || "" : ""),
-              nativeLanguage: studentData?.nativeLanguage || (shouldRestoreFromLocalStorage ? parsedFormData.nativeLanguage || "" : ""),
-              learningGoals: studentData?.learningGoals || (shouldRestoreFromLocalStorage ? parsedFormData.learningGoals || [] : []),
-              otherLanguages: studentData?.otherLanguages || (shouldRestoreFromLocalStorage ? parsedFormData.otherLanguages || [] : []),
-              customerId: studentData?.customerId || "",
-              priceId: studentData?.priceId || "",
-              packageName: studentData?.packageName || "",
-              selectedTeacher: shouldRestoreFromLocalStorage && parsedFormData.selectedTeacher ? parsedFormData.selectedTeacher : null,
-              selectedTimeSlot: shouldRestoreFromLocalStorage && parsedFormData.selectedTimeSlot ? parsedFormData.selectedTimeSlot : null,
-              notes: shouldRestoreFromLocalStorage ? parsedFormData.notes || "" : "",
+              ...step1Data,
+              // Only use these fields from localStorage
+              selectedTeacher: parsedFormData.selectedTeacher || null,
+              selectedTimeSlot: parsedFormData.selectedTimeSlot ? {
+                ...parsedFormData.selectedTimeSlot,
+                startDateTime: new Date(parsedFormData.selectedTimeSlot.startDateTime),
+                endDateTime: new Date(parsedFormData.selectedTimeSlot.endDateTime)
+              } : null,
+              notes: parsedFormData.notes || "",
+              pendingClass: parsedFormData.pendingClass ? {
+                ...parsedFormData.pendingClass,
+                startDateTime: new Date(parsedFormData.pendingClass.startDateTime),
+                endDateTime: new Date(parsedFormData.pendingClass.endDateTime)
+              } : undefined
             }));
 
-            // Restore date/time objects if they exist in localStorage and no database data exists
-            if (shouldRestoreFromLocalStorage) {
-              if (parsedFormData.classStartDateTime) {
-                setFormData((prev: OnboardingFormData) => ({
-                  ...prev,
-                  classStartDateTime: new Date(String(parsedFormData.classStartDateTime))
-                }));
-              }
+            // Set completed steps based on available data
+            const completedStepsArray = [];
 
-              if (parsedFormData.classEndDateTime) {
-                setFormData((prev: OnboardingFormData) => ({
-                  ...prev,
-                  classEndDateTime: new Date(String(parsedFormData.classEndDateTime))
-                }));
-              }
+            // Step 1 is completed if all required fields are valid
+            if (step1Data.firstName && 
+                step1Data.lastName && 
+                step1Data.email && 
+                step1Data.timeZone && 
+                step1Data.country && 
+                step1Data.portugueseLevel && 
+                step1Data.nativeLanguage && 
+                step1Data.learningGoals && 
+                step1Data.learningGoals.length > 0) {
+              completedStepsArray.push(1);
+            }
 
-              // Restore pending class data if available
-              if (parsedFormData.pendingClass) {
-                const pendingClass = {
-                  ...parsedFormData.pendingClass,
-                  startDateTime: new Date(String(parsedFormData.pendingClass.startDateTime)),
-                  endDateTime: new Date(String(parsedFormData.pendingClass.endDateTime))
-                };
+            // Step 2 is completed if we have teacher and class details from localStorage
+            if (parsedFormData.pendingClass && parsedFormData.pendingClass.teacherId) {
+              completedStepsArray.push(2);
+            }
 
-                setFormData((prev: OnboardingFormData) => ({
-                  ...prev,
-                  pendingClass
-                }));
-              }
+            setCompletedSteps(completedStepsArray);
 
-              // Set completed steps based on available data
-              const completedStepsArray = [];
-
-              // Step 1 is completed if we have basic personal info
-              if (parsedFormData.firstName && parsedFormData.lastName && parsedFormData.email) {
-                completedStepsArray.push(1);
-              }
-
-              // Step 2 is completed if we have teacher and class details
-              if (parsedFormData.pendingClass && parsedFormData.pendingClass.teacherId) {
-                completedStepsArray.push(2);
-              }
-
-              setCompletedSteps(completedStepsArray);
-
-              // Navigate to the appropriate step
+            // Always start at step 1 if no steps are completed
+            if (completedStepsArray.length === 0) {
+              setCurrentStep(1);
+              localStorage.setItem("onboardingCurrentStep", "1");
+              localStorage.setItem("onboardingCompletedSteps", "[]");
+            } else {
+              // Navigate to the appropriate step only if previous steps are completed
               if (completedStepsArray.includes(2)) {
-                // If step 2 is completed, go to step 3 (pricing)
                 setCurrentStep(3);
+                localStorage.setItem("onboardingCurrentStep", "3");
               } else if (completedStepsArray.includes(1)) {
-                // If only step 1 is completed, go to step 2
                 setCurrentStep(2);
+                localStorage.setItem("onboardingCurrentStep", "2");
               }
             }
+          } catch (parseError) {
+            console.error("Error parsing saved form data:", parseError);
+            localStorage.removeItem("onboardingFormData");
+            // If localStorage data is invalid, just use profile data
+            setFormData(initialFormState);
           }
-
-          if (studentData) {
-            // Set student data
-            setStudentData(studentData as unknown as Student);
-
-            // If onboarding is already completed and user has access, redirect to dashboard
-            if (studentData.hasCompletedOnboarding && studentData.hasAccess) {
-              router.push("/dashboard");
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        } finally {
-          setLoading(false);
+        } else {
+          // If no localStorage data, use profile data
+          setFormData(initialFormState);
         }
-      };
 
-      fetchUserData();
+        // If onboarding is already completed and user has access, redirect to dashboard
+        if (profile.hasCompletedOnboarding && profile.hasAccess) {
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        setErrors({
+          general: error instanceof Error ? error.message : tErrors("unknownError")
+        });
+      }
     }
-  }, [router, supabase.auth]);
+  }, [profile, router, tErrors, initialFormState]);
 
   /**
    * Handles input change events for text inputs
@@ -303,14 +267,6 @@ export default function StudentOnboarding(): React.JSX.Element {
   };
 
   /**
-   * Handles date/time change events
-   */
-  const handleDateTimeChange = (name: string, value: Date): void => {
-    setFormData((prev: OnboardingFormData) => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: undefined }));
-  };
-
-  /**
    * Handles multi-select change events
    */
   const handleMultiSelectChange = (name: string, values: string[]): void => {
@@ -319,7 +275,30 @@ export default function StudentOnboarding(): React.JSX.Element {
   };
 
   /**
-   * Validates form inputs for the current step
+   * Validates form inputs for the current step without updating state
+   */
+  const validateStepFields = useCallback((step: number): boolean => {
+    if (step === 1) {
+      // Validate personal details and learning preferences
+      if (!formData.firstName) return false;
+      if (!formData.lastName) return false;
+      if (!formData.email || !validateEmail(formData.email)) return false;
+      if (!formData.timeZone) return false;
+      if (!formData.country) return false;
+      if (!formData.portugueseLevel) return false;
+      if (!formData.nativeLanguage) return false;
+      if (formData.learningGoals.length === 0) return false;
+    } else if (step === 2) {
+      // Validate teacher selection and class scheduling
+      if (!formData.selectedTeacher) return false;
+      if (!formData.selectedTimeSlot) return false;
+    }
+
+    return true;
+  }, [formData]);
+
+  /**
+   * Validates form inputs for the current step and updates error state
    */
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
@@ -368,11 +347,16 @@ export default function StudentOnboarding(): React.JSX.Element {
       }
     }
 
-    // Add validation for future steps here
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  /**
+   * Checks if the current step is valid without updating error state
+   */
+  const isCurrentStepValid = useCallback((): boolean => {
+    return validateStepFields(currentStep);
+  }, [currentStep, validateStepFields]);
 
   /**
    * Handles navigation to the next step
@@ -383,9 +367,8 @@ export default function StudentOnboarding(): React.JSX.Element {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
+      // Use context data instead of fetching
+      if (!profile?.userId) {
         router.push("/signin");
         return;
       }
@@ -394,57 +377,51 @@ export default function StudentOnboarding(): React.JSX.Element {
       if (currentStep === 1) {
         try {
           // Update user data
-          const userUpdateResult = await updateUser(user.id, {
+          const updateResult = await updateUser(profile.userId, {
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email,
             country: formData.country,
-            gender: formData.gender,
+            gender: formData.gender
           });
 
-          if (!userUpdateResult) {
+          if (!updateResult) {
             throw new Error(tErrors("failedToUpdateUser"));
           }
 
-          // Update or create student data
-          if (studentData) {
-            try {
-              // Create a partial student object with only the fields we want to update
-              const updateData = {
-                userId: studentData.userId,
-                timeZone: formData.timeZone || "Etc/UTC", // Ensure we have a fallback timezone
-                portugueseLevel: formData.portugueseLevel,
-                nativeLanguage: formData.nativeLanguage,
-                learningGoals: formData.learningGoals,
-                otherLanguages: formData.otherLanguages,
-                // Add placeholder values for required package fields
-                customerId: studentData.customerId || "pending",
-                priceId: studentData.priceId || "pending",
-                packageName: studentData.packageName || "pending",
-                // Preserve existing values
-                credits: studentData.credits,
-                hasAccess: studentData.hasAccess,
-                // We'll set this to true after all steps are completed
-                hasCompletedOnboarding: false
-              };
-
-              const studentUpdateResult = await editStudent(user.id, updateData as Student);
-
-              if (!studentUpdateResult) {
-                throw new Error(tErrors("failedToUpdateStudentProfile"));
-              }
-            } catch (studentUpdateError) {
-              console.error("Error updating student data:", studentUpdateError);
-              throw new Error(
-                studentUpdateError instanceof Error
-                  ? studentUpdateError.message
-                  : tErrors("failedToUpdateStudentProfile")
-              );
-            }
+          // Update student data
+          if (!profile?.id) {
+            throw new Error(tErrors("failedToUpdateStudent"));
           }
 
+          const studentUpdateResult = await updateStudent(profile.id, {
+            portugueseLevel: formData.portugueseLevel,
+            nativeLanguage: formData.nativeLanguage,
+            learningGoals: formData.learningGoals,
+            otherLanguages: formData.otherLanguages,
+            timeZone: formData.timeZone || "Etc/UTC",
+            customerId: profile.customerId || "pending",
+            priceId: profile.priceId || "pending",
+            packageName: profile.packageName || "pending",
+            credits: profile.credits,
+            hasAccess: profile.hasAccess,
+            hasCompletedOnboarding: false
+          });
+
+          if (!studentUpdateResult) {
+            throw new Error(tErrors("failedToUpdateStudent"));
+          }
+
+          // Refresh user data in context
+          await refetchUserData();
+
           // Mark this step as completed
-          setCompletedSteps(prev => [...prev, currentStep]);
+          const newCompletedSteps = [...completedSteps, currentStep];
+          setCompletedSteps(newCompletedSteps);
+          localStorage.setItem("onboardingCompletedSteps", JSON.stringify(newCompletedSteps));
+
+          // Save current step to localStorage
+          localStorage.setItem("onboardingCurrentStep", (currentStep + 1).toString());
 
           // Move to the next step
           setCurrentStep(prev => prev + 1);
@@ -467,52 +444,11 @@ export default function StudentOnboarding(): React.JSX.Element {
         }
 
         try {
-          // Get the latest student data
-          let updatedStudentData = await getStudent(user.id);
+          // Use student data from context
+          const studentId = profile?.id;
 
-          if (!updatedStudentData) {
-            console.log("No student record found yet. This is normal during onboarding. Creating a new student record.");
-
-            // Create a new student record with minimal data
-            try {
-              // Create a partial student object with only the fields we want to update
-              const newStudentData = {
-                userId: user.id,
-                timeZone: formData.timeZone || "Etc/UTC", // Ensure we have a fallback timezone
-                portugueseLevel: formData.portugueseLevel,
-                nativeLanguage: formData.nativeLanguage,
-                learningGoals: formData.learningGoals,
-                otherLanguages: formData.otherLanguages,
-                // Add placeholder values for required package fields
-                customerId: "pending",
-                priceId: "pending",
-                packageName: "pending",
-                // Set default values
-                credits: 0,
-                hasAccess: false,
-                // We'll set this to true after all steps are completed
-                hasCompletedOnboarding: false
-              };
-
-              // Create the student record
-              const newStudent = await prisma.student.create({
-                data: newStudentData
-              });
-
-              if (!newStudent) {
-                throw new Error(tErrors("failedToCreateStudentProfile"));
-              }
-
-              // Use the newly created student data
-              updatedStudentData = newStudent;
-            } catch (createStudentError) {
-              console.error("Error creating student data:", createStudentError);
-              throw new Error(
-                createStudentError instanceof Error
-                  ? createStudentError.message
-                  : tErrors("failedToCreateStudentProfile")
-              );
-            }
+          if (!studentId) {
+            throw new Error(tErrors("failedToCreateStudentProfile"));
           }
 
           // Store the current pending class ID before potentially cancelling it
@@ -522,19 +458,17 @@ export default function StudentOnboarding(): React.JSX.Element {
           try {
             // Fetch all pending classes for this specific student
             const existingPendingClasses = await fetchClasses({
-              studentId: updatedStudentData.id, // Explicitly filter by the current student's ID
+              studentId: studentId,
               status: "PENDING"
             });
 
             // Check if we have existing pending classes
             if (existingPendingClasses && existingPendingClasses.data && existingPendingClasses.data.length > 0) {
-              console.log(`Found ${existingPendingClasses.data.length} existing pending classes for student ID ${updatedStudentData.id}`);
-
               // Check if we're selecting the same class details
               const pendingClass = existingPendingClasses.data[0];
 
               // Double-check that this class belongs to the current student
-              if (pendingClass.studentId === updatedStudentData.id) {
+              if (pendingClass.studentId === studentId) {
                 existingPendingClassId = pendingClass.id;
 
                 // Only cancel if we're selecting a different teacher or time
@@ -544,17 +478,12 @@ export default function StudentOnboarding(): React.JSX.Element {
                 const isSameTime = Math.abs(pendingStartTime - selectedStartTime) < 60000; // Within 1 minute
 
                 if (!isSameTeacher || !isSameTime) {
-                  console.log(`Cancelling existing pending class ID ${pendingClass.id} as user selected different teacher/time`);
                   await cancelPendingClass(pendingClass.id);
                   existingPendingClassId = null;
-                } else {
-                  console.log(`User selected the same teacher and time, keeping existing pending class ID ${pendingClass.id}`);
                 }
               } else {
-                console.log(`Found pending class ID ${pendingClass.id} but it belongs to student ID ${pendingClass.studentId}, not current student ID ${updatedStudentData.id}`);
+                console.log(`Found pending class ID ${pendingClass.id} but it belongs to student ID ${pendingClass.studentId}, not current student ID ${studentId}`);
               }
-            } else {
-              console.log(`No existing pending classes found for student ID ${updatedStudentData.id}`);
             }
           } catch (cancelError) {
             console.error("Error handling existing pending classes:", cancelError);
@@ -567,7 +496,12 @@ export default function StudentOnboarding(): React.JSX.Element {
             pendingClassRef.current = existingPendingClassId;
 
             // Mark this step as completed
-            setCompletedSteps(prev => [...prev, currentStep]);
+            const newCompletedSteps = [...completedSteps, currentStep];
+            setCompletedSteps(newCompletedSteps);
+            localStorage.setItem("onboardingCompletedSteps", JSON.stringify(newCompletedSteps));
+
+            // Save current step to localStorage
+            localStorage.setItem("onboardingCurrentStep", (currentStep + 1).toString());
 
             // Move to the next step
             setCurrentStep(prev => prev + 1);
@@ -585,7 +519,7 @@ export default function StudentOnboarding(): React.JSX.Element {
           const classData: ClassData = {
             id: '', // Will be generated by the database
             teacherId: formData.selectedTeacher?.id || '',
-            studentId: updatedStudentData.id,
+            studentId: studentId,
             startDateTime: formData.selectedTimeSlot?.startDateTime || new Date(),
             endDateTime: formData.selectedTimeSlot?.endDateTime || new Date(),
             duration: durationMinutes,
@@ -610,7 +544,7 @@ export default function StudentOnboarding(): React.JSX.Element {
             ...prev,
             pendingClass: {
               teacherId: formData.selectedTeacher?.id || '',
-              studentId: updatedStudentData.id,
+              studentId: studentId,
               startDateTime: formData.selectedTimeSlot?.startDateTime || new Date(),
               endDateTime: formData.selectedTimeSlot?.endDateTime || new Date(),
               duration: durationMinutes,
@@ -620,7 +554,12 @@ export default function StudentOnboarding(): React.JSX.Element {
           }));
 
           // Mark this step as completed
-          setCompletedSteps(prev => [...prev, currentStep]);
+          const newCompletedSteps = [...completedSteps, currentStep];
+          setCompletedSteps(newCompletedSteps);
+          localStorage.setItem("onboardingCompletedSteps", JSON.stringify(newCompletedSteps));
+
+          // Save current step to localStorage
+          localStorage.setItem("onboardingCurrentStep", (currentStep + 1).toString());
 
           // Move to the next step
           setCurrentStep(prev => prev + 1);
@@ -647,6 +586,10 @@ export default function StudentOnboarding(): React.JSX.Element {
             } : undefined
           }));
 
+          // Clear the current step and completed steps from localStorage as onboarding is complete
+          localStorage.removeItem("onboardingCurrentStep");
+          localStorage.removeItem("onboardingCompletedSteps");
+
           // Mark this step as completed
           setCompletedSteps(prev => [...prev, currentStep]);
         } catch (storageError) {
@@ -658,7 +601,9 @@ export default function StudentOnboarding(): React.JSX.Element {
         }
       } else {
         // For future steps, just navigate to the next one
-        setCompletedSteps(prev => [...prev, currentStep]);
+        const newCompletedSteps = [...completedSteps, currentStep];
+        setCompletedSteps(newCompletedSteps);
+        localStorage.setItem("onboardingCompletedSteps", JSON.stringify(newCompletedSteps));
         setCurrentStep(prev => prev + 1);
       }
     } catch (error) {
@@ -676,12 +621,19 @@ export default function StudentOnboarding(): React.JSX.Element {
    */
   const handleStepChange = (step: number): void => {
     setCurrentStep(step);
+    // Save the current step to localStorage when manually changing steps
+    localStorage.setItem("onboardingCurrentStep", step.toString());
   };
 
   /**
    * Checks if a step is completed
    */
   const isStepCompleted = (step: number): boolean => {
+    // Step 1 is only completed if all required fields are valid
+    if (step === 1) {
+      return validateStepFields(1);
+    }
+    // For other steps, check if they're in the completed steps array
     return completedSteps.includes(step);
   };
 
@@ -765,9 +717,7 @@ export default function StudentOnboarding(): React.JSX.Element {
     const cleanupPendingClass = async () => {
       if (pendingClassRef.current) {
         try {
-          console.log(`Attempting to clean up pending class: ${pendingClassRef.current}`);
           await cancelPendingClass(pendingClassRef.current);
-          console.log(`Successfully cleaned up pending class: ${pendingClassRef.current}`);
         } catch (error) {
           console.error("Failed to clean up pending class:", error);
         }
@@ -811,9 +761,8 @@ export default function StudentOnboarding(): React.JSX.Element {
 
   return (
     <motion.section
-      ref={sectionRef}
       initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="mx-auto px-4 py-16 md:py-24 max-w-4xl container"
     >
@@ -867,7 +816,7 @@ export default function StudentOnboarding(): React.JSX.Element {
           <div className={currentStep > 1 ? "ml-auto" : "ml-auto"}>
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || !isCurrentStepValid()}
               variant="default"
             >
               {loading ? (
