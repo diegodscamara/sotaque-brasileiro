@@ -82,14 +82,7 @@ export async function getTeachers() {
     // Query all teachers with user information
     const teachers = await prisma.teacher.findMany({
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            email: true,
-            avatarUrl: true
-          }
-        }
+        user: true
       }
     });
 
