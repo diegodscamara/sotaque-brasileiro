@@ -4,7 +4,7 @@ import { createClient } from "@/libs/supabase/client";
 import { getStudent } from "@/app/actions/students";
 import { getTeacher } from "@/app/actions/teachers";
 import { getUser } from "@/app/actions/users";
-import { createContext, useContext, useEffect, useState, ReactNode, JSX } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, JSX, useCallback, useRef } from "react";
 
 interface UserData {
   id?: string;
@@ -32,6 +32,9 @@ interface UserData {
   // User properties
   country?: string;
   gender?: "male" | "female" | "other" | "prefer_not_to_say";
+  // Package and payment properties
+  customerId?: string;
+  priceId?: string;
 }
 
 interface UserContextType {
@@ -51,6 +54,9 @@ const UserContext = createContext<UserContextType>({
   error: null,
   refetchUserData: async () => {},
 });
+
+// Add cache duration (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000;
 
 // Helper function to ensure dates are converted to strings
 const formatDateToString = (date: Date | string | null | undefined): string | undefined => {
@@ -79,7 +85,22 @@ export function UserProvider({ children }: { children: ReactNode }): JSX.Element
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchUserData = async () => {
+  // Add cache ref
+  const cacheRef = useRef<{
+    timestamp: number;
+    data: UserData | null;
+  }>({ timestamp: 0, data: null });
+
+  const fetchUserData = useCallback(async (force: boolean = false) => {
+    // Check cache first
+    const now = Date.now();
+    if (!force && cacheRef.current.data && (now - cacheRef.current.timestamp) < CACHE_DURATION) {
+      setProfile(cacheRef.current.data);
+      setHasAccess(!!cacheRef.current.data?.hasAccess);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     
@@ -91,6 +112,7 @@ export function UserProvider({ children }: { children: ReactNode }): JSX.Element
         setUser(null);
         setProfile(null);
         setHasAccess(false);
+        cacheRef.current = { timestamp: now, data: null };
         return;
       }
 
@@ -113,12 +135,14 @@ export function UserProvider({ children }: { children: ReactNode }): JSX.Element
         ...userData,
         ...(profileData || {}),
         createdAt: formatDateToString(profileData?.createdAt || userData?.createdAt),
-        // Convert other potential Date objects
-        updatedAt: undefined, // Exclude updatedAt from UserData
-        // Ensure packageName is string or undefined, not null
         packageName: profileData?.packageName || undefined,
-        // Normalize role
         role: normalizedRole
+      };
+
+      // Update cache
+      cacheRef.current = {
+        timestamp: now,
+        data: mergedProfile
       };
 
       setProfile(mergedProfile);
@@ -129,22 +153,55 @@ export function UserProvider({ children }: { children: ReactNode }): JSX.Element
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // Listen for auth state changes
   useEffect(() => {
     const supabase = createClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      fetchUserData();
-    });
+    
+    // Set up real-time subscription for user profile changes
+    const userChannel = supabase.channel('user-profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${user?.id}`
+        },
+        () => {
+          // Invalidate cache and refetch on changes
+          fetchUserData(true);
+        }
+      )
+      .subscribe();
+
+    // Set up real-time subscription for role-specific changes
+    const roleChannel = user?.role ? supabase.channel('role-specific-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: user.role === 'student' ? 'students' : 'teachers',
+          filter: `userId=eq.${user.id}`
+        },
+        () => {
+          // Invalidate cache and refetch on changes
+          fetchUserData(true);
+        }
+      )
+      .subscribe()
+    : null;
 
     // Initial fetch
     fetchUserData();
 
     return () => {
-      subscription.unsubscribe();
+      userChannel.unsubscribe();
+      if (roleChannel) roleChannel.unsubscribe();
     };
-  }, []);
+  }, [fetchUserData, user?.id, user?.role]);
 
   return (
     <UserContext.Provider
@@ -154,7 +211,7 @@ export function UserProvider({ children }: { children: ReactNode }): JSX.Element
         hasAccess, 
         isLoading,
         error,
-        refetchUserData: fetchUserData
+        refetchUserData: () => fetchUserData(true)
       }}
     >
       {children}
