@@ -557,81 +557,224 @@
             },
             "step1": {
                 "forms": {
-                    "requiredField": "Ce champ est requis",
+                    "requiredField": "Ce champ est obligatoire",
                     "personalDetails": {
-                        "title": "Informations personnelles",
-                        "subtitle": "Dites-nous un peu sur vous pour personnaliser votre expérience",
+                        "title": "Informations Personnelles",
+                        "subtitle": "Parlez-nous un peu de vous pour personnaliser votre expérience",
                         "firstNameLabel": "Prénom",
                         "firstNamePlaceholder": "Entrez votre prénom",
-                        "firstNameError": "Prénom est requis",
+                        "firstNameError": "Le prénom est obligatoire",
                         "lastNameLabel": "Nom",
                         "lastNamePlaceholder": "Entrez votre nom",
-                        "lastNameError": "Nom est requis",
+                        "lastNameError": "Le nom est obligatoire",
                         "emailLabel": "Email",
                         "emailPlaceholder": "Entrez votre email",
-                        "emailError": "Email est requis",
-                        "timezoneLabel": "Fuseau horaire",
+                        "emailError": "L'email est obligatoire",
+                        "timezoneLabel": "Fuseau Horaire",
                         "timezonePlaceholder": "Sélectionnez votre fuseau horaire",
-                        "timezoneHelp": "Cela nous aide à planifier les leçons à des moments commodes pour vous",
-                        "timezoneError": "Fuseau horaire est requis",
+                        "timezoneHelp": "Cela nous aide à planifier les cours à des horaires qui vous conviennent",
+                        "detectingTimezone": "Détection du fuseau horaire...",
+                        "timezoneError": "Le fuseau horaire est obligatoire",
                         "countryLabel": "Pays",
                         "countryPlaceholder": "Sélectionnez votre pays",
-                        "countryError": "Pays est requis",
+                        "countryError": "Le pays est obligatoire",
                         "genderLabel": "Genre",
                         "genderPlaceholder": "Sélectionnez votre genre (optionnel)",
-                        "genderError": "Genre est requis",
-                        "genderHelp": "Cette information nous aide à comprendre le profil de nos étudiants"
+                        "genderHelp": "Cette information nous aide à comprendre le profil de nos étudiants",
+                        "genderError": "Le genre est obligatoire",
+                        "genderOptions": {
+                            "male": "Masculin",
+                            "female": "Féminin",
+                            "other": "Autre",
+                            "non_binary": "Non-binaire",
+                            "prefer_not_to_say": "Je préfère ne pas dire"
+                        }
                     },
                     "learningPreferences": {
-                        "title": "Préférences d'apprentissage",
+                        "title": "Préférences d'Apprentissage",
                         "subtitle": "Aidez-nous à comprendre vos objectifs d'apprentissage et votre parcours",
-                        "portugueseLevelLabel": "Niveau de portugais",
+                        "portugueseLevelLabel": "Niveau de Portugais",
                         "portugueseLevelPlaceholder": "Sélectionnez votre niveau actuel",
-                        "portugueseLevelHelp": "Soyez honnête sur votre niveau actuel pour que nous puissions vous mettre en relation avec les bonnes classes",
-                        "nativeLanguageLabel": "Langue maternelle",
+                        "portugueseLevelHelp": "Soyez honnête sur votre niveau actuel pour que nous puissions vous associer aux cours appropriés",
+                        "portugueseLevelError": "Le niveau de portugais est obligatoire",
+                        "portugueseLevelOptions": {
+                            "beginner": "Débutant",
+                            "elementary": "Élémentaire",
+                            "intermediate": "Intermédiaire",
+                            "upper_intermediate": "Intermédiaire Supérieur",
+                            "advanced": "Avancé",
+                            "proficient": "Maîtrise",
+                            "native": "Natif",
+                            "unknown": "Inconnu"
+                        },
+                        "nativeLanguageLabel": "Langue Maternelle",
                         "nativeLanguagePlaceholder": "Sélectionnez votre langue maternelle",
-                        "learningGoalsLabel": "Objectifs d'apprentissage",
+                        "nativeLanguageHelp": "Cela nous aide à comprendre votre parcours d'apprentissage des langues",
+                        "nativeLanguageError": "La langue maternelle est obligatoire",
+                        "nativeLanguageNotFoundMessage": "Nous n'avons pas trouvé votre langue maternelle. Veuillez sélectionner une autre langue.",
+                        "learningGoalsLabel": "Objectifs d'Apprentissage",
                         "learningGoalsPlaceholder": "Sélectionnez vos objectifs d'apprentissage",
                         "learningGoalsHelp": "Qu'espérez-vous accomplir en apprenant le portugais ?",
-                        "otherLanguagesLabel": "Autres langues",
+                        "learningGoalsError": "Les objectifs d'apprentissage sont obligatoires",
+                        "otherLanguagesLabel": "Autres Langues",
                         "otherLanguagesPlaceholder": "Sélectionnez d'autres langues que vous parlez",
-                        "otherLanguagesHelp": "Cela nous aide à comprendre votre parcours d'apprentissage des langues"
+                        "otherLanguagesHelp": "Cela nous aide à comprendre votre parcours d'apprentissage des langues",
+                        "otherLanguagesError": "Les autres langues sont obligatoires",
+                        "nativeLanguageNonFoundMessage": "Aucune langue trouvée."
                     }
                 },
                 "dataPrivacy": {
-                    "text": "Votre vie privée est importante pour nous. Nous ne partagerons pas vos informations sans votre consentement. Vous souhaitez en savoir plus ? Consultez notre",
+                    "text": "Votre vie privée est importante pour nous. Nous n'utiliserons vos informations que pour personnaliser votre parcours d'apprentissage et ne les partagerons pas sans votre consentement. Curieux ? Consultez notre",
                     "link": "/privacy-policy",
-                    "linkText": "Politique de confidentialité"
+                    "linkText": "Politique de Confidentialité"
                 },
                 "formActions": {
                     "back": "Retour",
-                    "next": "Étape suivante",
+                    "next": "Étape Suivante",
                     "submit": "Envoyer",
                     "cancel": "Annuler",
                     "loading": "Chargement..."
                 }
+            },
+            "step2": {
+                "step": "ÉTAPE 2",
+                "title": "Réservez Votre Premier Cours",
+                "description": "Choisissez un professeur et planifiez votre premier cours pour commencer votre parcours d'apprentissage.",
+                "tabs": {
+                    "teachers": "Sélectionnez un Professeur",
+                    "schedule": "Planifiez un Cours"
+                },
+                "selectTeacher": "Sélectionner un Professeur",
+                "teacherSelected": "Professeur Sélectionné",
+                "noTeachersAvailable": "Aucun professeur disponible pour le moment. Veuillez réessayer plus tard.",
+                "schedule": {
+                    "title": "Choisissez l'Horaire de Votre Cours",
+                    "selectDate": "Sélectionnez une Date",
+                    "selectTime": "Sélectionnez une Heure",
+                    "noTimeSlotsAvailable": "Aucun créneau disponible pour cette date. Veuillez sélectionner une autre date.",
+                    "selectDateFirst": "Veuillez d'abord sélectionner une date pour voir les créneaux disponibles.",
+                    "loadingTimeSlots": "Chargement des créneaux disponibles...",
+                    "timeSlotSelected": "Créneau sélectionné",
+                    "timeSlotNotFound": "Créneau non trouvé",
+                    "availabilityError": "Échec du chargement de la disponibilité du professeur. Veuillez réessayer ou sélectionner une autre date.",
+                    "noAvailability": "Aucune disponibilité trouvée pour ce professeur à la date sélectionnée."
+                },
+                "reservation": {
+                    "timeSlotReserved": "Créneau réservé",
+                    "reservationNotFound": "Réservation non trouvée",
+                    "reservationError": "Échec du chargement de la réservation. Veuillez réessayer ou sélectionner une autre date.",
+                    "reservationNoAvailability": "Aucune disponibilité trouvée pour ce professeur à la date sélectionnée.",
+                    "expiresIn": "Expire dans {time}",
+                    "lastUpdated": "Dernière mise à jour {time}",
+                    "refresh": "Actualiser",
+                    "refreshing": "Actualisation...",
+                    "refreshAvailability": "Actualiser la Disponibilité"
+                },
+                "existingPendingClass": "Vous avez un cours en attente",
+                "pendingClassDescription": "Nous avons trouvé un cours en attente existant. Vous pouvez continuer avec ce cours ou sélectionner un horaire/professeur différent. Si vous sélectionnez une option différente, le cours en attente précédent sera annulé.",
+                "notes": {
+                    "title": "Notes du Cours",
+                    "placeholder": "Ajoutez des notes pour votre professeur concernant ce que vous souhaitez aborder dans ce cours, vos préférences d'apprentissage ou toute question que vous avez."
+                },
+                "summary": {
+                    "title": "Résumé du Cours",
+                    "teacherInfo": "Informations sur le Professeur",
+                    "dateTime": "Date et Heure",
+                    "duration": "Durée",
+                    "minutes": "{duration} minutes"
+                },
+                "errors": {
+                    "classStartDateTime": "Veuillez sélectionner une date et une heure pour votre cours.",
+                    "teacherRequired": "Veuillez sélectionner un professeur pour continuer.",
+                    "timeSlotRequired": "Veuillez sélectionner un créneau horaire pour continuer.",
+                    "refreshAvailability": "Échec du chargement de la disponibilité du professeur. Veuillez réessayer ou sélectionner une autre date.",
+                    "slotNoLongerAvailable": "Le créneau sélectionné n'est plus disponible. Veuillez sélectionner un autre créneau.",
+                    "failedToLoadTeachers": "Échec du chargement des professeurs. Veuillez réessayer plus tard."
+                },
+                "requiredSelections": "Sélections requises",
+                "validationComplete": "Toutes les sélections sont complètes",
+                "validationIncomplete": "Veuillez compléter toutes les sélections requises",
+                "readyForNextStep": "Vous êtes prêt à passer à l'étape suivante",
+                "completeAllSelections": "Veuillez compléter toutes les sélections requises avant de continuer",
+                "selectTeacherRequired": "Sélectionnez un professeur",
+                "selectDateRequired": "Sélectionnez une date",
+                "selectTimeRequired": "Sélectionnez un horaire"
+            },
+            "step3": {
+                "step": "Étape 3",
+                "title": "Confirmez vos informations",
+                "subtitle": "Revoyez et confirmez vos informations avant de finaliser votre inscription."
+            },
+            "seo": {
+                "title": "Apprenez le portugais avec des instructeurs natifs",
+                "seoDescription": "Transformez votre portugais avec des classes personnalisées et culturellement immersives adaptées à votre emploi du temps et à vos objectifs, dispensées par des instructeurs brésiliens natifs.",
+                "keywords": "apprentissage du portugais, portugais brésilien, cours de langues, cours en ligne, instructeurs natifs, immersion culturelle, éducation linguistique, culture brésilienne, apprentissage personnalisé, emploi du temps flexible",
+                "ogImageAlt": "Sotaque Brasileiro - Apprenez le portugais avec des instructeurs natifs"
             }
         },
         "step2": {
-            "step": "Étape 2",
-            "title": "Choisissez votre offre",
-            "subtitle": "Sélectionnez l'offre qui correspond le mieux à vos objectifs et à votre emploi du temps.",
-            "reservation": {
-                "existingPendingClass": "Vous avez un cours en attente",
-                "pendingClassDescription": "Nous avons trouvé un cours en attente existant. Vous pouvez continuer avec ce cours ou sélectionner un horaire/professeur différent. Si vous sélectionnez une option différente, le cours en attente précédent sera annulé."
+            "step": "ÉTAPE 2",
+            "title": "Réservez Votre Premier Cours",
+            "description": "Choisissez un professeur et planifiez votre premier cours pour commencer votre parcours d'apprentissage.",
+            "tabs": {
+                "teachers": "Sélectionnez un Professeur",
+                "schedule": "Planifiez un Cours"
             },
-            "checkout": {
-                "cancelled": {
-                    "title": "Paiement Annulé",
-                    "description": "Votre processus de paiement a été annulé ou a rencontré une erreur.",
-                    "message": "Nous avons nettoyé votre réservation de cours en attente. Vous pouvez réessayer ou sélectionner un horaire de cours différent.",
-                    "loading": "Nettoyage de votre cours en attente...",
-                    "pendingClassCancelled": "Cours en Attente Annulé",
-                    "pendingClassCancelledDescription": "Votre cours en attente précédent a été annulé. Vous pouvez sélectionner un nouvel horaire ou réessayer le paiement.",
-                    "goBackToTeacherSelection": "Sélectionner un Nouvel Horaire",
-                    "retryCheckout": "Réessayer le Paiement"
-                }
-            }
+            "selectTeacher": "Sélectionner un Professeur",
+            "teacherSelected": "Professeur Sélectionné",
+            "noTeachersAvailable": "Aucun professeur disponible pour le moment. Veuillez réessayer plus tard.",
+            "schedule": {
+                "title": "Choisissez l'Horaire de Votre Cours",
+                "selectDate": "Sélectionnez une Date",
+                "selectTime": "Sélectionnez une Heure",
+                "noTimeSlotsAvailable": "Aucun créneau disponible pour cette date. Veuillez sélectionner une autre date.",
+                "selectDateFirst": "Veuillez d'abord sélectionner une date pour voir les créneaux disponibles.",
+                "loadingTimeSlots": "Chargement des créneaux disponibles...",
+                "timeSlotSelected": "Créneau sélectionné",
+                "timeSlotNotFound": "Créneau non trouvé",
+                "availabilityError": "Échec du chargement de la disponibilité du professeur. Veuillez réessayer ou sélectionner une autre date.",
+                "noAvailability": "Aucune disponibilité trouvée pour ce professeur à la date sélectionnée."
+            },
+            "reservation": {
+                "timeSlotReserved": "Créneau réservé",
+                "reservationNotFound": "Réservation non trouvée",
+                "reservationError": "Échec du chargement de la réservation. Veuillez réessayer ou sélectionner une autre date.",
+                "reservationNoAvailability": "Aucune disponibilité trouvée pour ce professeur à la date sélectionnée.",
+                "expiresIn": "Expire dans {time}",
+                "lastUpdated": "Dernière mise à jour {time}",
+                "refresh": "Actualiser",
+                "refreshing": "Actualisation...",
+                "refreshAvailability": "Actualiser la Disponibilité"
+            },
+            "existingPendingClass": "Vous avez un cours en attente",
+            "pendingClassDescription": "Nous avons trouvé un cours en attente existant. Vous pouvez continuer avec ce cours ou sélectionner un horaire/professeur différent. Si vous sélectionnez une option différente, le cours en attente précédent sera annulé.",
+            "notes": {
+                "title": "Notes du Cours",
+                "placeholder": "Ajoutez des notes pour votre professeur concernant ce que vous souhaitez aborder dans ce cours, vos préférences d'apprentissage ou toute question que vous avez."
+            },
+            "summary": {
+                "title": "Résumé du Cours",
+                "teacherInfo": "Informations sur le Professeur",
+                "dateTime": "Date et Heure",
+                "duration": "Durée",
+                "minutes": "{duration} minutes"
+            },
+            "errors": {
+                "classStartDateTime": "Veuillez sélectionner une date et une heure pour votre cours.",
+                "teacherRequired": "Veuillez sélectionner un professeur pour continuer.",
+                "timeSlotRequired": "Veuillez sélectionner un créneau horaire pour continuer.",
+                "refreshAvailability": "Échec du chargement de la disponibilité du professeur. Veuillez réessayer ou sélectionner une autre date.",
+                "slotNoLongerAvailable": "Le créneau sélectionné n'est plus disponible. Veuillez sélectionner un autre créneau.",
+                "failedToLoadTeachers": "Échec du chargement des professeurs. Veuillez réessayer plus tard."
+            },
+            "requiredSelections": "Sélections requises",
+            "validationComplete": "Toutes les sélections sont complètes",
+            "validationIncomplete": "Veuillez compléter toutes les sélections requises",
+            "readyForNextStep": "Vous êtes prêt à passer à l'étape suivante",
+            "completeAllSelections": "Veuillez compléter toutes les sélections requises avant de continuer",
+            "selectTeacherRequired": "Sélectionnez un professeur",
+            "selectDateRequired": "Sélectionnez une date",
+            "selectTimeRequired": "Sélectionnez un horaire"
         },
         "step3": {
             "step": "Étape 3",

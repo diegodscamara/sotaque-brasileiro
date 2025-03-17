@@ -559,10 +559,10 @@
                 "forms": {
                     "requiredField": "Este campo é obrigatório",
                     "personalDetails": {
-                        "title": "Informações pessoais",
-                        "subtitle": "Diga-nos um pouco sobre você para personalizarmos sua experiência",
+                        "title": "Informações Pessoais",
+                        "subtitle": "Conte-nos um pouco sobre você para personalizarmos sua experiência",
                         "firstNameLabel": "Nome",
-                        "firstNamePlaceholder": "Digite seu primeiro nome",
+                        "firstNamePlaceholder": "Digite seu nome",
                         "firstNameError": "Nome é obrigatório",
                         "lastNameLabel": "Sobrenome",
                         "lastNamePlaceholder": "Digite seu sobrenome",
@@ -570,72 +570,212 @@
                         "emailLabel": "Email",
                         "emailPlaceholder": "Digite seu email",
                         "emailError": "Email é obrigatório",
-                        "timezoneLabel": "Fuso horário",
+                        "timezoneLabel": "Fuso Horário",
                         "timezonePlaceholder": "Selecione seu fuso horário",
-                        "timezoneHelp": "Isso nos ajuda a agendar aulas em momentos convenientes para você",
+                        "timezoneHelp": "Isso nos ajuda a agendar aulas em horários convenientes para você",
+                        "detectingTimezone": "Detectando fuso horário...",
                         "timezoneError": "Fuso horário é obrigatório",
                         "countryLabel": "País",
                         "countryPlaceholder": "Selecione seu país",
                         "countryError": "País é obrigatório",
                         "genderLabel": "Gênero",
                         "genderPlaceholder": "Selecione seu gênero (opcional)",
+                        "genderHelp": "Esta informação nos ajuda a entender o perfil de nossos alunos",
                         "genderError": "Gênero é obrigatório",
-                        "genderHelp": "Esta informação nos ajuda a entender o perfil de nossos alunos"
+                        "genderOptions": {
+                            "male": "Masculino",
+                            "female": "Feminino",
+                            "other": "Outro",
+                            "non_binary": "Não-binário",
+                            "prefer_not_to_say": "Prefiro não dizer"
+                        },
+                        "nativeLanguageNonFoundMessage": "Nenhum idioma encontrado."
                     },
                     "learningPreferences": {
-                        "title": "Preferências de aprendizado",
-                        "subtitle": "Ajude-nos a entender seus objetivos de aprendizado e seu background",
-                        "portugueseLevelLabel": "Nível de português",
+                        "title": "Preferências de Aprendizado",
+                        "subtitle": "Ajude-nos a entender seus objetivos de aprendizado e seu histórico",
+                        "portugueseLevelLabel": "Nível de Português",
                         "portugueseLevelPlaceholder": "Selecione seu nível atual",
-                        "portugueseLevelHelp": "Seja honesto sobre seu nível atual para que possamos te emparelhar com as aulas certas",
+                        "portugueseLevelHelp": "Seja honesto sobre seu nível atual para que possamos combinar você com as aulas certas",
                         "portugueseLevelError": "Nível de português é obrigatório",
-                        "nativeLanguageLabel": "Idioma nativo",
+                        "portugueseLevelOptions": {
+                            "beginner": "Iniciante",
+                            "elementary": "Elementar",
+                            "intermediate": "Intermediário",
+                            "upper_intermediate": "Intermediário Avançado",
+                            "advanced": "Avançado",
+                            "proficient": "Proficiente",
+                            "native": "Nativo",
+                            "unknown": "Desconhecido"
+                        },
+                        "nativeLanguageLabel": "Idioma Nativo",
                         "nativeLanguagePlaceholder": "Selecione seu idioma nativo",
+                        "nativeLanguageHelp": "Isso nos ajuda a entender seu histórico de aprendizado de idiomas",
                         "nativeLanguageError": "Idioma nativo é obrigatório",
-                        "learningGoalsLabel": "Objetivos de aprendizado",
+                        "nativeLanguageNotFoundMessage": "Não encontramos seu idioma nativo. Por favor, selecione outro idioma.",
+                        "learningGoalsLabel": "Objetivos de Aprendizado",
                         "learningGoalsPlaceholder": "Selecione seus objetivos de aprendizado",
                         "learningGoalsHelp": "O que você espera alcançar ao aprender português?",
-                        "learningGoalsError": "Objetivos de aprendizado é obrigatório",
-                        "otherLanguagesLabel": "Outros idiomas",
+                        "learningGoalsError": "Objetivos de aprendizado são obrigatórios",
+                        "otherLanguagesLabel": "Outros Idiomas",
                         "otherLanguagesPlaceholder": "Selecione outros idiomas que você fala",
-                        "otherLanguagesError": "Outros idiomas é obrigatório",
-                        "otherLanguagesHelp": "Isso nos ajuda a entender seu background de aprendizado de idiomas"
+                        "otherLanguagesHelp": "Isso nos ajuda a entender seu histórico de aprendizado de idiomas",
+                        "otherLanguagesError": "Outros idiomas são obrigatórios",
+                        "nativeLanguageNonFoundMessage": "Nenhum idioma encontrado."
                     }
                 },
                 "dataPrivacy": {
-                    "text": "Sua privacidade é importante para nós. Usaremos apenas suas informações para personalizar sua jornada de aprendizado e não compartilharemos sem seu consentimento. Curioso? Confira nossa",
+                    "text": "Sua privacidade é importante para nós. Usaremos suas informações apenas para personalizar sua jornada de aprendizado e não as compartilharemos sem seu consentimento. Curioso? Confira nossa",
                     "link": "/privacy-policy",
-                    "linkText": "Política de privacidade"
+                    "linkText": "Política de Privacidade"
                 },
                 "formActions": {
                     "back": "Voltar",
-                    "next": "Próximo passo",
+                    "next": "Próximo Passo",
                     "submit": "Enviar",
                     "cancel": "Cancelar",
                     "loading": "Carregando..."
                 }
             },
-            "reservation": {
+            "step2": {
+                "step": "ETAPA 2",
+                "title": "Agende Sua Primeira Aula",
+                "description": "Escolha um professor e agende sua primeira aula para começar sua jornada de aprendizado.",
+                "tabs": {
+                    "teachers": "Selecionar Professor",
+                    "schedule": "Agendar Aula"
+                },
+                "selectTeacher": "Selecionar Professor",
+                "teacherSelected": "Professor Selecionado",
+                "noTeachersAvailable": "Nenhum professor disponível no momento. Por favor, tente novamente mais tarde.",
+                "schedule": {
+                    "title": "Escolha o Horário da sua Aula",
+                    "selectDate": "Selecione uma Data",
+                    "selectTime": "Selecione um Horário",
+                    "noTimeSlotsAvailable": "Não há horários disponíveis para esta data. Por favor, selecione outra data.",
+                    "selectDateFirst": "Por favor, selecione uma data primeiro para ver os horários disponíveis.",
+                    "loadingTimeSlots": "Carregando horários disponíveis...",
+                    "timeSlotSelected": "Horário selecionado",
+                    "timeSlotNotFound": "Horário não encontrado",
+                    "availabilityError": "Falha ao carregar a disponibilidade do professor. Por favor, tente novamente ou selecione uma data diferente.",
+                    "noAvailability": "Nenhuma disponibilidade encontrada para este professor na data selecionada."
+                },
+                "reservation": {
+                    "timeSlotReserved": "Horário reservado",
+                    "reservationNotFound": "Reserva não encontrada",
+                    "reservationError": "Falha ao carregar a reserva. Por favor, tente novamente ou selecione uma data diferente.",
+                    "reservationNoAvailability": "Nenhuma disponibilidade encontrada para este professor na data selecionada.",
+                    "expiresIn": "Expira em {time}",
+                    "lastUpdated": "Última atualização {time}",
+                    "refresh": "Atualizar",
+                    "refreshing": "Atualizando...",
+                    "refreshAvailability": "Atualizar Disponibilidade"
+                },
                 "existingPendingClass": "Você tem uma aula pendente",
-                "pendingClassDescription": "Encontramos uma aula pendente existente. Você pode continuar com esta aula ou selecionar um horário/professor diferente. Se você selecionar uma opção diferente, a aula pendente anterior será cancelada."
+                "pendingClassDescription": "Encontramos uma aula pendente existente. Você pode continuar com esta aula ou selecionar um horário/professor diferente. Se você selecionar uma opção diferente, a aula pendente anterior será cancelada.",
+                "notes": {
+                    "title": "Notas da Aula",
+                    "placeholder": "Adicione notas para seu professor sobre o que você gostaria de focar nesta aula, suas preferências de aprendizado ou quaisquer dúvidas que você tenha."
+                },
+                "summary": {
+                    "title": "Resumo da Aula",
+                    "teacherInfo": "Informações do Professor",
+                    "dateTime": "Data e Hora",
+                    "duration": "Duração",
+                    "minutes": "{duration} minutos"
+                },
+                "errors": {
+                    "classStartDateTime": "Por favor, selecione uma data e hora para sua aula.",
+                    "teacherRequired": "Por favor, selecione um professor para continuar.",
+                    "timeSlotRequired": "Por favor, selecione um horário para continuar.",
+                    "refreshAvailability": "Falha ao carregar a disponibilidade do professor. Por favor, tente novamente ou selecione uma data diferente.",
+                    "slotNoLongerAvailable": "O horário selecionado não está mais disponível. Por favor, selecione outro horário.",
+                    "failedToLoadTeachers": "Falha ao carregar professores. Por favor, tente novamente mais tarde."
+                },
+                "requiredSelections": "Seleções obrigatórias",
+                "validationComplete": "Todas as seleções completas",
+                "validationIncomplete": "Por favor, complete todas as seleções obrigatórias",
+                "readyForNextStep": "Você está pronto para prosseguir para o próximo passo",
+                "completeAllSelections": "Por favor, complete todas as seleções obrigatórias antes de prosseguir",
+                "selectTeacherRequired": "Selecione um professor",
+                "selectDateRequired": "Selecione uma data",
+                "selectTimeRequired": "Selecione um horário"
             },
-            "checkout": {
-                "cancelled": {
-                    "title": "Pagamento Cancelado",
-                    "description": "Seu processo de pagamento foi cancelado ou encontrou um erro.",
-                    "message": "Limpamos sua reserva de aula pendente. Você pode tentar novamente ou selecionar um horário de aula diferente.",
-                    "loading": "Limpando sua aula pendente...",
-                    "pendingClassCancelled": "Aula Pendente Cancelada",
-                    "pendingClassCancelledDescription": "Sua aula pendente anterior foi cancelada. Você pode selecionar um novo horário ou tentar o pagamento novamente.",
-                    "goBackToTeacherSelection": "Selecionar Novo Horário",
-                    "retryCheckout": "Tentar Pagamento Novamente"
-                }
+            "step3": {
+                "step": "PASSO 3",
+                "title": "Confirme seus detalhes",
+                "subtitle": "Revise e confirme suas informações antes de finalizar seu registro."
+            },
+            "seo": {
+                "title": "Aprenda português com instrutores nativos",
+                "seoDescription": "Transforme seu português com aulas personalizadas e culturalmente imersivas adaptadas ao seu horário e objetivos, ministradas por instrutores brasileiros nativos.",
+                "keywords": "aprendizado de português, português brasileiro, cursos de idiomas, aulas online, instrutores nativos, imersão cultural, educação linguística, cultura brasileira, aprendizado personalizado, horário flexível",
+                "ogImageAlt": "Sotaque Brasileiro - Aprenda português com instrutores nativos"
             }
         },
         "step2": {
-            "step": "PASSO 2",
-            "title": "Escolha seu plano",
-            "subtitle": "Selecione o plano que melhor se adapta aos seus objetivos e ao seu horário."
+            "step": "ETAPA 2",
+            "title": "Agende Sua Primeira Aula",
+            "description": "Escolha um professor e agende sua primeira aula para começar sua jornada de aprendizado.",
+            "tabs": {
+                "teachers": "Selecionar Professor",
+                "schedule": "Agendar Aula"
+            },
+            "selectTeacher": "Selecionar Professor",
+            "teacherSelected": "Professor Selecionado",
+            "noTeachersAvailable": "Nenhum professor disponível no momento. Por favor, tente novamente mais tarde.",
+            "schedule": {
+                "title": "Escolha o Horário da sua Aula",
+                "selectDate": "Selecione uma Data",
+                "selectTime": "Selecione um Horário",
+                "noTimeSlotsAvailable": "Não há horários disponíveis para esta data. Por favor, selecione outra data.",
+                "selectDateFirst": "Por favor, selecione uma data primeiro para ver os horários disponíveis.",
+                "loadingTimeSlots": "Carregando horários disponíveis...",
+                "timeSlotSelected": "Horário selecionado",
+                "timeSlotNotFound": "Horário não encontrado",
+                "availabilityError": "Falha ao carregar a disponibilidade do professor. Por favor, tente novamente ou selecione uma data diferente.",
+                "noAvailability": "Nenhuma disponibilidade encontrada para este professor na data selecionada."
+            },
+            "reservation": {
+                "timeSlotReserved": "Horário reservado",
+                "reservationNotFound": "Reserva não encontrada",
+                "reservationError": "Falha ao carregar a reserva. Por favor, tente novamente ou selecione uma data diferente.",
+                "reservationNoAvailability": "Nenhuma disponibilidade encontrada para este professor na data selecionada.",
+                "expiresIn": "Expira em {time}",
+                "lastUpdated": "Última atualização {time}",
+                "refresh": "Atualizar",
+                "refreshing": "Atualizando...",
+                "refreshAvailability": "Atualizar Disponibilidade"
+            },
+            "existingPendingClass": "Você tem uma aula pendente",
+            "pendingClassDescription": "Encontramos uma aula pendente existente. Você pode continuar com esta aula ou selecionar um horário/professor diferente. Se você selecionar uma opção diferente, a aula pendente anterior será cancelada.",
+            "notes": {
+                "title": "Notas da Aula",
+                "placeholder": "Adicione notas para seu professor sobre o que você gostaria de focar nesta aula, suas preferências de aprendizado ou quaisquer dúvidas que você tenha."
+            },
+            "summary": {
+                "title": "Resumo da Aula",
+                "teacherInfo": "Informações do Professor",
+                "dateTime": "Data e Hora",
+                "duration": "Duração",
+                "minutes": "{duration} minutos"
+            },
+            "errors": {
+                "classStartDateTime": "Por favor, selecione uma data e hora para sua aula.",
+                "teacherRequired": "Por favor, selecione um professor para continuar.",
+                "timeSlotRequired": "Por favor, selecione um horário para continuar.",
+                "refreshAvailability": "Falha ao carregar a disponibilidade do professor. Por favor, tente novamente ou selecione uma data diferente.",
+                "slotNoLongerAvailable": "O horário selecionado não está mais disponível. Por favor, selecione outro horário.",
+                "failedToLoadTeachers": "Falha ao carregar professores. Por favor, tente novamente mais tarde."
+            },
+            "requiredSelections": "Seleções obrigatórias",
+            "validationComplete": "Todas as seleções completas",
+            "validationIncomplete": "Por favor, complete todas as seleções obrigatórias",
+            "readyForNextStep": "Você está pronto para prosseguir para o próximo passo",
+            "completeAllSelections": "Por favor, complete todas as seleções obrigatórias antes de prosseguir",
+            "selectTeacherRequired": "Selecione um professor",
+            "selectDateRequired": "Selecione uma data",
+            "selectTimeRequired": "Selecione um horário"
         },
         "step3": {
             "step": "PASSO 3",
