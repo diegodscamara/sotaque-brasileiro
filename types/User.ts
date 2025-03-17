@@ -34,6 +34,7 @@ export interface User extends SupabaseUser {
   role: UserRole;
   country?: string | null;
   gender?: UserGender | null;
+  timezone?: string | null;
   hasAccess: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -61,6 +62,7 @@ export interface UpdateUserInput {
   avatarUrl?: string;
   country?: string;
   gender?: UserGender;
+  timezone?: string;
 }
 
 /**
