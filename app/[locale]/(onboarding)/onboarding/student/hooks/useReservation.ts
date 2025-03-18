@@ -42,28 +42,33 @@ export function useReservation(
   // Create a new reservation
   const createReservation = useCallback(async (slotId: string) => {
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch("/api/reservations", {
-        method: "POST",
-        body: JSON.stringify({ slotId })
-      });
+      // Clear any existing reservation first
+      clearReservation();
       
-      const data = await response.json();
-      setCurrentReservation(data.id);
+      // Set a mock reservation for development
+      // In a real app, this would call a server action
+      console.log(`Creating reservation for slot: ${slotId}`);
       
-      // Set expiry time to 5 minutes from now
-      const expiry = new Date(Date.now() + 5 * 60 * 1000);
+      // Set temporary reservation data (in production this would come from API)
+      setCurrentReservation(slotId);
+      
+      // Create expiry time (10 minutes from now)
+      const expiry = new Date();
+      expiry.setMinutes(expiry.getMinutes() + 10);
       setReservationExpiry(expiry);
       
-      // Set timer to clear reservation
+      // Set up timer to clear reservation when it expires
       if (expiryTimer.current) {
         clearTimeout(expiryTimer.current);
       }
-      expiryTimer.current = setTimeout(() => clearReservation(), 5 * 60 * 1000);
       
-    } catch (err) {
-      console.error("Error creating reservation:", err);
-      throw new Error("Failed to create reservation");
+      expiryTimer.current = setTimeout(() => {
+        clearReservation();
+      }, 10 * 60 * 1000); // 10 minutes
+      
+    } catch (error) {
+      console.error("Error creating reservation:", error);
+      clearReservation();
     }
   }, [clearReservation]);
 
