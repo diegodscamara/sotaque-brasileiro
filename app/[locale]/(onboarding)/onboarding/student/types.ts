@@ -28,7 +28,7 @@ export interface PendingClass {
   startDateTime: Date;
   endDateTime: Date;
   duration: number;
-  notes?: string;
+  notes?: string | null;
   status: "PENDING";
 }
 
@@ -65,6 +65,8 @@ export interface Step2FormData {
   notes: string;
   classStartDateTime?: Date;
   classEndDateTime?: Date;
+  pendingClass?: PendingClass;
+  studentId?: string;
 }
 
 /**
