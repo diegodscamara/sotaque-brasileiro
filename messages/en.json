@@ -469,15 +469,31 @@
             },
             "step2": {
                 "step": "STEP 2",
-                "title": "Book Your First Class",
-                "description": "Choose a teacher and schedule your first class to start your learning journey.",
+                "header": {
+                    "title": "Book Your First Class",
+                    "description": "Choose a teacher and schedule your first class to start your learning journey.",
+                    "selectedTeacherDescription": "You've selected {teacher} for your first class on {date} at {time}."
+                },
                 "tabs": {
                     "teachers": "Select a Teacher",
                     "schedule": "Schedule a Class"
                 },
-                "selectTeacher": "Select a Teacher",
-                "teacherSelected": "Teacher Selected",
-                "noTeachersAvailable": "No teachers available at the moment. Please try again later.",
+                "reservation": {
+                    "title": "Reservation Indicator",
+                    "description": "You have a pending class. You can continue with this class or select a different time/teacher. If you select a different option, the previous pending class will be cancelled.",
+                    "refreshButton": "Refresh",
+                    "lastRefresh": "Last refresh: {time}"
+                },
+                "selection": {
+                    "selectTeacher": "Select a Teacher",
+                    "reviews": "reviews",
+                    "specialties": "Specialties",
+                    "languages": "Languages",
+                    "teacherSelected": "Teacher Selected",
+                    "noTeachersAvailable": "No teachers available at the moment. Please try again later.",
+                    "existingPendingClass": "You have a pending class",
+                    "pendingClassDescription": "We found an existing pending class. You can continue with this class or select a different time/teacher. If you select a different option, the previous pending class will be cancelled."
+                },
                 "schedule": {
                     "title": "Choose Your Class Time",
                     "selectDate": "Select a Date",
@@ -488,24 +504,11 @@
                     "timeSlotSelected": "Time slot selected",
                     "timeSlotNotFound": "Time slot not found",
                     "availabilityError": "Failed to load teacher's availability. Please try again or select a different date.",
-                    "noAvailability": "No availability found for this teacher on the selected date."
-                },
-                "reservation": {
-                    "timeSlotReserved": "Time slot reserved",
-                    "reservationNotFound": "Reservation not found",
-                    "reservationError": "Failed to load reservation. Please try again or select a different date.",
-                    "reservationNoAvailability": "No availability found for this teacher on the selected date.",
-                    "expiresIn": "Expires in {time}",
-                    "lastUpdated": "Last updated {time}",
-                    "refresh": "Refresh",
-                    "refreshing": "Refreshing...",
-                    "refreshAvailability": "Refresh Availability"
-                },
-                "existingPendingClass": "You have a pending class",
-                "pendingClassDescription": "We found an existing pending class. You can continue with this class or select a different time/teacher. If you select a different option, the previous pending class will be cancelled.",
-                "notes": {
-                    "title": "Class Notes",
-                    "placeholder": "Add any notes for your teacher about what you'd like to focus on in this class, your learning preferences, or any questions you have."
+                    "noAvailability": "No availability found for this teacher on the selected date.",
+                    "notes": {
+                        "title": "Class Notes",
+                        "placeholder": "Add any notes for your teacher about what you'd like to focus on in this class, your learning preferences, or any questions you have."
+                    }
                 },
                 "summary": {
                     "title": "Class Summary",
@@ -515,6 +518,9 @@
                     "minutes": "{duration} minutes"
                 },
                 "errors": {
+                    "availabilityLoadingError": "Failed to load teacher's availability. Please try again or select a different date.",
+                    "retryButton": "Retry",
+                    "teacherLoadingError": "Failed to load teachers. Please try again later.",
                     "classStartDateTime": "Please select a date and time for your class.",
                     "teacherRequired": "Please select a teacher to continue.",
                     "timeSlotRequired": "Please select a time slot to continue.",
@@ -522,14 +528,14 @@
                     "slotNoLongerAvailable": "The selected time slot is no longer available. Please select a different time slot.",
                     "failedToLoadTeachers": "Failed to load teachers. Please try again later."
                 },
-                "requiredSelections": "Required selections",
-                "validationComplete": "All selections complete",
-                "validationIncomplete": "Please complete all required selections",
-                "readyForNextStep": "You're ready to proceed to the next step",
-                "completeAllSelections": "Please complete all required selections before proceeding",
-                "selectTeacherRequired": "Select a teacher",
-                "selectDateRequired": "Select a date",
-                "selectTimeRequired": "Select a time slot"
+                "validation": {
+                    "incomplete": "Please complete all required selections",
+                    "readyForNextStep": "You're ready to proceed to the next step",
+                    "completeAllSelections": "Please complete all required selections before proceeding",
+                    "selectTeacherRequired": "Select a teacher",
+                    "selectDateRequired": "Select a date",
+                    "selectTimeRequired": "Select a time slot"
+                }
             },
             "formActions": {
                 "back": "Back",
