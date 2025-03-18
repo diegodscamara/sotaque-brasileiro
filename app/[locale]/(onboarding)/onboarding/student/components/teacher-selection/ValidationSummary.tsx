@@ -24,7 +24,7 @@ export default function ValidationSummary({
   if (isStepValid) {
     return null;
   }
-  
+
   // Only render the warning message when there are incomplete selections
   return (
     <div className="bg-amber-50 dark:bg-amber-900/20 mt-6 p-4 border border-amber-200 dark:border-amber-800 rounded-lg text-amber-800 dark:text-amber-300">
@@ -37,12 +37,12 @@ export default function ValidationSummary({
           </div>
         </div>
         <div>
-          <h3 className="font-medium">{t("step2.validationIncomplete")}</h3>
-          <p className="mt-1 text-sm">{t("step2.completeAllSelections")}</p>
+          <h3 className="font-medium">{t("step2.validation.incomplete")}</h3>
+          <p className="mt-1 text-sm">{t("step2.validation.completeAllSelections")}</p>
           <ul className="mt-2 text-sm list-disc list-inside">
-            {!selectedTeacher && <li>{t("step2.selectTeacherRequired")}</li>}
-            {!selectedDate && <li>{t("step2.selectDateRequired")}</li>}
-            {!selectedTimeSlot && <li>{t("step2.selectTimeRequired")}</li>}
+            {!selectedTeacher && <li>{t("step2.validation.selectTeacherRequired")}</li>}
+            {!selectedDate && <li>{t("step2.validation.selectDateRequired")}</li>}
+            {!selectedTimeSlot && <li>{t("step2.validation.selectTimeRequired")}</li>}
           </ul>
         </div>
       </div>
