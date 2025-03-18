@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import { scheduleClass, fetchClasses, cancelPendingClass } from "@/app/actions/c
 import { validateEmail } from "@/libs/utils/validation";
 import { updateUser } from "@/app/actions/users";
 import { updateStudent } from "@/app/actions/students";
+import { updateTeacherAvailability } from "@/app/actions/availability";
 
 // Types
 import { OnboardingFormData, UserGender, ClassData } from "./types";
@@ -75,6 +75,8 @@ export default function StudentOnboarding(): React.JSX.Element {
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  // Track step validity without automatically advancing
+  const [isStep2Valid, setIsStep2Valid] = useState(false);
 
   // Hooks
   const router = useRouter();
@@ -82,6 +84,13 @@ export default function StudentOnboarding(): React.JSX.Element {
   // Refs to track initialization
   const hasLoadedUserData = useRef(false);
   const pendingClassRef = useRef<string | null>(null);
+
+  // Debugging function for step transitions
+  const logStepTransition = useCallback((message: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Step Transition]: ${message}`);
+    }
+  }, []);
 
   /**
    * Pre-fills form with user data from context and handles step navigation
@@ -236,6 +245,38 @@ export default function StudentOnboarding(): React.JSX.Element {
         if (profile.hasCompletedOnboarding && profile.hasAccess) {
           router.push("/dashboard");
         }
+
+        // Check for pending classes
+        const checkForPendingClasses = async () => {
+          if (profile?.id) {
+            try {
+              const existingPendingClasses = await fetchClasses({
+                studentId: profile.id,
+                status: "PENDING"
+              });
+              
+              if (existingPendingClasses?.data?.length > 0) {
+                const pendingClass = existingPendingClasses.data[0];
+                setFormData(prev => ({
+                  ...prev,
+                  pendingClass: {
+                    teacherId: pendingClass.teacherId,
+                    studentId: pendingClass.studentId,
+                    startDateTime: new Date(pendingClass.startDateTime),
+                    endDateTime: new Date(pendingClass.endDateTime),
+                    duration: pendingClass.duration,
+                    notes: pendingClass.notes,
+                    status: "PENDING"
+                  }
+                }));
+              }
+            } catch (error) {
+              console.error("Error checking for pending classes:", error);
+            }
+          }
+        };
+        
+        checkForPendingClasses();
       } catch (error) {
         console.error("Error loading user data:", error);
         setErrors({
@@ -355,13 +396,37 @@ export default function StudentOnboarding(): React.JSX.Element {
    * Checks if the current step is valid without updating error state
    */
   const isCurrentStepValid = useCallback((): boolean => {
+    // For step 2, use our dedicated state to avoid auto-advancing
+    if (currentStep === 2) {
+      return isStep2Valid;
+    }
+    // For other steps, use the regular validation
     return validateStepFields(currentStep);
-  }, [currentStep, validateStepFields]);
+  }, [currentStep, validateStepFields, isStep2Valid]);
 
   /**
    * Handles navigation to the next step
    */
   const handleNextStep = async (): Promise<void> => {
+    logStepTransition(`handleNextStep called with currentStep: ${currentStep}`);
+    
+    // Explicit handling of Next button click
+    if (currentStep === 2) {
+      // This is crucial: when Next is clicked, we need to update formData with the current selectedTimeSlot
+      // This is where we finally sync the data from Step2TeacherSelection to the parent
+      const selectedTimeSlotElement = document.querySelector('[data-selected-time-slot="true"]');
+      const timeSlotId = selectedTimeSlotElement?.getAttribute('data-time-slot-id');
+      
+      logStepTransition(`Selected time slot ID from DOM: ${timeSlotId}`);
+      
+      if (!timeSlotId) {
+        setErrors({
+          general: tErrors("missingRequiredFields")
+        });
+        return;
+      }
+    }
+    
     if (!validateStep(currentStep)) return;
 
     setLoading(true);
@@ -435,78 +500,35 @@ export default function StudentOnboarding(): React.JSX.Element {
       }
       // If this is the second step, save class selection with PENDING status
       else if (currentStep === 2) {
-        if (!formData.selectedTeacher || !formData.selectedTimeSlot) {
+        logStepTransition('Processing step 2 - Next button clicked');
+        
+        // First check if step is valid
+        if (!isStep2Valid) {
           setErrors({
             general: tErrors("missingRequiredFields")
           });
           setLoading(false);
           return;
         }
-
+        
         try {
+          // Get the selectedTimeSlot directly from the DOM since it isn't in formData
+          const selectedTimeSlotElement = document.querySelector('[data-selected-time-slot="true"]');
+          const selectedTimeSlotId = selectedTimeSlotElement?.getAttribute('data-time-slot-id');
+          
+          if (!selectedTimeSlotId) {
+            throw new Error(tErrors("missingRequiredFields"));
+          }
+          
+          // The timeSlot ID is now in the DOM, but we need the full timeSlot object
+          // We can only do this on the client side by getting it from the DOM
+          // For simplicity, we'll use the existing formData.selectedTimeSlot if possible
+          
           // Use student data from context
           const studentId = profile?.id;
 
           if (!studentId) {
             throw new Error(tErrors("failedToCreateStudentProfile"));
-          }
-
-          // Store the current pending class ID before potentially cancelling it
-          let existingPendingClassId = null;
-
-          // Only cancel existing pending classes if we're creating a new one with different details
-          try {
-            // Fetch all pending classes for this specific student
-            const existingPendingClasses = await fetchClasses({
-              studentId: studentId,
-              status: "PENDING"
-            });
-
-            // Check if we have existing pending classes
-            if (existingPendingClasses && existingPendingClasses.data && existingPendingClasses.data.length > 0) {
-              // Check if we're selecting the same class details
-              const pendingClass = existingPendingClasses.data[0];
-
-              // Double-check that this class belongs to the current student
-              if (pendingClass.studentId === studentId) {
-                existingPendingClassId = pendingClass.id;
-
-                // Only cancel if we're selecting a different teacher or time
-                const isSameTeacher = pendingClass.teacherId === formData.selectedTeacher?.id;
-                const pendingStartTime = new Date(pendingClass.startDateTime).getTime();
-                const selectedStartTime = formData.selectedTimeSlot?.startDateTime.getTime() || 0;
-                const isSameTime = Math.abs(pendingStartTime - selectedStartTime) < 60000; // Within 1 minute
-
-                if (!isSameTeacher || !isSameTime) {
-                  await cancelPendingClass(pendingClass.id);
-                  existingPendingClassId = null;
-                }
-              } else {
-                console.log(`Found pending class ID ${pendingClass.id} but it belongs to student ID ${pendingClass.studentId}, not current student ID ${studentId}`);
-              }
-            }
-          } catch (cancelError) {
-            console.error("Error handling existing pending classes:", cancelError);
-            // Continue with the process even if cancellation fails
-          }
-
-          // If we already have a valid pending class with the same details, use it
-          if (existingPendingClassId) {
-            // Store the pending class ID in the ref for cleanup if needed
-            pendingClassRef.current = existingPendingClassId;
-
-            // Mark this step as completed
-            const newCompletedSteps = [...completedSteps, currentStep];
-            setCompletedSteps(newCompletedSteps);
-            localStorage.setItem("onboardingCompletedSteps", JSON.stringify(newCompletedSteps));
-
-            // Save current step to localStorage
-            localStorage.setItem("onboardingCurrentStep", (currentStep + 1).toString());
-
-            // Move to the next step
-            setCurrentStep(prev => prev + 1);
-            setLoading(false);
-            return;
           }
 
           // Calculate class duration in minutes (for validation)
@@ -534,6 +556,26 @@ export default function StudentOnboarding(): React.JSX.Element {
 
           if (!pendingClass) {
             throw new Error(tErrors("failedToCreatePendingClass"));
+          }
+
+          // Update the teacher's availability to mark this time slot as unavailable
+          if (formData.selectedTimeSlot) {
+            try {
+              await updateTeacherAvailability(
+                formData.selectedTimeSlot.id,
+                {
+                  teacherId: formData.selectedTeacher?.id || '',
+                  startDateTime: formData.selectedTimeSlot.startDateTime,
+                  endDateTime: formData.selectedTimeSlot.endDateTime,
+                  isAvailable: false,
+                  notes: `Reserved for class ${pendingClass.id}`
+                }
+              );
+              console.log(`Updated availability for slot ${formData.selectedTimeSlot.id}`);
+            } catch (availabilityError) {
+              console.error("Error updating teacher availability:", availabilityError);
+              // Continue despite availability update error - the class is already created
+            }
           }
 
           // Store the pending class ID in the ref for cleanup if needed
@@ -620,6 +662,7 @@ export default function StudentOnboarding(): React.JSX.Element {
    * Handles navigation to a specific step
    */
   const handleStepChange = (step: number): void => {
+    logStepTransition(`handleStepChange called to set step to: ${step}`);
     setCurrentStep(step);
     // Save the current step to localStorage when manually changing steps
     localStorage.setItem("onboardingCurrentStep", step.toString());
@@ -675,7 +718,8 @@ export default function StudentOnboarding(): React.JSX.Element {
                 selectedTeacher: formData.selectedTeacher,
                 selectedTimeSlot: formData.selectedTimeSlot,
                 timeZone: formData.timeZone,
-                notes: formData.notes
+                notes: formData.notes,
+                studentId: profile?.id
               }}
               errors={errors as Record<string, string>}
               handleInputChange={(name: string, value: any) => {
@@ -684,9 +728,8 @@ export default function StudentOnboarding(): React.JSX.Element {
               }}
               t={t}
               setIsStepValid={(isValid) => {
-                if (isValid && !completedSteps.includes(2)) {
-                  setCompletedSteps(prev => prev.includes(2) ? prev : [...prev, 2]);
-                }
+                // Only track validity, don't automatically advance
+                setIsStep2Valid(isValid);
               }}
             />
           );
