@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+name: stripe-best-practices.mdc
+description: Best practices for integrating Stripe payments
+globs: **/*.{ts,tsx}
+
+- Use Stripe's official TypeScript SDK for type-safe integration.
+- Implement server-side validation and error handling for payment processes.
+- Use Stripe's Webhooks for real-time payment status updates.
+- Implement proper error handling and user feedback for payment failures.
+- Use Stripe's Elements for secure and customizable payment forms.

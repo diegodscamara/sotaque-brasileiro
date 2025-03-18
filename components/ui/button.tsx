@@ -14,6 +14,7 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent dark:hover:bg-gray-700/50 hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        trigger: 'flex justify-between items-center bg-popover disabled:opacity-50 shadow-sm px-3 py-1 border border-gray-300 focus:border-green-700 dark:focus:border-green-500 active:border-primary-600 dark:border-gray-500 file:border-0 rounded-md focus:outline-none focus-visible:ring-primary-600 focus:ring-1 focus:ring-green-700 dark:focus:ring-green-500 w-full h-10 text-gray-800 dark:text-gray-200 dark:placeholder:text-gray-400 placeholder:text-gray-500 md:text-sm text-base transition-colors disabled:cursor-not-allowed'
       },
       effect: {
         expandIcon: 'group gap-0 relative',

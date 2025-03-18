@@ -1,7 +1,7 @@
 ---
-description: Comprehensive coding standards for Sotaque Brasileiro, covering security, maintainability, scalability, accessibility, and best practices for React, TypeScript, and Next.js development. These standards ensure high-quality, secure, and accessible code throughout the project.
+description: 
 globs: \.(tsx|ts|js|jsx)$
-alwaysApply: true
+alwaysApply: false
 ---
  ---
 description: Comprehensive coding standards for Sotaque Brasileiro, covering security, maintainability, scalability, accessibility, and best practices for React, TypeScript, and Next.js development. These standards ensure high-quality, secure, and accessible code throughout the project.

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface TeacherSelectionTabProps {
   teachers: TeacherComplete[];
@@ -50,6 +51,17 @@ export default function TeacherSelectionTab({
           </Card>
         ))}
       </div>
+    );
+  }
+
+  // Add fallback message when no teachers are available
+  if (!teachers || teachers.length === 0) {
+    return (
+      <Alert>
+        <AlertDescription>
+          {t("step2.noTeachersAvailable")}
+        </AlertDescription>
+      </Alert>
     );
   }
 

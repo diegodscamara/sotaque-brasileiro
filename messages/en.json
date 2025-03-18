@@ -404,10 +404,6 @@
                 "progress": "Step {current} of {total}",
                 "ariaLabel": "Onboarding Progress Steps"
             },
-            "comingSoon": {
-                "title": "Coming Soon",
-                "message": "We're working on this feature. It will be available soon. Please continue to the next step."
-            },
             "step1": {
                 "forms": {
                     "requiredField": "This field is required",
@@ -445,6 +441,8 @@
                         "portugueseLevelError": "Portuguese level is required",
                         "nativeLanguageLabel": "Native Language",
                         "nativeLanguagePlaceholder": "Select your native language",
+                        "nativeLanguageHelp": "This helps us understand your language learning background",
+                        "nativeLanguageNonFoundMessage": "No language found.",
                         "nativeLanguageError": "Native language is required",
                         "learningGoalsLabel": "Learning Goals",
                         "learningGoalsError": "Learning goals are required",
@@ -479,6 +477,7 @@
                 },
                 "selectTeacher": "Select a Teacher",
                 "teacherSelected": "Teacher Selected",
+                "noTeachersAvailable": "No teachers available at the moment. Please try again later.",
                 "schedule": {
                     "title": "Choose Your Class Time",
                     "selectDate": "Select a Date",
@@ -517,7 +516,6 @@
                 },
                 "errors": {
                     "classStartDateTime": "Please select a date and time for your class.",
-                    "dateTimeRequired": "Please select a date and time for your class.",
                     "teacherRequired": "Please select a teacher to continue.",
                     "timeSlotRequired": "Please select a time slot to continue.",
                     "refreshAvailability": "Failed to load teacher's availability. Please try again or select a different date.",

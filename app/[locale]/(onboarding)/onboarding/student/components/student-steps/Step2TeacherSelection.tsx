@@ -20,8 +20,6 @@ import { useReservation } from "../../hooks/useReservation";
 import { useStepValidation } from "../../hooks/useStepValidation";
 
 // Types
-import { TeacherComplete } from "@/types/teacher";
-import { ClassBase } from "@/types/class";
 import { TimeSlot, Step2FormData } from "../../types";
 
 /**
@@ -33,56 +31,6 @@ interface Step2TeacherSelectionProps {
   setIsStepValid?: (isValid: boolean) => void;
   handleInputChange: (name: string, value: any) => void;
   t: ReturnType<typeof useTranslations>;
-}
-
-/**
- * Props for the ErrorDisplay component
- */
-interface ErrorDisplayProps {
-  teachersError: string | null;
-  availabilityError: string | null;
-  refreshAvailabilityData: () => Promise<void>;
-  t: any;
-}
-
-/**
- * Props for the StepHeader component
- */
-interface StepHeaderProps {
-  t: any;
-  selectedTeacher: TeacherComplete | null;
-  selectedDate: Date | null;
-  selectedTimeSlot: TimeSlot | null;
-}
-
-/**
- * Props for the TeacherSelectionTab component
- */
-interface TeacherSelectionTabProps {
-  teachers: TeacherComplete[];
-  selectedTeacher: TeacherComplete | null;
-  loading: boolean;
-  errors: Record<string, string | undefined>;
-  handleTeacherSelect: (teacher: TeacherComplete) => void;
-  t: any;
-}
-
-/**
- * Props for the ScheduleTab component
- */
-interface ScheduleTabProps {
-  t: any;
-  formData: Step2FormData;
-  errors: Record<string, string | undefined>;
-  selectedTeacher: TeacherComplete | null;
-  selectedDate: Date | null;
-  selectedTimeSlot: TimeSlot | null;
-  timeSlots: TimeSlot[];
-  isLoadingTimeSlots: boolean;
-  teachers: TeacherComplete[];
-  handleDateSelect: (date: Date) => Promise<void>;
-  handleTimeSlotSelect: (timeSlot: TimeSlot) => Promise<void>;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 /**

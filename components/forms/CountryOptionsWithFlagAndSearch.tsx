@@ -40,11 +40,11 @@ export default function CountryOptionsWithFlagAndSearch({
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
+                        variant="trigger"
                         id={id}
-                        variant="outline"
+                        type="button"
                         role="combobox"
                         aria-expanded={open}
-                        className="justify-between bg-background hover:bg-background px-3 border-input outline-none focus-visible:outline-[3px] outline-offset-0 w-full font-normal"
                     >
                         {value ? (
                             <span className="flex items-center gap-2 min-w-0">
@@ -69,7 +69,7 @@ export default function CountryOptionsWithFlagAndSearch({
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="p-0 border-input w-full min-w-[var(--radix-popper-anchor-width)]"
+                    className="p-0 border-input w-full min-w-[var(--radix-popover-trigger-width)]"
                     align="start"
                 >
                     <Command>

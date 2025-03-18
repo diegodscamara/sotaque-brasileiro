@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+name: supabase-best-practices.mdc
+description: Best practices for using Supabase in Next.js applications
+globs: **/*.{ts,tsx}
+
+- Use Prisma to handle schema, migrations, and queries for Supabase.
+- Implement server-side actions for database operations to enhance security.
+- Cache database results in actions and use real-time subscriptions for updates.
+- Use `@supabase/ssr` for server-side rendering compatibility.
+- Implement proper error handling and validation for database operations.

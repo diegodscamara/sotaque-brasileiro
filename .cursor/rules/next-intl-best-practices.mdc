@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+name: next-intl-best-practices.mdc
+description: Best practices for internationalization with next-intl
+globs: **/*.{ts,tsx}
+
+- Use `next-intl` for server-side and client-side internationalization.
+- Implement language detection and switching using `next-intl`'s middleware.
+- Use the `useTranslations` hook for client-side translations.
+- Implement proper fallback locales for missing translations.
+- Use `next-intl`'s formatting utilities for dates, numbers, and currencies.

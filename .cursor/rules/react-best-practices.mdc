@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+name: react-best-practices.mdc
+description: Best practices for React component development and state management
+globs: **/*.{ts,tsx}
+
+- Use functional components with hooks instead of class components.
+- Implement proper prop type checking with TypeScript interfaces.
+- Utilize React.memo for performance optimization of functional components.
+- Use custom hooks for reusable state logic and side effects.
+- Implement state management with Zustand or TanStack React Query for global state and data fetching.

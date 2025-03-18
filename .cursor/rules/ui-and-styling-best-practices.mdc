@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/*.{ts,tsx,css}
+alwaysApply: false
+---
+name: ui-and-styling-best-practices.mdc
+description: Guidelines for UI components and styling with Tailwind/Shadcn/Radix
+globs: **/*.{ts,tsx,css}
+
+- Use Tailwind CSS for utility-first styling and responsive design.
+- Follow Shadcn UI component guidelines for consistent and accessible components.
+- Utilize Radix UI primitives for building custom, accessible components.
+- Implement proper accessibility features like ARIA labels and keyboard navigation.
+- Use `@phosphor-icons/react` for accessible icons with proper ARIA attributes.
