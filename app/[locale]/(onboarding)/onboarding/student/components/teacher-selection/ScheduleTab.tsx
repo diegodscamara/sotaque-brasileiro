@@ -57,7 +57,7 @@ export default function ScheduleTab({
         <h3 className="mb-2 font-medium">{t("step2.schedule.selectDate")}</h3>
         <Calendar
           mode="single"
-          selected={selectedDate}
+          selected={selectedDate || undefined}
           onSelect={(date) => date && handleDateSelect(date)}
           disabled={(date) => date < new Date() || date > new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
           className="border rounded-md"
@@ -82,6 +82,8 @@ export default function ScheduleTab({
                   variant={selectedTimeSlot === slot ? "default" : "outline"}
                   className="w-full"
                   onClick={() => handleTimeSlotSelect(slot)}
+                  data-selected-time-slot={selectedTimeSlot === slot ? "true" : "false"}
+                  data-time-slot-id={slot.id}
                 >
                   {slot.displayStartTime} - {slot.displayEndTime}
                 </Button>
@@ -103,9 +105,9 @@ export default function ScheduleTab({
       {/* Notes */}
       {selectedTimeSlot && (
         <div>
-          <h3 className="mb-2 font-medium">{t("step2.schedule.notes")}</h3>
+          <h3 className="mb-2 font-medium">{t("step2.schedule.notes.title")}</h3>
           <Textarea
-            placeholder={t("step2.schedule.notesPlaceholder")}
+            placeholder={t("step2.schedule.notes.placeholder")}
             value={formData.notes || ""}
             onChange={(e) => handleInputChange("notes", e.target.value)}
             className="min-h-[100px]"
