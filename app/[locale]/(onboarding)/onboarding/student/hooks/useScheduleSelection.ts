@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { TeacherComplete } from "@/types/teacher";
 import { Step2FormData, TimeSlot } from "../types";
+import { getTeacherAvailability } from "@/app/actions/availability";
 
 /**
  * Hook return type for schedule selection
@@ -36,14 +37,30 @@ export function useScheduleSelection(
     setAvailabilityError(null);
 
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch(`/api/availability/${teacher.id}?date=${date.toISOString()}`);
-      const data = await response.json();
+      // Use the server action instead of direct API call
+      const availabilityResponse = await getTeacherAvailability(teacher.id, date.toISOString());
       
-      setTimeSlots(data.timeSlots);
+      if (!availabilityResponse || availabilityResponse.length === 0) {
+        setTimeSlots([]);
+        return;
+      }
+      
+      // Convert response to TimeSlot format
+      const slots: TimeSlot[] = availabilityResponse.map(slot => ({
+        id: slot.id,
+        startTime: new Date(slot.startDateTime).toLocaleTimeString(),
+        endTime: new Date(slot.endDateTime).toLocaleTimeString(),
+        startDateTime: new Date(slot.startDateTime),
+        endDateTime: new Date(slot.endDateTime),
+        displayStartTime: new Date(slot.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        displayEndTime: new Date(slot.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isAvailable: slot.isAvailable !== false
+      }));
+      
+      setTimeSlots(slots);
     } catch (err) {
       console.error("Error fetching time slots:", err);
-      setAvailabilityError("Failed to load available time slots");
+      setAvailabilityError("Failed to load available time slots. Please try again.");
       setTimeSlots([]);
     } finally {
       setIsLoadingTimeSlots(false);
