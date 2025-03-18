@@ -1,26 +1,27 @@
 /* eslint-disable no-unused-vars */
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Components
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StepHeader from "../teacher-selection/StepHeader";
 import TeacherSelectionTab from "../teacher-selection/TeacherSelectionTab";
 import ScheduleTab from "../teacher-selection/ScheduleTab";
-import ErrorDisplay from "../teacher-selection/ErrorDisplay";
-import ReservationIndicator from "../teacher-selection/ReservationIndicator";
-
-// Hooks
-import { useTeacherSelection } from "../../hooks/useTeacherSelection";
-import { useScheduleSelection } from "../../hooks/useScheduleSelection";
-import { useReservation } from "../../hooks/useReservation";
-import { useStepValidation } from "../../hooks/useStepValidation";
 
 // Types
 import { TimeSlot, Step2FormData } from "../../types";
+import { TeacherComplete } from "@/types/teacher";
+
+// Hooks
+import { useStepValidation } from "../../hooks/useStepValidation";
+
+// Actions
+import { getTeachers } from "@/app/actions/teachers";
+import { getTeacherAvailability, updateTeacherAvailability } from "@/app/actions/availability";
+import { fetchClasses, cancelPendingClass } from "@/app/actions/classes";
 
 /**
  * Props for the Step2TeacherSelection component
@@ -45,122 +46,247 @@ export default function Step2TeacherSelection({
   handleInputChange,
   t
 }: Step2TeacherSelectionProps): React.JSX.Element {
+  // UI state
   const [activeTab, setActiveTab] = useState<string>("teachers");
+  
+  // Data state
+  const [teachers, setTeachers] = useState<TeacherComplete[]>([]);
+  const [selectedTeacher, setSelectedTeacher] = useState<TeacherComplete | null>(formData.selectedTeacher);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(formData.selectedTimeSlot);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  
+  // Loading state
+  const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
+  const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
+  
+  // Error state
+  const [teachersError, setTeachersError] = useState<string | null>(null);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
-  // Use custom hooks to separate concerns
-  const {
-    teachers,
-    selectedTeacher,
-    isLoadingTeachers: teachersLoading,
-    teacherError: teachersError,
-    handleTeacherSelect
-  } = useTeacherSelection(formData);
+  // Use step validation hook
+  const { 
+    isValid, 
+    errorMessage, 
+    validateStep, 
+    isReadyToAdvance, 
+    setReadyToAdvance 
+  } = useStepValidation();
 
-  // Create a stable refresh function using useRef to avoid dependency cycles
-  const refreshFnRef = useRef<() => Promise<void>>(async () => {});
-
-  // Set up reservation hook with the ref function
-  const {
-    currentReservation,
-    reservationExpiry,
-    isRefreshing,
-    lastRefreshTime,
-    createReservation,
-    cancelReservation,
-    handleRefreshAvailability
-  } = useReservation(() => refreshFnRef.current());
-
-  // Set up schedule selection hook with reservation functions
-  const {
-    selectedDate,
-    selectedTimeSlot,
-    timeSlots,
-    isLoadingTimeSlots,
-    availabilityError,
-    handleDateSelect,
-    handleTimeSlotSelect,
-    refreshAvailabilityData
-  } = useScheduleSelection(formData);
-
-  // Update the ref with the actual refresh function
+  // Check step validity when data changes
   useEffect(() => {
-    refreshFnRef.current = refreshAvailabilityData;
-  }, [refreshAvailabilityData]);
+    // Update internal validation without marking step as ready to advance
+    validateStep({
+      selectedTeacher,
+      selectedTimeSlot,
+      timeZone: formData.timeZone,
+      notes: formData.notes || "",
+      studentId: formData.studentId
+    });
 
-  // Use step validation hook to determine if the step is valid
-  const { errorMessage, validateStep } = useStepValidation();
-
-  // Update parent component with step validity
-  useEffect(() => {
+    // Only update parent's isStepValid if we have all required data
     if (setIsStepValid) {
-      const isValid = validateStep(formData);
-      setIsStepValid(isValid);
+      setIsStepValid(!!selectedTeacher && !!selectedTimeSlot);
     }
-  }, [formData, setIsStepValid, validateStep]);
+  }, [selectedTeacher, selectedTimeSlot, setIsStepValid, formData.timeZone, formData.notes, formData.studentId, validateStep]);
 
-  // Handle restored data from localStorage or database
-  const hasRestoredDataRef = useRef(false);
-
-  useEffect(() => {
-    const handleRestoredData = async () => {
-      if (hasRestoredDataRef.current) return;
-      hasRestoredDataRef.current = true;
-
-      if (formData.selectedTeacher?.id && !selectedTeacher) {
-        handleTeacherSelect(formData.selectedTeacher);
+  // Function to fetch teachers with available time slots
+  const fetchTeachersWithAvailability = useCallback(async () => {
+    setIsLoadingTeachers(true);
+    setTeachersError(null);
+    
+    try {
+      // Get all teachers
+      const allTeachers = await getTeachers();
+      
+      // Only keep teachers with availability
+      const availableTeachers = [];
+      
+      for (const teacher of allTeachers) {
+        const now = new Date();
+        const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        
+        // Check if teacher has any availability in the next 30 days
+        const availability = await getTeacherAvailability(
+          teacher.id, 
+          now.toISOString()
+        );
+        
+        if (availability && availability.length > 0) {
+          availableTeachers.push(teacher);
+        }
       }
+      
+      setTeachers(availableTeachers as TeacherComplete[]);
+      
+      // If no teachers are available, show an error
+      if (availableTeachers.length === 0) {
+        setTeachersError(t("step2.errors.noTeachersAvailable"));
+      }
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+      setTeachersError(t("step2.errors.failedToLoadTeachers"));
+    } finally {
+      setIsLoadingTeachers(false);
+    }
+  }, [t]);
 
-      if (formData.classStartDateTime && !selectedDate) {
-        const date = new Date(formData.classStartDateTime);
-        await handleDateSelect(date);
+  // Function to fetch time slots for a given date and teacher
+  const fetchTimeSlots = useCallback(async (date: Date, teacherId: string) => {
+    setIsLoadingTimeSlots(true);
+    setAvailabilityError(null);
+    
+    try {
+      const availability = await getTeacherAvailability(teacherId, date.toISOString());
+      
+      if (!availability || availability.length === 0) {
+        setTimeSlots([]);
+        return;
+      }
+      
+      // Map to TimeSlot format
+      const slots: TimeSlot[] = availability.map(slot => ({
+        id: slot.id,
+        startTime: new Date(slot.startDateTime).toLocaleTimeString(),
+        endTime: new Date(slot.endDateTime).toLocaleTimeString(),
+        startDateTime: new Date(slot.startDateTime),
+        endDateTime: new Date(slot.endDateTime),
+        displayStartTime: new Date(slot.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        displayEndTime: new Date(slot.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isAvailable: slot.isAvailable
+      }));
+      
+      setTimeSlots(slots);
+    } catch (error) {
+      console.error("Error fetching time slots:", error);
+      setAvailabilityError(t("step2.errors.failedToLoadTimeSlots"));
+      setTimeSlots([]);
+    } finally {
+      setIsLoadingTimeSlots(false);
+    }
+  }, [t]);
+
+  // Function to handle teacher selection
+  const handleTeacherSelect = useCallback(async (teacher: TeacherComplete) => {
+    setSelectedTeacher(teacher);
+    
+    // Update the parent form data
+    handleInputChange("selectedTeacher", teacher);
+    
+    // Reset selected date and time slot
+    setSelectedDate(null);
+    setSelectedTimeSlot(null);
+    handleInputChange("selectedTimeSlot", null);
+    
+    // Move to the schedule tab
+    setActiveTab("schedule");
+  }, [handleInputChange]);
+
+  // Function to handle date selection
+  const handleDateSelect = useCallback(async (date: Date) => {
+    if (!selectedTeacher) return;
+    
+    setSelectedDate(date);
+    setSelectedTimeSlot(null);
+    handleInputChange("selectedTimeSlot", null);
+    
+    // Fetch time slots for the selected date and teacher
+    await fetchTimeSlots(date, selectedTeacher.id);
+  }, [selectedTeacher, fetchTimeSlots, handleInputChange]);
+
+  // Function to handle time slot selection
+  const handleTimeSlotSelect = useCallback(async (slot: TimeSlot) => {
+    // Update local state
+    setSelectedTimeSlot(slot);
+    
+    // Update parent form data with the selected time slot
+    handleInputChange("selectedTimeSlot", slot);
+    
+    // Update validation state
+    validateStep({
+      selectedTeacher,
+      selectedTimeSlot: slot,
+      timeZone: formData.timeZone,
+      notes: formData.notes || "",
+      studentId: formData.studentId
+    });
+    
+    // Update parent's isStepValid
+    if (setIsStepValid) {
+      setIsStepValid(!!selectedTeacher && !!slot);
+    }
+  }, [selectedTeacher, validateStep, formData.timeZone, formData.notes, formData.studentId, setIsStepValid, handleInputChange]);
+
+  // Check and clear any pending classes for the student
+  useEffect(() => {
+    const checkAndClearPendingClasses = async () => {
+      if (!formData.pendingClass && formData.studentId) {
+        try {
+          // Check for existing pending classes
+          const pendingClasses = await fetchClasses({
+            studentId: formData.studentId,
+            status: "PENDING"
+          });
+          
+          // Cancel any existing pending classes
+          if (pendingClasses?.data?.length > 0) {
+            for (const pendingClass of pendingClasses.data) {
+              // First cancel the pending class
+              await cancelPendingClass(pendingClass.id);
+              console.log(`Cancelled pending class: ${pendingClass.id}`);
+              
+              // Get availability slots for this teacher on the class date
+              try {
+                // Get the date of the pending class as ISO string
+                const classDate = new Date(pendingClass.startDateTime).toISOString();
+                const teacherAvailability = await getTeacherAvailability(
+                  pendingClass.teacherId,
+                  classDate
+                );
+                
+                // Find the availability slot that matches the class time
+                const matchingSlot = teacherAvailability?.find(slot => {
+                  const slotStartTime = new Date(slot.startDateTime).getTime();
+                  const classStartTime = new Date(pendingClass.startDateTime).getTime();
+                  // Match by time (within a minute to account for small differences)
+                  return Math.abs(slotStartTime - classStartTime) < 60000;
+                });
+                
+                // If found, update it to be available again
+                if (matchingSlot) {
+                  await updateTeacherAvailability(
+                    matchingSlot.id,
+                    {
+                      teacherId: pendingClass.teacherId,
+                      startDateTime: new Date(matchingSlot.startDateTime),
+                      endDateTime: new Date(matchingSlot.endDateTime),
+                      isAvailable: true,
+                      notes: "Restored availability after cancellation"
+                    }
+                  );
+                  console.log(`Restored availability for slot ${matchingSlot.id}`);
+                }
+              } catch (availabilityError) {
+                console.error("Error restoring teacher availability:", availabilityError);
+                // Continue despite availability update error - the class is already canceled
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error handling pending classes:", error);
+        }
       }
     };
-
-    if (!teachersLoading) {
-      handleRestoredData();
+    
+    if (formData.studentId) {
+      checkAndClearPendingClasses();
     }
-  }, [
-    formData.selectedTeacher?.id,
-    formData.classStartDateTime,
-    selectedTeacher,
-    selectedDate,
-    handleTeacherSelect,
-    handleDateSelect,
-    teachersLoading
-  ]);
+  }, [formData.pendingClass, formData.studentId]);
 
-  // Debounce validation to avoid excessive re-renders
+  // Initial fetch of teachers when component mounts
   useEffect(() => {
-    const timer = setTimeout(() => {
-      validateStep(formData);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [formData, validateStep]);
-
-  // Create wrapper functions to match the expected types
-  const handleDateSelectWrapper = useCallback((date: Date | undefined) => {
-    if (date) {
-      return handleDateSelect(date);
-    }
-    return Promise.resolve();
-  }, [handleDateSelect]);
-  /**
-   * Wraps handleTimeSlotSelect to match the expected type signature.
-   * @param slot - The selected time slot.
-   * @returns A promise that resolves to void.
-   */
-  const handleTimeSlotSelectWrapper = useCallback((slot: TimeSlot): Promise<void> => {
-    return Promise.resolve(handleTimeSlotSelect(slot));
-  }, [handleTimeSlotSelect]);
-
-  /**
-   * Handles changes to the active tab.
-   * @param value - The value of the newly selected tab.
-   */
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
+    fetchTeachersWithAvailability();
+  }, [fetchTeachersWithAvailability]);
 
   return (
     <motion.div
@@ -178,43 +304,24 @@ export default function Step2TeacherSelection({
         selectedTimeSlot={selectedTimeSlot}
       />
 
-      {/* Display pending class notification if one exists */}
-      {selectedTeacher && !teachersLoading && (
-        <div className="bg-blue-50 mb-4 p-4 border border-blue-200 rounded-md">
-          <h3 className="mb-1 font-medium text-blue-800 text-sm">
-            {t("step2.existingPendingClass")}
-          </h3>
-          <p className="text-blue-700 text-sm">
-            {t("step2.pendingClassDescription")}
-          </p>
+      {/* Error displays */}
+      {teachersError && (
+        <div className="bg-red-50 mb-4 p-4 border border-red-200 rounded-md">
+          <p className="text-red-700 text-sm">{teachersError}</p>
         </div>
       )}
-
-      {/* Reservation indicator */}
-      {currentReservation && reservationExpiry && (
-        <ReservationIndicator
-          t={t}
-          reservationExpiry={reservationExpiry}
-          refreshAvailabilityData={handleRefreshAvailability}
-          isRefreshing={isRefreshing}
-          lastRefreshTime={lastRefreshTime || new Date()}
-          timeZone={formData.timeZone}
-        />
+      
+      {availabilityError && (
+        <div className="bg-red-50 mb-4 p-4 border border-red-200 rounded-md">
+          <p className="text-red-700 text-sm">{availabilityError}</p>
+        </div>
       )}
-
-      {/* Error messages */}
-      <ErrorDisplay
-        teachersError={teachersError}
-        availabilityError={availabilityError}
-        refreshAvailabilityData={refreshAvailabilityData}
-        t={t}
-      />
 
       {/* Tabs for the two-step process: 1) Select Teacher, 2) Schedule Class */}
       <Tabs
         defaultValue="teachers"
         value={activeTab}
-        onValueChange={handleTabChange}
+        onValueChange={setActiveTab}
         className="w-full"
       >
         <TabsList className="grid grid-cols-2 w-full">
@@ -235,7 +342,7 @@ export default function Step2TeacherSelection({
           <TeacherSelectionTab
             teachers={teachers}
             selectedTeacher={selectedTeacher}
-            loading={teachersLoading}
+            loading={isLoadingTeachers}
             errors={errors}
             handleTeacherSelect={handleTeacherSelect}
             t={t}
@@ -254,8 +361,8 @@ export default function Step2TeacherSelection({
             timeSlots={timeSlots}
             isLoadingTimeSlots={isLoadingTimeSlots}
             teachers={teachers}
-            handleDateSelect={handleDateSelectWrapper}
-            handleTimeSlotSelect={handleTimeSlotSelectWrapper}
+            handleDateSelect={handleDateSelect}
+            handleTimeSlotSelect={handleTimeSlotSelect}
             handleInputChange={handleInputChange}
           />
         </TabsContent>
