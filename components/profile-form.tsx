@@ -29,9 +29,9 @@ import { Combobox } from "@/components/ui/combobox";
 import { LanguageCombobox } from "./ui/language-combobox";
 import { MultiLanguageCombobox } from "./ui/multi-language-combobox";
 import { MultiGoalsCombobox } from "./ui/multi-goals-combobox";
-import { timezones } from "@/data/timezones";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
+import TimeZoneSelectWithSearch from "@/components/forms/TimeZoneSelectWithSearch";
 
 // Define the form schema with Zod
 const profileFormSchema = z.object({
@@ -119,12 +119,12 @@ const useTimezoneDetection = (form: any, profile: any, t: any) => {
  * @param {Function} options.toast - Toast function
  * @returns {Object} Form submission state and handler
  */
-const useProfileSubmission = ({ 
-  updateProfile, 
-  refetchUserData, 
-  t, 
-  toast 
-}: { 
+const useProfileSubmission = ({
+  updateProfile,
+  refetchUserData,
+  t,
+  toast
+}: {
   updateProfile: (values: z.infer<typeof profileFormSchema>) => Promise<any>;
   refetchUserData?: () => Promise<void>;
   t: any;
@@ -139,7 +139,7 @@ const useProfileSubmission = ({
 
     try {
       const result = await updateProfile(values);
-      
+
       if (result.error) {
         setSubmitError(result.error);
         toast({
@@ -152,7 +152,7 @@ const useProfileSubmission = ({
           title: t("updateSuccess"),
           description: t("updateSuccessDescription"),
         });
-        
+
         // Refresh user data if needed
         if (refetchUserData) {
           await refetchUserData();
@@ -161,14 +161,14 @@ const useProfileSubmission = ({
     } catch (error) {
       console.error("Error updating profile:", error);
       setSubmitError(
-        error instanceof Error 
-          ? error.message 
+        error instanceof Error
+          ? error.message
           : t("unknownError")
       );
       toast({
         title: t("updateError"),
-        description: error instanceof Error 
-          ? error.message 
+        description: error instanceof Error
+          ? error.message
           : t("unknownError"),
         variant: "destructive",
       });
@@ -223,7 +223,7 @@ export function ProfileForm(): React.JSX.Element {
   const t = useTranslations("profile");
   const locale = useLocale() as "en" | "es" | "fr" | "pt";
   const { profile, user, refetchUserData } = useUser();
-  
+
   // Initialize the form
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -236,18 +236,18 @@ export function ProfileForm(): React.JSX.Element {
       timeZone: profile?.timeZone || "",
       portugueseLevel: (profile?.portugueseLevel as any) || "unknown",
       nativeLanguage: profile?.nativeLanguage || "",
-      otherLanguages: Array.isArray(profile?.otherLanguages) 
-        ? profile.otherLanguages 
+      otherLanguages: Array.isArray(profile?.otherLanguages)
+        ? profile.otherLanguages
         : [],
-      learningGoals: Array.isArray(profile?.learningGoals) 
-        ? profile.learningGoals 
+      learningGoals: Array.isArray(profile?.learningGoals)
+        ? profile.learningGoals
         : [],
       biography: profile?.biography || "",
-      specialties: Array.isArray(profile?.specialties) 
-        ? profile.specialties 
+      specialties: Array.isArray(profile?.specialties)
+        ? profile.specialties
         : [],
-      languages: Array.isArray(profile?.languages) 
-        ? profile.languages 
+      languages: Array.isArray(profile?.languages)
+        ? profile.languages
         : [],
     },
     mode: "onChange",
@@ -265,18 +265,18 @@ export function ProfileForm(): React.JSX.Element {
         timeZone: profile.timeZone || "",
         portugueseLevel: (profile.portugueseLevel as any) || "unknown",
         nativeLanguage: profile.nativeLanguage || "",
-        otherLanguages: Array.isArray(profile.otherLanguages) 
-          ? profile.otherLanguages 
+        otherLanguages: Array.isArray(profile.otherLanguages)
+          ? profile.otherLanguages
           : [],
-        learningGoals: Array.isArray(profile.learningGoals) 
-          ? profile.learningGoals 
+        learningGoals: Array.isArray(profile.learningGoals)
+          ? profile.learningGoals
           : [],
         biography: profile.biography || "",
-        specialties: Array.isArray(profile.specialties) 
-          ? profile.specialties 
+        specialties: Array.isArray(profile.specialties)
+          ? profile.specialties
           : [],
-        languages: Array.isArray(profile.languages) 
-          ? profile.languages 
+        languages: Array.isArray(profile.languages)
+          ? profile.languages
           : [],
       });
     }
@@ -329,10 +329,10 @@ export function ProfileForm(): React.JSX.Element {
       return { success: true };
     } catch (error) {
       console.error("Error in updateProfile:", error);
-      return { 
-        error: error instanceof Error 
-          ? error.message 
-          : "An unknown error occurred" 
+      return {
+        error: error instanceof Error
+          ? error.message
+          : "An unknown error occurred"
       };
     }
   };
@@ -416,9 +416,9 @@ export function ProfileForm(): React.JSX.Element {
                           <RequiredFieldIndicator />
                         </FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder={t("personal.lastNamePlaceholder")} 
-                            {...field} 
+                          <Input
+                            placeholder={t("personal.lastNamePlaceholder")}
+                            {...field}
                             className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
                           />
                         </FormControl>
@@ -437,10 +437,10 @@ export function ProfileForm(): React.JSX.Element {
                           <RequiredFieldIndicator />
                         </FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder={t("personal.emailPlaceholder")} 
-                            {...field} 
-                            disabled 
+                          <Input
+                            placeholder={t("personal.emailPlaceholder")}
+                            {...field}
+                            disabled
                             className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
                           />
                         </FormControl>
@@ -531,25 +531,11 @@ export function ProfileForm(): React.JSX.Element {
                           <RequiredFieldIndicator />
                           <FieldHelp content={t("preferences.timeZoneHelp")} />
                         </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger
-                              className="focus:ring-2 focus:ring-primary/20 w-full transition-shadow"
-                            >
-                              <SelectValue placeholder={t("preferences.timeZonePlaceholder")} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="max-h-[300px]">
-                            {timezones.map((timezone) => (
-                              <SelectItem key={timezone.id} value={timezone.id}>
-                                {timezone.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <TimeZoneSelectWithSearch
+                          value={field.value || ""}
+                          onChange={(value) => field.onChange(value)}
+                          placeholder={t("forms.personalDetails.timezonePlaceholder")}
+                        />
                         <FormMessage className="text-xs" />
                       </FormItem>
                     )}
@@ -731,8 +717,8 @@ export function ProfileForm(): React.JSX.Element {
           >
             {t("buttons.cancel")}
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting}
             className="focus:ring-2 focus:ring-primary/20 transition-shadow"
           >
@@ -746,7 +732,7 @@ export function ProfileForm(): React.JSX.Element {
             )}
           </Button>
         </div>
-        
+
         {submitError && (
           <div className="bg-red-50 dark:bg-red-900/20 mt-4 p-3 border border-red-200 dark:border-red-800 rounded-md text-red-600 dark:text-red-400 text-sm">
             <p className="font-medium">{t("error.title")}</p>
