@@ -410,6 +410,20 @@ export default function StudentOnboarding(): React.JSX.Element {
   const handleNextStep = async (): Promise<void> => {
     logStepTransition(`handleNextStep called with currentStep: ${currentStep}`);
     
+    // For step 2, we need to get the selected time slot from the component
+    if (currentStep === 2) {
+      // When Next is clicked, tell the Step2TeacherSelection component to update parent data
+      const step2Component = document.getElementById('step-panel-2');
+      if (step2Component) {
+        // Trigger the data update from child to parent
+        const event = new CustomEvent('update-parent-data');
+        step2Component.dispatchEvent(event);
+        
+        // Wait a tiny bit for the state to update
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+    }
+    
     // Explicit handling of Next button click
     if (currentStep === 2) {
       // This is crucial: when Next is clicked, we need to update formData with the current selectedTimeSlot
@@ -532,8 +546,14 @@ export default function StudentOnboarding(): React.JSX.Element {
           }
 
           // Calculate class duration in minutes (for validation)
-          const startTime = formData.selectedTimeSlot?.startDateTime || new Date();
-          const endTime = formData.selectedTimeSlot?.endDateTime || new Date();
+          const startTime = formData.selectedTimeSlot?.startDateTime instanceof Date 
+            ? formData.selectedTimeSlot.startDateTime 
+            : new Date(formData.selectedTimeSlot?.startDateTime || new Date());
+          
+          const endTime = formData.selectedTimeSlot?.endDateTime instanceof Date 
+            ? formData.selectedTimeSlot.endDateTime 
+            : new Date(formData.selectedTimeSlot?.endDateTime || new Date());
+          
           const durationMs = endTime.getTime() - startTime.getTime();
           const durationMinutes = Math.round(durationMs / (1000 * 60));
 
@@ -561,12 +581,16 @@ export default function StudentOnboarding(): React.JSX.Element {
           // Update the teacher's availability to mark this time slot as unavailable
           if (formData.selectedTimeSlot) {
             try {
+              // Ensure we're using proper Date objects
+              const startDateTime = new Date(formData.selectedTimeSlot.startDateTime);
+              const endDateTime = new Date(formData.selectedTimeSlot.endDateTime);
+              
               await updateTeacherAvailability(
                 formData.selectedTimeSlot.id,
                 {
                   teacherId: formData.selectedTeacher?.id || '',
-                  startDateTime: formData.selectedTimeSlot.startDateTime,
-                  endDateTime: formData.selectedTimeSlot.endDateTime,
+                  startDateTime,
+                  endDateTime,
                   isAvailable: false,
                   notes: `Reserved for class ${pendingClass.id}`
                 }
@@ -730,6 +754,33 @@ export default function StudentOnboarding(): React.JSX.Element {
               setIsStepValid={(isValid) => {
                 // Only track validity, don't automatically advance
                 setIsStep2Valid(isValid);
+              }}
+              onNextClicked={() => {
+                // When Next is clicked in the parent, get the selected time slot
+                const selectedTimeSlotElement = document.querySelector('[data-selected-time-slot="true"]');
+                if (selectedTimeSlotElement) {
+                  const timeSlotId = selectedTimeSlotElement.getAttribute('data-time-slot-id');
+                  // Find the matching time slot in the component's state
+                  const selectedTimeSlot = document.querySelector('[data-selected-time-slot-data]')?.getAttribute('data-selected-time-slot-data');
+                  if (selectedTimeSlot) {
+                    try {
+                      const parsedTimeSlot = JSON.parse(selectedTimeSlot);
+                      // Convert ISO strings back to Date objects
+                      const timeSlotWithDates = {
+                        ...parsedTimeSlot,
+                        startDateTime: new Date(parsedTimeSlot.startDateTime),
+                        endDateTime: new Date(parsedTimeSlot.endDateTime)
+                      };
+                      // Update form data with the selected time slot
+                      setFormData(prev => ({
+                        ...prev,
+                        selectedTimeSlot: timeSlotWithDates
+                      }));
+                    } catch (error) {
+                      console.error("Error parsing time slot data:", error);
+                    }
+                  }
+                }
               }}
             />
           );

@@ -576,7 +576,8 @@
         "step3": {
             "step": "STEP 3",
             "title": "Confirm Your Details",
-            "subtitle": "Review and confirm your information before finalizing your registration."
+            "subtitle": "Review and confirm your information before finalizing your registration.",
+            "successNote": "Your information has been saved. Click Submit to continue to payment."
         },
         "seo": {
             "title": "Learn Portuguese with native instructors",
