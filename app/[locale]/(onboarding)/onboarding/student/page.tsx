@@ -831,9 +831,10 @@ export default function StudentOnboarding(): React.JSX.Element {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
 
-      // If the component unmounts normally (not from page unload),
-      // we can run the async cleanup directly
-      if (currentStep === 3) {
+      // IMPORTANT: Only cleanup if the component is unmounting due to navigation away from the onboarding flow
+      // NOT when moving between steps within the onboarding flow
+      // This was causing unintentional cancellation when moving from step 2 to 3
+      if (currentStep === 3 && window.location.pathname.indexOf('/onboarding/student') === -1) {
         cleanupPendingClass();
       }
     };
