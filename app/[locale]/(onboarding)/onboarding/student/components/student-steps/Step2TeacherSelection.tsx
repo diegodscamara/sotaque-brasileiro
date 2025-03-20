@@ -191,7 +191,7 @@ export default function Step2TeacherSelection({
 
     setSelectedDate(date);
     setSelectedTimeSlot(null);
-    
+
     // Update the parent form data with the selected date and clear the time slot
     handleInputChange("selectedDate", date);
     handleInputChange("selectedTimeSlot", null);
@@ -236,20 +236,16 @@ export default function Step2TeacherSelection({
             studentId: formData.studentId,
             status: "PENDING"
           });
-          
-          console.log(`Found ${pendingClasses?.data?.length || 0} pending classes to clean up`);
-          
           // Cancel any existing pending classes
           if (pendingClasses?.data?.length > 0) {
             for (const pendingClass of pendingClasses.data) {
               // Cancel the pending class - availability restoration is handled by the server action
               await cancelPendingClass(pendingClass.id);
-              console.log(`Cancelled pending class: ${pendingClass.id}`);
 
               // Refresh the time slots if we're on the same date/teacher
               if (selectedDate && selectedTeacher &&
-                  selectedTeacher.id === pendingClass.teacherId &&
-                  selectedDate.toDateString() === new Date(pendingClass.startDateTime).toDateString()) {
+                selectedTeacher.id === pendingClass.teacherId &&
+                selectedDate.toDateString() === new Date(pendingClass.startDateTime).toDateString()) {
                 await fetchTimeSlots(selectedDate, selectedTeacher.id);
               }
             }
