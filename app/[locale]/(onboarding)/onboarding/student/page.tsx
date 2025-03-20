@@ -21,7 +21,6 @@ import { scheduleClass, fetchClasses, cancelPendingClass } from "@/app/actions/c
 import { validateEmail } from "@/libs/utils/validation";
 import { updateUser } from "@/app/actions/users";
 import { updateStudent } from "@/app/actions/students";
-import { updateTeacherAvailability } from "@/app/actions/availability";
 
 // Types
 import { OnboardingFormData, UserGender, ClassData } from "./types";
@@ -63,6 +62,7 @@ export default function StudentOnboarding(): React.JSX.Element {
 
     // Teacher selection and class scheduling
     selectedTeacher: null,
+    selectedDate: null,
     selectedTimeSlot: null,
     notes: ""
   }), [profile]);
@@ -179,6 +179,7 @@ export default function StudentOnboarding(): React.JSX.Element {
               ...step1Data,
               // Only use these fields from localStorage
               selectedTeacher: parsedFormData.selectedTeacher || null,
+              selectedDate: parsedFormData.selectedDate || null,
               selectedTimeSlot: parsedFormData.selectedTimeSlot ? {
                 ...parsedFormData.selectedTimeSlot,
                 startDateTime: new Date(parsedFormData.selectedTimeSlot.startDateTime),
@@ -578,30 +579,6 @@ export default function StudentOnboarding(): React.JSX.Element {
             throw new Error(tErrors("failedToCreatePendingClass"));
           }
 
-          // Update the teacher's availability to mark this time slot as unavailable
-          if (formData.selectedTimeSlot) {
-            try {
-              // Ensure we're using proper Date objects
-              const startDateTime = new Date(formData.selectedTimeSlot.startDateTime);
-              const endDateTime = new Date(formData.selectedTimeSlot.endDateTime);
-              
-              await updateTeacherAvailability(
-                formData.selectedTimeSlot.id,
-                {
-                  teacherId: formData.selectedTeacher?.id || '',
-                  startDateTime,
-                  endDateTime,
-                  isAvailable: false,
-                  notes: `Reserved for class ${pendingClass.id}`
-                }
-              );
-              console.log(`Updated availability for slot ${formData.selectedTimeSlot.id}`);
-            } catch (availabilityError) {
-              console.error("Error updating teacher availability:", availabilityError);
-              // Continue despite availability update error - the class is already created
-            }
-          }
-
           // Store the pending class ID in the ref for cleanup if needed
           pendingClassRef.current = pendingClass.id;
 
@@ -687,6 +664,14 @@ export default function StudentOnboarding(): React.JSX.Element {
    */
   const handleStepChange = (step: number): void => {
     logStepTransition(`handleStepChange called to set step to: ${step}`);
+    
+    // Check if navigating back from step 3 to step 2
+    if (currentStep === 3 && step === 2) {
+      // Add the back parameter to the URL and reload the page
+      window.location.href = `${window.location.pathname}?step=2&back=true`;
+      return;
+    }
+    
     setCurrentStep(step);
     // Save the current step to localStorage when manually changing steps
     localStorage.setItem("onboardingCurrentStep", step.toString());
@@ -740,6 +725,7 @@ export default function StudentOnboarding(): React.JSX.Element {
               key="teacher-selection"
               formData={{
                 selectedTeacher: formData.selectedTeacher,
+                selectedDate: formData.selectedDate,
                 selectedTimeSlot: formData.selectedTimeSlot,
                 timeZone: formData.timeZone,
                 notes: formData.notes,
