@@ -21,11 +21,23 @@ const availabilitySchema = z.object({
 });
 
 /**
+ * Maps Prisma TeacherAvailability object to TeacherAvailability interface
+ * Converts null values to undefined to match the expected type
+ */
+function mapPrismaAvailabilityToTeacherAvailability(prismaAvailability: any): TeacherAvailability {
+  return {
+    ...prismaAvailability,
+    notes: prismaAvailability.notes || undefined,
+    recurringRules: prismaAvailability.recurringRules || undefined
+  };
+}
+
+/**
  * Adds teacher availability
  * @param {Omit<TeacherAvailability, 'id' | 'createdAt' | 'updatedAt'>} data - The availability data to create
  * @returns {Promise<TeacherAvailability>} The created availability data
  */
-export async function addTeacherAvailability(data: Omit<TeacherAvailability, 'id' | 'createdAt' | 'updatedAt'>) {
+export async function addTeacherAvailability(data: Omit<TeacherAvailability, 'id' | 'createdAt' | 'updatedAt'>): Promise<TeacherAvailability> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -95,7 +107,7 @@ export async function addTeacherAvailability(data: Omit<TeacherAvailability, 'id
       },
     });
 
-    return newAvailability;
+    return mapPrismaAvailabilityToTeacherAvailability(newAvailability);
   } catch (error) {
     console.error("Error adding availability:", error);
     throw error;
@@ -113,7 +125,7 @@ export async function getTeacherAvailability(
   teacherId: string, 
   date: string, 
   includeUnavailable: boolean = true
-) {
+): Promise<TeacherAvailability[]> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -138,11 +150,6 @@ export async function getTeacherAvailability(
     const endDate = new Date(date);
     endDate.setUTCHours(23, 59, 59, 999);
 
-    console.log(`Fetching availability for teacher ${teacherId} on ${date}`);
-    console.log(`  - UTC start date: ${startDate.toISOString()}`);
-    console.log(`  - UTC end date: ${endDate.toISOString()}`);
-    console.log(`  - Including unavailable slots: ${includeUnavailable}`);
-
     // Prepare the query
     const query: any = {
       teacherId,
@@ -165,28 +172,7 @@ export async function getTeacherAvailability(
       },
     });
 
-    console.log(`Found ${availability.length} availability slots`);
-    
-    // Log available vs unavailable slots
-    const availableSlots = availability.filter(slot => slot.isAvailable);
-    const unavailableSlots = availability.filter(slot => !slot.isAvailable);
-    console.log(`Available slots: ${availableSlots.length}, Unavailable slots: ${unavailableSlots.length}`);
-    
-    // Log the first few slots for debugging
-    if (availability.length > 0) {
-      availability.slice(0, 3).forEach((slot, index) => {
-        console.log(`Slot ${index + 1}:`);
-        console.log(`  - ID: ${slot.id}`);
-        console.log(`  - Start: ${slot.startDateTime.toISOString()}`);
-        console.log(`  - End: ${slot.endDateTime.toISOString()}`);
-        console.log(`  - Available: ${slot.isAvailable}`);
-      });
-    }
-    
-    // Special logging for UI display - what's actually being sent back
-    console.log(`Will return ${availability.filter(slot => includeUnavailable || slot.isAvailable).length} slots to UI`);
-
-    return availability;
+    return availability.map(mapPrismaAvailabilityToTeacherAvailability);
   } catch (error) {
     console.error("Error fetching availability:", error);
     throw error;
@@ -285,7 +271,7 @@ export async function updateTeacherAvailability(
     });
 
     console.log(`Updated availability ${availabilityId} - isAvailable: ${updatedAvailability.isAvailable}`);
-    return updatedAvailability;
+    return mapPrismaAvailabilityToTeacherAvailability(updatedAvailability);
   } catch (error) {
     console.error("Error updating availability:", error);
     throw error;
@@ -297,7 +283,7 @@ export async function updateTeacherAvailability(
  * @param {string} availabilityId - The ID of the availability to delete
  * @returns {Promise<TeacherAvailability>} The deleted availability data
  */
-export async function deleteTeacherAvailability(availabilityId: string) {
+export async function deleteTeacherAvailability(availabilityId: string): Promise<TeacherAvailability> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -334,7 +320,7 @@ export async function deleteTeacherAvailability(availabilityId: string) {
       where: { id: availabilityId }
     });
 
-    return deletedAvailability;
+    return mapPrismaAvailabilityToTeacherAvailability(deletedAvailability);
   } catch (error) {
     console.error("Error deleting availability:", error);
     throw error;
@@ -352,7 +338,7 @@ export async function getTeacherAvailabilityRange(
   teacherId: string,
   startDate: string,
   endDate: string
-) {
+): Promise<TeacherAvailability[]> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -377,10 +363,6 @@ export async function getTeacherAvailabilityRange(
     const parsedEndDate = new Date(endDate);
     parsedEndDate.setUTCHours(23, 59, 59, 999);
 
-    console.log(`Fetching availability range for teacher ${teacherId} from ${startDate} to ${endDate}`);
-    console.log(`  - UTC start date: ${parsedStartDate.toISOString()}`);
-    console.log(`  - UTC end date: ${parsedEndDate.toISOString()}`);
-
     // Query availability directly using Prisma
     const availability = await prisma.teacherAvailability.findMany({
       where: {
@@ -394,217 +376,10 @@ export async function getTeacherAvailabilityRange(
         startDateTime: 'asc',
       },
     });
-
-    console.log(`Found ${availability.length} availability slots in range`);
     
-    return availability;
+    return availability.map(mapPrismaAvailabilityToTeacherAvailability);
   } catch (error) {
     console.error("Error fetching availability range:", error);
-    throw error;
-  }
-}
-
-/**
- * Creates a temporary reservation for a time slot
- * @param {string} teacherId - The ID of the teacher
- * @param {Date} startDateTime - The start date and time of the reservation
- * @param {Date} endDateTime - The end date and time of the reservation
- * @param {string} studentId - The ID of the student making the reservation
- * @returns {Promise<{reservationId: string, expiresAt: Date}>} The reservation ID and expiration time
- */
-export async function createTemporaryReservation(
-  teacherId: string,
-  startDateTime: Date,
-  endDateTime: Date,
-  studentId: string
-): Promise<{reservationId: string, expiresAt: Date}> {
-  try {
-    // Standardize dates to ensure consistent time zone handling
-    const standardizedStartDateTime = standardizeDate(startDateTime);
-    const standardizedEndDateTime = standardizeDate(endDateTime);
-    
-    // Log timezone information for debugging
-    console.log(`Creating temporary reservation with UTC times:`);
-    console.log(`  - UTC startDateTime: ${standardizedStartDateTime.toISOString()}`);
-    console.log(`  - UTC endDateTime: ${standardizedEndDateTime.toISOString()}`);
-    
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Verify the teacher exists
-    const teacher = await prisma.teacher.findUnique({
-      where: { id: teacherId }
-    });
-
-    if (!teacher) {
-      throw new Error("Teacher not found");
-    }
-
-    // Verify the student exists and get their timezone
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
-      select: {
-        id: true,
-        timeZone: true
-      }
-    });
-
-    if (!student) {
-      throw new Error("Student not found");
-    }
-
-    // Log the student's timezone for debugging
-    const studentTimezone = student.timeZone || 'UTC';
-    console.log(`Student timezone: ${studentTimezone}`);
-    
-    // Format times in student's timezone for logging
-    if (studentTimezone) {
-      try {
-        const localStartTime = formatDateInTimezone(standardizedStartDateTime, studentTimezone, 'HH:mm');
-        const localEndTime = formatDateInTimezone(standardizedEndDateTime, studentTimezone, 'HH:mm');
-        console.log(`  - Student local time: ${localStartTime}-${localEndTime}`);
-      } catch (error) {
-        console.error("Error formatting time in student timezone:", error);
-      }
-    }
-
-    // Check if the student already has a reservation for this time slot
-    const existingReservation = await prisma.class.findFirst({
-      where: {
-        teacherId,
-        studentId,
-        startDateTime: standardizedStartDateTime,
-        endDateTime: standardizedEndDateTime,
-        status: 'PENDING',
-        notes: 'TEMPORARY_RESERVATION'
-      }
-    });
-
-    if (existingReservation) {
-      console.log(`Student ${studentId} already has reservation ${existingReservation.id} for this time slot, returning it`);
-      
-      // If the student already has a reservation for this time slot, return it
-      // Set expiration time (15 minutes from now)
-      const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 15);
-
-      return {
-        reservationId: existingReservation.id,
-        expiresAt
-      };
-    }
-
-    // Check if there are any conflicting classes from other students
-    const conflictingClasses = await prisma.class.findMany({
-      where: {
-        teacherId,
-        status: { in: ['PENDING', 'CONFIRMED', 'SCHEDULED'] },
-        studentId: { not: studentId }, // Exclude this student's reservations
-        OR: [
-          // Class starts during the requested time slot
-          {
-            startDateTime: {
-              gte: standardizedStartDateTime,
-              lt: standardizedEndDateTime,
-            },
-          },
-          // Class ends during the requested time slot
-          {
-            endDateTime: {
-              gt: standardizedStartDateTime,
-              lte: standardizedEndDateTime,
-            },
-          },
-          // Class completely encompasses the requested time slot
-          {
-            startDateTime: {
-              lte: standardizedStartDateTime,
-            },
-            endDateTime: {
-              gte: standardizedEndDateTime,
-            },
-          },
-        ],
-      },
-    });
-
-    // If there are any conflicting classes from other students, the time slot is not available
-    if (conflictingClasses.length > 0) {
-      console.log(`Time slot is taken by another student: ${conflictingClasses[0].id}`);
-      throw new Error("Time slot is no longer available");
-    }
-
-    // Check if there's teacher availability for this time slot
-    const date = new Date(standardizedStartDateTime);
-    date.setUTCHours(0, 0, 0, 0);
-    const dateStr = date.toISOString().split('T')[0];
-
-    // Get all availability for this day
-    const availabilityList = await getTeacherAvailability(teacherId, dateStr);
-    
-    if (!availabilityList || availabilityList.length === 0) {
-      console.log(`No availability found for teacher ${teacherId} on ${dateStr}`);
-      throw new Error("Teacher is not available on this date");
-    }
-
-    // Check if the requested time slot falls within any available time slot
-    const isWithinAvailability = availabilityList.some(slot => {
-      const slotStart = standardizeDate(slot.startDateTime);
-      const slotEnd = standardizeDate(slot.endDateTime);
-      
-      const isAvailable = (
-        slotStart <= standardizedStartDateTime &&
-        slotEnd >= standardizedEndDateTime &&
-        slot.isAvailable
-      );
-      
-      if (isAvailable) {
-        console.log(`Found matching availability slot: ${slot.id}`);
-        console.log(`  - Slot start: ${slotStart.toISOString()}`);
-        console.log(`  - Slot end: ${slotEnd.toISOString()}`);
-        console.log(`  - Requested start: ${standardizedStartDateTime.toISOString()}`);
-        console.log(`  - Requested end: ${standardizedEndDateTime.toISOString()}`);
-      }
-      
-      return isAvailable;
-    });
-
-    if (!isWithinAvailability) {
-      console.log(`Time slot is not within teacher's availability`);
-      throw new Error("This time slot is not available in the teacher's schedule");
-    }
-
-    console.log(`Creating new reservation for student ${studentId} with teacher ${teacherId}`);
-
-    // Create a temporary reservation in the database
-    const reservation = await prisma.class.create({
-      data: {
-        teacherId,
-        studentId,
-        startDateTime: standardizedStartDateTime,
-        endDateTime: standardizedEndDateTime,
-        duration: Math.round((standardizedEndDateTime.getTime() - standardizedStartDateTime.getTime()) / (1000 * 60)),
-        status: 'PENDING', // Using PENDING status for reservations
-        notes: 'TEMPORARY_RESERVATION', // Mark as temporary
-      }
-    });
-
-    // Set expiration time (15 minutes from now)
-    const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
-
-    console.log(`Created reservation ${reservation.id} expiring at ${expiresAt.toISOString()}`);
-
-    return {
-      reservationId: reservation.id,
-      expiresAt
-    };
-  } catch (error) {
-    console.error("Error creating temporary reservation:", error);
     throw error;
   }
 }
@@ -742,40 +517,6 @@ export async function checkTimeSlotAvailability(
 }
 
 /**
- * Cancels a temporary reservation
- * @param {string} reservationId - The ID of the reservation to cancel
- * @returns {Promise<boolean>} Whether the cancellation was successful
- */
-export async function cancelTemporaryReservation(reservationId: string): Promise<boolean> {
-  try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Find the reservation
-    const reservation = await prisma.class.findUnique({
-      where: { id: reservationId }
-    });
-
-    // Only delete if it's a temporary reservation
-    if (reservation && reservation.notes === 'TEMPORARY_RESERVATION') {
-      await prisma.class.delete({
-        where: { id: reservationId }
-      });
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    console.error("Error canceling temporary reservation:", error);
-    return false;
-  }
-}
-
-/**
  * Refreshes availability data for a teacher on a specific date
  * @param {string} teacherId - The ID of the teacher
  * @param {string} date - The date to refresh availability for
@@ -830,7 +571,7 @@ export async function findAvailabilitySlotsForTimeRange(
 
     console.log(`Found ${availabilitySlots.length} slots containing the time range`);
     
-    return availabilitySlots;
+    return availabilitySlots.map(mapPrismaAvailabilityToTeacherAvailability);
   } catch (error) {
     console.error("Error finding availability slots:", error);
     throw error;
