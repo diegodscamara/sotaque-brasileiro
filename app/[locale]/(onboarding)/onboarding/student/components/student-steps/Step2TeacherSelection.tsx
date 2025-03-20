@@ -229,13 +229,7 @@ export default function Step2TeacherSelection({
   // Check and clear any pending classes for the student
   useEffect(() => {
     const checkAndClearPendingClasses = async () => {
-      // Add a check to ensure we only run this if we're on step 2 and navigating back, not when moving forward
-      const isNavigatingBack = new URLSearchParams(window.location.search).get('back') === 'true';
-      
-      // Only clear pending classes when either:
-      // 1. We're explicitly navigating back to step 2 (back=true in URL)
-      // 2. We're on step 2 first time and there's no pending class yet
-      if (isNavigatingBack && formData.studentId) {
+      if (formData.studentId) {
         try {
           // Check for existing pending classes
           const pendingClasses = await fetchClasses({
@@ -243,14 +237,14 @@ export default function Step2TeacherSelection({
             status: "PENDING"
           });
           
-          console.log(`Found ${pendingClasses?.data?.length || 0} pending classes to manage when navigating back`);
+          console.log(`Found ${pendingClasses?.data?.length || 0} pending classes to clean up`);
           
           // Cancel any existing pending classes
           if (pendingClasses?.data?.length > 0) {
             for (const pendingClass of pendingClasses.data) {
               // Cancel the pending class - availability restoration is handled by the server action
               await cancelPendingClass(pendingClass.id);
-              console.log(`Cancelled pending class: ${pendingClass.id} when navigating back`);
+              console.log(`Cancelled pending class: ${pendingClass.id}`);
 
               // Refresh the time slots if we're on the same date/teacher
               if (selectedDate && selectedTeacher &&
@@ -273,21 +267,6 @@ export default function Step2TeacherSelection({
             if (setIsStepValid) {
               setIsStepValid(false);
             }
-
-            // Only update localStorage and reload page if we're navigating back from step 3
-            // Remove step 2 from completedSteps in localStorage
-            const savedCompletedSteps = localStorage.getItem("onboardingCompletedSteps");
-            if (savedCompletedSteps) {
-              const completedSteps = JSON.parse(savedCompletedSteps);
-              const updatedCompletedSteps = completedSteps.filter((step: number) => step !== 2);
-              localStorage.setItem("onboardingCompletedSteps", JSON.stringify(updatedCompletedSteps));
-              
-              // Also update the current step in localStorage
-              localStorage.setItem("onboardingCurrentStep", "2");
-              
-              // Use location.href to force refresh the page with step=2 parameter
-              window.location.href = window.location.pathname + "?step=2";
-            }
           }
         } catch (error) {
           console.error("Error handling pending classes:", error);
@@ -295,10 +274,8 @@ export default function Step2TeacherSelection({
       }
     };
 
-    if (formData.studentId) {
-      checkAndClearPendingClasses();
-    }
-  }, [formData.pendingClass, formData.studentId, selectedDate, selectedTeacher, fetchTimeSlots, handleInputChange, setIsStepValid]);
+    checkAndClearPendingClasses();
+  }, []); // Empty dependency array - only run once on mount
 
   // Initial fetch of teachers when component mounts
   useEffect(() => {
