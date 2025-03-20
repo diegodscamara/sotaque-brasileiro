@@ -20,7 +20,7 @@ import { useStepValidation } from "../../hooks/useStepValidation";
 
 // Actions
 import { getTeachers } from "@/app/actions/teachers";
-import { getTeacherAvailability, updateTeacherAvailability, findAvailabilitySlotsForTimeRange, restoreAvailabilityForCancelledClass } from "@/app/actions/availability";
+import { getTeacherAvailability } from "@/app/actions/availability";
 import { fetchClasses, cancelPendingClass } from "@/app/actions/classes";
 
 /**
@@ -50,29 +50,29 @@ export default function Step2TeacherSelection({
 }: Step2TeacherSelectionProps): React.JSX.Element {
   // UI state
   const [activeTab, setActiveTab] = useState<string>("teachers");
-  
+
   // Data state
   const [teachers, setTeachers] = useState<TeacherComplete[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherComplete | null>(formData.selectedTeacher);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(formData.selectedDate);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(formData.selectedTimeSlot);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  
+
   // Loading state
   const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
   const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
-  
+
   // Error state
   const [teachersError, setTeachersError] = useState<string | null>(null);
   const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
   // Use step validation hook
-  const { 
-    isValid, 
-    errorMessage, 
-    validateStep, 
-    isReadyToAdvance, 
-    setReadyToAdvance 
+  const {
+    isValid,
+    errorMessage,
+    validateStep,
+    isReadyToAdvance,
+    setReadyToAdvance
   } = useStepValidation();
 
   // Check step validity when data changes
@@ -80,6 +80,7 @@ export default function Step2TeacherSelection({
     // Update internal validation without marking step as ready to advance
     validateStep({
       selectedTeacher,
+      selectedDate,
       selectedTimeSlot,
       timeZone: formData.timeZone,
       notes: formData.notes || "",
@@ -88,39 +89,39 @@ export default function Step2TeacherSelection({
 
     // Only update parent's isStepValid if we have all required data
     if (setIsStepValid) {
-      setIsStepValid(!!selectedTeacher && !!selectedTimeSlot);
+      setIsStepValid(!!selectedTeacher && !!selectedDate && !!selectedTimeSlot);
     }
-  }, [selectedTeacher, selectedTimeSlot, setIsStepValid, formData.timeZone, formData.notes, formData.studentId, validateStep]);
+  }, [selectedTeacher, selectedDate, selectedTimeSlot, setIsStepValid, formData.timeZone, formData.notes, formData.studentId, validateStep]);
 
   // Function to fetch teachers with available time slots
   const fetchTeachersWithAvailability = useCallback(async () => {
     setIsLoadingTeachers(true);
     setTeachersError(null);
-    
+
     try {
       // Get all teachers
       const allTeachers = await getTeachers();
-      
+
       // Only keep teachers with availability
       const availableTeachers = [];
-      
+
       for (const teacher of allTeachers) {
         const now = new Date();
         const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-        
+
         // Check if teacher has any availability in the next 30 days
         const availability = await getTeacherAvailability(
-          teacher.id, 
+          teacher.id,
           now.toISOString()
         );
-        
+
         if (availability && availability.length > 0) {
           availableTeachers.push(teacher);
         }
       }
-      
+
       setTeachers(availableTeachers as TeacherComplete[]);
-      
+
       // If no teachers are available, show an error
       if (availableTeachers.length === 0) {
         setTeachersError(t("step2.errors.noTeachersAvailable"));
@@ -137,22 +138,15 @@ export default function Step2TeacherSelection({
   const fetchTimeSlots = useCallback(async (date: Date, teacherId: string) => {
     setIsLoadingTimeSlots(true);
     setAvailabilityError(null);
-    
+
     try {
-      console.log(`Fetching time slots for teacher ${teacherId} on ${date.toISOString().split('T')[0]}`);
       const availability = await getTeacherAvailability(teacherId, date.toISOString());
-      
+
       if (!availability || availability.length === 0) {
-        console.log('No time slots received');
         setTimeSlots([]);
         return;
       }
-      
-      console.log(`Time slots received: ${availability.length}`);
-      const availableSlots = availability.filter(slot => slot.isAvailable);
-      const unavailableSlots = availability.filter(slot => !slot.isAvailable);
-      console.log(`Available slots: ${availableSlots.length}, Unavailable slots: ${unavailableSlots.length}`);
-      
+
       // Map to TimeSlot format
       const slots: TimeSlot[] = availability.map(slot => ({
         id: slot.id,
@@ -164,7 +158,7 @@ export default function Step2TeacherSelection({
         displayEndTime: new Date(slot.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isAvailable: slot.isAvailable
       }));
-      
+
       setTimeSlots(slots);
     } catch (error) {
       console.error("Error fetching time slots:", error);
@@ -178,15 +172,15 @@ export default function Step2TeacherSelection({
   // Function to handle teacher selection
   const handleTeacherSelect = useCallback(async (teacher: TeacherComplete) => {
     setSelectedTeacher(teacher);
-    
+
     // Update the parent form data
     handleInputChange("selectedTeacher", teacher);
-    
+
     // Reset selected date and time slot
     setSelectedDate(null);
     setSelectedTimeSlot(null);
     handleInputChange("selectedTimeSlot", null);
-    
+
     // Move to the schedule tab
     setActiveTab("schedule");
   }, [handleInputChange]);
@@ -194,11 +188,14 @@ export default function Step2TeacherSelection({
   // Function to handle date selection
   const handleDateSelect = useCallback(async (date: Date) => {
     if (!selectedTeacher) return;
-    
+
     setSelectedDate(date);
     setSelectedTimeSlot(null);
-    handleInputChange("selectedTimeSlot", null);
     
+    // Update the parent form data with the selected date and clear the time slot
+    handleInputChange("selectedDate", date);
+    handleInputChange("selectedTimeSlot", null);
+
     // Fetch time slots for the selected date and teacher
     await fetchTimeSlots(date, selectedTeacher.id);
   }, [selectedTeacher, fetchTimeSlots, handleInputChange]);
@@ -207,26 +204,27 @@ export default function Step2TeacherSelection({
   const handleTimeSlotSelect = useCallback(async (slot: TimeSlot) => {
     // Only update local state
     setSelectedTimeSlot(slot);
-    
+
     // IMPORTANT: Do NOT update parent form data here
     // This would cause automatic advancement
     // handleInputChange("selectedTimeSlot", slot);
-    
+
     // Update validation state
     validateStep({
       selectedTeacher,
+      selectedDate,
       selectedTimeSlot: slot,
       timeZone: formData.timeZone,
       notes: formData.notes || "",
       studentId: formData.studentId
     });
-    
+
     // Only inform parent that step is valid (enables Next button)
     // but doesn't trigger navigation
     if (setIsStepValid) {
-      setIsStepValid(!!selectedTeacher && !!slot);
+      setIsStepValid(!!selectedTeacher && !!selectedDate && !!slot);
     }
-  }, [selectedTeacher, validateStep, formData.timeZone, formData.notes, formData.studentId, setIsStepValid]);
+  }, [selectedTeacher, selectedDate, validateStep, formData.timeZone, formData.notes, formData.studentId, setIsStepValid]);
 
   // Check and clear any pending classes for the student
   useEffect(() => {
@@ -239,46 +237,50 @@ export default function Step2TeacherSelection({
             status: "PENDING"
           });
           
-          console.log(`Found ${pendingClasses?.data?.length || 0} pending classes to cancel`);
-          
           // Cancel any existing pending classes
           if (pendingClasses?.data?.length > 0) {
+            const isNavigatingBack = new URLSearchParams(window.location.search).get('back') === 'true';
+            
             for (const pendingClass of pendingClasses.data) {
-              // First cancel the pending class
+              // Cancel the pending class - availability restoration is handled by the server action
               await cancelPendingClass(pendingClass.id);
-              console.log(`Cancelled pending class: ${pendingClass.id} at ${new Date(pendingClass.startDateTime).toLocaleString()}`);
-              
-              // Use our new direct restoration function first
-              try {
-                console.log("Attempting to restore availability directly...");
-                const classStart = new Date(pendingClass.startDateTime);
-                const classEnd = new Date(pendingClass.endDateTime);
-                console.log(`Class time: ${classStart.toLocaleString()} - ${classEnd.toLocaleString()}`);
+
+              // Refresh the time slots if we're on the same date/teacher
+              if (selectedDate && selectedTeacher &&
+                selectedTeacher.id === pendingClass.teacherId &&
+                selectedDate.toDateString() === new Date(pendingClass.startDateTime).toDateString()) {
+                await fetchTimeSlots(selectedDate, selectedTeacher.id);
+              }
+            }
+
+            // Reset UI state after canceling classes
+            setSelectedTeacher(null);
+            setSelectedDate(null);
+            setSelectedTimeSlot(null);
+            setActiveTab("teachers");
+            handleInputChange("selectedTeacher", null);
+            handleInputChange("selectedDate", null);
+            handleInputChange("selectedTimeSlot", null);
+
+            // Mark the step as not completed
+            if (setIsStepValid) {
+              setIsStepValid(false);
+            }
+
+            // Only update localStorage and reload page if we're navigating back from step 3
+            if (isNavigatingBack) {
+              // Remove step 2 from completedSteps in localStorage
+              const savedCompletedSteps = localStorage.getItem("onboardingCompletedSteps");
+              if (savedCompletedSteps) {
+                const completedSteps = JSON.parse(savedCompletedSteps);
+                const updatedCompletedSteps = completedSteps.filter((step: number) => step !== 2);
+                localStorage.setItem("onboardingCompletedSteps", JSON.stringify(updatedCompletedSteps));
                 
-                const restored = await restoreAvailabilityForCancelledClass(
-                  pendingClass.teacherId,
-                  classStart,
-                  classEnd
-                );
+                // Also update the current step in localStorage
+                localStorage.setItem("onboardingCurrentStep", "2");
                 
-                if (restored) {
-                  console.log("Successfully restored availability using direct method");
-                  
-                  // Refresh the time slots if we're on the same date/teacher
-                  if (selectedDate && selectedTeacher && 
-                      selectedTeacher.id === pendingClass.teacherId &&
-                      selectedDate.toDateString() === new Date(pendingClass.startDateTime).toDateString()) {
-                    console.log("Refreshing time slots after cancellation");
-                    await fetchTimeSlots(selectedDate, selectedTeacher.id);
-                  }
-                  
-                  continue; // Skip to the next pending class if we successfully restored this one
-                } else {
-                  console.log("Direct restoration failed, falling back to previous methods");
-                }
-              } catch (directRestoreError) {
-                console.error("Error in direct availability restoration:", directRestoreError);
-                // Continue with fallback approaches
+                // Use location.href to force refresh the page with step=2 parameter
+                window.location.href = window.location.pathname + "?step=2";
               }
             }
           }
@@ -287,11 +289,11 @@ export default function Step2TeacherSelection({
         }
       }
     };
-    
+
     if (formData.studentId) {
       checkAndClearPendingClasses();
     }
-  }, [formData.pendingClass, formData.studentId, selectedDate, selectedTeacher, fetchTimeSlots]);
+  }, [formData.pendingClass, formData.studentId, selectedDate, selectedTeacher, fetchTimeSlots, handleInputChange, setIsStepValid]);
 
   // Initial fetch of teachers when component mounts
   useEffect(() => {
@@ -304,20 +306,20 @@ export default function Step2TeacherSelection({
       if (selectedTimeSlot) {
         // Update parent component with the selected time slot
         handleInputChange("selectedTimeSlot", selectedTimeSlot);
-        
+
         // Call the onNextClicked callback if provided
         if (onNextClicked) {
           onNextClicked();
         }
       }
     };
-    
+
     // Get the step panel element
     const stepPanel = document.getElementById('step-panel-2');
     if (stepPanel) {
       stepPanel.addEventListener('update-parent-data', handleUpdateParentData);
     }
-    
+
     return () => {
       if (stepPanel) {
         stepPanel.removeEventListener('update-parent-data', handleUpdateParentData);
@@ -335,20 +337,20 @@ export default function Step2TeacherSelection({
     >
       {/* Hidden field to store selected time slot data */}
       {selectedTimeSlot && (
-        <div 
+        <div
           data-selected-time-slot-data={JSON.stringify({
             ...selectedTimeSlot,
-            startDateTime: selectedTimeSlot.startDateTime instanceof Date 
-              ? selectedTimeSlot.startDateTime.toISOString() 
+            startDateTime: selectedTimeSlot.startDateTime instanceof Date
+              ? selectedTimeSlot.startDateTime.toISOString()
               : new Date(selectedTimeSlot.startDateTime).toISOString(),
-            endDateTime: selectedTimeSlot.endDateTime instanceof Date 
-              ? selectedTimeSlot.endDateTime.toISOString() 
+            endDateTime: selectedTimeSlot.endDateTime instanceof Date
+              ? selectedTimeSlot.endDateTime.toISOString()
               : new Date(selectedTimeSlot.endDateTime).toISOString()
           })}
           className="hidden"
         />
       )}
-      
+
       {/* Step Title and Header */}
       <StepHeader
         t={t}
@@ -363,7 +365,7 @@ export default function Step2TeacherSelection({
           <p className="text-red-700 text-sm">{teachersError}</p>
         </div>
       )}
-      
+
       {availabilityError && (
         <div className="bg-red-50 mb-4 p-4 border border-red-200 rounded-md">
           <p className="text-red-700 text-sm">{availabilityError}</p>
