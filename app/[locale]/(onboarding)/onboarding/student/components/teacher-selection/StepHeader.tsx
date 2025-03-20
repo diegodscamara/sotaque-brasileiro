@@ -29,11 +29,14 @@ export default function StepHeader({
     return "Teacher";
   };
 
+  // Only show selection details when we have a teacher AND time slot selected
+  const hasCompleteSelection = selectedTeacher && selectedDate && selectedTimeSlot;
+
   return (
     <div className="mb-6">
       <h2 className="mb-2 font-semibold text-2xl">{t("step2.header.title")}</h2>
       <p className="text-muted-foreground">
-        {selectedTeacher
+        {hasCompleteSelection
           ? t("step2.header.selectedTeacherDescription", {
             teacher: getTeacherDisplayName(selectedTeacher),
             date: selectedDate
