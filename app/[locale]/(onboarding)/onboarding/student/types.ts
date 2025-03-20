@@ -60,6 +60,7 @@ export interface Step1FormData extends Omit<BaseFormData, 'gender'> {
  */
 export interface Step2FormData {
   selectedTeacher: TeacherComplete | null;
+  selectedDate: Date | null;
   selectedTimeSlot: TimeSlot | null;
   timeZone: string;
   notes: string;
