@@ -32,6 +32,13 @@ export function useStepValidation(): UseStepValidationReturn {
       setIsValid(false);
       return false;
     }
+    
+    // Validate date selection
+    if (!formData.selectedDate) {
+      setErrorMessage("Please select a date");
+      setIsValid(false);
+      return false;
+    }
 
     // Validate time slot selection
     if (!formData.selectedTimeSlot) {
