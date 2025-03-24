@@ -12,30 +12,6 @@ interface ErrorDisplayProps {
 }
 
 /**
- * Helper function to determine if the error is about a time slot being taken
- */
-const isTimeSlotTakenError = (error: string): boolean => {
-  return error.includes('taken by another student') || 
-         error.includes('no longer available');
-};
-
-/**
- * Helper function to determine if the error is about availability loading
- */
-const isAvailabilityLoadingError = (error: string): boolean => {
-  return error.includes('Failed to load') || 
-         error.includes('connection');
-};
-
-/**
- * Helper function to determine if the error is about teacher schedule
- */
-const isTeacherScheduleError = (error: string): boolean => {
-  return error.includes('teacher\'s schedule') || 
-         error.includes('teacher is not available');
-};
-
-/**
  * Component for displaying errors in the teacher selection process
  * @param {ErrorDisplayProps} props - Component props
  * @returns {React.JSX.Element | null} The error display component or null if no errors

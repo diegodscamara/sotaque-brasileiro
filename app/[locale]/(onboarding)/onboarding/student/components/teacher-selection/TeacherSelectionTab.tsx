@@ -59,7 +59,7 @@ export default function TeacherSelectionTab({
     return (
       <Alert>
         <AlertDescription>
-          {t("step2.noTeachersAvailable")}
+          {t("step2.selection.noTeachersAvailable")}
         </AlertDescription>
       </Alert>
     );
@@ -100,7 +100,7 @@ export default function TeacherSelectionTab({
                   <Star className="w-4 h-4" />
                   <span>5.0</span>
                   <span>•</span>
-                  <span>0 {t("step2.reviews")}</span>
+                  <span>0 {t("step2.selection.reviews")}</span>
                 </div>
               </div>
             </div>
@@ -110,11 +110,11 @@ export default function TeacherSelectionTab({
               <div className="flex items-start gap-2">
                 <GraduationCap className="mt-0.5 w-5 h-5 text-muted-foreground" />
                 <div>
-                  <h4 className="font-medium">{t("step2.specialties")}</h4>
+                  <h4 className="font-medium">{t("step2.selection.specialties")}</h4>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {teacher.specialties.map((specialty) => (
                       <Badge key={specialty} variant="secondary">
-                        {t(`specialties.${specialty}`)}
+                        {specialty}
                       </Badge>
                     ))}
                   </div>
@@ -123,11 +123,11 @@ export default function TeacherSelectionTab({
               <div className="flex items-start gap-2">
                 <Globe className="mt-0.5 w-5 h-5 text-muted-foreground" />
                 <div>
-                  <h4 className="font-medium">{t("step2.languages")}</h4>
+                  <h4 className="font-medium">{t("step2.selection.languages")}</h4>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {teacher.languages.map((language) => (
                       <Badge key={language} variant="secondary">
-                        {t(`languages.${language}`)}
+                        {language}
                       </Badge>
                     ))}
                   </div>
@@ -144,7 +144,7 @@ export default function TeacherSelectionTab({
                 handleTeacherSelect(teacher);
               }}
             >
-              {selectedTeacher === teacher ? t("step2.teacherSelected") : t("step2.selectTeacher")}
+              {selectedTeacher === teacher ? t("step2.selection.teacherSelected") : t("step2.selection.selectTeacher")}
             </Button>
           </CardFooter>
         </Card>

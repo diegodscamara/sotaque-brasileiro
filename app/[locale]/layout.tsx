@@ -6,7 +6,6 @@ import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import SupabaseProvider from "../providers/SupabaseProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster"
 import { Viewport } from "next";
@@ -14,6 +13,9 @@ import { getSEOTags } from "@/libs/seo";
 import { notFound } from 'next/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { getTranslations } from 'next-intl/server';
+import { OnboardingProvider } from "@/contexts/onboarding-context";
+import { UserProvider } from "@/contexts/user-context";
+import SupabaseProvider from "../providers/SupabaseProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -144,14 +146,17 @@ export default async function LocaleLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-						<SupabaseProvider>
-							{/* <ScrollProgress className="top-[65px]" /> */}
-							<ClientLayout>{children}</ClientLayout>
-							<Analytics />
-							<SpeedInsights />
-							<Toaster />
-						</SupabaseProvider>
+						<UserProvider>
+							<OnboardingProvider>
+								<SupabaseProvider>
+									{/* <ScrollProgress className="top-[65px]" /> */}
+									<ClientLayout>{children}</ClientLayout>
+									<Analytics />
+									<SpeedInsights />
+									<Toaster />
+								</SupabaseProvider>
+							</OnboardingProvider>
+						</UserProvider>
 					</ThemeProvider>
 				</NextIntlClientProvider>
 			</body>

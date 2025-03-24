@@ -5,6 +5,11 @@ import { prisma } from "@/libs/prisma";
 import { z } from "zod";
 
 import { type ClassData } from "@/types";
+import { 
+  findAvailabilitySlotsForTimeRange, 
+  updateTeacherAvailability,
+  restoreAvailabilityForCancelledClass 
+} from './availability';
 
 const classDataSchema = z.object({
   teacherId: z.string().uuid(),
@@ -19,16 +24,35 @@ const classDataSchema = z.object({
   recurringGroupId: z.string().uuid().optional(),
 });
 
+interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+/**
+ * Maps Prisma Class object to ClassData interface
+ * Converts null values to undefined to match the expected type
+ */
+function mapPrismaClassToClassData(prismaClass: any): ClassData {
+  return {
+    ...prismaClass,
+    notes: prismaClass.notes || undefined,
+    feedback: prismaClass.feedback || undefined,
+    rating: prismaClass.rating || undefined,
+    recurringGroupId: prismaClass.recurringGroupId || undefined
+  };
+}
+
 /**
  * Fetches classes with optional filtering and pagination
  * @param {object} filters - Optional filters for the query
- * @param {object} pagination - Pagination options
+ * @param {PaginationParams} pagination - Pagination options
  * @returns {Promise<{ data: ClassData[], total: number }>} Paginated class data
  */
 export async function fetchClasses(
-  filters = {},
-  pagination = { page: 1, limit: 10 }
-) {
+  filters: object = {},
+  pagination: PaginationParams = { page: 1, limit: 10 }
+): Promise<{ data: ClassData[]; total: number; }> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -113,7 +137,7 @@ export async function fetchClasses(
     ]);
 
     return {
-      data: classes,
+      data: classes.map(mapPrismaClassToClassData),
       total,
     };
   } catch (error) {
@@ -128,7 +152,7 @@ export async function fetchClasses(
  * @param {ClassData} classData - The updated class data
  * @returns {Promise<ClassData>} The updated class data
  */
-export async function editClass(classId: string, classData: ClassData) {
+export async function editClass(classId: string, classData: ClassData): Promise<ClassData> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -215,7 +239,7 @@ export async function editClass(classId: string, classData: ClassData) {
       }
     });
 
-    return updatedClass;
+    return mapPrismaClassToClassData(updatedClass);
   } catch (error) {
     console.error("Error editing class:", error);
     throw error;
@@ -227,7 +251,7 @@ export async function editClass(classId: string, classData: ClassData) {
  * @param {string} classId - The ID of the class to cancel
  * @returns {Promise<ClassData>} The cancelled class data
  */
-export async function cancelClass(classId: string) {
+export async function cancelClass(classId: string): Promise<ClassData> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -316,12 +340,26 @@ export async function cancelClass(classId: string) {
       }
     });
 
+    // Restore teacher availability for the cancelled class time slot
+    try {
+      await restoreAvailabilityForCancelledClass(
+        existingClass.teacherId,
+        existingClass.startDateTime,
+        existingClass.endDateTime
+      );
+      console.log(`Restored availability for teacher ${existingClass.teacherId} after class cancellation`);
+    } catch (error) {
+      console.error("Error restoring teacher availability:", error);
+      // Don't throw the error, as we want the class cancellation to succeed even if restoring availability fails
+    }
+
     // If the class is part of a recurring group and it's in the future, handle it
     if (existingClass.recurringGroupId && existingClass.startDateTime > new Date()) {
       // You could add logic here to handle recurring classes if needed
+      //TODO: Handle recurring classes
     }
 
-    return cancelledClass;
+    return mapPrismaClassToClassData(cancelledClass);
   } catch (error) {
     console.error("Error cancelling class:", error);
     throw error;
@@ -334,12 +372,14 @@ export async function cancelClass(classId: string) {
  * @param {string} classId - The ID of the class to cancel
  * @returns {Promise<ClassData>} The cancelled class data
  */
-export async function cancelPendingClass(classId: string) {
+export async function cancelPendingClass(classId: string): Promise<ClassData> {
   try {
     // Ensure the class exists
     const existingClass = await prisma.class.findUnique({
       where: { id: classId }
     });
+
+    //TODO: Handle checks if the student booked the class
 
     if (!existingClass) {
       throw new Error("Class not found");
@@ -356,7 +396,20 @@ export async function cancelPendingClass(classId: string) {
       data: { status: 'CANCELLED' }
     });
 
-    return cancelledClass;
+    // Restore teacher availability for the cancelled class time slot
+    try {
+      await restoreAvailabilityForCancelledClass(
+        existingClass.teacherId,
+        existingClass.startDateTime,
+        existingClass.endDateTime
+      );
+      console.log(`Restored availability for teacher ${existingClass.teacherId} after pending class cancellation`);
+    } catch (error) {
+      console.error("Error restoring teacher availability during onboarding:", error);
+      // Don't throw the error, as we want the class cancellation to succeed even if restoring availability fails
+    }
+
+    return mapPrismaClassToClassData(cancelledClass);
   } catch (error) {
     console.error("Error cancelling pending class:", error);
     throw error;
@@ -372,7 +425,7 @@ export async function cancelPendingClass(classId: string) {
 export async function scheduleClass(
   classData: ClassData, 
   options: { isOnboarding?: boolean } = {}
-) {
+): Promise<ClassData> {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -453,7 +506,7 @@ export async function scheduleClass(
           // Double-check that this class belongs to the current student
           if (existingClasses[0].studentId === validatedData.studentId) {
             console.log(`Found existing pending class with ID ${existingClasses[0].id} for student ID ${validatedData.studentId}, returning it instead of creating a new one`);
-            return existingClasses[0];
+            return mapPrismaClassToClassData(existingClasses[0]);
           } else {
             console.log(`Found pending class ID ${existingClasses[0].id} but it belongs to student ID ${existingClasses[0].studentId}, not current student ID ${validatedData.studentId}`);
           }
@@ -527,7 +580,30 @@ export async function scheduleClass(
       }
     });
 
-    return newClass;
+    // Update teacher availability for all classes, not just during onboarding
+    try {
+      // Find matching availability slots
+      const availabilitySlots = await findAvailabilitySlotsForTimeRange(
+        validatedData.teacherId,
+        validatedData.startDateTime,
+        validatedData.endDateTime
+      );
+      
+      // Update all matching availability slots to be unavailable
+      for (const slot of availabilitySlots) {
+        await updateTeacherAvailability(slot.id, {
+          ...slot,
+          isAvailable: false,
+          notes: slot.notes ? `${slot.notes} (Reserved for class)` : "Reserved for class"
+        });
+      }
+      console.log(`Updated availability for teacher ${validatedData.teacherId} after scheduling class`);
+    } catch (error) {
+      console.error("Error updating teacher availability:", error);
+      // Don't throw here, as we want the class creation to succeed even if updating availability fails
+    }
+
+    return mapPrismaClassToClassData(newClass);
   } catch (error) {
     console.error("Error scheduling class:", error);
     throw error;

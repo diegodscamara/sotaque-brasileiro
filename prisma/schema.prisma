@@ -49,6 +49,7 @@ model Student {
   subscriptionInfo       String?
   classes                Class[]
   user                   User      @relation("UserStudents", fields: [userId], references: [id])
+  onboardingProgress     OnboardingProgress?
 
   @@index([userId])
 }
@@ -142,6 +143,17 @@ model ErrorLog {
   user         User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+model OnboardingProgress {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId      String   @unique @db.Uuid
+  currentStep    Int      @default(1)
+  completedSteps Int[]
+  lastUpdated    DateTime @default(now()) @updatedAt
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
 }
 
 enum Role {

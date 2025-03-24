@@ -8,6 +8,8 @@ interface UseStepValidationReturn {
   isValid: boolean;
   errorMessage: string | null;
   validateStep: (formData: Step2FormData) => boolean;
+  isReadyToAdvance: boolean;
+  setReadyToAdvance: (ready: boolean) => void;
 }
 
 /**
@@ -17,6 +19,8 @@ interface UseStepValidationReturn {
 export function useStepValidation(): UseStepValidationReturn {
   const [isValid, setIsValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Add a separate state to track if user is ready to advance
+  const [isReadyToAdvance, setReadyToAdvance] = useState(false);
 
   const validateStep = useCallback((formData: Step2FormData): boolean => {
     // Reset validation state
@@ -28,6 +32,13 @@ export function useStepValidation(): UseStepValidationReturn {
       setIsValid(false);
       return false;
     }
+    
+    // Validate date selection
+    if (!formData.selectedDate) {
+      setErrorMessage("Please select a date");
+      setIsValid(false);
+      return false;
+    }
 
     // Validate time slot selection
     if (!formData.selectedTimeSlot) {
@@ -36,14 +47,21 @@ export function useStepValidation(): UseStepValidationReturn {
       return false;
     }
 
-    // All validations passed
+    // All validations passed - but this only means the form is VALID
+    // It doesn't mean the user is ready to advance to the next step
     setIsValid(true);
+    
+    // IMPORTANT: We don't set isReadyToAdvance here.
+    // That will only be set when the user explicitly clicks "Next"
+    
     return true;
   }, []);
 
   return {
     isValid,
     errorMessage,
-    validateStep
+    validateStep,
+    isReadyToAdvance,
+    setReadyToAdvance
   };
 } 
