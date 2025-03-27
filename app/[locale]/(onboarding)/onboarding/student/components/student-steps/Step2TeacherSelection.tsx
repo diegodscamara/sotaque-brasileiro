@@ -68,11 +68,7 @@ export default function Step2TeacherSelection({
 
   // Use step validation hook
   const {
-    isValid,
-    errorMessage,
-    validateStep,
-    isReadyToAdvance,
-    setReadyToAdvance
+    validateStep
   } = useStepValidation();
 
   // Function to fetch teachers with available time slots
@@ -89,7 +85,6 @@ export default function Step2TeacherSelection({
 
       for (const teacher of allTeachers) {
         const now = new Date();
-        const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
         // Check if teacher has any availability in the next 30 days
         const availability = await getTeacherAvailability(
