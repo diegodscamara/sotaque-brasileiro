@@ -2,7 +2,6 @@ import { ReactNode, Suspense } from "react";
 import Header from "@/components/auth/Header";
 import { createClient } from "@/libs/supabase/server";
 import { redirect } from "next/navigation";
-import { Role } from "@prisma/client";
 import { getCurrentUser } from "@/app/actions/users";
 import { getStudent } from "@/app/actions/students";
 import config from "@/config";
