@@ -13,7 +13,7 @@ import { Confetti } from "@/components/ui/confetti";
 
 // Utils and API
 import { createClient } from "@/libs/supabase/client";
-import { getStudent, editStudent } from "@/app/actions/students";
+import { getStudent } from "@/app/actions/students";
 import { editClass, fetchClasses } from "@/app/actions/classes";
 import { prisma } from "@/libs/prisma";
 
