@@ -31,7 +31,6 @@ export default function TeacherSelectionTab({
   selectedTeacher,
   loading,
   handleTeacherSelect,
-  errors,
   t
 }: TeacherSelectionTabProps): React.JSX.Element {
   if (loading) {

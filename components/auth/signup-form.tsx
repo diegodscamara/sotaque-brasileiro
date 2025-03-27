@@ -1,9 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeSlash, Check, X } from "@phosphor-icons/react";
+import { Eye, EyeSlash } from "@phosphor-icons/react";
 import React, { JSX } from "react";
-import { getPasswordStrength, validateEmail, validatePassword } from "@/libs/utils/validation";
+import { validateEmail, validatePassword } from "@/libs/utils/validation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,6 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Progress } from "@/components/ui/progress";
 import PasswordInput from "../ui/password-input";
 
 interface SignUpFormProps {

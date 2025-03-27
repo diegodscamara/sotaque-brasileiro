@@ -45,8 +45,7 @@ export default function StudentOnboarding(): React.JSX.Element {
     completeCurrentStep,
     resetCurrentStep,
     goToStep,
-    isStepCompleted,
-    isStepCurrent
+    isStepCompleted
   } = useOnboarding();
 
   // Form state - memoize initial state

@@ -31,13 +31,11 @@ interface ScheduleTabProps {
 export default function ScheduleTab({
   t,
   formData,
-  errors,
   selectedTeacher,
   selectedDate,
   selectedTimeSlot,
   timeSlots,
   isLoadingTimeSlots,
-  teachers,
   handleDateSelect,
   handleTimeSlotSelect,
   handleInputChange

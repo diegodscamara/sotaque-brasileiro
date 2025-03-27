@@ -5,7 +5,7 @@ import { StudentProfileData } from '@/types/profile';
 import { countries } from '@/data/countries';
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { Gender, genders } from '@/data/genders';
+import { Gender } from '@/data/genders';
 
 interface BasicInfoProps {
   profile: StudentProfileData;
@@ -22,15 +22,15 @@ interface BasicInfoProps {
  * @param onFieldChange - Function to handle field changes
  * @param genderOptions - Available gender options
  */
-export const BasicInfo = ({ 
-  profile, 
-  formData, 
-  onFieldChange, 
-  genderOptions 
+export const BasicInfo = ({
+  profile,
+  formData,
+  onFieldChange,
+  genderOptions
 }: BasicInfoProps) => {
   const t = useTranslations("profile");
   const locale = useLocale() as 'en' | 'es' | 'fr' | 'pt';
-  
+
   return (
     <div>
       <h2 className="mt-4 font-semibold text-base">{t("personalInfo.title")}</h2>

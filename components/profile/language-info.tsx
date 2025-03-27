@@ -5,8 +5,7 @@ import { StudentProfileData } from '@/types/profile';
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { PortugueseLevel, portugueseLevels } from '@/data/portuguese-levels';
-import { LearningGoal, learningGoals } from '@/data/learning-goals';
+import { portugueseLevels } from '@/data/portuguese-levels';
 
 interface LanguageLearningProps {
   profile: StudentProfileData;
@@ -18,20 +17,18 @@ interface LanguageLearningProps {
 /**
  * LanguageLearning component for displaying and editing language learning preferences
  * 
- * @param profile - The user's profile data
  * @param formData - The current form state
  * @param onFieldChange - Function to handle field changes
  * @param languageOptions - Available language options
  */
-export const LanguageLearning = ({ 
-  profile, 
-  formData, 
-  onFieldChange, 
-  languageOptions 
+export const LanguageLearning = ({
+  formData,
+  onFieldChange,
+  languageOptions
 }: LanguageLearningProps) => {
   const t = useTranslations("profile");
   const locale = useLocale() as 'en' | 'es' | 'fr' | 'pt';
-  
+
   return (
     <div>
       <h2 className="mt-4 font-semibold text-base">{t("languageLearning.title")}</h2>
