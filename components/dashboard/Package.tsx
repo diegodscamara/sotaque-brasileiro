@@ -4,14 +4,12 @@ import { Calendar, X } from "@phosphor-icons/react";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { MonthCalendar } from "./calendar/Calendar";
 import { useSupabase } from "@/hooks/useSupabase";
 
 type Package = {
@@ -199,9 +197,6 @@ export default function PackageInfo() {
               >
                 <X className="w-5 h-5" />
               </Button>
-            </div>
-            <div className="h-[calc(100%-60px)] overflow-auto">
-              <MonthCalendar />
             </div>
           </div>
         </div>
