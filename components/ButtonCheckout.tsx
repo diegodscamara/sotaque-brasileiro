@@ -5,12 +5,6 @@ import apiClient from "@/libs/api";
 import { useState } from "react";
 import { toast } from "sonner";
 
-// Define the expected response type
-interface CheckoutResponse {
-  url: string | null;
-  error?: string;
-}
-
 interface ButtonCheckoutProps {
   priceId: string;
   mode?: "payment" | "subscription";
