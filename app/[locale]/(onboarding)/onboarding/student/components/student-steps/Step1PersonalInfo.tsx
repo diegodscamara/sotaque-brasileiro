@@ -47,8 +47,7 @@ const Step1PersonalInfo = ({
     errors,
     handleInputChange,
     handleSelectChange,
-    handleMultiSelectChange,
-    setErrors
+    handleMultiSelectChange
 }: Step1PersonalInfoProps): React.JSX.Element => {
     // Translations
     const t = useTranslations("student.onboarding.step1");
