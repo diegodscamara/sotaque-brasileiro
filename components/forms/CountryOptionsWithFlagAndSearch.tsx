@@ -17,7 +17,6 @@ import { CircleFlag } from "react-circle-flags";
 interface CountryOptionsWithFlagAndSearchProps {
     value: string;
     onChange: (value: string) => void;
-    disabled?: boolean;
     placeholder?: string;
     label?: string;
     options: { label: string; value: string }[];
@@ -27,7 +26,6 @@ export default function CountryOptionsWithFlagAndSearch({
     value,
     onChange,
     options,
-    disabled = false,
     placeholder = "Select country",
     label
 }: CountryOptionsWithFlagAndSearchProps) {
