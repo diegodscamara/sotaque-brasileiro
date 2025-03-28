@@ -15,9 +15,6 @@ import ScheduleTab from "../teacher-selection/ScheduleTab";
 import { TimeSlot, Step2FormData } from "../../types";
 import { TeacherComplete } from "@/types/teacher";
 
-// Hooks
-import { useStepValidation } from "../../hooks/useStepValidation";
-
 // Actions
 import { getTeachers } from "@/app/actions/teachers";
 import { getTeacherAvailability } from "@/app/actions/availability";
@@ -29,10 +26,8 @@ import { fetchClasses, cancelPendingClass } from "@/app/actions/classes";
 interface Step2TeacherSelectionProps {
   formData: Step2FormData;
   errors: Record<string, string>;
-  setIsStepValid?: (isValid: boolean) => void;
   handleInputChange: (name: string, value: any) => void;
   t: ReturnType<typeof useTranslations>;
-  onNextClicked?: () => void;
 }
 
 /**
@@ -43,10 +38,8 @@ interface Step2TeacherSelectionProps {
 export default function Step2TeacherSelection({
   formData,
   errors,
-  setIsStepValid,
   handleInputChange,
-  t,
-  onNextClicked
+  t
 }: Step2TeacherSelectionProps): React.JSX.Element {
   // UI state
   const [activeTab, setActiveTab] = useState<string>("teachers");
@@ -66,15 +59,16 @@ export default function Step2TeacherSelection({
   const [teachersError, setTeachersError] = useState<string | null>(null);
   const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
-  // Use step validation hook
-  const {
-    validateStep
-  } = useStepValidation();
-
   // Function to fetch teachers with available time slots
   const fetchTeachersWithAvailability = useCallback(async () => {
     setIsLoadingTeachers(true);
     setTeachersError(null);
+    setSelectedTeacher(null);
+    setSelectedDate(null);
+    setSelectedTimeSlot(null);
+    handleInputChange("selectedTeacher", null);
+    handleInputChange("selectedDate", null);
+    handleInputChange("selectedTimeSlot", null);
 
     try {
       // Get all teachers
@@ -109,7 +103,7 @@ export default function Step2TeacherSelection({
     } finally {
       setIsLoadingTeachers(false);
     }
-  }, [t]);
+  }, []);
 
   // Function to fetch time slots for a given date and teacher
   const fetchTimeSlots = useCallback(async (date: Date, teacherId: string) => {
@@ -159,14 +153,9 @@ export default function Step2TeacherSelection({
     handleInputChange("selectedDate", null);
     handleInputChange("selectedTimeSlot", null);
 
-    // Update validation
-    if (setIsStepValid) {
-      setIsStepValid(false);
-    }
-
     // Move to the schedule tab
     setActiveTab("schedule");
-  }, [handleInputChange, setIsStepValid]);
+  }, [handleInputChange]);
 
   // Function to handle date selection
   const handleDateSelect = useCallback(async (date: Date) => {
@@ -178,15 +167,9 @@ export default function Step2TeacherSelection({
     // Update the parent form data
     handleInputChange("selectedDate", date);
     handleInputChange("selectedTimeSlot", null);
-
-    // Update validation
-    if (setIsStepValid) {
-      setIsStepValid(false);
-    }
-
     // Fetch time slots for the selected date and teacher
     await fetchTimeSlots(date, selectedTeacher.id);
-  }, [selectedTeacher, fetchTimeSlots, handleInputChange, setIsStepValid]);
+  }, [selectedTeacher, fetchTimeSlots, handleInputChange]);
 
   // Function to handle time slot selection
   const handleTimeSlotSelect = useCallback(async (slot: TimeSlot) => {
@@ -195,41 +178,7 @@ export default function Step2TeacherSelection({
 
     // Update parent form data
     handleInputChange("selectedTimeSlot", slot);
-
-    // Update validation state
-    validateStep({
-      selectedTeacher,
-      selectedDate,
-      selectedTimeSlot: slot,
-      timeZone: formData.timeZone,
-      notes: formData.notes || "",
-      studentId: formData.studentId
-    });
-
-    // Enable the Next button if all data is present
-    if (setIsStepValid) {
-      setIsStepValid(!!selectedTeacher && !!selectedDate && !!slot);
-    }
-  }, [selectedTeacher, selectedDate, validateStep, formData.timeZone, formData.notes, formData.studentId, setIsStepValid, handleInputChange]);
-
-  // Check step validity when data changes
-  useEffect(() => {
-    // Update internal validation
-    validateStep({
-      selectedTeacher,
-      selectedDate,
-      selectedTimeSlot,
-      timeZone: formData.timeZone,
-      notes: formData.notes || "",
-      studentId: formData.studentId
-    });
-
-    // Update parent's isStepValid if we have all required data
-    if (setIsStepValid) {
-      const isValid = !!selectedTeacher && !!selectedDate && !!selectedTimeSlot;
-      setIsStepValid(isValid);
-    }
-  }, [selectedTeacher, selectedDate, selectedTimeSlot, setIsStepValid, formData.timeZone, formData.notes, formData.studentId, validateStep]);
+  }, [selectedTeacher, selectedDate, formData.timeZone, formData.studentId, handleInputChange]);
 
   // Check and clear any pending classes for the student
   useEffect(() => {
@@ -263,11 +212,6 @@ export default function Step2TeacherSelection({
             handleInputChange("selectedTeacher", null);
             handleInputChange("selectedDate", null);
             handleInputChange("selectedTimeSlot", null);
-
-            // Mark the step as not completed
-            if (setIsStepValid) {
-              setIsStepValid(false);
-            }
           }
         } catch (error) {
           console.error("Error handling pending classes:", error);
@@ -282,35 +226,6 @@ export default function Step2TeacherSelection({
   useEffect(() => {
     fetchTeachersWithAvailability();
   }, [fetchTeachersWithAvailability]);
-
-  // Add event listener for parent's "Next" button click
-  useEffect(() => {
-    const handleUpdateParentData = () => {
-      if (selectedTimeSlot && selectedTeacher && selectedDate) {
-        // Ensure all data is present in parent state
-        handleInputChange("selectedTeacher", selectedTeacher);
-        handleInputChange("selectedDate", selectedDate);
-        handleInputChange("selectedTimeSlot", selectedTimeSlot);
-
-        // Call the onNextClicked callback if provided
-        if (onNextClicked) {
-          onNextClicked();
-        }
-      }
-    };
-
-    // Get the step panel element
-    const stepPanel = document.getElementById('step-panel-2');
-    if (stepPanel) {
-      stepPanel.addEventListener('update-parent-data', handleUpdateParentData);
-    }
-
-    return () => {
-      if (stepPanel) {
-        stepPanel.removeEventListener('update-parent-data', handleUpdateParentData);
-      }
-    };
-  }, [selectedTimeSlot, selectedTeacher, selectedDate, handleInputChange, onNextClicked]);
 
   return (
     <motion.div
