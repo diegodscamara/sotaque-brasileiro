@@ -76,6 +76,7 @@ export default function ScheduleTab({
             <div className="gap-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
               {timeSlots.map((slot) => (
                 <Button
+                  type="button"
                   key={slot.id}
                   variant={selectedTimeSlot === slot ? "default" : "outline"}
                   className="w-full"
